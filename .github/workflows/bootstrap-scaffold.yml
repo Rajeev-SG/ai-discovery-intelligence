@@ -1,4 +1,4 @@
-name: Bootstrap scaffold
+name: Bootstrap scaffold retry
 
 on:
   push:
