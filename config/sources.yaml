@@ -1,0 +1,308 @@
+# Public/free evidence catalogue. Paid products/APIs are never required by v1.
+version: 1
+last_reviewed: 2026-09-15
+sources:
+  # Official / primary
+  - id: openai-help-search
+    publisher: OpenAI
+    class: official
+    url: https://help.openai.com/
+    topics: [chatgpt, search, shopping, crawlers, releases]
+    preferred_fetch: sitemap_or_http
+  - id: openai-platform-bots
+    publisher: OpenAI
+    class: official
+    url: https://platform.openai.com/docs/bots
+    topics: [crawlers, user_agents]
+    preferred_fetch: http
+  - id: google-search-central-ai
+    publisher: Google
+    class: official
+    url: https://developers.google.com/search/docs/appearance/ai-features
+    topics: [google_ai_mode, ai_overviews, indexing]
+    preferred_fetch: http
+  - id: google-search-blog
+    publisher: Google
+    class: official
+    url: https://blog.google/products/search/
+    topics: [google_ai_mode, ai_overviews, shopping, search]
+    preferred_fetch: rss_or_http
+  - id: google-gemini-updates
+    publisher: Google
+    class: official
+    url: https://gemini.google.com/updates
+    topics: [gemini, releases]
+    preferred_fetch: http
+  - id: microsoft-copilot-support
+    publisher: Microsoft
+    class: official
+    url: https://support.microsoft.com/copilot
+    topics: [copilot, web_grounding]
+    preferred_fetch: http
+  - id: bing-blogs
+    publisher: Microsoft
+    class: official
+    url: https://blogs.bing.com/
+    topics: [bing, copilot_search, search]
+    preferred_fetch: rss_or_http
+  - id: anthropic-help
+    publisher: Anthropic
+    class: official
+    url: https://support.anthropic.com/
+    topics: [claude, web_search, releases]
+    preferred_fetch: http
+  - id: anthropic-news
+    publisher: Anthropic
+    class: official
+    url: https://www.anthropic.com/news
+    topics: [claude, releases]
+    preferred_fetch: http
+  - id: perplexity-blog
+    publisher: Perplexity
+    class: official
+    url: https://www.perplexity.ai/hub/blog
+    topics: [perplexity, search, shopping, releases]
+    preferred_fetch: http
+  - id: deepseek-docs
+    publisher: DeepSeek
+    class: official
+    url: https://api-docs.deepseek.com/
+    topics: [deepseek, releases]
+    preferred_fetch: http
+  - id: xai-docs
+    publisher: xAI
+    class: official
+    url: https://docs.x.ai/
+    topics: [grok, search]
+    preferred_fetch: http
+  - id: xai-news
+    publisher: xAI
+    class: official
+    url: https://x.ai/news
+    topics: [grok, releases]
+    preferred_fetch: http
+  - id: meta-ai-news
+    publisher: Meta
+    class: official
+    url: https://ai.meta.com/blog/
+    topics: [meta_ai, releases]
+    preferred_fetch: http
+  - id: mistral-news
+    publisher: Mistral AI
+    class: official
+    url: https://mistral.ai/news
+    topics: [le_chat, releases]
+    preferred_fetch: http
+  - id: duckduckgo-help-ai
+    publisher: DuckDuckGo
+    class: official
+    url: https://duckduckgo.com/duckduckgo-help-pages/duckai/
+    topics: [duck_ai]
+    preferred_fetch: http
+  - id: brave-search-ai-help
+    publisher: Brave
+    class: official
+    url: https://search.brave.com/help/ai
+    topics: [brave_search, answer_with_ai]
+    preferred_fetch: http
+  - id: alibaba-qwen-blog
+    publisher: Alibaba/Qwen
+    class: official
+    url: https://qwenlm.github.io/blog/
+    topics: [qwen, china]
+    preferred_fetch: http
+  - id: naver-search-news
+    publisher: NAVER
+    class: official
+    url: https://www.navercorp.com/en/media/pressReleases
+    topics: [naver_ai, korea]
+    preferred_fetch: http
+  - id: yandex-company-news
+    publisher: Yandex
+    class: official
+    url: https://yandex.com/company/news
+    topics: [yandex_ai_search, russia]
+    preferred_fetch: http
+
+  # Free audience / market telemetry
+  - id: similarweb-blog
+    publisher: Similarweb
+    class: market_telemetry
+    url: https://www.similarweb.com/blog/
+    topics: [ai_usage, traffic, referrals, market_share]
+    preferred_fetch: rsshub_or_http
+  - id: similarweb-ai-search
+    publisher: Similarweb
+    class: market_telemetry
+    url: https://aisearch.similarweb.com/blog/
+    topics: [ai_usage, referrals, market_share]
+    preferred_fetch: http
+  - id: statcounter-ai-chatbot
+    publisher: Statcounter
+    class: market_telemetry
+    url: https://gs.statcounter.com/ai-chatbot-market-share
+    topics: [market_share]
+    preferred_fetch: http
+  - id: questmobile-research
+    publisher: QuestMobile
+    class: market_telemetry
+    url: https://www.questmobile.com.cn/research/report-new
+    topics: [china, app_mau, market_share]
+    preferred_fetch: http
+  - id: cloudflare-radar-ai
+    publisher: Cloudflare
+    class: market_telemetry
+    url: https://radar.cloudflare.com/
+    topics: [ai_bots, crawlers, traffic]
+    preferred_fetch: api_or_http
+  - id: cloudflare-blog-ai
+    publisher: Cloudflare
+    class: market_telemetry
+    url: https://blog.cloudflare.com/tag/ai/
+    topics: [ai_bots, crawlers, economics]
+    preferred_fetch: rss_or_http
+  - id: adobe-digital-insights
+    publisher: Adobe
+    class: market_telemetry
+    url: https://business.adobe.com/resources/digital-insights.html
+    topics: [ai_referrals, ecommerce, conversion]
+    preferred_fetch: http
+  - id: datareportal
+    publisher: DataReportal
+    class: market_telemetry
+    url: https://datareportal.com/reports
+    topics: [digital_usage, regional_context]
+    preferred_fetch: http
+
+  # Free research from commercial measurement vendors
+  - id: peec-blog
+    publisher: Peec AI
+    class: visibility_research
+    url: https://peec.ai/blog
+    topics: [citations, fanout, sources, shopping, referrals, geo]
+    preferred_fetch: http
+  - id: profound-research
+    publisher: Profound
+    class: visibility_research
+    url: https://www.tryprofound.com/research
+    topics: [citations, answer_engines, sources, prompts, geo]
+    preferred_fetch: http
+  - id: ahrefs-blog-ai
+    publisher: Ahrefs
+    class: visibility_research
+    url: https://ahrefs.com/blog/
+    topics: [citations, ai_visibility, seo, referrals]
+    preferred_fetch: rss_or_http
+  - id: semrush-blog-ai
+    publisher: Semrush
+    class: visibility_research
+    url: https://www.semrush.com/blog/
+    topics: [citations, ai_visibility, seo, industry_news]
+    preferred_fetch: rss_or_http
+  - id: sistrix-blog
+    publisher: SISTRIX
+    class: visibility_research
+    url: https://www.sistrix.com/blog/
+    topics: [citation_drift, ai_search, seo]
+    preferred_fetch: rss_or_http
+  - id: scrunch-blog
+    publisher: Scrunch AI
+    class: visibility_research
+    url: https://scrunch.com/blog
+    topics: [ai_visibility, agent_experience, case_studies]
+    preferred_fetch: http
+  - id: evertune-resources
+    publisher: Evertune
+    class: visibility_research
+    url: https://www.evertune.ai/resources
+    topics: [ai_visibility, prompts, measurement]
+    preferred_fetch: http
+  - id: seer-ai-research
+    publisher: Seer Interactive
+    class: visibility_research
+    url: https://www.seerinteractive.com/insights
+    topics: [ai_search, seo, conversion]
+    preferred_fetch: http
+
+  # Editorial discovery only; prefer primary source for canonical facts.
+  - id: search-engine-land
+    publisher: Search Engine Land
+    class: editorial_discovery
+    url: https://searchengineland.com/
+    topics: [seo, ai_search, platform_changes]
+    preferred_fetch: rss_or_http
+  - id: search-engine-roundtable
+    publisher: Search Engine Roundtable
+    class: editorial_discovery
+    url: https://www.seroundtable.com/
+    topics: [seo, search_changes]
+    preferred_fetch: rss_or_http
+  - id: search-engine-journal
+    publisher: Search Engine Journal
+    class: editorial_discovery
+    url: https://www.searchenginejournal.com/
+    topics: [seo, ai_search]
+    preferred_fetch: rss_or_http
+
+  # Open discovery/research infrastructure
+  - id: gdelt-doc
+    publisher: GDELT
+    class: open_discovery
+    url: https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/
+    topics: [news_discovery]
+    preferred_fetch: api
+  - id: google-news-rss
+    publisher: Google News
+    class: open_discovery
+    url: https://news.google.com/
+    topics: [news_discovery]
+    preferred_fetch: rss
+  - id: arxiv
+    publisher: arXiv
+    class: open_research
+    url: https://info.arxiv.org/help/api/
+    topics: [research]
+    preferred_fetch: api
+  - id: openalex
+    publisher: OpenAlex
+    class: open_research
+    url: https://docs.openalex.org/
+    topics: [research]
+    preferred_fetch: api
+  - id: crossref
+    publisher: Crossref
+    class: open_research
+    url: https://www.crossref.org/documentation/retrieve-metadata/rest-api/
+    topics: [research_metadata]
+    preferred_fetch: api
+  - id: common-crawl
+    publisher: Common Crawl
+    class: open_research
+    url: https://index.commoncrawl.org/
+    topics: [crawl_history, web_corpus]
+    preferred_fetch: api
+
+  - id: questmobile-source-preference-2026
+    publisher: QuestMobile
+    class: market_telemetry
+    url: https://www.questmobile.com.cn/research/report/2059118379722096641/
+    topics: [china, source_preferences, ai_discovery, brand_information]
+    preferred_fetch: http
+  - id: hakuhodo-ai-search-2026
+    publisher: Hakuhodo DY ONE
+    class: market_telemetry
+    url: https://global.hakuhodody-one.co.jp/en/news/news-releases_202606105959/
+    topics: [japan, consumer_behaviour, ai_search]
+    preferred_fetch: http
+  - id: kakao-kanana-news
+    publisher: Kakao
+    class: official
+    url: https://www.kakaocorp.com/page/detail/12132
+    topics: [kakao, kanana, korea]
+    preferred_fetch: http
+  - id: naver-ai-tab-launch
+    publisher: NAVER
+    class: official
+    url: https://www.navercorp.com/media/pressReleasesDetail?seq=10034442
+    topics: [naver_ai, korea, usage]
+    preferred_fetch: http

@@ -1,0 +1,24 @@
+version: 1
+weekly_brief:
+  target_items: 3
+  hard_max_items: 5
+  allow_zero_items: true
+  minimum_confidence: medium
+  normal_minimum_significance: 3.5
+  watch_item_minimum_significance: 4.5
+include_topics:
+  - consumer_audience_shift
+  - retrieval_or_index_architecture
+  - citation_or_source_ecosystem_shift
+  - shopping_transaction_or_ads
+  - crawler_or_index_policy
+  - referral_conversion_or_measurement
+  - regional_surface_breakout
+exclude_topics:
+  - model_benchmark_only
+  - developer_api_without_consumer_effect
+  - minor_ui_change
+  - generic_geo_tips
+  - unsupported_vendor_promotion
+  - repeated_non_incremental_story
+item_fields: [change, why_it_matters, agency_action, confidence, evidence_ids]

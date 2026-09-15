@@ -1,0 +1,22 @@
+name: Implementation task
+description: Product-backed implementation work
+title: ""
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: What useful user/analyst capability exists when this is done?
+    validations: {required: true}
+  - type: textarea
+    id: proof
+    attributes:
+      label: Required product proof
+      description: Real data/output that will prove completion. Tests alone are insufficient.
+    validations: {required: true}
+  - type: textarea
+    id: oss
+    attributes:
+      label: OSS / adopt-before-build check
+      description: Which adopted components solve the generic parts? Link an ADR if proposing bespoke infrastructure.
+    validations: {required: true}

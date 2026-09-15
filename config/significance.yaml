@@ -1,0 +1,27 @@
+version: 1
+scale: [0, 1, 2, 3, 4, 5]
+dimensions:
+  reach: 0.20
+  commercial_intent: 0.20
+  magnitude: 0.20
+  breadth: 0.15
+  persistence: 0.10
+  actionability: 0.15
+confidence_dimensions:
+  source_authority: 0.20
+  methodology_transparency: 0.15
+  sample_strength: 0.15
+  recency: 0.10
+  geography_fit: 0.10
+  corroboration: 0.20
+  directness: 0.10
+labels:
+  high: [0.85, 1.00]
+  medium_high: [0.70, 0.8499]
+  medium: [0.55, 0.6999]
+  low: [0.00, 0.5499]
+conflict_penalty:
+  unresolved_material_conflict: 0.15
+notes:
+  - Confidence measures evidence quality, not model confidence.
+  - Commercial significance and evidence confidence are independent axes.
