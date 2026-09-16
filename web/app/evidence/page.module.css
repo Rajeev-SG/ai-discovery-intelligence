@@ -1,0 +1,22 @@
+.main { max-width: 1320px; margin: auto; padding: clamp(20px, 4vw, 56px); color: #20332c; }
+.main a { color: #195a43; text-underline-offset: .18em; }
+.main a:focus-visible, .main summary:focus-visible { outline: 3px solid #ad590f; outline-offset: 4px; }
+.header { max-width: 850px; margin: 40px 0 28px; }
+.header h1 { font-size: clamp(2rem, 4vw, 3.3rem); line-height: 1.08; letter-spacing: -.04em; margin: 12px 0 20px; }
+.header p { line-height: 1.6; }
+.eyebrow { text-transform: uppercase; letter-spacing: .1em; font-size: .75rem; font-weight: 700; }
+.summary { border-top: 2px solid #20332c; padding: 16px 0; font-size: .88rem; }
+.feed { list-style: none; margin: 0; padding: 0; }
+.feed li { padding: 28px 0; border-top: 1px solid #bbc8bf; }
+.feed h2 { font-size: 1.3rem; line-height: 1.35; max-width: 900px; margin: 12px 0 20px; }
+.context { display: flex; gap: 10px 24px; flex-wrap: wrap; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; }
+.dates { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 850px; gap: 16px; }
+.main dt { font-size: .78rem; color: #53655c; margin-bottom: 4px; }
+.main dd { margin: 0 0 12px; overflow-wrap: anywhere; }
+.topics { font-size: .85rem; }
+.main details { max-width: 1000px; margin-top: 16px; }
+.main summary { cursor: pointer; padding: 8px 0; width: fit-content; font-weight: 600; }
+.main blockquote { margin: 16px 0; border-left: 3px solid #789884; padding: 4px 18px; line-height: 1.6; }
+.main code { font-size: .8rem; overflow-wrap: anywhere; }
+.notice { padding: 24px; border-left: 4px solid #ad590f; background: #f5eee1; }
+@media (max-width: 600px) { .dates { grid-template-columns: 1fr; gap: 2px; } .header { margin-top: 28px; } }
