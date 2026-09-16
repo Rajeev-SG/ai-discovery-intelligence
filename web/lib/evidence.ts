@@ -35,7 +35,12 @@ export async function loadEvidenceFeed(): Promise<EvidenceFeed> {
     if (body.items.some((item: EvidenceItem) =>
       typeof item.id !== "string" || typeof item.title !== "string" ||
       typeof item.url !== "string" || !/^https?:\/\//i.test(item.url) ||
-      typeof item.capture_hash !== "string" || !Array.isArray(item.topics)
+      typeof item.capture_hash !== "string" || !/^[a-f0-9]{64}$/i.test(item.capture_hash) ||
+      typeof item.source_class !== "string" || typeof item.observed_at !== "string" ||
+      typeof item.validation_status !== "string" || typeof item.is_candidate !== "boolean" ||
+      !Array.isArray(item.topics) || item.topics.some(topic => typeof topic !== "string") ||
+      (item.excerpt !== null && typeof item.excerpt !== "string") ||
+      (item.publisher !== null && typeof item.publisher !== "string")
     )) throw new Error("Evidence service returned an invalid record");
     return { status: "ready", items: body.items, total: body.total };
   } catch {

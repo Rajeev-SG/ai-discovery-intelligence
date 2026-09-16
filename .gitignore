@@ -15,3 +15,5 @@ coverage/
 *.log
 artifacts/
 private-snapshots/
+web/node_modules/
+web/tests/
