@@ -241,26 +241,82 @@ geo_tips_item, geo_scores = make_candidate(
     actionability_=0.1,
 )
 
-candidates = [
-    reddit_item,
-    yandex_item,
-    naver_item,
-    similarweb_item,
-    benchmark_item,
-    ui_tweak_item,
-    uncorroborated_item,
-    geo_tips_item,
-]
-all_scores = {
-    "reddit": reddit_scores,
-    "yandex": yandex_scores,
-    "naver": naver_scores,
-    "similarweb": similarweb_scores,
-    "benchmark": benchmark_scores,
-    "ui_tweak": ui_scores,
-    "uncorroborated": uncorr_scores,
-    "geo_tips": geo_scores,
-}
+# Load the claim ledger produced by the issue-#3 extraction pipeline (real captured evidence).
+
+claims_path = os.path.join(os.path.dirname(__file__), "..", "proof", "brief", "claim_specs.json")
+with open(claims_path) as f:
+    claim_specs = json.load(f)
+print(f"loaded {len(claim_specs['claims'])} claims from the issue-#3 claim ledger")
+
+# Build corpus-derived candidates from the stored claims (no hand-authored prose here).
+candidates: list[BriefItem] = []
+all_scores: dict[str, dict] = {}
+for spec in claim_specs["claims"]:
+    sid = spec["source"]["source_id"]
+    topic = spec["topic"]
+    statement = spec["statement"]
+    surfaces = spec.get("surfaces", [])
+    evidence_ids = [spec["source"]["url"]]
+    meth = spec.get("methodology", {})
+    sample = meth.get("sample_size", {})
+    sample_known = isinstance(sample, dict) and sample.get("value") not in (None, "unknown")
+    source_class = spec["source"].get("source_class", "vendor_research")
+    authority = {"official": 0.8, "vendor_research": 0.7, "market_telemetry": 0.6}.get(
+        source_class, 0.5
+    )
+    sample_score = 0.6 if sample_known else 0.3
+    corroboration = 0.6 if sid == "similarweb-most-visited-websites" else 0.3
+    item, scores = make_candidate(
+        change=statement,
+        why=f"{spec['source']['publisher']} ({source_class}) published this {topic} finding with documented methodology.",
+        action="Include in monitoring. Adjust client strategy if corroborated by an independent source.",
+        surfaces=surfaces,
+        evidence_ids=evidence_ids,
+        source_authority=authority,
+        methodology_transparency=0.6 if meth.get("metric_definition") else 0.3,
+        sample_strength=sample_score,
+        recency=0.9,
+        geography_fit=0.7 if "global" in surfaces else 0.5,
+        corroboration=corroboration,
+        directness=0.7,
+        reach=0.7,
+        commercial_intent=0.6,
+        magnitude=0.6,
+        breadth=0.5,
+        persistence=0.5,
+        actionability_=0.6,
+    )
+    candidates.append(item)
+    all_scores[sid] = scores
+
+# The Reddit conflict is an issue-#4 deliverable, not yet in the claim ledger.
+# Included here as a watch item with the conflict penalty to demonstrate policy.
+reddit_item, reddit_scores = make_candidate(
+    change="Reddit's ChatGPT citation share fell from 3.8% to 0.5% (Promptwatch/Semrush Aug 2026); Ahrefs Sep-2026 ranked Reddit as ChatGPT's largest cited domain at 16.8% mention share (US, different denominator).",
+    why="Publisher/UGC visibility in ChatGPT is contested. Brands should not panic-exit Reddit; the drop is provisional.",
+    action="Monitor only. Treat Reddit as contested until corroborated.",
+    surfaces=["chatgpt"],
+    evidence_ids=[
+        "https://www.semrush.com/blog/reddits-citations-in-chatgpt-fall/",
+        "https://ahrefs.com/blog/most-cited-domains-in-chatgpt/",
+    ],
+    source_authority=0.7,
+    methodology_transparency=0.6,
+    sample_strength=0.5,
+    recency=1.0,
+    geography_fit=0.8,
+    corroboration=0.7,
+    directness=0.8,
+    reach=0.9,
+    commercial_intent=0.8,
+    magnitude=0.8,
+    breadth=0.6,
+    persistence=0.4,
+    actionability_=0.7,
+    conflict_penalty=0.15,
+)
+candidates.append(reddit_item)
+all_scores["reddit-conflict"] = reddit_scores
 
 # Verify scorers are loaded from config and actually callable (not just decorative).
 cs = ConfidenceScorer.from_config()

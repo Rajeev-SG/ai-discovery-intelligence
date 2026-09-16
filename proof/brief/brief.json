@@ -1,126 +1,81 @@
 {
-  "generated_at": "2026-09-16T18:26:38.254616+00:00",
-  "total_candidates": 8,
-  "included": 2,
-  "excluded": 6,
+  "generated_at": "2026-09-16T19:47:10.870658+00:00",
+  "total_candidates": 5,
+  "included": 1,
+  "excluded": 4,
   "scorer_audit": {
-    "reddit": {
+    "similarweb-most-visited-websites": {
+      "confidence_raw": 0.605,
+      "confidence_penalty": 0.0,
+      "confidence_penalised": 0.605,
+      "confidence_label": "medium",
+      "significance": 2.97
+    },
+    "sistrix-ai-citation-drift": {
+      "confidence_raw": 0.59,
+      "confidence_penalty": 0.0,
+      "confidence_penalised": 0.59,
+      "confidence_label": "medium",
+      "significance": 2.97
+    },
+    "yandex-ai-search-pretrain-2026-09": {
+      "confidence_raw": 0.505,
+      "confidence_penalty": 0.0,
+      "confidence_penalised": 0.505,
+      "confidence_label": "low",
+      "significance": 2.97
+    },
+    "naver-ai-tab-launch-2026-06": {
+      "confidence_raw": 0.505,
+      "confidence_penalty": 0.0,
+      "confidence_penalised": 0.505,
+      "confidence_label": "low",
+      "significance": 2.97
+    },
+    "reddit-conflict": {
       "confidence_raw": 0.705,
       "confidence_penalty": 0.15,
       "confidence_penalised": 0.5549999999999999,
       "confidence_label": "medium",
       "significance": 3.68
-    },
-    "yandex": {
-      "confidence_raw": 0.65,
-      "confidence_penalty": 0.0,
-      "confidence_penalised": 0.65,
-      "confidence_label": "medium",
-      "significance": 3.6
-    },
-    "naver": {
-      "confidence_raw": 0.63,
-      "confidence_penalty": 0.0,
-      "confidence_penalised": 0.63,
-      "confidence_label": "medium",
-      "significance": 3.15
-    },
-    "similarweb": {
-      "confidence_raw": 0.62,
-      "confidence_penalty": 0.0,
-      "confidence_penalised": 0.62,
-      "confidence_label": "medium",
-      "significance": 3.4
-    },
-    "benchmark": {
-      "confidence_raw": 0.9,
-      "confidence_penalty": 0.0,
-      "confidence_penalised": 0.9,
-      "confidence_label": "high",
-      "significance": 1.35
-    },
-    "ui_tweak": {
-      "confidence_raw": 0.9,
-      "confidence_penalty": 0.0,
-      "confidence_penalised": 0.9,
-      "confidence_label": "high",
-      "significance": 0.75
-    },
-    "uncorroborated": {
-      "confidence_raw": 0.355,
-      "confidence_penalty": 0.0,
-      "confidence_penalised": 0.355,
-      "confidence_label": "low",
-      "significance": 3.68
-    },
-    "geo_tips": {
-      "confidence_raw": 0.31,
-      "confidence_penalty": 0.0,
-      "confidence_penalised": 0.31,
-      "confidence_label": "low",
-      "significance": 0.65
     }
   },
   "items": [
     {
-      "change": "Reddit's ChatGPT citation share fell from 3.8% (Jul 18–Aug 7) to 0.5% (Aug 14–17) per Promptwatch/Semrush; Ahrefs' Sep-2026 US snapshot subsequently ranked Reddit as ChatGPT's largest cited domain at 16.8% mention share.",
-      "why_it_matters": "Publisher/UGC visibility in ChatGPT is contested. Brands should not panic-exit Reddit as a distribution channel; the drop is provisional and not confirmed by an independent September snapshot.",
-      "agency_action": "Monitor only. Treat Reddit as a contested/possibly-temporary ChatGPT visibility source until corroborated by a second independent dataset with the same denominator.",
+      "change": "Reddit's ChatGPT citation share fell from 3.8% to 0.5% (Promptwatch/Semrush Aug 2026); Ahrefs Sep-2026 ranked Reddit as ChatGPT's largest cited domain at 16.8% mention share (US, different denominator).",
+      "why_it_matters": "Publisher/UGC visibility in ChatGPT is contested. Brands should not panic-exit Reddit; the drop is provisional.",
+      "agency_action": "Monitor only. Treat Reddit as contested until corroborated.",
       "confidence": "medium",
       "significance": 3.68,
       "evidence_ids": [
-        "semrush-reddit-decline-2026-08",
-        "ahrefs-reddit-16-8-sep-2026"
+        "https://www.semrush.com/blog/reddits-citations-in-chatgpt-fall/",
+        "https://ahrefs.com/blog/most-cited-domains-in-chatgpt/"
       ],
       "surfaces": [
         "chatgpt"
-      ],
-      "is_watch_item": false
-    },
-    {
-      "change": "Yandex AI answers exceeded 49M monthly users — the vendor's most widely used generative AI product.",
-      "why_it_matters": "A regionally dominant surface now has material generative-AI reach. Brands with Russia/CIS exposure should treat Yandex AI answers as a first-class discovery surface alongside conventional search.",
-      "agency_action": "For clients with Russia/CIS exposure: include Yandex AI answers in regional search strategy. Monitor-only for global-only accounts.",
-      "confidence": "medium",
-      "significance": 3.6,
-      "evidence_ids": [
-        "yandex-49m-monthly-2026-09"
-      ],
-      "surfaces": [
-        "yandex-search-ai"
       ],
       "is_watch_item": false
     }
   ],
   "excluded_items": [
     {
-      "change": "NAVER AI Tab surpassed 4M cumulative users in ~2 months post-beta; product and p",
-      "significance": 3.15,
+      "change": "Similarweb estimates ChatGPT at ~52.7% of all AI-chatbot web traffic in the mont",
+      "significance": 2.97,
       "confidence": "medium"
     },
     {
-      "change": "Similarweb May-2026 report: ChatGPT share of AI-chatbot web traffic fell from 76",
-      "significance": 3.4,
+      "change": "SISTRIX's 17-week, six-country study of 82,619 prompts found ChatGPT replaces ~7",
+      "significance": 2.97,
       "confidence": "medium"
     },
     {
-      "change": "A new OpenAI model version was released with higher benchmark scores.",
-      "significance": 1.35,
-      "confidence": "high"
-    },
-    {
-      "change": "A minor UI tweak in Gemini's chat layout.",
-      "significance": 0.75,
-      "confidence": "high"
-    },
-    {
-      "change": "A significant new retrieval architecture change was observed in a small, uncorro",
-      "significance": 3.68,
+      "change": "Yandex reports that more than 49 million people use its AI answers in Search eac",
+      "significance": 2.97,
       "confidence": "low"
     },
     {
-      "change": "A generic '10 GEO tips' blog post was published.",
-      "significance": 0.65,
+      "change": "NAVER's AI Tab surpassed 4 million cumulative users in ~2 months of beta, produc",
+      "significance": 2.97,
       "confidence": "low"
     }
   ]
