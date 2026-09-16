@@ -1,5 +1,10 @@
 """Canonical persistence models (SQLAlchemy 2.0).
 
+Dedup model: no unique constraint on (canonical_url, capture_hash); upsert
+semantics in the ingest layer (store.py) enforce idempotency instead.
+Test coverage: tests/test_dedup.py.
+"
+
 PostgreSQL is canonical. Raw snapshots stay private on disk and are referenced
 here only by hash/path. History is append-only: evidence rows are never
 overwritten in place; a new capture creates a new row.

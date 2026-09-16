@@ -1,4 +1,6 @@
 # Public/free evidence catalogue. Paid products/APIs are never required by v1.
+# Acquisition hierarchy: sitemap/RSS → documented API → changedetection.io → Scrapy → Playwright.
+# See issue #2 and ad-platform-intelligence #23 for the rationale.
 version: 1
 last_reviewed: 2026-09-15
 sources:
