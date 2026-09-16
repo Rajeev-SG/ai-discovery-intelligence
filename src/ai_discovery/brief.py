@@ -133,7 +133,7 @@ class BriefGenerator:
         self.normal_min_significance = normal_min_significance
         self.watch_item_min_significance = watch_item_min_significance
 
-    _confidence_rank: dict[ConfidenceLabel, int] = {
+    _confidence_rank: ClassVar[dict[ConfidenceLabel, int]] = {
         ConfidenceLabel.HIGH: 4,
         ConfidenceLabel.MEDIUM_HIGH: 3,
         ConfidenceLabel.MEDIUM: 2,
