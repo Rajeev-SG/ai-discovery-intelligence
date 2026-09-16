@@ -1,0 +1,43 @@
+# Scoped local services for AI Discovery Intelligence.
+# Names/volumes are prefixed ai-discovery-intelligence so nothing collides with
+# other stacks on this machine. Ports bind to 127.0.0.1 only.
+#
+# changedetection.io is the adopted change tripwire (OSS_STACK); it triggers a
+# targeted refresh and is never the canonical store. RSSHub/SearXNG images are
+# intentionally NOT declared here: no route in config/sources.yaml uses them yet
+# (search discovery runs through GDELT + Google News RSS). Add them, pinned to a
+# verified tag or digest, in the change that first configures a consumer.
+name: ai-discovery-intelligence
+
+services:
+  db:
+    # Postgres patch/digest pinning is owned by issue #9 (production deployment).
+    image: postgres:17-alpine
+    container_name: ai-discovery-intelligence-db
+    environment:
+      POSTGRES_USER: ai_discovery
+      POSTGRES_PASSWORD: ai_discovery
+      POSTGRES_DB: ai_discovery
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - ai-discovery-intelligence-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ai_discovery -d ai_discovery"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  # Change tripwire: docker compose --profile tripwire up -d changedetection
+  changedetection:
+    image: ghcr.io/dgtlmoon/changedetection.io:0.49.8
+    container_name: ai-discovery-intelligence-changedetection
+    profiles: ["tripwire"]
+    ports:
+      - "127.0.0.1:55001:5000"
+    volumes:
+      - ai-discovery-intelligence-changedetection:/datastore
+
+volumes:
+  ai-discovery-intelligence-db:
+  ai-discovery-intelligence-changedetection:
