@@ -7,8 +7,8 @@
     "final_url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
     "content_type": "text/html; charset=utf-8",
     "bytes": 408906,
-    "raw_sha256": "0e14ec71713a58c5a57260db2506ad46d60b3ea3ac6bd91319cc293e722db446",
-    "fetched_at": "2026-09-16T17:26:50.414991+00:00"
+    "raw_sha256": "d2d07cb3a167ff202e1fa571717c54e49f87bd4249b87bd033d6622ec736ebad",
+    "fetched_at": "2026-09-16T21:01:10.277454+00:00"
   },
   "sistrix-ai-citation-drift": {
     "url": "https://www.sistrix.com/blog/ai-citation-drift-how-stable-are-sources-in-ai-search-results/",
@@ -18,8 +18,8 @@
     "final_url": "https://www.sistrix.com/blog/ai-citation-drift-how-stable-are-sources-in-ai-search-results/",
     "content_type": "text/html; charset=UTF-8",
     "bytes": 116865,
-    "raw_sha256": "3aa63e617aff80e0d81787572be90269cac3e92ddc4c8e0251a41ab5d524fc52",
-    "fetched_at": "2026-09-16T17:26:50.874912+00:00"
+    "raw_sha256": "083fe311267285a0302f4316e2bd07ec9da48ec6c0dc9a6e3e5023b56b3d5066",
+    "fetched_at": "2026-09-16T21:01:10.765410+00:00"
   },
   "yandex-ai-search-pretrain-2026-09": {
     "url": "https://yandex.com/company/news/2026-09-14-01",
@@ -29,8 +29,8 @@
     "final_url": "https://yandex.com/company/news/2026-09-14-01",
     "content_type": "text/html; charset=utf-8",
     "bytes": 42105,
-    "raw_sha256": "32bdc4d94256a43b3548e0b4503c380cc06692aff3808e6ccf9314d88b9eabd0",
-    "fetched_at": "2026-09-16T17:26:51.276199+00:00"
+    "raw_sha256": "07ecca933da0b015ec9dda4a273eca6ea5cc97a3dac53692b4a52ab3d94f7412",
+    "fetched_at": "2026-09-16T21:01:11.257653+00:00"
   },
   "naver-ai-tab-launch-2026-06": {
     "url": "https://www.navercorp.com/media/pressReleasesDetail?seq=10034442",
@@ -41,6 +41,127 @@
     "content_type": "text/html; charset=utf-8",
     "bytes": 96454,
     "raw_sha256": "bfe34667e199e320459131de77c95541ac278168e4314f0c2489b751bd3e41ec",
-    "fetched_at": "2026-09-16T17:26:52.868235+00:00"
+    "fetched_at": "2026-09-16T21:01:13.082458+00:00"
+  },
+  "openai-platform-bots": {
+    "url": "https://platform.openai.com/docs/bots",
+    "canonical_url": "https://platform.openai.com/docs/bots",
+    "publisher": "OpenAI",
+    "http_status": 200,
+    "final_url": "https://developers.openai.com/api/docs/bots",
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 327517,
+    "raw_sha256": "bdfc311d0ebb6c0bab9fbfa89ee8f2d940a4140d5cb43d50f4ff4b30e9b26ab0",
+    "fetched_at": "2026-09-16T21:01:13.716630+00:00"
+  },
+  "google-search-central-ai": {
+    "url": "https://developers.google.com/search/docs/appearance/ai-features",
+    "canonical_url": "https://developers.google.com/search/docs/appearance/ai-features",
+    "publisher": "Google",
+    "http_status": 200,
+    "final_url": "https://developers.google.com/search/docs/appearance/ai-features",
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 179611,
+    "raw_sha256": "081497c6cc91a542127ca1f2d04aa4b8a79886adf1dd79e3b08351da16938984",
+    "fetched_at": "2026-09-16T21:01:14.291020+00:00"
+  },
+  "xai-docs": {
+    "url": "https://docs.x.ai/docs/overview",
+    "canonical_url": "https://docs.x.ai/docs/overview",
+    "publisher": "xAI",
+    "http_status": 200,
+    "final_url": "https://docs.x.ai/overview",
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 531526,
+    "raw_sha256": "6f29e7962d3e610666140db3a0bbad94cdc8662a4e78378dece6a2f565488d5f",
+    "fetched_at": "2026-09-16T21:01:14.772821+00:00"
+  },
+  "alibaba-qwen-blog": {
+    "url": "https://qwenlm.github.io/blog/",
+    "canonical_url": "https://qwenlm.github.io/blog/",
+    "publisher": "Alibaba Qwen",
+    "http_status": 200,
+    "final_url": "https://qwenlm.github.io/blog/",
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 13828,
+    "raw_sha256": "ea6345e313611b786c3a13b418128385d677cdd7b50609353654ff48025a7ab9",
+    "fetched_at": "2026-09-16T21:01:15.029555+00:00"
+  },
+  "ahrefs-blog-ai": {
+    "url": "https://ahrefs.com/blog/why-chatgpt-cites-pages/",
+    "canonical_url": "https://ahrefs.com/blog/why-chatgpt-cites-pages/",
+    "publisher": "Ahrefs",
+    "http_status": 200,
+    "final_url": "https://ahrefs.com/blog/why-chatgpt-cites-pages/",
+    "content_type": "text/html; charset=UTF-8",
+    "bytes": 902148,
+    "raw_sha256": "2c939c6fe994033e65e3df4e2de1c903e6e8c6553689519b26610eee1095efb9",
+    "fetched_at": "2026-09-16T21:01:15.329889+00:00"
+  },
+  "peec-blog": {
+    "url": "https://peec.ai/blog",
+    "canonical_url": "https://peec.ai/blog",
+    "publisher": "Peec AI",
+    "http_status": 200,
+    "final_url": "https://peec.ai/blog",
+    "content_type": "text/html",
+    "bytes": 757394,
+    "raw_sha256": "2ac92bb4e92e1e962ec59f595c88519413fe80ac5863f2d5b35fd8b1152b0492",
+    "fetched_at": "2026-09-16T21:01:15.684420+00:00"
+  },
+  "semrush-blog-ai": {
+    "url": "https://www.semrush.com/blog/",
+    "canonical_url": "https://www.semrush.com/blog/",
+    "publisher": "Semrush",
+    "http_status": 200,
+    "final_url": "https://www.semrush.com/blog/",
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 272017,
+    "raw_sha256": "3d0bb8cb7d75890746fc623098994b580376abbb0465dd552acd270ccac3e810",
+    "fetched_at": "2026-09-16T21:01:16.374077+00:00"
+  },
+  "sistrix-blog": {
+    "url": "https://www.sistrix.com/blog/",
+    "canonical_url": "https://www.sistrix.com/blog/",
+    "publisher": "SISTRIX",
+    "http_status": 200,
+    "final_url": "https://www.sistrix.com/blog/",
+    "content_type": "text/html; charset=UTF-8",
+    "bytes": 91061,
+    "raw_sha256": "b278448b8277f2bcf3230e55e8a3b85ee3f28f61faacbd85710e6a4e64d8040b",
+    "fetched_at": "2026-09-16T21:01:16.966446+00:00"
+  },
+  "statcounter-ai-chatbot": {
+    "url": "https://gs.statcounter.com/ai-chatbot-market-share",
+    "canonical_url": "https://gs.statcounter.com/ai-chatbot-market-share",
+    "publisher": "Statcounter",
+    "http_status": 200,
+    "final_url": "https://gs.statcounter.com/ai-chatbot-market-share",
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 88344,
+    "raw_sha256": "a0944d6803d9eccefd0942a03fad5d5e0b05d21a3fc9beb70a43b8e87ba46f89",
+    "fetched_at": "2026-09-16T21:01:17.778997+00:00"
+  },
+  "cloudflare-blog-ai": {
+    "url": "https://blog.cloudflare.com/tag/ai/",
+    "canonical_url": "https://blog.cloudflare.com/tag/ai/",
+    "publisher": "Cloudflare",
+    "http_status": 200,
+    "final_url": "https://blog.cloudflare.com/tag/ai/",
+    "content_type": "text/html",
+    "bytes": 180263,
+    "raw_sha256": "29b22062bd3efcaf8cfb8eb2f3f9e9674816e3d6003c299224ccd2d3fa042402",
+    "fetched_at": "2026-09-16T21:01:17.966914+00:00"
+  },
+  "search-engine-journal": {
+    "url": "https://www.searchenginejournal.com/",
+    "canonical_url": "https://www.searchenginejournal.com/",
+    "publisher": "Search Engine Journal",
+    "http_status": 200,
+    "final_url": "https://www.searchenginejournal.com/",
+    "content_type": "text/html; charset=UTF-8",
+    "bytes": 398726,
+    "raw_sha256": "4f69fdcf530d64a1895a015d121cc3261e08daac62cecd171ad0c408c45cfe12",
+    "fetched_at": "2026-09-16T21:01:18.256588+00:00"
   }
 }
