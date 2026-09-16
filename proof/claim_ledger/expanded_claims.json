@@ -1,0 +1,3913 @@
+[
+  {
+    "claim_id": "b3ab565f9b1437ef0ef461c23c72bb6f",
+    "topic": "audience_usage",
+    "statement": "Similarweb estimates ChatGPT at ~52.7% of all AI-chatbot web traffic in the month before the May 2026 update, down from 76.4% twelve months earlier, with Gemini at 27.3% and Claude at 8.9%.",
+    "surfaces": [
+      "chatgpt",
+      "gemini",
+      "claude",
+      "deepseek-chat"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "medium",
+    "source": {
+      "source_id": "similarweb-most-visited-websites",
+      "publisher": "Similarweb",
+      "url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+      "canonical_url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+      "source_class": "vendor_research"
+    },
+    "dates": {
+      "published_at": "2026-05-14T00:00:00+00:00",
+      "published_at_source": "datePublished",
+      "modified_at": "2026-06-11T00:00:00+00:00",
+      "measured_window": "~Apr 2026",
+      "observed_at": "2026-09-16T12:00:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "vendor_estimate",
+      "metric_family": "share of measured AI-chatbot web traffic",
+      "denominator": "all AI chatbot web traffic (visits), worldwide",
+      "prompt_universe": null,
+      "sample_size": null,
+      "unit_of_analysis": "domain-level monthly visits (estimated)",
+      "time_window": "~Apr 2026 (the month before the 14 May 2026 update)",
+      "geography": null,
+      "geography_basis": "not_stated",
+      "language": null,
+      "language_basis": "not_stated",
+      "limitations": [
+        "Estimates, rounded, and modelled - not a measured census.",
+        "Visit-share denominator, not users/MAU; not comparable to panel market-share trackers."
+      ],
+      "methodology_notes": "Similarweb combines opt-in device/panel measurement, ISP data, public data sources, and machine-learning models."
+    },
+    "metrics": [
+      {
+        "metric_id": "chatgpt_prior_share",
+        "label": "ChatGPT share twelve months earlier",
+        "comparator": "share_of_total",
+        "definition": "ChatGPT's share of all AI-chatbot web traffic one year before",
+        "value_text": "76.4",
+        "value_number": 76.4,
+        "unit": "%",
+        "window": "~Apr 2025 (12 months before measurement)",
+        "scope": "worldwide, all AI chatbots"
+      },
+      {
+        "metric_id": "chatgpt_share",
+        "label": "ChatGPT share of AI-chatbot web traffic",
+        "comparator": "share_of_total",
+        "definition": "ChatGPT's share of all AI-chatbot web traffic",
+        "value_text": "52.7",
+        "value_number": 52.7,
+        "unit": "%",
+        "window": "~Apr 2026",
+        "scope": "worldwide, all AI chatbots"
+      },
+      {
+        "metric_id": "deepseek_visits",
+        "label": "DeepSeek chat visits",
+        "comparator": "approx",
+        "definition": "Estimated monthly visits to chat.deepseek.com",
+        "value_text": "375.1M",
+        "value_number": null,
+        "unit": "visits",
+        "window": "May 2026",
+        "scope": "worldwide (rank #82)"
+      },
+      {
+        "metric_id": "gemini_share",
+        "label": "Gemini share of AI-chatbot web traffic",
+        "comparator": "share_of_total",
+        "definition": "Gemini's share of AI-chatbot web traffic",
+        "value_text": "27.3",
+        "value_number": 27.3,
+        "unit": "%",
+        "window": "~Apr 2026",
+        "scope": "worldwide, AI chatbots"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "falling from 76.4% of all AI chatbot web traffic",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "around 52.7% one month ago",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "52.7%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "one month ago",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "all AI chatbot web traffic",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "falling from 76.4% of all AI chatbot web traffic 12 months ago",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "76.4% of all AI chatbot web traffic 12 months ago",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "76.4%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "12 months ago",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "all AI chatbot web traffic",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Gemini has taken the largest share of that ground, rising from roughly 9% to 27.3%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "rising from roughly 9% to 27.3% over the same period",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "27.3%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "over the same period",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "the same period",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[3].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "chat.deepseek.com 375.1M",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[3].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "chat.deepseek.com 375.1M",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[3].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "Monthly Visits",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[3].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "monthly visits in May 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[3].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "chat.deepseek.com 375.1M",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "falling from 76.4% of all AI chatbot web traffic",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "ChatGPT's web traffic share fell from 76.4% one year ago to around 52.7% one month ago.",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "falling from 76.4% of all AI chatbot web traffic 12 months ago to around 52.7% one month ago",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "# Domain Monthly Visits MoM traffic change Yearly Change",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "around 52.7% one month ago",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.devices",
+        "locator_kind": "verbatim_quote",
+        "quote": "Our methodology covers both desktop and mobile web.",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "Similarweb estimates monthly visits using a combination of direct measurement from opt-in devices and panels, ISP data, public data sources, and machine learning models.",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "dates.published_at",
+        "locator_kind": "jsonld_field",
+        "quote": null,
+        "selector": "datePublished",
+        "note": null
+      },
+      {
+        "field_path": "dates.modified_at",
+        "locator_kind": "jsonld_field",
+        "quote": null,
+        "selector": "dateModified",
+        "note": null
+      },
+      {
+        "field_path": "dates.measured_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "one month ago",
+        "selector": null,
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "77014d384c935969d90bedba93fe24dabd6020836033736fca5cd43969dfb35b",
+        "raw_sha256": "d2d07cb3a167ff202e1fa571717c54e49f87bd4249b87bd033d6622ec736ebad",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:01:10.277454+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "similarweb_visit_share_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "811a077fd62e9309d4c354664ed1f712",
+    "topic": "citations_sources",
+    "statement": "SISTRIX's 17-week, six-country study of 82,619 prompts found ChatGPT replaces ~74% of its cited sources week to week and Google AI Mode ~56%, with Google AI Mode churn a consistent 54-59% across all six countries.",
+    "surfaces": [
+      "chatgpt",
+      "google-ai-mode"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "medium",
+    "source": {
+      "source_id": "sistrix-ai-citation-drift",
+      "publisher": "SISTRIX",
+      "url": "https://www.sistrix.com/blog/ai-citation-drift-how-stable-are-sources-in-ai-search-results/",
+      "canonical_url": "https://www.sistrix.com/blog/ai-citation-drift-how-stable-are-sources-in-ai-search-results/",
+      "source_class": "vendor_research"
+    },
+    "dates": {
+      "published_at": "2026-05-01T00:00:00+00:00",
+      "published_at_source": "datePublished",
+      "modified_at": "2026-05-12T00:00:00+00:00",
+      "measured_window": "17 weeks up to ~Apr 2026",
+      "observed_at": "2026-09-16T12:05:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "vendor_panel",
+      "metric_family": "weekly source/citation churn",
+      "denominator": "cited sources in AI-generated responses, week over week",
+      "prompt_universe": "82,619 prompts across six countries",
+      "sample_size": "82,619 prompts; 17 weeks",
+      "unit_of_analysis": "cited source/domain per weekly prompt set",
+      "time_window": "17 weeks (study period, published May 2026)",
+      "geography": "six countries incl. US, Germany, UK, France",
+      "geography_basis": "source_stated",
+      "language": "English-language report",
+      "language_basis": "inferred",
+      "limitations": [
+        "Vendor panel (SISTRIX data); prompt selection method not published in the article.",
+        "Country-level ChatGPT churn varies (Germany 74%, UK 60%, France 42%); do not generalise one country."
+      ],
+      "methodology_notes": "Weekly comparison of the source set per prompt; 'drift' = sources swapped out week to week."
+    },
+    "metrics": [
+      {
+        "metric_id": "chatgpt_weekly_churn",
+        "label": "ChatGPT weekly source churn",
+        "comparator": "exact",
+        "definition": "% of ChatGPT sources replaced each week",
+        "value_text": "74%",
+        "value_number": null,
+        "unit": "%",
+        "window": "per week over 17 weeks",
+        "scope": "ChatGPT, six countries"
+      },
+      {
+        "metric_id": "google_ai_mode_country_range",
+        "label": "Google AI Mode weekly churn range across countries",
+        "comparator": "exact",
+        "definition": "country-level weekly churn range",
+        "value_text": "54-59%",
+        "value_number": null,
+        "unit": "%",
+        "window": "weekly, 17 weeks",
+        "scope": "Google AI Mode, six countries incl. US and Germany"
+      },
+      {
+        "metric_id": "google_ai_mode_weekly_churn",
+        "label": "Google AI Mode weekly source churn",
+        "comparator": "exact",
+        "definition": "% of Google AI Mode sources replaced each week",
+        "value_text": "56%",
+        "value_number": null,
+        "unit": "%",
+        "window": "per week over 17 weeks",
+        "scope": "Google AI Mode, six countries"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "ChatGPT replaces as much as 74%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "ChatGPT replaces as much as 74%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "74%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "every week",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "ChatGPT replaces as much as 74%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Google replaces 56% of sources",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "Google replaces 56% of sources in AI-generated responses every week",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "56%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "every week",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "Google replaces 56% of sources",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "drift rates in Google AI Mode are remarkably consistent across all six countries studied",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "Drift rates remain consistently at 54-59% across six countries",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "54-59%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "over the 17-week period",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "not a phenomenon specific to the US or Germany",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "Citation drift is global and persistent",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Google replaces 56% of sources in AI-generated responses every week",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "replaces 56% of sources in AI-generated responses every week",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.prompt_universe",
+        "locator_kind": "verbatim_quote",
+        "quote": "Our analysis of 82,619 prompts over 17 weeks",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.sample_size",
+        "locator_kind": "verbatim_quote",
+        "quote": "Our analysis of 82,619 prompts over 17 weeks",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "sources in AI-generated responses",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "over 17 weeks",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.geography",
+        "locator_kind": "verbatim_quote",
+        "quote": "covering three platforms , six countries and 17 weeks",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.language",
+        "locator_kind": "jsonld_field",
+        "quote": null,
+        "selector": "inLanguage=en-US (article JSON-LD)",
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "We took a closer look at the issue using SISTRIX data , covering three platforms , six countries and 17 weeks",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "dates.published_at",
+        "locator_kind": "jsonld_field",
+        "quote": null,
+        "selector": "datePublished",
+        "note": null
+      },
+      {
+        "field_path": "dates.modified_at",
+        "locator_kind": "jsonld_field",
+        "quote": null,
+        "selector": "dateModified",
+        "note": null
+      },
+      {
+        "field_path": "dates.measured_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "over 17 weeks",
+        "selector": null,
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "3395672633be8856e57758c04b113edb80344bc18fb9cc6599a0efbb943d8e98",
+        "raw_sha256": "083fe311267285a0302f4316e2bd07ec9da48ec6c0dc9a6e3e5023b56b3d5066",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:01:10.765410+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "sistrix_citation_drift_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "ed8996433be34fff1fc7a302a03d1d8c",
+    "topic": "audience_usage",
+    "statement": "Yandex reports that more than 49 million people use its AI answers in Search each month, making it Yandex's most widely used generative AI product (press release, 14 Sep 2026).",
+    "surfaces": [
+      "yandex-ai-search"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "low",
+    "source": {
+      "source_id": "yandex-ai-search-pretrain-2026-09",
+      "publisher": "Yandex",
+      "url": "https://yandex.com/company/news/2026-09-14-01",
+      "canonical_url": "https://yandex.com/company/news/2026-09-14-01",
+      "source_class": "press_release"
+    },
+    "dates": {
+      "published_at": "2026-09-14T00:00:00+00:00",
+      "published_at_source": "page stamp 'September 14, 2026'",
+      "modified_at": null,
+      "measured_window": "each month (no named measurement month)",
+      "observed_at": "2026-09-16T12:10:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "press_release",
+      "metric_family": "monthly feature usage",
+      "denominator": "monthly users of the AI answers feature within Yandex Search",
+      "prompt_universe": null,
+      "sample_size": null,
+      "unit_of_analysis": "people (feature users), not app MAU and not all search users",
+      "time_window": "each month (no named measurement month; published Sep 2026)",
+      "geography": "Russia / Russian-language Yandex ecosystem",
+      "geography_basis": "source_stated",
+      "language": "Russian",
+      "language_basis": "source_stated",
+      "limitations": [
+        "Vendor press release; no sample, panel or measurement method published.",
+        "Measured month is not named - only 'each month' at publication."
+      ],
+      "methodology_notes": "Company-stated usage figure in a press release about open-sourcing the model behind the feature."
+    },
+    "metrics": [
+      {
+        "metric_id": "monthly_ai_answer_users",
+        "label": "Monthly users of Yandex AI answers in Search",
+        "comparator": "at_least",
+        "definition": "people using AI answers in Yandex Search per month",
+        "value_text": "49000000.0",
+        "value_number": 49000000.0,
+        "unit": "people (monthly)",
+        "window": "each month (unnamed)",
+        "scope": "Yandex Search AI answers feature"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "use the feature each month",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "More than 49 million people use the feature each month",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "49 million people",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "each month",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "the feature each month",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "use the feature each month",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "use the feature each month",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "More than 49 million people use the feature each month",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "Yandex's most widely used generative AI product",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "each month",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.geography",
+        "locator_kind": "verbatim_quote",
+        "quote": "blind tests of Russian-language answer quality",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.language",
+        "locator_kind": "verbatim_quote",
+        "quote": "Russian-language answer quality",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "Yandex has open-sourced Alice AI Search Pretrain",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "dates.published_at",
+        "locator_kind": "jsonld_field",
+        "quote": null,
+        "selector": "page stamp 'September 14, 2026'",
+        "note": null
+      },
+      {
+        "field_path": "dates.measured_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "each month",
+        "selector": null,
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "8935ebb3773ba88376237ab50caac5174e322a000e94fb4dc548069ae7680d8e",
+        "raw_sha256": "07ecca933da0b015ec9dda4a273eca6ea5cc97a3dac53692b4a52ab3d94f7412",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:01:11.257653+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "yandex_feature_usage_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "11c44269d92b5326c8174dc4566aa546",
+    "topic": "referrals_conversion",
+    "statement": "NAVER's AI Tab surpassed 4 million cumulative users in ~2 months of beta, product and place card CTR exceeded 20%, and it is built on a model for NAVER's service environment which averages 50 million daily visitors (press release, 26 Jun 2026).",
+    "surfaces": [
+      "naver-ai"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "low",
+    "source": {
+      "source_id": "naver-ai-tab-launch-2026-06",
+      "publisher": "NAVER",
+      "url": "https://www.navercorp.com/media/pressReleasesDetail?seq=10034442",
+      "canonical_url": "https://www.navercorp.com/media/pressReleasesDetail?seq=10034442",
+      "source_class": "press_release"
+    },
+    "dates": {
+      "published_at": "2026-06-26T00:00:00+00:00",
+      "published_at_source": "page stamp '2026.06.26'",
+      "modified_at": null,
+      "measured_window": "Apr-Jun 2026 (~2-month beta)",
+      "observed_at": "2026-09-16T12:15:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "press_release",
+      "metric_family": "cumulative users and card click-through rate",
+      "denominator": "cumulative beta users (~2 months) and card CTR during beta - distinct denominators",
+      "prompt_universe": null,
+      "sample_size": null,
+      "unit_of_analysis": "users and card impressions (three separate quantities kept apart)",
+      "time_window": "~2 months post-Apr 2026 beta, to 26 Jun 2026 launch",
+      "geography": "South Korea (navercorp.com press release, Korean-language page)",
+      "geography_basis": "publisher_scope",
+      "language": "Korean",
+      "language_basis": "source_stated",
+      "limitations": [
+        "Vendor press release; no sample or measurement method published.",
+        "The '50 million daily visitors' is the NAVER main page, not AI Tab users - must not be merged."
+      ],
+      "methodology_notes": "Company-stated beta metrics in a launch press release; three quantities with different denominators."
+    },
+    "metrics": [
+      {
+        "metric_id": "card_ctr",
+        "label": "Product/place card click-through rate",
+        "comparator": "at_least",
+        "definition": "CTR for product and place cards during beta",
+        "value_text": ">20%",
+        "value_number": null,
+        "unit": "%",
+        "window": "beta period",
+        "scope": "product and place cards"
+      },
+      {
+        "metric_id": "cumulative_users",
+        "label": "AI Tab cumulative beta users",
+        "comparator": "at_least",
+        "definition": "cumulative users in ~2 months of beta",
+        "value_text": "4000000.0",
+        "value_number": 4000000.0,
+        "unit": "people (cumulative)",
+        "window": "~2 months of beta (Apr-Jun 2026)",
+        "scope": "NAVER Plus Membership beta users"
+      },
+      {
+        "metric_id": "main_page_daily_visitors",
+        "label": "NAVER main page average daily visitors",
+        "comparator": "approx",
+        "definition": "average daily visitors to NAVER's main page (not AI Tab users)",
+        "value_text": "50000000.0",
+        "value_number": 50000000.0,
+        "unit": "visitors per day",
+        "window": "period not stated",
+        "scope": "NAVER main page / service environment"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Surpassed 4 million cumulative users in two months after beta launch",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "surpassed 4 million cumulative users in about two months",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "4 million cumulative users",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "in about two months",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "for NAVER Plus Membership users",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "click-through rates (CTR) for both product and place cards",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "click-through rates (CTR) for both product and place cards exceeded 20%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "20%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "During the beta period",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "both product and place cards",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "which receives an average of 50 million daily visitors",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "which receives an average of 50 million daily visitors",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "daily visitors",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "receives an average of",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "NAVER's service environment, which receives an average of 50 million daily visitors",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "Surpassed 4 million cumulative users",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "click-through rates (CTR) for both product and place cards exceeded 20%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "surpassed 4 million cumulative users in about two months",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "which receives an average of 50 million daily visitors",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "in about two months",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.geography",
+        "locator_kind": "verbatim_quote",
+        "quote": "NAVER Officially Launches AI Tab",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.language",
+        "locator_kind": "jsonld_field",
+        "quote": null,
+        "selector": "document element lang=ko",
+        "note": null
+      },
+      {
+        "field_path": "methodology.devices",
+        "locator_kind": "verbatim_quote",
+        "quote": "one click from the mobile and PC search bars",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Tab, which launched in beta in April for NAVER Plus Membership users, surpassed 4 million cumulative users in about two months.",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "dates.published_at",
+        "locator_kind": "jsonld_field",
+        "quote": null,
+        "selector": "page stamp '2026.06.26'",
+        "note": null
+      },
+      {
+        "field_path": "dates.measured_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "in about two months",
+        "selector": null,
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "9219f54652db26f8c64ccbc3d13cba3df941059fd8f69d945ed1b1a81948323c",
+        "raw_sha256": "bfe34667e199e320459131de77c95541ac278168e4314f0c2489b751bd3e41ec",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:01:13.082458+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "naver_ai_tab_beta_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "48787b31df75a8666098b2fc4be73167",
+    "topic": "crawler_index_policy",
+    "statement": "OpenAI uses two independent robots.txt controls for AI: OAI-SearchBot, which surfaces sites in ChatGPT search results, and GPTBot, which governs generative-AI training. A site can allow one while disallowing the other.",
+    "surfaces": [
+      "chatgpt"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "high",
+    "source": {
+      "source_id": "openai-platform-bots",
+      "publisher": "OpenAI",
+      "url": "https://platform.openai.com/docs/bots",
+      "canonical_url": "https://platform.openai.com/docs/bots",
+      "source_class": "official"
+    },
+    "dates": {
+      "published_at": null,
+      "published_at_source": null,
+      "modified_at": null,
+      "measured_window": null,
+      "observed_at": "2026-09-16T21:55:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "official_documentation",
+      "metric_family": "OpenAI uses OAI-SearchBot and GPTBot robots.txt tags to enable webmasters to manage how their sites and content work with AI.",
+      "denominator": "enable webmasters to manage how their sites and content work with AI",
+      "prompt_universe": null,
+      "sample_size": null,
+      "unit_of_analysis": "OAI-SearchBot is used to surface websites in search results in ChatGPT's search features.",
+      "time_window": "User agent Description & details",
+      "geography": null,
+      "geography_basis": "not_stated",
+      "language": null,
+      "language_basis": "not_stated",
+      "limitations": [
+        "Documents stated crawler policy, not observed crawl frequency."
+      ],
+      "methodology_notes": "OpenAI uses OAI-SearchBot and GPTBot robots.txt tags to enable webmasters to manage how their sites and content work with AI."
+    },
+    "metrics": [
+      {
+        "metric_id": "openai_search_vs_training",
+        "label": "Search and training opt-out are independent",
+        "comparator": "policy_statement",
+        "definition": "Each setting is independent of the others",
+        "value_text": "1.0",
+        "value_number": 1.0,
+        "unit": "independent",
+        "window": "robots.txt",
+        "scope": "ChatGPT search results"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Each setting is independent of the others",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "Each setting is independent of the others",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "independent",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "robots.txt",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "surface websites in search results in ChatGPT's search features",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "OpenAI uses OAI-SearchBot and GPTBot robots.txt tags to enable webmasters to manage how their sites and content work with AI.",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Each setting is independent of the others",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "enable webmasters to manage how their sites and content work with AI",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "OAI-SearchBot is used to surface websites in search results in ChatGPT's search features.",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "User agent Description & details",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "OpenAI uses OAI-SearchBot and GPTBot robots.txt tags to enable webmasters to manage how their sites and content work with AI.",
+        "selector": null,
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "7de3f25cd95e8b230bfe8ef56b4f2e16e69460b86bd9f9597346d00ed05b11af",
+        "raw_sha256": "bdfc311d0ebb6c0bab9fbfa89ee8f2d940a4140d5cb43d50f4ff4b30e9b26ab0",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:01:13.716630+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "openai_crawler_independence_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "503ec66c6c7d4b36c0b08fccfe4dec77",
+    "topic": "retrieval_index",
+    "statement": "Google states there are no additional content requirements to appear in AI Overviews or AI Mode beyond existing SEO fundamentals and no special schema, while eligibility still requires a page to be indexed and snippet-eligible in Google Search.",
+    "surfaces": [
+      "google-ai-overviews",
+      "google-ai-mode"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "high",
+    "source": {
+      "source_id": "google-search-central-ai",
+      "publisher": "Google",
+      "url": "https://developers.google.com/search/docs/appearance/ai-features",
+      "canonical_url": "https://developers.google.com/search/docs/appearance/ai-features",
+      "source_class": "official"
+    },
+    "dates": {
+      "published_at": null,
+      "published_at_source": null,
+      "modified_at": null,
+      "measured_window": null,
+      "observed_at": "2026-09-16T21:55:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "official_documentation",
+      "metric_family": "The best practices for SEO remain relevant for AI features",
+      "denominator": "As with Search overall",
+      "prompt_universe": null,
+      "sample_size": null,
+      "unit_of_analysis": "AI Overviews and AI Mode work in Google Search",
+      "time_window": "Last updated 2025-12-10 UTC",
+      "geography": null,
+      "geography_basis": "not_stated",
+      "language": null,
+      "language_basis": "not_stated",
+      "limitations": [
+        "Documents stated policy, not actual inclusion rates in AI features."
+      ],
+      "methodology_notes": "Google Search Central | Documentation | Google for Developers"
+    },
+    "metrics": [
+      {
+        "metric_id": "google_ai_eligibility",
+        "label": "Eligibility for AI features requires indexing + snippet eligibility",
+        "comparator": "policy_statement",
+        "definition": "page must be indexed and eligible to be shown in Google Search with a snippet",
+        "value_text": "1.0",
+        "value_number": 1.0,
+        "unit": "indexed and snippet-eligible",
+        "window": "Last updated 2025-12-10 UTC",
+        "scope": "AI Overviews or AI Mode"
+      },
+      {
+        "metric_id": "google_ai_no_special_opt",
+        "label": "No special optimisation needed for AI Overviews / AI Mode",
+        "comparator": "policy_statement",
+        "definition": "There are no additional requirements to appear in AI Overviews or AI Mode, nor other special optimizations necessary",
+        "value_text": "1.0",
+        "value_number": 1.0,
+        "unit": "additional requirements",
+        "window": "Last updated 2025-12-10 UTC",
+        "scope": "AI Overviews or AI Mode"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "There are no additional requirements to appear in AI Overviews or AI Mode, nor other special optimizations necessary",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "There are no additional requirements to appear in AI Overviews or AI Mode, nor other special optimizations necessary",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "additional requirements",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "Last updated 2025-12-10 UTC",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Overviews or AI Mode",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "page must be indexed and eligible to be shown in Google Search with a snippet",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "page must be indexed and eligible to be shown in Google Search with a snippet",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "indexed and eligible to be shown in Google Search with a snippet",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "Last updated 2025-12-10 UTC",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Overviews or AI Mode",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "The best practices for SEO remain relevant for AI features",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "There are no additional requirements to appear in AI Overviews or AI Mode, nor other special optimizations necessary",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "As with Search overall",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Overviews and AI Mode work in Google Search",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "Last updated 2025-12-10 UTC",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "Google Search Central | Documentation | Google for Developers",
+        "selector": null,
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "4f9bbdc25c02edbe821011283e920c64f2c393ab18bb58ebb6c2e7a0d529c60c",
+        "raw_sha256": "081497c6cc91a542127ca1f2d04aa4b8a79886adf1dd79e3b08351da16938984",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:11:43.725911+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "google_ai_feature_eligibility_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "7f917acf444c17ce1f9ef8b723e0cbc7",
+    "topic": "retrieval_index",
+    "statement": "xAI's developer documentation lists a Web search tool among Grok's server-side API capabilities, alongside function calling and structured outputs, on the Grok 4.6 flagship model.",
+    "surfaces": [
+      "grok"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "low",
+    "source": {
+      "source_id": "xai-docs",
+      "publisher": "xAI",
+      "url": "https://docs.x.ai/docs/overview",
+      "canonical_url": "https://docs.x.ai/docs/overview",
+      "source_class": "official"
+    },
+    "dates": {
+      "published_at": null,
+      "published_at_source": null,
+      "modified_at": null,
+      "measured_window": null,
+      "observed_at": "2026-09-16T21:55:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "official_documentation",
+      "metric_family": "Function calling Web search",
+      "denominator": "Explore the documentation",
+      "prompt_universe": null,
+      "sample_size": null,
+      "unit_of_analysis": "Web search",
+      "time_window": "Grok 4.6",
+      "geography": null,
+      "geography_basis": "not_stated",
+      "language": null,
+      "language_basis": "not_stated",
+      "limitations": [
+        "Documented capability, not measured retrieval behaviour."
+      ],
+      "methodology_notes": "Our flagship model for code and everything else: agentic tool calling, minimal hallucinations, configurable reasoning."
+    },
+    "metrics": [
+      {
+        "metric_id": "xai_web_search_tool",
+        "label": "Grok exposes a server-side Web search tool",
+        "comparator": "policy_statement",
+        "definition": "Function calling Web search",
+        "value_text": "1.0",
+        "value_number": 1.0,
+        "unit": "Web search",
+        "window": "Grok 4.6",
+        "scope": "Grok developer platform"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Function calling Web search",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "Function calling Web search",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "Web search",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "Grok 4.6",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "Try in playground",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "Function calling Web search",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Function calling Web search",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "Explore the documentation",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "Web search",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "Grok 4.6",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "Our flagship model for code and everything else: agentic tool calling, minimal hallucinations, configurable reasoning.",
+        "selector": null,
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "b2a568912af30d5f9e18f9908e53beaab1bdf7145c50b93cbbd813c258d8c4ed",
+        "raw_sha256": "6f29e7962d3e610666140db3a0bbad94cdc8662a4e78378dece6a2f565488d5f",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:11:43.726769+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "xai_web_search_tool_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "9fe33a2b358b9be1dc3911ed864acb57",
+    "topic": "audience_usage",
+    "statement": "Alibaba's Qwen-MT translation model supports 92 major official languages and prominent dialects, covering over 95% of the global population, per the Qwen team's release blog.",
+    "surfaces": [
+      "qwen-consumer"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "low",
+    "source": {
+      "source_id": "alibaba-qwen-blog",
+      "publisher": "Alibaba Qwen",
+      "url": "https://qwenlm.github.io/blog/",
+      "canonical_url": "https://qwenlm.github.io/blog/",
+      "source_class": "official"
+    },
+    "dates": {
+      "published_at": null,
+      "published_at_source": null,
+      "modified_at": null,
+      "measured_window": null,
+      "observed_at": "2026-09-16T21:55:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "unknown",
+      "metric_family": "92 major official languages",
+      "denominator": "over 95% of the global population",
+      "prompt_universe": null,
+      "sample_size": null,
+      "unit_of_analysis": "92 major official languages and prominent dialects",
+      "time_window": "July 27, 2025",
+      "geography": null,
+      "geography_basis": "not_stated",
+      "language": null,
+      "language_basis": "not_stated",
+      "limitations": [
+        "Vendor-stated coverage; no independent verification."
+      ],
+      "methodology_notes": "Qwen-MT: Where Speed Meets Smart Translation"
+    },
+    "metrics": [
+      {
+        "metric_id": "qwen_mt_languages",
+        "label": "Languages supported by Qwen-MT",
+        "comparator": "exact",
+        "definition": "92 major official languages",
+        "value_text": "92.0",
+        "value_number": 92.0,
+        "unit": "languages",
+        "window": "July 2025",
+        "scope": "Qwen-MT"
+      },
+      {
+        "metric_id": "qwen_mt_population",
+        "label": "Global population covered by Qwen-MT languages",
+        "comparator": "at_least",
+        "definition": "over 95% of the global population",
+        "value_text": "95%+",
+        "value_number": null,
+        "unit": "%",
+        "window": "July 2025",
+        "scope": "global population"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "92 major official languages",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "92 major official languages",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "languages",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "July 27, 2025",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "Qwen-MT",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "over 95% of the global population",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "over 95% of the global population",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "July 27, 2025",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "global population",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "92 major official languages",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "covering over 95% of the global population",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "over 95% of the global population",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "92 major official languages and prominent dialects",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "July 27, 2025",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "Qwen-MT: Where Speed Meets Smart Translation",
+        "selector": null,
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "10c6d1d2fb2ceb161be1e0b47387d5223b135999d1f1ebb64f178092b0d74282",
+        "raw_sha256": "ea6345e313611b786c3a13b418128385d677cdd7b50609353654ff48025a7ab9",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:11:43.727156+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "qwen_mt_language_reach_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "0813ea6e3a5c124110127edcd1f1b03a",
+    "topic": "citations_sources",
+    "statement": "Ahrefs' analysis of 1.4 million ChatGPT 5.2 prompts from February 2025 found ChatGPT retrieves dozens of URLs per response but ends up citing only about 50% of them (about 16.57 cited vs 16.58 non-cited URLs per prompt).",
+    "surfaces": [
+      "chatgpt"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "medium",
+    "source": {
+      "source_id": "ahrefs-blog-ai",
+      "publisher": "Ahrefs",
+      "url": "https://ahrefs.com/blog/why-chatgpt-cites-pages/",
+      "canonical_url": "https://ahrefs.com/blog/why-chatgpt-cites-pages/",
+      "source_class": "vendor_research"
+    },
+    "dates": {
+      "published_at": null,
+      "published_at_source": null,
+      "modified_at": null,
+      "measured_window": null,
+      "observed_at": "2026-09-16T21:55:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "vendor_panel",
+      "metric_family": "it only ends up citing ~50% of them",
+      "denominator": "it only ends up citing ~50% of them",
+      "prompt_universe": "we analyzed 1.4 million ChatGPT 5.2 prompts from February 2025",
+      "sample_size": "we analyzed 1.4 million ChatGPT 5.2 prompts from February 2025",
+      "unit_of_analysis": "~16.57 cited URLs and ~16.58 non-cited URLs per prompt",
+      "time_window": "February 2025",
+      "geography": null,
+      "geography_basis": "not_stated",
+      "language": null,
+      "language_basis": "not_stated",
+      "limitations": [
+        "Vendor study; desktop prompts only."
+      ],
+      "methodology_notes": "Why ChatGPT Cites One Page Over Another (Study of 1.4M Prompts)"
+    },
+    "metrics": [
+      {
+        "metric_id": "ahrefs_citation_rate",
+        "label": "Share of retrieved URLs that get cited",
+        "comparator": "approx",
+        "definition": "it only ends up citing ~50% of them",
+        "value_text": "50.0",
+        "value_number": 50.0,
+        "unit": "%",
+        "window": "February 2025",
+        "scope": "ChatGPT 5.2 responses"
+      },
+      {
+        "metric_id": "ahrefs_cited_urls_per_prompt",
+        "label": "Cited URLs per ChatGPT prompt",
+        "comparator": "approx",
+        "definition": "~16.57 cited URLs and ~16.58 non-cited URLs per prompt",
+        "value_text": "16.57",
+        "value_number": 16.57,
+        "unit": "URLs per prompt",
+        "window": "February 2025",
+        "scope": "cited URLs"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "it only ends up citing ~50% of them",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "it only ends up citing ~50% of them",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "February 2025",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "1.4 million ChatGPT 5.2 prompts",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "~16.57 cited URLs and ~16.58 non-cited URLs per prompt",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "~16.57 cited URLs and ~16.58 non-cited URLs per prompt",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "URLs per prompt",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "February 2025",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "cited URLs",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "it only ends up citing ~50% of them",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Our 50% figure captures the full journey from retrieval to citation, not just the final decision after a page has been read.",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "it only ends up citing ~50% of them",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.prompt_universe",
+        "locator_kind": "verbatim_quote",
+        "quote": "we analyzed 1.4 million ChatGPT 5.2 prompts from February 2025",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.sample_size",
+        "locator_kind": "verbatim_quote",
+        "quote": "we analyzed 1.4 million ChatGPT 5.2 prompts from February 2025",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "~16.57 cited URLs and ~16.58 non-cited URLs per prompt",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "February 2025",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "Why ChatGPT Cites One Page Over Another (Study of 1.4M Prompts)",
+        "selector": null,
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "8eae42a9aa06fdb81dd2ee6362e86d1b8f54f644986c5320f5e7548af237540b",
+        "raw_sha256": "2c939c6fe994033e65e3df4e2de1c903e6e8c6553689519b26610eee1095efb9",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:11:43.727868+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "ahrefs_retrieval_to_citation_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "9c6cbb27ff6967a25a0e02e27e046e00",
+    "topic": "citations_sources",
+    "statement": "Peec AI's analysis of 500,000 prompts found Google AI Overviews appear 86% of the time in its sample, which it calls the most undertracked AI search surface.",
+    "surfaces": [
+      "google-ai-overviews"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "medium",
+    "source": {
+      "source_id": "peec-blog",
+      "publisher": "Peec AI",
+      "url": "https://peec.ai/blog",
+      "canonical_url": "https://peec.ai/blog",
+      "source_class": "vendor_research"
+    },
+    "dates": {
+      "published_at": "2026-06-11T00:00:00+00:00",
+      "published_at_source": "page_stamp 'Jun 11, 2026'",
+      "modified_at": null,
+      "measured_window": null,
+      "observed_at": "2026-09-16T21:55:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "vendor_panel",
+      "metric_family": "AI Overviews appear 86% of the time in our sample",
+      "denominator": "500,000 prompts",
+      "prompt_universe": "500,000 prompts",
+      "sample_size": "500,000 prompts",
+      "unit_of_analysis": "AI Overviews appear 86% of the time in our sample",
+      "time_window": "Jun 11, 2026",
+      "geography": null,
+      "geography_basis": "not_stated",
+      "language": null,
+      "language_basis": "not_stated",
+      "limitations": [
+        "Vendor sample; prompt selection not published on the index page."
+      ],
+      "methodology_notes": "AI Overviews is the most undertracked AI search"
+    },
+    "metrics": [
+      {
+        "metric_id": "peec_aio_trigger_rate",
+        "label": "Share of tracked prompts that trigger an AI Overview",
+        "comparator": "share_of_total",
+        "definition": "AI Overviews appear 86% of the time in our sample",
+        "value_text": "86.0",
+        "value_number": 86.0,
+        "unit": "86%",
+        "window": "our sample",
+        "scope": "AI Overviews"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Overviews appear 86% of the time in our sample",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Overviews appear 86% of the time in our sample",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "86%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "our sample",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Overviews",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Overviews appear 86% of the time in our sample",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Overviews appear 86% of the time in our sample",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "500,000 prompts",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.prompt_universe",
+        "locator_kind": "verbatim_quote",
+        "quote": "500,000 prompts",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.sample_size",
+        "locator_kind": "verbatim_quote",
+        "quote": "500,000 prompts",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Overviews appear 86% of the time in our sample",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "Jun 11, 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Overviews is the most undertracked AI search",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "dates.published_at",
+        "locator_kind": "jsonld_field",
+        "quote": null,
+        "selector": "page_stamp 'Jun 11, 2026'",
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "5c540418014bf8cecf0c4bde4eb451491e1b10a3c5c751f39df55fdbd06b63e5",
+        "raw_sha256": "2ac92bb4e92e1e962ec59f595c88519413fe80ac5863f2d5b35fd8b1152b0492",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:11:43.728841+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "peec_aio_trigger_rate_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "21b58045dd775cc348a9a3916b84da1b",
+    "topic": "commerce_ads",
+    "statement": "A Semrush survey of 2,338 US consumers found AI chatbots talked 57.5% of AI users out of a purchase, and 65% of AI users had replaced some product-related Google searches with chatbots.",
+    "surfaces": [
+      "chatgpt"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "medium",
+    "source": {
+      "source_id": "semrush-blog-ai",
+      "publisher": "Semrush",
+      "url": "https://www.semrush.com/blog/",
+      "canonical_url": "https://www.semrush.com/blog/",
+      "source_class": "vendor_research"
+    },
+    "dates": {
+      "published_at": "2026-09-10T00:00:00+00:00",
+      "published_at_source": "page_stamp 'September 10, 2026'",
+      "modified_at": null,
+      "measured_window": null,
+      "observed_at": "2026-09-16T21:55:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "survey",
+      "metric_family": "AI chatbots talked 57.5% of AI users out of buying",
+      "denominator": "We surveyed 2,338 US consumers",
+      "prompt_universe": null,
+      "sample_size": "We surveyed 2,338 US consumers",
+      "unit_of_analysis": "AI users",
+      "time_window": "September 10, 2026",
+      "geography": null,
+      "geography_basis": "not_stated",
+      "language": null,
+      "language_basis": "not_stated",
+      "limitations": [
+        "Vendor survey of US consumers; self-reported behaviour."
+      ],
+      "methodology_notes": "4 in 10 dislike chatbot ads"
+    },
+    "metrics": [
+      {
+        "metric_id": "semrush_replaced_google",
+        "label": "AI users who replaced product Google searches with chatbots",
+        "comparator": "share_of_total",
+        "definition": "65% of AI users have replaced some product-related Google searches with chatbots",
+        "value_text": "65.0",
+        "value_number": 65.0,
+        "unit": "65%",
+        "window": "September 2026",
+        "scope": "US AI users"
+      },
+      {
+        "metric_id": "semrush_talked_out_of_buying",
+        "label": "AI users talked out of a purchase by chatbots",
+        "comparator": "share_of_total",
+        "definition": "AI chatbots talked 57.5% of AI users out of buying",
+        "value_text": "57.5",
+        "value_number": 57.5,
+        "unit": "57.5%",
+        "window": "September 2026",
+        "scope": "US AI users"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI chatbots talked 57.5% of AI users out of buying",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI chatbots talked 57.5% of AI users out of buying",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "57.5%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "September 10, 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "We surveyed 2,338 US consumers",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "65% of AI users have replaced some product-related Google searches with chatbots",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "65% of AI users have replaced some product-related Google searches with chatbots",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "65%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "September 10, 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "We surveyed 2,338 US consumers",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI chatbots talked 57.5% of AI users out of buying",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "65% of AI users have replaced some product-related Google searches with chatbots",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "We surveyed 2,338 US consumers",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.sample_size",
+        "locator_kind": "verbatim_quote",
+        "quote": "We surveyed 2,338 US consumers",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI users",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "September 10, 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "4 in 10 dislike chatbot ads",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "dates.published_at",
+        "locator_kind": "jsonld_field",
+        "quote": null,
+        "selector": "page_stamp 'September 10, 2026'",
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "87a12350acecbe1ff9da7512c18eb62b7ef6b7d5c4bddaf7b317ce8cdeb8c97b",
+        "raw_sha256": "3d0bb8cb7d75890746fc623098994b580376abbb0465dd552acd270ccac3e810",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:11:43.728174+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "semrush_chatbot_commerce_survey_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "2dec24599a8a8ef5b605bffbc84c305e",
+    "topic": "measurement",
+    "statement": "SISTRIX built its Prompt Research feature on over 62 million real user questions, replacing keyword-level research with topic-level abstractions for AI search.",
+    "surfaces": [
+      "chatgpt",
+      "google-ai-mode"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "low",
+    "source": {
+      "source_id": "sistrix-blog",
+      "publisher": "SISTRIX",
+      "url": "https://www.sistrix.com/blog/",
+      "canonical_url": "https://www.sistrix.com/blog/",
+      "source_class": "vendor_blog"
+    },
+    "dates": {
+      "published_at": null,
+      "published_at_source": null,
+      "modified_at": null,
+      "measured_window": null,
+      "observed_at": "2026-09-16T21:55:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "unknown",
+      "metric_family": "over 62 million real user questions",
+      "denominator": "over 62 million real user questions",
+      "prompt_universe": null,
+      "sample_size": "over 62 million real user questions",
+      "unit_of_analysis": "real user questions",
+      "time_window": "24.08.2026",
+      "geography": null,
+      "geography_basis": "not_stated",
+      "language": null,
+      "language_basis": "not_stated",
+      "limitations": [
+        "Vendor product description; underlying question set not published."
+      ],
+      "methodology_notes": "Prompt Research: Keyword Research for AI Search"
+    },
+    "metrics": [
+      {
+        "metric_id": "sistrix_prompt_corpus",
+        "label": "Real user questions behind Prompt Research",
+        "comparator": "at_least",
+        "definition": "over 62 million real user questions",
+        "value_text": "62M+",
+        "value_number": null,
+        "unit": "real user questions",
+        "window": "Aug 2026",
+        "scope": "SISTRIX prompt data"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "over 62 million real user questions",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "over 62 million real user questions",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "real user questions",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "24.08.2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "over 62 million real user questions",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "over 62 million real user questions",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "topics instead of keywords",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "over 62 million real user questions",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.sample_size",
+        "locator_kind": "verbatim_quote",
+        "quote": "over 62 million real user questions",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "real user questions",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "24.08.2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "Prompt Research: Keyword Research for AI Search",
+        "selector": null,
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "c8f2a648354afe3d13337da1501c406872d1b6f699790ce283fa2a0bfd24dac1",
+        "raw_sha256": "b278448b8277f2bcf3230e55e8a3b85ee3f28f61faacbd85710e6a4e64d8040b",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:11:43.728352+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "sistrix_prompt_research_corpus_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "1fc7b9973972734f0e2ca31e2b55b263",
+    "topic": "audience_usage",
+    "statement": "Statcounter's August 2026 AI-chatbot market-share measure puts ChatGPT at 79.4%, Google Gemini at 10.9%, Perplexity at 4.31%, Microsoft Copilot at 2.79%, Claude at 2.57% and DeepSeek at 0.02% worldwide.",
+    "surfaces": [
+      "chatgpt",
+      "google-gemini",
+      "perplexity",
+      "microsoft-copilot",
+      "claude",
+      "deepseek-chat"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "medium",
+    "source": {
+      "source_id": "statcounter-ai-chatbot",
+      "publisher": "Statcounter",
+      "url": "https://gs.statcounter.com/ai-chatbot-market-share",
+      "canonical_url": "https://gs.statcounter.com/ai-chatbot-market-share",
+      "source_class": "vendor_research"
+    },
+    "dates": {
+      "published_at": null,
+      "published_at_source": null,
+      "modified_at": null,
+      "measured_window": null,
+      "observed_at": "2026-09-16T21:55:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "clickstream",
+      "metric_family": "Percentage Market Share",
+      "denominator": "AI Chatbot Market Share Worldwide",
+      "prompt_universe": null,
+      "sample_size": null,
+      "unit_of_analysis": "Percentage Market Share",
+      "time_window": "August 2026",
+      "geography": null,
+      "geography_basis": "not_stated",
+      "language": null,
+      "language_basis": "not_stated",
+      "limitations": [
+        "Clickstream panel; visit-share denominator, not users."
+      ],
+      "methodology_notes": "Source: Statcounter Global Stats"
+    },
+    "metrics": [
+      {
+        "metric_id": "statcounter_chatgpt_share",
+        "label": "ChatGPT share of AI-chatbot market",
+        "comparator": "share_of_total",
+        "definition": "ChatGPT 79.4 %",
+        "value_text": "79.4",
+        "value_number": 79.4,
+        "unit": "79.4 %",
+        "window": "August 2026",
+        "scope": "worldwide AI chatbots"
+      },
+      {
+        "metric_id": "statcounter_claude_share",
+        "label": "Claude share of AI-chatbot market",
+        "comparator": "share_of_total",
+        "definition": "Claude 2.57 %",
+        "value_text": "2.57",
+        "value_number": 2.57,
+        "unit": "2.57 %",
+        "window": "August 2026",
+        "scope": "worldwide AI chatbots"
+      },
+      {
+        "metric_id": "statcounter_copilot_share",
+        "label": "Microsoft Copilot share of AI-chatbot market",
+        "comparator": "share_of_total",
+        "definition": "Microsoft Copilot 2.79 %",
+        "value_text": "2.79",
+        "value_number": 2.79,
+        "unit": "2.79 %",
+        "window": "August 2026",
+        "scope": "worldwide AI chatbots"
+      },
+      {
+        "metric_id": "statcounter_deepseek_share",
+        "label": "DeepSeek share of AI-chatbot market",
+        "comparator": "share_of_total",
+        "definition": "Deepseek 0.02 %",
+        "value_text": "0.02",
+        "value_number": 0.02,
+        "unit": "0.02 %",
+        "window": "August 2026",
+        "scope": "worldwide AI chatbots"
+      },
+      {
+        "metric_id": "statcounter_gemini_share",
+        "label": "Google Gemini share of AI-chatbot market",
+        "comparator": "share_of_total",
+        "definition": "Google Gemini 10.9 %",
+        "value_text": "10.9",
+        "value_number": 10.9,
+        "unit": "10.9 %",
+        "window": "August 2026",
+        "scope": "worldwide AI chatbots"
+      },
+      {
+        "metric_id": "statcounter_perplexity_share",
+        "label": "Perplexity share of AI-chatbot market",
+        "comparator": "share_of_total",
+        "definition": "Perplexity 4.31 %",
+        "value_text": "4.31",
+        "value_number": 4.31,
+        "unit": "4.31 %",
+        "window": "August 2026",
+        "scope": "worldwide AI chatbots"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "ChatGPT 79.4 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "ChatGPT 79.4 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "79.4 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "August 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Chatbot Market Share Worldwide",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Google Gemini 10.9 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "Google Gemini 10.9 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "10.9 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "August 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Chatbot Market Share Worldwide",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Perplexity 4.31 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "Perplexity 4.31 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "4.31 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "August 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[2].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Chatbot Market Share Worldwide",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[3].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Microsoft Copilot 2.79 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[3].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "Microsoft Copilot 2.79 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[3].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "2.79 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[3].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "August 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[3].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Chatbot Market Share Worldwide",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[4].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Claude 2.57 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[4].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "Claude 2.57 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[4].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "2.57 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[4].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "August 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[4].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Chatbot Market Share Worldwide",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[5].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Deepseek 0.02 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[5].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "Deepseek 0.02 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[5].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "0.02 %",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[5].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "August 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[5].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Chatbot Market Share Worldwide",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "Percentage Market Share",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Chatbot Market Share Worldwide - August 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Chatbot Market Share Worldwide",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "Percentage Market Share",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "August 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "Source: Statcounter Global Stats",
+        "selector": null,
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "4a4defa6335c28b768a6af19cdb203e70edad9b52146ae8ba5ba019b4c197648",
+        "raw_sha256": "a0944d6803d9eccefd0942a03fad5d5e0b05d21a3fc9beb70a43b8e87ba46f89",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:11:43.729029+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "statcounter_ai_chatbot_share_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "b371c36129f6c35e78025b3695db1a22",
+    "topic": "crawler_index_policy",
+    "statement": "Cloudflare announced a control that lets site owners stay discoverable in search while disallowing AI training, and separately detects MCP traffic via protocol-level heuristics.",
+    "surfaces": [
+      "chatgpt"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "low",
+    "source": {
+      "source_id": "cloudflare-blog-ai",
+      "publisher": "Cloudflare",
+      "url": "https://blog.cloudflare.com/tag/ai/",
+      "canonical_url": "https://blog.cloudflare.com/tag/ai/",
+      "source_class": "vendor_blog"
+    },
+    "dates": {
+      "published_at": null,
+      "published_at_source": null,
+      "modified_at": null,
+      "measured_window": null,
+      "observed_at": "2026-09-16T21:55:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "unknown",
+      "metric_family": "stay discoverable in search while disallowing AI training",
+      "denominator": "site owners",
+      "prompt_universe": null,
+      "sample_size": null,
+      "unit_of_analysis": "site owners",
+      "time_window": "September 15, 2026",
+      "geography": null,
+      "geography_basis": "not_stated",
+      "language": null,
+      "language_basis": "not_stated",
+      "limitations": [
+        "Vendor blog announcement; surface tag is contextual."
+      ],
+      "methodology_notes": "How Cloudflare detects MCP traffic"
+    },
+    "metrics": [
+      {
+        "metric_id": "cloudflare_ai_training_control",
+        "label": "Control to allow search crawl while disallowing AI training",
+        "comparator": "policy_statement",
+        "definition": "stay discoverable in search while disallowing AI training",
+        "value_text": "1.0",
+        "value_number": 1.0,
+        "unit": "control",
+        "window": "September 2026",
+        "scope": "Cloudflare site owners"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "stay discoverable in search while disallowing AI training",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "stay discoverable in search while disallowing AI training",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "control",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "September 15, 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "site owners",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "stay discoverable in search while disallowing AI training",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Cloudflare is giving site owners a way to stay discoverable while disallowing AI training",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "site owners",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "site owners",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "September 15, 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "How Cloudflare detects MCP traffic",
+        "selector": null,
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "9785cbb38129ad6a52a3a26fb1b2a22db2a10c646a5a650dd30f118dbb23aee6",
+        "raw_sha256": "29b22062bd3efcaf8cfb8eb2f3f9e9674816e3d6003c299224ccd2d3fa042402",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:01:17.966914+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "cloudflare_search_vs_training_control_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "8e80857f06771d0e99cbf5f05061dd05",
+    "topic": "commerce_ads",
+    "statement": "Search Engine Journal argues ChatGPT Ads should not be treated as paid search, advising advertisers to define a clear role, budget source and success criteria for ChatGPT Ads before shifting budget away from paid search.",
+    "surfaces": [
+      "chatgpt"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "low",
+    "source": {
+      "source_id": "search-engine-journal",
+      "publisher": "Search Engine Journal",
+      "url": "https://www.searchenginejournal.com/",
+      "canonical_url": "https://www.searchenginejournal.com/",
+      "source_class": "news"
+    },
+    "dates": {
+      "published_at": "2026-09-15T00:00:00+00:00",
+      "published_at_source": "page_stamp 'Sep 15, 2026'",
+      "modified_at": null,
+      "measured_window": null,
+      "observed_at": "2026-09-16T21:55:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "unknown",
+      "metric_family": "ChatGPT Ads Aren't Paid Search",
+      "denominator": "paid search",
+      "prompt_universe": null,
+      "sample_size": null,
+      "unit_of_analysis": "ChatGPT Ads",
+      "time_window": "Sep 15, 2026",
+      "geography": null,
+      "geography_basis": "not_stated",
+      "language": null,
+      "language_basis": "not_stated",
+      "limitations": [
+        "Editorial analysis, not a measurement."
+      ],
+      "methodology_notes": "ChatGPT Ads Aren't Paid Search - 5 Questions To Answer Before You Shift Budget"
+    },
+    "metrics": [
+      {
+        "metric_id": "sej_chatgpt_ads_guidance",
+        "label": "Editorial guidance treating ChatGPT Ads distinctly from paid search",
+        "comparator": "qualitative_finding",
+        "definition": "Give ChatGPT Ads a clear role, budget source, and success criteria before pulling money from paid search",
+        "value_text": "1.0",
+        "value_number": 1.0,
+        "unit": "editorial guidance",
+        "window": "Sep 2026",
+        "scope": "ChatGPT Ads"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Give ChatGPT Ads a clear role, budget source, and success criteria before pulling money from paid search",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "Give ChatGPT Ads a clear role, budget source, and success criteria before pulling money from paid search",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "paid search",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "Sep 15, 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "Give ChatGPT Ads a clear role, budget source, and success criteria before pulling money from paid search",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "ChatGPT Ads Aren't Paid Search",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Give ChatGPT Ads a clear role, budget source, and success criteria before pulling money from paid search",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "paid search",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "ChatGPT Ads",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "Sep 15, 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "ChatGPT Ads Aren't Paid Search - 5 Questions To Answer Before You Shift Budget",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "dates.published_at",
+        "locator_kind": "jsonld_field",
+        "quote": null,
+        "selector": "page_stamp 'Sep 15, 2026'",
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "156000622d8a854fa8a913d466f46aad75521097c827fa9e9573895a17b60b2e",
+        "raw_sha256": "4f69fdcf530d64a1895a015d121cc3261e08daac62cecd171ad0c408c45cfe12",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:11:43.729374+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "sej_chatgpt_ads_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "325c98bd2b0747b97157e98aafa86f1a",
+    "topic": "audience_usage",
+    "statement": "Profound's research on travel decision-making found nearly eight in ten (79.7%) of respondents relied on answer engines for at least half of their decision making.",
+    "surfaces": [
+      "chatgpt",
+      "google-ai-overviews"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "medium",
+    "source": {
+      "source_id": "tryprofound-research",
+      "publisher": "Profound",
+      "url": "https://www.tryprofound.com/research",
+      "canonical_url": "https://www.tryprofound.com/research",
+      "source_class": "vendor_research"
+    },
+    "dates": {
+      "published_at": null,
+      "published_at_source": null,
+      "modified_at": null,
+      "measured_window": null,
+      "observed_at": "2026-09-16T21:55:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "survey",
+      "metric_family": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making",
+      "denominator": "The state of AI Search in travel",
+      "prompt_universe": null,
+      "sample_size": "Nearly eight in ten (79.7%)",
+      "unit_of_analysis": "The state of AI Search in travel",
+      "time_window": "9 Jul, 2026",
+      "geography": null,
+      "geography_basis": "not_stated",
+      "language": null,
+      "language_basis": "not_stated",
+      "limitations": [
+        "Vendor survey; single industry vertical (travel)."
+      ],
+      "methodology_notes": "The state of AI Search in travel"
+    },
+    "metrics": [
+      {
+        "metric_id": "profound_travel_answer_engine_reliance",
+        "label": "Travel decision-makers relying on answer engines for >=half of decisions",
+        "comparator": "at_least",
+        "definition": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making",
+        "value_text": "79.7",
+        "value_number": 79.7,
+        "unit": "79.7%",
+        "window": "9 Jul, 2026",
+        "scope": "travel decision-makers"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "79.7%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "9 Jul, 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "The state of AI Search in travel",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "The state of AI Search in travel",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.sample_size",
+        "locator_kind": "verbatim_quote",
+        "quote": "Nearly eight in ten (79.7%)",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "The state of AI Search in travel",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "9 Jul, 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "The state of AI Search in travel",
+        "selector": null,
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "2b02de95917c3409d0b9cb8a4303db0a1d5759c46e146912bf118b61f2c48c92",
+        "raw_sha256": "5b8b3f1624e533740d4f962cedb09a50257ee38520a4df0130e7513f34cf66f1",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:11:43.729735+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "profound_travel_reliance_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "81c504d522ab85f26575112df0b20260",
+    "topic": "citations_sources",
+    "statement": "Seer Interactive's study found AI assistants declined to answer prompts about its brand 31% of the time, though answers were mostly correct when given.",
+    "surfaces": [
+      "chatgpt",
+      "google-ai-mode"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "low",
+    "source": {
+      "source_id": "seer-ai-research",
+      "publisher": "Seer Interactive",
+      "url": "https://www.seerinteractive.com/insights",
+      "canonical_url": "https://www.seerinteractive.com/insights",
+      "source_class": "vendor_research"
+    },
+    "dates": {
+      "published_at": null,
+      "published_at_source": null,
+      "modified_at": null,
+      "measured_window": null,
+      "observed_at": "2026-09-16T21:55:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "vendor_panel",
+      "metric_family": "AI Declined to Answer Prompts About Our Brand 31% of the Time",
+      "denominator": "AI Declined to Answer Prompts About Our Brand",
+      "prompt_universe": null,
+      "sample_size": null,
+      "unit_of_analysis": "AI Declined to Answer Prompts About Our Brand",
+      "time_window": "2026",
+      "geography": null,
+      "geography_basis": "not_stated",
+      "language": null,
+      "language_basis": "not_stated",
+      "limitations": [
+        "Single-brand vendor study; prompt set not published on the index page."
+      ],
+      "methodology_notes": "AI Study"
+    },
+    "metrics": [
+      {
+        "metric_id": "seer_declined_to_answer",
+        "label": "Share of brand prompts the AI declined to answer",
+        "comparator": "share_of_total",
+        "definition": "AI Declined to Answer Prompts About Our Brand 31% of the Time",
+        "value_text": "31.0",
+        "value_number": 31.0,
+        "unit": "31%",
+        "window": "2026",
+        "scope": "prompts about Seer's own brand"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Declined to Answer Prompts About Our Brand 31% of the Time",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Declined to Answer Prompts About Our Brand 31% of the Time",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "31%",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Declined to Answer Prompts About Our Brand",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Declined to Answer Prompts About Our Brand 31% of the Time",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Study: AI Declined to Answer Prompts About Our Brand 31% of the Time (But Got Our Info Mostly Right When It Answered)",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Declined to Answer Prompts About Our Brand",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Declined to Answer Prompts About Our Brand",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "AI Study",
+        "selector": null,
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "e248b1b6c9a8e3c509cdd8f3250beb69139befac6d525d044f0810a3fd29524a",
+        "raw_sha256": "7c42a52c2cfb2dafb4a66c619275a67b7a10a16cefbe7c0fc781bc21dc66cbd0",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:11:43.729929+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "seer_brand_decline_rate_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "57853a3998e2b82ec831c92ec5587761",
+    "topic": "commerce_ads",
+    "statement": "Search Engine Roundtable reports OpenAI is testing a ChatGPT ad format named Sponsored Agents, which lets people start a conversation with a business-sponsored agent after clicking an ad in ChatGPT.",
+    "surfaces": [
+      "chatgpt"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "low",
+    "source": {
+      "source_id": "search-engine-roundtable",
+      "publisher": "Search Engine Roundtable",
+      "url": "https://www.seroundtable.com/",
+      "canonical_url": "https://www.seroundtable.com/",
+      "source_class": "news"
+    },
+    "dates": {
+      "published_at": "2026-09-16T00:00:00+00:00",
+      "published_at_source": "page_stamp 'Sep 16, 2026'",
+      "modified_at": null,
+      "measured_window": null,
+      "observed_at": "2026-09-16T21:55:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "unknown",
+      "metric_family": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents",
+      "denominator": "Sponsored Agents",
+      "prompt_universe": null,
+      "sample_size": null,
+      "unit_of_analysis": "ChatGPT Ads",
+      "time_window": "Sep 16, 2026",
+      "geography": null,
+      "geography_basis": "not_stated",
+      "language": null,
+      "language_basis": "not_stated",
+      "limitations": [
+        "Industry news reporting stated testing; not an OpenAI primary source."
+      ],
+      "methodology_notes": "let people start a conversation with a business-sponsored agent after clicking an ad in ChatGPT"
+    },
+    "metrics": [
+      {
+        "metric_id": "ser_sponsored_agents_test",
+        "label": "ChatGPT Sponsored Agents ad format in testing",
+        "comparator": "qualitative_finding",
+        "definition": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents",
+        "value_text": "1.0",
+        "value_number": 1.0,
+        "unit": "in testing",
+        "window": "Sep 16, 2026",
+        "scope": "ChatGPT Ads"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "Sep 16, 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "ChatGPT Ads",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "Sponsored Agents",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "ChatGPT Ads",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "Sep 16, 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "let people start a conversation with a business-sponsored agent after clicking an ad in ChatGPT",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "dates.published_at",
+        "locator_kind": "jsonld_field",
+        "quote": null,
+        "selector": "page_stamp 'Sep 16, 2026'",
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "8ff776628bcef3416f8501d32486e0cdb16c59d496822039b86f85005ec4d252",
+        "raw_sha256": "cb7750f9d595cbefa6ecb67c0e6030a95b665ecffa3ad1aa84f1e7969b9842f6",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:11:43.730148+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "ser_chatgpt_sponsored_agents_v1",
+      "human_reviewed": false
+    }
+  },
+  {
+    "claim_id": "d4e351ea0b7d77defa82777737996cdc",
+    "topic": "retrieval_index",
+    "statement": "Perplexity Research published Q2D-Web, a first-stage retriever benchmark and leaderboard built from 70 thousand agent queries and 190 million web documents with three sets of relevance judgements.",
+    "surfaces": [
+      "perplexity"
+    ],
+    "status": "current",
+    "relationship": "new",
+    "supersedes_claim_id": null,
+    "confidence": "low",
+    "source": {
+      "source_id": "perplexity-blog",
+      "publisher": "Perplexity",
+      "url": "https://www.perplexity.ai/hub/blog",
+      "canonical_url": "https://www.perplexity.ai/hub/blog",
+      "source_class": "vendor_blog"
+    },
+    "dates": {
+      "published_at": "2026-09-09T00:00:00+00:00",
+      "published_at_source": "page_stamp 'Sep 9, 2026'",
+      "modified_at": null,
+      "measured_window": null,
+      "observed_at": "2026-09-16T21:55:00+00:00"
+    },
+    "methodology": {
+      "measurement_mode": "vendor_panel",
+      "metric_family": "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements",
+      "denominator": "190 million web documents",
+      "prompt_universe": null,
+      "sample_size": null,
+      "unit_of_analysis": "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements",
+      "time_window": "Sep 9, 2026",
+      "geography": null,
+      "geography_basis": "not_stated",
+      "language": null,
+      "language_basis": "not_stated",
+      "limitations": [
+        "Vendor benchmark; index page summarises the study."
+      ],
+      "methodology_notes": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+    },
+    "metrics": [
+      {
+        "metric_id": "perplexity_q2d_documents",
+        "label": "Web documents in the Q2D-Web benchmark",
+        "comparator": "exact",
+        "definition": "190 million web documents",
+        "value_text": "190000000.0",
+        "value_number": 190000000.0,
+        "unit": "web documents",
+        "window": "Sep 2026",
+        "scope": "Q2D-Web benchmark"
+      },
+      {
+        "metric_id": "perplexity_q2d_queries",
+        "label": "Agent queries in the Q2D-Web benchmark",
+        "comparator": "exact",
+        "definition": "70 thousand agent queries",
+        "value_text": "70000.0",
+        "value_number": 70000.0,
+        "unit": "agent queries",
+        "window": "Sep 2026",
+        "scope": "Q2D-Web benchmark"
+      }
+    ],
+    "provenance": [
+      {
+        "field_path": "metrics[0].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "70 thousand agent queries",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "70 thousand agent queries",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "agent queries",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "Sep 9, 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[0].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "190 million web documents",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].value",
+        "locator_kind": "verbatim_quote",
+        "quote": "190 million web documents",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].unit",
+        "locator_kind": "verbatim_quote",
+        "quote": "web documents",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].window",
+        "locator_kind": "verbatim_quote",
+        "quote": "Sep 9, 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "metrics[1].scope",
+        "locator_kind": "verbatim_quote",
+        "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_family",
+        "locator_kind": "verbatim_quote",
+        "quote": "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.metric_definition",
+        "locator_kind": "verbatim_quote",
+        "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.denominator",
+        "locator_kind": "verbatim_quote",
+        "quote": "190 million web documents",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.unit_of_analysis",
+        "locator_kind": "verbatim_quote",
+        "quote": "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.time_window",
+        "locator_kind": "verbatim_quote",
+        "quote": "Sep 9, 2026",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "methodology.methodology_notes",
+        "locator_kind": "verbatim_quote",
+        "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale",
+        "selector": null,
+        "note": null
+      },
+      {
+        "field_path": "dates.published_at",
+        "locator_kind": "jsonld_field",
+        "quote": null,
+        "selector": "page_stamp 'Sep 9, 2026'",
+        "note": null
+      }
+    ],
+    "evidence": [
+      {
+        "capture_hash": "5ddb33fa021400956d398679f140b83a570e720cbbd9c829af97486b2f1d9b02",
+        "raw_sha256": "de2b8649fa9a2a297271ec94f83abe830aefd000fd210d760021f24d23858887",
+        "snapshot_path": null,
+        "http_status": 200,
+        "robots_allowed": true,
+        "fetched_at": "2026-09-16T21:11:43.730248+00:00"
+      }
+    ],
+    "extraction": {
+      "method": "deterministic_parser",
+      "tool": "ai_discovery.claims",
+      "version": "claim-extraction-0.1.0",
+      "rule_id": "perplexity_q2d_web_benchmark_v1",
+      "human_reviewed": false
+    }
+  }
+]

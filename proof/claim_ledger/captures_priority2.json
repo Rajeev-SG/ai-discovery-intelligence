@@ -1,0 +1,56 @@
+{
+  "tryprofound-research": {
+    "url": "https://www.tryprofound.com/research",
+    "robots_allowed": true,
+    "http_status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 157921,
+    "final_url": "https://www.tryprofound.com/research",
+    "raw_sha256": "5b8b3f1624e533740d4f962cedb09a50257ee38520a4df0130e7513f34cf66f1"
+  },
+  "seer-ai-research": {
+    "url": "https://www.seerinteractive.com/insights",
+    "robots_allowed": true,
+    "http_status": 200,
+    "content_type": "text/html; charset=UTF-8",
+    "bytes": 99199,
+    "final_url": "https://www.seerinteractive.com/insights",
+    "raw_sha256": "7c42a52c2cfb2dafb4a66c619275a67b7a10a16cefbe7c0fc781bc21dc66cbd0"
+  },
+  "search-engine-land": {
+    "url": "https://searchengineland.com/",
+    "robots_allowed": true,
+    "http_status": 403,
+    "content_type": "text/html; charset=UTF-8",
+    "bytes": 2000,
+    "final_url": "https://searchengineland.com/",
+    "raw_sha256": "3e4d0545bcc3289db8bafbd7e05a83ef2c4cbd4572123e449441e4030333a85a"
+  },
+  "search-engine-roundtable": {
+    "url": "https://www.seroundtable.com/",
+    "robots_allowed": true,
+    "http_status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 98261,
+    "final_url": "https://www.seroundtable.com/",
+    "raw_sha256": "cb7750f9d595cbefa6ecb67c0e6030a95b665ecffa3ad1aa84f1e7969b9842f6"
+  },
+  "adobe-digital-insights": {
+    "url": "https://business.adobe.com/resources/digital-insights.html",
+    "robots_allowed": null,
+    "http_status": null,
+    "content_type": "TimeoutError('The read operation timed out')",
+    "bytes": 0,
+    "final_url": "https://business.adobe.com/resources/digital-insights.html",
+    "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "perplexity-blog": {
+    "url": "https://www.perplexity.ai/hub/blog",
+    "robots_allowed": true,
+    "http_status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 192251,
+    "final_url": "https://www.perplexity.ai/hub/blog",
+    "raw_sha256": "de2b8649fa9a2a297271ec94f83abe830aefd000fd210d760021f24d23858887"
+  }
+}

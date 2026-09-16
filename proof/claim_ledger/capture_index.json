@@ -1,0 +1,74 @@
+{
+  "openai-platform-bots": {
+    "url": "https://platform.openai.com/docs/bots",
+    "sha256": "7de3f25cd95e8b230bfe8ef56b4f2e16e69460b86bd9f9597346d00ed05b11af",
+    "text_chars": 15566,
+    "status": "ok"
+  },
+  "google-search-central-ai": {
+    "url": "https://developers.google.com/search/docs/appearance/ai-features",
+    "sha256": "4f9bbdc25c02edbe821011283e920c64f2c393ab18bb58ebb6c2e7a0d529c60c",
+    "text_chars": 13784,
+    "status": "ok"
+  },
+  "xai-docs": {
+    "url": "https://docs.x.ai/",
+    "sha256": "b2a568912af30d5f9e18f9908e53beaab1bdf7145c50b93cbbd813c258d8c4ed",
+    "text_chars": 6357,
+    "status": "ok"
+  },
+  "meta-ai-news": {
+    "url": "https://ai.meta.com/blog/",
+    "sha256": "7cfd889adc7276632927a155e0ea25c82b8eb62baaf9d1fa08815510e91e9382",
+    "text_chars": 1167,
+    "status": "ok"
+  },
+  "alibaba-qwen-blog": {
+    "url": "https://qwenlm.github.io/blog/",
+    "sha256": "10c6d1d2fb2ceb161be1e0b47387d5223b135999d1f1ebb64f178092b0d74282",
+    "text_chars": 3819,
+    "status": "ok"
+  },
+  "deepseek-docs": {
+    "url": "https://api-docs.deepseek.com/",
+    "sha256": "dadebe794caba15f9cdbc5605d2ffc60080595931d4becea51157b85b11f7da3",
+    "text_chars": 3957,
+    "status": "ok"
+  },
+  "ahrefs-blog-ai": {
+    "url": "https://ahrefs.com/blog/why-chatgpt-cites-pages/",
+    "sha256": "8eae42a9aa06fdb81dd2ee6362e86d1b8f54f644986c5320f5e7548af237540b",
+    "text_chars": 20003,
+    "status": "ok"
+  },
+  "semrush-blog-ai": {
+    "url": "https://www.semrush.com/blog/",
+    "sha256": "87a12350acecbe1ff9da7512c18eb62b7ef6b7d5c4bddaf7b317ce8cdeb8c97b",
+    "text_chars": 10510,
+    "status": "ok"
+  },
+  "sistrix-blog": {
+    "url": "https://www.sistrix.com/blog/",
+    "sha256": "c8f2a648354afe3d13337da1501c406872d1b6f699790ce283fa2a0bfd24dac1",
+    "text_chars": 9336,
+    "status": "ok"
+  },
+  "peec-blog": {
+    "url": "https://peec.ai/blog",
+    "sha256": "5c540418014bf8cecf0c4bde4eb451491e1b10a3c5c751f39df55fdbd06b63e5",
+    "text_chars": 10592,
+    "status": "ok"
+  },
+  "statcounter-ai-chatbot": {
+    "url": "https://gs.statcounter.com/ai-chatbot-market-share",
+    "sha256": "4a4defa6335c28b768a6af19cdb203e70edad9b52146ae8ba5ba019b4c197648",
+    "text_chars": 7687,
+    "status": "ok"
+  },
+  "cloudflare-blog-ai": {
+    "url": "https://blog.cloudflare.com/tag/ai/",
+    "sha256": "9785cbb38129ad6a52a3a26fb1b2a22db2a10c646a5a650dd30f118dbb23aee6",
+    "text_chars": 7897,
+    "status": "ok"
+  }
+}

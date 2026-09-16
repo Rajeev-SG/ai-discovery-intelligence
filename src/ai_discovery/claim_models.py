@@ -52,7 +52,19 @@ CLAIM_TOPICS: tuple[str, ...] = (
 LocatorKind = Literal["verbatim_quote", "jsonld_field", "table_row", "page_stamp", "section"]
 ClaimStatus = Literal["current", "contested", "historical", "watch", "unknown"]
 Relationship = Literal["new", "supports", "updates", "contradicts", "supersedes", "contextualizes"]
-Comparator = Literal["exact", "at_least", "at_most", "approx", "share_of_total"]
+Comparator = Literal[
+    "exact",
+    "at_least",
+    "at_most",
+    "approx",
+    "share_of_total",
+    "policy_statement",
+    "qualitative_finding",
+    "trigger_rate",
+    "trend",
+    "absence_of_documentation",
+    "qualitative_signal",
+]
 Confidence = Literal["high", "medium", "low", "unknown"]
 ScopeBasis = Literal["source_stated", "publisher_scope", "inferred", "not_stated"]
 MeasurementMode = Literal[
@@ -63,6 +75,7 @@ MeasurementMode = Literal[
     "server_logs",
     "survey",
     "press_release",
+    "official_documentation",
     "unknown",
 ]
 SourceClass = Literal[
@@ -71,6 +84,8 @@ SourceClass = Literal[
     "press_release",
     "news",
     "industry_report",
+    "official",
+    "market_telemetry",
     "other",
 ]
 
