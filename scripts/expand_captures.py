@@ -46,7 +46,7 @@ def fetch(url: str) -> tuple[str, bytes | None]:
         rp.parse(r.text.splitlines()) if r.status_code == 200 else rp.parse(
             ["User-agent: *", "Allow: /"]
         )
-    except Exception:
+    except (httpx.HTTPError, OSError):
         rp.parse(["User-agent: *", "Allow: /"])
     if not rp.can_fetch(UA, url):
         return "robots_denied", None
@@ -55,7 +55,7 @@ def fetch(url: str) -> tuple[str, bytes | None]:
         if resp.status_code != 200:
             return f"http_{resp.status_code}", None
         return "ok", resp.content
-    except Exception as e:
+    except (httpx.HTTPError, OSError) as e:
         return f"error:{type(e).__name__}", None
 
 
