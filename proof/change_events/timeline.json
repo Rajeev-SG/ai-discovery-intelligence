@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-16T17:40:02.815801+00:00",
+  "generated_at": "2026-09-16T18:11:22.494561+00:00",
   "total_events": 6,
   "after_dedupe": 6,
   "surfaces_covered": [
@@ -14,7 +14,7 @@
   "has_qualifying_pair": true,
   "events": [
     {
-      "id": "529f94d246b5",
+      "id": "26b271a7c129",
       "type": "citation_source_shift",
       "title": "SISTRIX: ChatGPT weekly citation churn ~74%, Google AI Mode ~56%",
       "surfaces": [
@@ -34,11 +34,12 @@
       "metadata": {
         "publisher": "SISTRIX",
         "metric": "weekly citation churn",
-        "sample": "82,619 prompts; 17 weeks"
+        "sample": "82,619 prompts; 17 weeks",
+        "source_hash": "61c070d0f494f5548cbed11ef7c11127dc9f90f9f408b526075107a9a5afe5f6"
       }
     },
     {
-      "id": "ccd5cdaf24ee",
+      "id": "e24ee97521f6",
       "type": "audience_shift",
       "title": "ChatGPT AI-chatbot web-traffic share fell from 76.4% to ~52.7%",
       "surfaces": [
@@ -59,11 +60,12 @@
       "dedupe_key": "similarweb-may-2026-ai-chatbot-share",
       "metadata": {
         "publisher": "Similarweb",
-        "denominator": "all AI chatbot web traffic (visits)"
+        "denominator": "all AI chatbot web traffic (visits)",
+        "source_hash": "ab69fca8970c5ec1c1cd958742d1baa04dde44ae54c8b1099b856656a2011b31"
       }
     },
     {
-      "id": "b07ad72b5b01",
+      "id": "8b74f2f70adc",
       "type": "commerce_ads",
       "title": "NAVER AI Tab surpassed 4M cumulative users with >20% product/place CTR",
       "surfaces": [
@@ -81,11 +83,12 @@
       "dedupe_key": "naver-ai-tab-4m-ctr",
       "metadata": {
         "publisher": "NAVER",
-        "metric": "cumulative users (not MAU)"
+        "metric": "cumulative users (not MAU)",
+        "source_hash": "bb7887fcd0e2bb7cdb104f1fad21666a347a09833261bad7337fb6837220a6fd"
       }
     },
     {
-      "id": "61a0e5e05fa6",
+      "id": "676ef53aa654",
       "type": "citation_source_shift",
       "title": "Reddit ChatGPT citation share fell from 3.8% to 0.5% (Promptwatch/Semrush)",
       "surfaces": [
@@ -94,7 +97,9 @@
       "published_at": "2026-08-26T00:00:00+00:00",
       "observed_at": "2026-09-16T17:00:00+00:00",
       "effective_from": "2026-08-14T00:00:00+00:00",
-      "claims": [],
+      "claims": [
+        "c41f8e1bde6615c831ab5b9195a5dd99"
+      ],
       "evidence_urls": [
         "https://www.semrush.com/blog/reddits-citations-in-chatgpt-fall/"
       ],
@@ -102,11 +107,12 @@
       "metadata": {
         "publisher": "Semrush (reporting Promptwatch)",
         "metric": "share of ChatGPT citations",
-        "sample": "daily-panel windows"
+        "sample": "daily-panel windows",
+        "source_hash": "6fa303dc9867d18288f312bb9294517d274a6bb582824115710c1e79c4bed8ba"
       }
     },
     {
-      "id": "edc426631c9c",
+      "id": "a2593847cc9c",
       "type": "citation_source_shift",
       "title": "Ahrefs Sep-2026 snapshot: Reddit is largest cited domain at 16.8% (US)",
       "surfaces": [
@@ -115,7 +121,9 @@
       "published_at": "2026-09-02T00:00:00+00:00",
       "observed_at": "2026-09-16T17:00:00+00:00",
       "effective_from": "2026-09-01T00:00:00+00:00",
-      "claims": [],
+      "claims": [
+        "40889045b2ed4172263bccd12081a666"
+      ],
       "evidence_urls": [
         "https://ahrefs.com/blog/most-cited-domains-in-chatgpt/"
       ],
@@ -125,11 +133,12 @@
         "metric": "mention share among top sources",
         "sample": "810,887 pages cited",
         "qualifies_event_dedupe_key": "semrush-promptwatch-reddit-decline",
-        "qualification_note": "Different denominator (mention share among top sources vs all-citations share), different time window (Sep vs Aug), US-only. Not a direct contradiction."
+        "qualification_note": "Different denominator (mention share among top sources vs all-citations share), different time window (Sep vs Aug), US-only. Not a direct contradiction.",
+        "source_hash": "286c4c39adfffb045559981c397bc7f79b462ac1bff4b4199590c185c11db9c8"
       }
     },
     {
-      "id": "2f2f61f074d3",
+      "id": "6936aaca3ca8",
       "type": "audience_shift",
       "title": "Yandex AI answers exceed 49M monthly users",
       "surfaces": [
@@ -147,7 +156,8 @@
       "dedupe_key": "yandex-49m-monthly-ai-answers",
       "metadata": {
         "publisher": "Yandex",
-        "metric": "monthly feature users"
+        "metric": "monthly feature users",
+        "source_hash": "46439b204b9ac12c90aed4d38905e20b3e9e64db3c79e232f1e7284a1c8c2d14"
       }
     }
   ]

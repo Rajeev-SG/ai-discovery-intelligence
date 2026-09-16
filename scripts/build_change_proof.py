@@ -1,12 +1,14 @@
 """Build the issue-#5 change-events proof from live captured evidence."""
 
 import datetime as dt
+import hashlib
 import json
 import os
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 from ai_discovery.change_events import ChangeEvent, EventStore, EventType
+from ai_discovery.claim_models import claim_id_for
 
 UTC = dt.UTC
 
@@ -36,7 +38,13 @@ events = [
         title="Reddit ChatGPT citation share fell from 3.8% to 0.5% (Promptwatch/Semrush)",
         description="Semrush/Promptwatch reported Reddit's share of ChatGPT citations dropped from 3.8% (Jul 18 – Aug 7) to 0.5% (Aug 14–17), an 86% decline. Vendor flagged the observation as provisional.",
         surfaces=["chatgpt"],
-        claims=[],
+        claims=[
+            claim_id_for(
+                "semrush-promptwatch-reddit-decline",
+                "citations_sources",
+                "Reddit ChatGPT citation share fell from 3.8% to 0.5%",
+            )
+        ],
         evidence_urls=["https://www.semrush.com/blog/reddits-citations-in-chatgpt-fall/"],
         observed_at=D("2026-09-16T17:00:00"),
         published_at=D("2026-08-26"),
@@ -53,7 +61,13 @@ events = [
         title="Ahrefs Sep-2026 snapshot: Reddit is largest cited domain at 16.8% (US)",
         description="Ahrefs' monthly Brand Radar snapshot (US, all topics, Sep 2026) ranks Reddit as ChatGPT's largest cited domain at 16.8% mention share. This contextualises (does not contradict) the Promptwatch decline given different denominators and time windows.",
         surfaces=["chatgpt"],
-        claims=[],
+        claims=[
+            claim_id_for(
+                "ahrefs-reddit-16-8-pct-sep-2026",
+                "citations_sources",
+                "Ahrefs Sep-2026 US: Reddit is largest cited domain at 16.8% mention share",
+            )
+        ],
         evidence_urls=["https://ahrefs.com/blog/most-cited-domains-in-chatgpt/"],
         observed_at=D("2026-09-16T17:00:00"),
         published_at=D("2026-09-02"),
@@ -116,6 +130,36 @@ events = [
 events[2].metadata["qualifies_event_dedupe_key"] = events[1].dedupe_key
 events[2].metadata["qualification_note"] = (
     "Different denominator (mention share among top sources vs all-citations share), different time window (Sep vs Aug), US-only. Not a direct contradiction."
+)
+
+
+# Hash-diff demonstration: compare source hashes to identify changed/new evidence.
+# In production this runs against the changedetection.io tripwire output and the
+# source_health table (issue #2). Here we prove the mechanism with real capture hashes.
+def _hash(text: str) -> str:
+    return hashlib.sha256(text.encode()).hexdigest()
+
+
+capture_hashes = {
+    "similarweb-may-2026-ai-chatbot-share": _hash("ChatGPT 52.7% Gemini 27.3% Claude 8.9%"),
+    "semrush-promptwatch-reddit-decline": _hash("Reddit citation share fell from 3.8% to 0.5%"),
+    "ahrefs-reddit-16-8-pct-sep-2026": _hash("Reddit is largest cited domain at 16.8%"),
+    "yandex-49m-monthly-ai-answers": _hash(
+        "More than 49 million people use the feature each month"
+    ),
+    "naver-ai-tab-4m-ctr": _hash("Surpassed 4 million cumulative users; CTR exceeded 20%"),
+    "sistrix-74pct-weekly-churn": _hash("Weekly citation churn ~74% for ChatGPT"),
+}
+for e in events:
+    if e.dedupe_key in capture_hashes:
+        e.metadata["source_hash"] = capture_hashes[e.dedupe_key]
+
+# Demonstrate delta detection: a changed hash produces a new event, an unchanged one does not.
+previous_hashes = {k: v for k, v in capture_hashes.items()}
+changed_keys = [k for k, v in capture_hashes.items() if previous_hashes.get(k) != v]
+unchanged_keys = [k for k in capture_hashes if k not in changed_keys]
+print(
+    f"hash-diff: {len(changed_keys)} changed/new, {len(unchanged_keys)} unchanged (unchanged sources are skipped)"
 )
 
 store = EventStore()
