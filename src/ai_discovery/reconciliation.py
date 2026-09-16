@@ -7,7 +7,7 @@ from datetime import date
 from math import isfinite
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 Relationship = Literal["supports", "updates", "contradicts", "supersedes", "contextualises"]
 ConflictState = Literal[
@@ -20,8 +20,8 @@ class StudyClaim(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
     id: str = Field(min_length=1)
     evidence_ids: tuple[str, ...] = Field(min_length=1)
-    surface: str
-    subject: str  # E.g. reddit.com; two different cited domains aren't a conflict.
+    surface: str = Field(min_length=1)
+    subject: str = Field(min_length=1)  # E.g. reddit.com; two different cited domains aren't a conflict.
     statement: str
     metric: str | None = None
     denominator: str | None = None
@@ -33,6 +33,13 @@ class StudyClaim(BaseModel):
     value: float | None = None
     unit: str | None = None
     provisional: bool = False
+
+    @field_validator("metric", "denominator", "geography", "mode", "sampling_frame", "unit", mode="before")
+    @classmethod
+    def missing_context(cls, value):
+        if isinstance(value, str) and value.strip().lower() in {"", "unknown", "undocumented"}:
+            return None
+        return value
 
     @model_validator(mode="after")
     def valid_measurement(self):

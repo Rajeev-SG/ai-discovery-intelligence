@@ -96,3 +96,8 @@ def test_self_relation_invalid():
 def test_bad_measurements_rejected(changes):
     with pytest.raises(ValidationError):
         claim(**changes)
+
+
+@pytest.mark.parametrize("value", ["", " ", "unknown", "Unknown", "undocumented"])
+def test_textual_unknown_does_not_make_comparison_known(value):
+    assert compare_claims(claim(mode=value), claim("b", mode=value)).state == "unresolved"
