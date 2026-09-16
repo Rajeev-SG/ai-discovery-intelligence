@@ -289,7 +289,7 @@ class DiscoverySpider(scrapy.Spider):
             return
         try:
             hits = parse_provider(query, bytes(response.body))
-        except Exception as exc:  # surfaced, never silently dropped
+        except Exception as exc:  # noqa: BLE001 — surfaced, never silently dropped
             self.failures.append(
                 {"query_id": query["id"], "provider": query["provider"], "error": str(exc)}
             )
