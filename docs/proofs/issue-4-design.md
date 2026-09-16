@@ -47,3 +47,4 @@ The 3 findings are template placeholders with no content (Problem/Impact/Require
 | F2 (blank) | No actionable content. Live-source verification is documented in docs/proofs/issue-4-design.md. | Live capture /tmp/adi-reddit-research.md |
 | F3 (blank) | No actionable content. No identified defect. | `ruff check src tests` |
 
+# Issue-#4 product proof: contested Reddit/ChatGPT reconciliation. PR #11.
