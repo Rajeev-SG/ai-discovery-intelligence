@@ -1,6 +1,12 @@
 import datetime as dt
 
-from ai_discovery.coverage import CoverageGap, CoverageMatrix, GapCategory, Priority
+from ai_discovery.coverage import (
+    CoverageGap,
+    CoverageMatrix,
+    GapCategory,
+    LedgerDerivedMatrix,
+    Priority,
+)
 
 
 def gap(**kw):
@@ -75,3 +81,56 @@ def test_not_stale_without_days():
     g = gap(last_verified=dt.datetime(2026, 6, 1, tzinfo=dt.UTC))
     m = CoverageMatrix([g])
     assert not m.is_stale(g)
+
+
+def test_fetch_failed_is_distinct_from_no_evidence():
+    """A fetch failure must never be categorised as no_evidence."""
+    m = CoverageMatrix(
+        [
+            gap(id="fetch-fail", category=GapCategory.fetch_failed),
+            gap(id="no-ev", category=GapCategory.no_evidence),
+        ]
+    )
+    assert [g.id for g in m.by_category(GapCategory.fetch_failed)] == ["fetch-fail"]
+    assert [g.id for g in m.by_category(GapCategory.no_evidence)] == ["no-ev"]
+    assert GapCategory.fetch_failed != GapCategory.no_evidence
+
+
+def test_derived_matrix_from_claim_ledger():
+    """Given a ledger with a fresh claim and an expired claim for one surface and nothing for another, the matrix reports covered / stale / no_evidence."""
+    import types
+
+    now = dt.datetime(2026, 9, 16, tzinfo=dt.UTC)
+    fresh_claim = types.SimpleNamespace(
+        surfaces=["chatgpt"],
+        topics=["citation"],
+        geographies=["global"],
+        observed_at=dt.datetime(2026, 9, 1, tzinfo=dt.UTC),
+        url="https://example.com/fresh",
+    )
+    stale_claim = types.SimpleNamespace(
+        surfaces=["gemini"],
+        topics=["citation"],
+        geographies=["global"],
+        observed_at=dt.datetime(2026, 1, 1, tzinfo=dt.UTC),
+        url="https://example.com/stale",
+    )
+    dm = LedgerDerivedMatrix([fresh_claim, stale_claim], stale_after_days=90, now=now)
+    gaps = dm.derive()
+    by_surface = {}
+    for g in gaps:
+        by_surface[g.surfaces[0]] = g.category
+    assert by_surface.get("chatgpt") == GapCategory.single_source, (
+        f"fresh single source should be single_source, got {by_surface.get('chatgpt')}"
+    )
+    assert by_surface.get("gemini") == GapCategory.stale_evidence, (
+        f"expired claim should be stale_evidence, got {by_surface.get('gemini')}"
+    )
+
+
+def test_derived_matrix_empty_for_missing_surface():
+    """A surface with no claims should produce no gap entry (not covered, not stale)."""
+    now = dt.datetime(2026, 9, 16, tzinfo=dt.UTC)
+    dm = LedgerDerivedMatrix([], stale_after_days=90, now=now)
+    gaps = dm.derive()
+    assert gaps == []
