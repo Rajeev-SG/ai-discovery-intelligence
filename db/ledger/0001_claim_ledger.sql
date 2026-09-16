@@ -1,8 +1,8 @@
 -- Migration: claim ledger (issue #3)
 --
 -- Additive only. Depends on the issue #2 tables (source, evidence_item) for the
--- two commented-out foreign keys below; run those uncommented at integration
--- once 0001_evidence (issue #2) has been applied.
+-- two deferred foreign keys below; enable both at issue-#2 integration.
+-- source_id FK is likewise deferred; no live REFERENCES exists in this file.
 --
 -- History is append-only: `claim.statement` / methodology are never UPDATEd in
 -- place. A new capture writes a new `claim_evidence` row; a materially changed
@@ -12,7 +12,7 @@ BEGIN;
 
 CREATE TABLE study (
     study_id            varchar(32) PRIMARY KEY,
-    source_id           varchar(120) NOT NULL REFERENCES source(id) ON DELETE SET NULL,
+    source_id           varchar(120) NOT NULL, -- FK to source(id) deferred to issue-#2 integration
     publisher           varchar(200) NOT NULL,
     url                 text NOT NULL,
     canonical_url       text NOT NULL,
