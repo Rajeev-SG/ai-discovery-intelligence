@@ -147,6 +147,7 @@ class BriefItem(BaseModel):
     is_watch_item: bool = False
 
 
+# BriefGenerator resolves all thresholds from config/executive_policy.yaml via None sentinels.
 class BriefGenerator:
     """Generates a restrained weekly brief from scored candidates."""
 
