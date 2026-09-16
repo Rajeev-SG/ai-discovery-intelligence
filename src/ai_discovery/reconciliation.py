@@ -103,12 +103,12 @@ def compare_claims(first: StudyClaim, second: StudyClaim) -> Reconciliation:
         for key in (*context, "period_start", "period_end", "value")
         if getattr(first, key) is None or getattr(second, key) is None
     )
-    common = dict(
-        claim_ids=(first.id, second.id),
-        evidence_ids=tuple(dict.fromkeys((*first.evidence_ids, *second.evidence_ids))),
-        differences=differences,
-        unknown_dimensions=unknown,
-    )
+    common = {
+        "claim_ids": (first.id, second.id),
+        "evidence_ids": tuple(dict.fromkeys((*first.evidence_ids, *second.evidence_ids))),
+        "differences": differences,
+        "unknown_dimensions": unknown,
+    }
     if differences:
         return Reconciliation(
             **common,
