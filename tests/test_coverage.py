@@ -134,3 +134,82 @@ def test_derived_matrix_empty_for_missing_surface():
     dm = LedgerDerivedMatrix([], stale_after_days=90, now=now)
     gaps = dm.derive()
     assert gaps == []
+
+
+def test_registry_surfaces_produce_no_evidence():
+    """A surface in the registry with zero claims must produce a no_evidence gap."""
+
+    now = dt.datetime(2026, 9, 16, tzinfo=dt.UTC)
+    dm = LedgerDerivedMatrix([], surfaces_registry=["doubao", "qwen"], stale_after_days=90, now=now)
+    gaps = dm.derive()
+    categories = {g.surfaces[0]: g.category for g in gaps}
+    assert categories.get("doubao") == GapCategory.no_evidence
+    assert categories.get("qwen") == GapCategory.no_evidence
+
+
+def test_computed_priority_from_importance():
+    """Priority should be computed from importance_score, not hardcoded medium."""
+    now = dt.datetime(2026, 9, 16, tzinfo=dt.UTC)
+    dm = LedgerDerivedMatrix(
+        [],
+        surfaces_registry=["a", "b", "c"],
+        stale_after_days=90,
+        now=now,
+        importance_overrides={"a": 0.9, "b": 0.6, "c": 0.3},
+    )
+    gaps = dm.derive()
+    by_surface = {g.surfaces[0]: g for g in gaps}
+    assert by_surface["a"].priority == Priority.high
+    assert by_surface["b"].priority == Priority.medium
+    assert by_surface["c"].priority == Priority.low
+
+
+def test_stale_urls_retained_in_single_source():
+    """One fresh + two stale claims → single_source with stale URLs in metadata."""
+    import types
+
+    now = dt.datetime(2026, 9, 16, tzinfo=dt.UTC)
+    fresh = types.SimpleNamespace(
+        surfaces=["chatgpt"],
+        topics=["citation"],
+        geographies=["global"],
+        observed_at=dt.datetime(2026, 9, 1, tzinfo=dt.UTC),
+        url="https://fresh.example",
+    )
+    stale_a = types.SimpleNamespace(
+        surfaces=["chatgpt"],
+        topics=["citation"],
+        geographies=["global"],
+        observed_at=dt.datetime(2026, 1, 1, tzinfo=dt.UTC),
+        url="https://stale-a.example",
+    )
+    stale_b = types.SimpleNamespace(
+        surfaces=["chatgpt"],
+        topics=["citation"],
+        geographies=["global"],
+        observed_at=dt.datetime(2026, 2, 1, tzinfo=dt.UTC),
+        url="https://stale-b.example",
+    )
+    dm = LedgerDerivedMatrix([fresh, stale_a, stale_b], stale_after_days=90, now=now)
+    gaps = dm.derive()
+    assert gaps[0].category == GapCategory.single_source
+    assert "https://stale-a.example" in gaps[0].metadata["stale_evidence_urls"]
+    assert "https://stale-b.example" in gaps[0].metadata["stale_evidence_urls"]
+
+
+def test_published_at_only_not_fresh():
+    """A claim with only published_at (no observed_at) should be treated as not fresh."""
+    import types
+
+    now = dt.datetime(2026, 9, 16, tzinfo=dt.UTC)
+    published_only = types.SimpleNamespace(
+        surfaces=["x"],
+        topics=["t"],
+        geographies=["g"],
+        observed_at=None,
+        published_at=dt.datetime(2026, 9, 1, tzinfo=dt.UTC),
+        url="https://x",
+    )
+    dm = LedgerDerivedMatrix([published_only], stale_after_days=90, now=now)
+    gaps = dm.derive()
+    assert gaps[0].category == GapCategory.stale_evidence
