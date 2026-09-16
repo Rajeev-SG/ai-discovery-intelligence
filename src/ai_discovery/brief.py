@@ -9,8 +9,10 @@ self-reported confidence.
 from __future__ import annotations
 
 from enum import Enum
+from pathlib import Path
 from typing import ClassVar
 
+import yaml
 from pydantic import BaseModel, Field
 
 
@@ -23,7 +25,7 @@ class ConfidenceLabel(str, Enum):
 
 
 class ConfidenceScorer(BaseModel):
-    """Weighted-input confidence scorer driven by config/significance.yaml."""
+    """Weighted-input confidence scorer. Weights loaded from config/significance.yaml."""
 
     source_authority: float = 0.2
     methodology_transparency: float = 0.15
@@ -32,6 +34,23 @@ class ConfidenceScorer(BaseModel):
     geography_fit: float = 0.1
     corroboration: float = 0.2
     directness: float = 0.1
+
+    @classmethod
+    def from_config(cls, config_path: str | None = None) -> ConfidenceScorer:
+        path = Path(
+            config_path or Path(__file__).resolve().parents[2] / "config" / "significance.yaml"
+        )
+        cfg = yaml.safe_load(path.read_text())
+        cd = cfg["confidence_dimensions"]
+        return cls(
+            source_authority=cd["source_authority"],
+            methodology_transparency=cd["methodology_transparency"],
+            sample_strength=cd["sample_strength"],
+            recency=cd["recency"],
+            geography_fit=cd["geography_fit"],
+            corroboration=cd["corroboration"],
+            directness=cd["directness"],
+        )
 
     def score(
         self,
@@ -68,7 +87,7 @@ class ConfidenceScorer(BaseModel):
 
 
 class SignificanceScorer(BaseModel):
-    """Weighted-input significance scorer driven by config/significance.yaml."""
+    """Weighted-input significance scorer. Weights loaded from config/significance.yaml."""
 
     reach: float = 0.2
     commercial_intent: float = 0.2
@@ -76,6 +95,22 @@ class SignificanceScorer(BaseModel):
     breadth: float = 0.15
     persistence: float = 0.1
     actionability: float = 0.15
+
+    @classmethod
+    def from_config(cls, config_path: str | None = None) -> SignificanceScorer:
+        path = Path(
+            config_path or Path(__file__).resolve().parents[2] / "config" / "significance.yaml"
+        )
+        cfg = yaml.safe_load(path.read_text())
+        dims = cfg["dimensions"]
+        return cls(
+            reach=dims["reach"],
+            commercial_intent=dims["commercial_intent"],
+            magnitude=dims["magnitude"],
+            breadth=dims["breadth"],
+            persistence=dims["persistence"],
+            actionability=dims["actionability"],
+        )
 
     def score(
         self,
@@ -126,8 +161,30 @@ class BriefGenerator:
         normal_min_significance: float = 3.5,
         watch_item_min_significance: float = 4.5,
     ):
-        self.confidence_scorer = confidence_scorer or ConfidenceScorer()
-        self.significance_scorer = significance_scorer or SignificanceScorer()
+        if (
+            max_items == 5
+            and target_items == 3
+            and min_confidence is ConfidenceLabel.MEDIUM
+            and normal_min_significance == 3.5
+            and watch_item_min_significance == 4.5
+        ):
+            # Load defaults from config only when caller did not override any threshold.
+            policy_path = Path(__file__).resolve().parents[2] / "config" / "executive_policy.yaml"
+            if policy_path.exists():
+                policy = yaml.safe_load(policy_path.read_text())["weekly_brief"]
+                max_items = policy.get("hard_max_items", max_items)
+                target_items = policy.get("target_items", target_items)
+                mc = policy.get("minimum_confidence")
+                if mc:
+                    min_confidence = ConfidenceLabel(mc)
+                normal_min_significance = policy.get(
+                    "normal_minimum_significance", normal_min_significance
+                )
+                watch_item_min_significance = policy.get(
+                    "watch_item_minimum_significance", watch_item_min_significance
+                )
+        self.confidence_scorer = confidence_scorer or ConfidenceScorer.from_config()
+        self.significance_scorer = significance_scorer or SignificanceScorer.from_config()
         self.max_items = max_items
         self.target_items = target_items
         self.min_confidence = min_confidence

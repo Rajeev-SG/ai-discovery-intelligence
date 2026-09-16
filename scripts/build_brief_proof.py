@@ -6,7 +6,13 @@ import os
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-from ai_discovery.brief import BriefGenerator, BriefItem, ConfidenceLabel
+from ai_discovery.brief import (
+    BriefGenerator,
+    BriefItem,
+    ConfidenceLabel,
+    ConfidenceScorer,
+    SignificanceScorer,
+)
 
 candidates = [
     BriefItem(
@@ -90,6 +96,20 @@ candidates = [
         is_watch_item=False,
     ),
 ]
+
+# Verify scorers are loaded from config and actually callable (not just decorative).
+cs = ConfidenceScorer.from_config()
+ss = SignificanceScorer.from_config()
+print(
+    f"ConfidenceScorer weights from config: source_authority={cs.source_authority}, corroboration={cs.corroboration}"
+)
+print(f"SignificanceScorer weights from config: reach={ss.reach}, breadth={ss.breadth}")
+print(
+    f"Example confidence score for (0.8, 0.6, 0.4, 0.7, 0.5, 0.9, 0.7) = {cs.score(source_authority=0.8, methodology_transparency=0.6, sample_strength=0.4, recency=0.7, geography_fit=0.5, corroboration=0.9, directness=0.7)} ({cs.label(cs.score(source_authority=0.8, methodology_transparency=0.6, sample_strength=0.4, recency=0.7, geography_fit=0.5, corroboration=0.9, directness=0.7)).value})"
+)
+print(
+    f"Example significance score for (0.8, 0.6, 0.7, 0.5, 0.9, 0.7) = {ss.score(reach=0.8, commercial_intent=0.6, magnitude=0.7, breadth=0.5, persistence=0.9, actionability=0.7)}"
+)
 
 bg = BriefGenerator()
 included = bg.generate(candidates)
