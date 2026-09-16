@@ -86,7 +86,7 @@ class LedgerDerivedMatrix:
         gaps = []
         for (surface, topic, geo), matched in triples.items():
             fresh = [c for c in matched if self._is_fresh(c)]
-            stale = [c for c in matched if not self._is_fresh(c)]
+            # stale claims: fresh list is empty when all are stale
             if len(matched) == 0:
                 continue
             elif len(fresh) == 0:
