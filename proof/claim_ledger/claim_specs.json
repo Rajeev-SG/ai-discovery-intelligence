@@ -1,0 +1,2307 @@
+{
+  "extraction_version": "claim-extraction-0.1.0",
+  "claims": [
+    {
+      "source": {
+        "source_id": "similarweb-most-visited-websites",
+        "publisher": "Similarweb",
+        "url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+        "canonical_url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+        "source_class": "vendor_research",
+        "robots_allowed": true
+      },
+      "topic": "audience_usage",
+      "statement": "Similarweb estimates ChatGPT at ~52.7% of all AI-chatbot web traffic in the month before the May 2026 update, down from 76.4% twelve months earlier, with Gemini at 27.3% and Claude at 8.9%.",
+      "surfaces": [
+        "chatgpt",
+        "gemini",
+        "claude",
+        "deepseek-chat"
+      ],
+      "methodology": {
+        "measurement_mode": "vendor_estimate",
+        "metric_family": {
+          "value": "share of measured AI-chatbot web traffic",
+          "quote": "falling from 76.4% of all AI chatbot web traffic"
+        },
+        "metric_definition": {
+          "value": "share of estimated monthly visits attributable to each AI chatbot",
+          "quote": "ChatGPT's web traffic share fell from 76.4% one year ago to around 52.7% one month ago."
+        },
+        "denominator": {
+          "value": "all AI chatbot web traffic (visits), worldwide",
+          "quote": "falling from 76.4% of all AI chatbot web traffic 12 months ago to around 52.7% one month ago"
+        },
+        "prompt_universe": null,
+        "sample_size": null,
+        "unit_of_analysis": {
+          "value": "domain-level monthly visits (estimated)",
+          "quote": "# Domain Monthly Visits MoM traffic change Yearly Change"
+        },
+        "time_window": {
+          "value": "~Apr 2026 (the month before the 14 May 2026 update)",
+          "quote": "around 52.7% one month ago"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "devices": {
+          "value": "desktop and mobile web",
+          "quote": "Our methodology covers both desktop and mobile web."
+        },
+        "limitations": [
+          "Estimates, rounded, and modelled - not a measured census.",
+          "Visit-share denominator, not users/MAU; not comparable to panel market-share trackers."
+        ],
+        "methodology_notes": {
+          "value": "Similarweb combines opt-in device/panel measurement, ISP data, public data sources, and machine-learning models.",
+          "quote": "Similarweb estimates monthly visits using a combination of direct measurement from opt-in devices and panels, ISP data, public data sources, and machine learning models."
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "chatgpt_share",
+          "label": "ChatGPT share of AI-chatbot web traffic",
+          "definition": {
+            "value": "ChatGPT's share of all AI-chatbot web traffic",
+            "quote": "falling from 76.4% of all AI chatbot web traffic"
+          },
+          "value": {
+            "value": 52.7,
+            "quote": "around 52.7% one month ago"
+          },
+          "unit": {
+            "value": "%",
+            "quote": "52.7%"
+          },
+          "comparator": "share_of_total",
+          "window": {
+            "value": "~Apr 2026",
+            "quote": "one month ago"
+          },
+          "scope": {
+            "value": "worldwide, all AI chatbots",
+            "quote": "all AI chatbot web traffic"
+          }
+        },
+        {
+          "metric_id": "chatgpt_prior_share",
+          "label": "ChatGPT share twelve months earlier",
+          "definition": {
+            "value": "ChatGPT's share of all AI-chatbot web traffic one year before",
+            "quote": "falling from 76.4% of all AI chatbot web traffic 12 months ago"
+          },
+          "value": {
+            "value": 76.4,
+            "quote": "76.4% of all AI chatbot web traffic 12 months ago"
+          },
+          "unit": {
+            "value": "%",
+            "quote": "76.4%"
+          },
+          "comparator": "share_of_total",
+          "window": {
+            "value": "~Apr 2025 (12 months before measurement)",
+            "quote": "12 months ago"
+          },
+          "scope": {
+            "value": "worldwide, all AI chatbots",
+            "quote": "all AI chatbot web traffic"
+          }
+        },
+        {
+          "metric_id": "gemini_share",
+          "label": "Gemini share of AI-chatbot web traffic",
+          "definition": {
+            "value": "Gemini's share of AI-chatbot web traffic",
+            "quote": "Gemini has taken the largest share of that ground, rising from roughly 9% to 27.3%"
+          },
+          "value": {
+            "value": 27.3,
+            "quote": "rising from roughly 9% to 27.3% over the same period"
+          },
+          "unit": {
+            "value": "%",
+            "quote": "27.3%"
+          },
+          "comparator": "share_of_total",
+          "window": {
+            "value": "~Apr 2026",
+            "quote": "over the same period"
+          },
+          "scope": {
+            "value": "worldwide, AI chatbots",
+            "quote": "the same period"
+          }
+        },
+        {
+          "metric_id": "deepseek_visits",
+          "label": "DeepSeek chat visits",
+          "definition": {
+            "value": "Estimated monthly visits to chat.deepseek.com",
+            "quote": "chat.deepseek.com 375.1M"
+          },
+          "value": {
+            "value": "375.1M",
+            "quote": "chat.deepseek.com 375.1M"
+          },
+          "unit": {
+            "value": "visits",
+            "quote": "Monthly Visits"
+          },
+          "comparator": "approx",
+          "window": {
+            "value": "May 2026",
+            "quote": "monthly visits in May 2026"
+          },
+          "scope": {
+            "value": "worldwide (rank #82)",
+            "quote": "chat.deepseek.com 375.1M"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": "2026-05-14",
+        "published_at_selector": "datePublished",
+        "modified_at": "2026-06-11",
+        "modified_at_selector": "dateModified",
+        "measured_window": {
+          "value": "~Apr 2026",
+          "quote": "one month ago"
+        },
+        "observed_at": "2026-09-16T12:00:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "jsonld_field",
+          "selector": "datePublished=2026-05-14T01:54:23+00:00 / dateModified=2026-06-11T12:07:19+00:00"
+        },
+        {
+          "kind": "verbatim_quote",
+          "quote": "falling from 76.4% of all AI chatbot web traffic 12 months ago to around 52.7% one month ago"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "similarweb_visit_share_v1"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "medium"
+    },
+    {
+      "source": {
+        "source_id": "sistrix-ai-citation-drift",
+        "publisher": "SISTRIX",
+        "url": "https://www.sistrix.com/blog/ai-citation-drift-how-stable-are-sources-in-ai-search-results/",
+        "canonical_url": "https://www.sistrix.com/blog/ai-citation-drift-how-stable-are-sources-in-ai-search-results/",
+        "source_class": "vendor_research",
+        "robots_allowed": true
+      },
+      "topic": "citations_sources",
+      "statement": "SISTRIX's 17-week, six-country study of 82,619 prompts found ChatGPT replaces ~74% of its cited sources week to week and Google AI Mode ~56%, with Google AI Mode churn a consistent 54-59% across all six countries.",
+      "surfaces": [
+        "chatgpt",
+        "google-ai-mode"
+      ],
+      "methodology": {
+        "measurement_mode": "vendor_panel",
+        "metric_family": {
+          "value": "weekly source/citation churn",
+          "quote": "Citation drift is global and persistent"
+        },
+        "metric_definition": {
+          "value": "share of cited sources replaced from one week to the next",
+          "quote": "Google replaces 56% of sources in AI-generated responses every week"
+        },
+        "denominator": {
+          "value": "cited sources in AI-generated responses, week over week",
+          "quote": "replaces 56% of sources in AI-generated responses every week"
+        },
+        "prompt_universe": {
+          "value": "82,619 prompts across six countries",
+          "quote": "Our analysis of 82,619 prompts over 17 weeks"
+        },
+        "sample_size": {
+          "value": "82,619 prompts; 17 weeks",
+          "quote": "Our analysis of 82,619 prompts over 17 weeks"
+        },
+        "unit_of_analysis": {
+          "value": "cited source/domain per weekly prompt set",
+          "quote": "sources in AI-generated responses"
+        },
+        "time_window": {
+          "value": "17 weeks (study period, published May 2026)",
+          "quote": "over 17 weeks"
+        },
+        "geography": {
+          "value": "six countries incl. US, Germany, UK, France",
+          "quote": "covering three platforms , six countries and 17 weeks"
+        },
+        "geography_basis": "source_stated",
+        "language": {
+          "value": "English-language report",
+          "kind": "jsonld_field",
+          "selector": "inLanguage=en-US (article JSON-LD)"
+        },
+        "language_basis": "inferred",
+        "devices": null,
+        "limitations": [
+          "Vendor panel (SISTRIX data); prompt selection method not published in the article.",
+          "Country-level ChatGPT churn varies (Germany 74%, UK 60%, France 42%); do not generalise one country."
+        ],
+        "methodology_notes": {
+          "value": "Weekly comparison of the source set per prompt; 'drift' = sources swapped out week to week.",
+          "quote": "We took a closer look at the issue using SISTRIX data , covering three platforms , six countries and 17 weeks"
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "chatgpt_weekly_churn",
+          "label": "ChatGPT weekly source churn",
+          "definition": {
+            "value": "% of ChatGPT sources replaced each week",
+            "quote": "ChatGPT replaces as much as 74%"
+          },
+          "value": {
+            "value": "74%",
+            "quote": "ChatGPT replaces as much as 74%"
+          },
+          "unit": {
+            "value": "%",
+            "quote": "74%"
+          },
+          "comparator": "exact",
+          "window": {
+            "value": "per week over 17 weeks",
+            "quote": "every week"
+          },
+          "scope": {
+            "value": "ChatGPT, six countries",
+            "quote": "ChatGPT replaces as much as 74%"
+          }
+        },
+        {
+          "metric_id": "google_ai_mode_weekly_churn",
+          "label": "Google AI Mode weekly source churn",
+          "definition": {
+            "value": "% of Google AI Mode sources replaced each week",
+            "quote": "Google replaces 56% of sources"
+          },
+          "value": {
+            "value": "56%",
+            "quote": "Google replaces 56% of sources in AI-generated responses every week"
+          },
+          "unit": {
+            "value": "%",
+            "quote": "56%"
+          },
+          "comparator": "exact",
+          "window": {
+            "value": "per week over 17 weeks",
+            "quote": "every week"
+          },
+          "scope": {
+            "value": "Google AI Mode, six countries",
+            "quote": "Google replaces 56% of sources"
+          }
+        },
+        {
+          "metric_id": "google_ai_mode_country_range",
+          "label": "Google AI Mode weekly churn range across countries",
+          "definition": {
+            "value": "country-level weekly churn range",
+            "quote": "drift rates in Google AI Mode are remarkably consistent across all six countries studied"
+          },
+          "value": {
+            "value": "54-59%",
+            "quote": "Drift rates remain consistently at 54-59% across six countries"
+          },
+          "unit": {
+            "value": "%",
+            "quote": "54-59%"
+          },
+          "comparator": "exact",
+          "window": {
+            "value": "weekly, 17 weeks",
+            "quote": "over the 17-week period"
+          },
+          "scope": {
+            "value": "Google AI Mode, six countries incl. US and Germany",
+            "quote": "not a phenomenon specific to the US or Germany"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": "2026-05-01",
+        "published_at_selector": "datePublished",
+        "modified_at": "2026-05-12",
+        "modified_at_selector": "dateModified",
+        "measured_window": {
+          "value": "17 weeks up to ~Apr 2026",
+          "quote": "over 17 weeks"
+        },
+        "observed_at": "2026-09-16T12:05:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "jsonld_field",
+          "selector": "datePublished=2026-05-01T11:34:47+00:00 / dateModified=2026-05-12T12:41:18+00:00"
+        },
+        {
+          "kind": "verbatim_quote",
+          "quote": "Google replaces 56% of sources in AI-generated responses every week, whilst ChatGPT replaces as much as 74%"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "sistrix_citation_drift_v1"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "medium"
+    },
+    {
+      "source": {
+        "source_id": "yandex-ai-search-pretrain-2026-09",
+        "publisher": "Yandex",
+        "url": "https://yandex.com/company/news/2026-09-14-01",
+        "canonical_url": "https://yandex.com/company/news/2026-09-14-01",
+        "source_class": "press_release",
+        "robots_allowed": true
+      },
+      "topic": "audience_usage",
+      "statement": "Yandex reports that more than 49 million people use its AI answers in Search each month, making it Yandex's most widely used generative AI product (press release, 14 Sep 2026).",
+      "surfaces": [
+        "yandex-ai-search"
+      ],
+      "methodology": {
+        "measurement_mode": "press_release",
+        "metric_family": {
+          "value": "monthly feature usage",
+          "quote": "use the feature each month"
+        },
+        "metric_definition": {
+          "value": "people who use AI answers in Yandex Search in a month",
+          "quote": "use the feature each month"
+        },
+        "denominator": {
+          "value": "monthly users of the AI answers feature within Yandex Search",
+          "quote": "More than 49 million people use the feature each month"
+        },
+        "prompt_universe": null,
+        "sample_size": null,
+        "unit_of_analysis": {
+          "value": "people (feature users), not app MAU and not all search users",
+          "quote": "Yandex's most widely used generative AI product"
+        },
+        "time_window": {
+          "value": "each month (no named measurement month; published Sep 2026)",
+          "quote": "each month"
+        },
+        "geography": {
+          "value": "Russia / Russian-language Yandex ecosystem",
+          "quote": "blind tests of Russian-language answer quality"
+        },
+        "geography_basis": "source_stated",
+        "language": {
+          "value": "Russian",
+          "quote": "Russian-language answer quality"
+        },
+        "language_basis": "source_stated",
+        "devices": null,
+        "limitations": [
+          "Vendor press release; no sample, panel or measurement method published.",
+          "Measured month is not named - only 'each month' at publication."
+        ],
+        "methodology_notes": {
+          "value": "Company-stated usage figure in a press release about open-sourcing the model behind the feature.",
+          "quote": "Yandex has open-sourced Alice AI Search Pretrain"
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "monthly_ai_answer_users",
+          "label": "Monthly users of Yandex AI answers in Search",
+          "definition": {
+            "value": "people using AI answers in Yandex Search per month",
+            "quote": "use the feature each month"
+          },
+          "value": {
+            "value": 49000000,
+            "quote": "More than 49 million people use the feature each month"
+          },
+          "unit": {
+            "value": "people (monthly)",
+            "quote": "49 million people"
+          },
+          "comparator": "at_least",
+          "window": {
+            "value": "each month (unnamed)",
+            "quote": "each month"
+          },
+          "scope": {
+            "value": "Yandex Search AI answers feature",
+            "quote": "the feature each month"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": "2026-09-14",
+        "published_at_selector": "page stamp 'September 14, 2026'",
+        "modified_at": null,
+        "modified_at_selector": null,
+        "measured_window": {
+          "value": "each month (no named measurement month)",
+          "quote": "each month"
+        },
+        "observed_at": "2026-09-16T12:10:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "page_stamp",
+          "selector": "September 14, 2026"
+        },
+        {
+          "kind": "verbatim_quote",
+          "quote": "More than 49 million people use the feature each month, making it Yandex's most widely used generative AI product"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "yandex_feature_usage_v1"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "low"
+    },
+    {
+      "source": {
+        "source_id": "naver-ai-tab-launch-2026-06",
+        "publisher": "NAVER",
+        "url": "https://www.navercorp.com/media/pressReleasesDetail?seq=10034442",
+        "canonical_url": "https://www.navercorp.com/media/pressReleasesDetail?seq=10034442",
+        "source_class": "press_release",
+        "robots_allowed": true
+      },
+      "topic": "referrals_conversion",
+      "statement": "NAVER's AI Tab surpassed 4 million cumulative users in ~2 months of beta, product and place card CTR exceeded 20%, and it is built on a model for NAVER's service environment which averages 50 million daily visitors (press release, 26 Jun 2026).",
+      "surfaces": [
+        "naver-ai"
+      ],
+      "methodology": {
+        "measurement_mode": "press_release",
+        "metric_family": {
+          "value": "cumulative users and card click-through rate",
+          "quote": "Surpassed 4 million cumulative users"
+        },
+        "metric_definition": {
+          "value": "beta cumulative users; CTR for product and place cards",
+          "quote": "click-through rates (CTR) for both product and place cards exceeded 20%"
+        },
+        "denominator": {
+          "value": "cumulative beta users (~2 months) and card CTR during beta - distinct denominators",
+          "quote": "surpassed 4 million cumulative users in about two months"
+        },
+        "prompt_universe": null,
+        "sample_size": null,
+        "unit_of_analysis": {
+          "value": "users and card impressions (three separate quantities kept apart)",
+          "quote": "which receives an average of 50 million daily visitors"
+        },
+        "time_window": {
+          "value": "~2 months post-Apr 2026 beta, to 26 Jun 2026 launch",
+          "quote": "in about two months"
+        },
+        "geography": {
+          "value": "South Korea (navercorp.com press release, Korean-language page)",
+          "quote": "NAVER Officially Launches AI Tab"
+        },
+        "geography_basis": "publisher_scope",
+        "language": {
+          "value": "Korean",
+          "kind": "jsonld_field",
+          "selector": "document element lang=ko"
+        },
+        "language_basis": "source_stated",
+        "devices": {
+          "value": "mobile and PC search bars",
+          "quote": "one click from the mobile and PC search bars"
+        },
+        "limitations": [
+          "Vendor press release; no sample or measurement method published.",
+          "The '50 million daily visitors' is the NAVER main page, not AI Tab users - must not be merged."
+        ],
+        "methodology_notes": {
+          "value": "Company-stated beta metrics in a launch press release; three quantities with different denominators.",
+          "quote": "AI Tab, which launched in beta in April for NAVER Plus Membership users, surpassed 4 million cumulative users in about two months."
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "cumulative_users",
+          "label": "AI Tab cumulative beta users",
+          "definition": {
+            "value": "cumulative users in ~2 months of beta",
+            "quote": "Surpassed 4 million cumulative users in two months after beta launch"
+          },
+          "value": {
+            "value": 4000000,
+            "quote": "surpassed 4 million cumulative users in about two months"
+          },
+          "unit": {
+            "value": "people (cumulative)",
+            "quote": "4 million cumulative users"
+          },
+          "comparator": "at_least",
+          "window": {
+            "value": "~2 months of beta (Apr-Jun 2026)",
+            "quote": "in about two months"
+          },
+          "scope": {
+            "value": "NAVER Plus Membership beta users",
+            "quote": "for NAVER Plus Membership users"
+          }
+        },
+        {
+          "metric_id": "card_ctr",
+          "label": "Product/place card click-through rate",
+          "definition": {
+            "value": "CTR for product and place cards during beta",
+            "quote": "click-through rates (CTR) for both product and place cards"
+          },
+          "value": {
+            "value": ">20%",
+            "quote": "click-through rates (CTR) for both product and place cards exceeded 20%"
+          },
+          "unit": {
+            "value": "%",
+            "quote": "20%"
+          },
+          "comparator": "at_least",
+          "window": {
+            "value": "beta period",
+            "quote": "During the beta period"
+          },
+          "scope": {
+            "value": "product and place cards",
+            "quote": "both product and place cards"
+          }
+        },
+        {
+          "metric_id": "main_page_daily_visitors",
+          "label": "NAVER main page average daily visitors",
+          "definition": {
+            "value": "average daily visitors to NAVER's main page (not AI Tab users)",
+            "quote": "which receives an average of 50 million daily visitors"
+          },
+          "value": {
+            "value": 50000000,
+            "quote": "which receives an average of 50 million daily visitors"
+          },
+          "unit": {
+            "value": "visitors per day",
+            "quote": "daily visitors"
+          },
+          "comparator": "approx",
+          "window": {
+            "value": "period not stated",
+            "quote": "receives an average of"
+          },
+          "scope": {
+            "value": "NAVER main page / service environment",
+            "quote": "NAVER's service environment, which receives an average of 50 million daily visitors"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": "2026-06-26",
+        "published_at_selector": "page stamp '2026.06.26'",
+        "modified_at": null,
+        "modified_at_selector": null,
+        "measured_window": {
+          "value": "Apr-Jun 2026 (~2-month beta)",
+          "quote": "in about two months"
+        },
+        "observed_at": "2026-09-16T12:15:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "page_stamp",
+          "selector": "2026.06.26"
+        },
+        {
+          "kind": "verbatim_quote",
+          "quote": "surpassed 4 million cumulative users in about two months"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "naver_ai_tab_beta_v1"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "low"
+    },
+    {
+      "source": {
+        "source_id": "openai-platform-bots",
+        "publisher": "OpenAI",
+        "url": "https://platform.openai.com/docs/bots",
+        "canonical_url": "https://platform.openai.com/docs/bots",
+        "source_class": "official",
+        "robots_allowed": true
+      },
+      "topic": "crawler_index_policy",
+      "statement": "OpenAI uses two independent robots.txt controls for AI: OAI-SearchBot, which surfaces sites in ChatGPT search results, and GPTBot, which governs generative-AI training. A site can allow one while disallowing the other.",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "methodology": {
+        "measurement_mode": "official_documentation",
+        "metric_family": {
+          "value": "OpenAI uses OAI-SearchBot and GPTBot robots.txt tags to enable webmasters to manage how their sites and content work with AI.",
+          "quote": "OpenAI uses OAI-SearchBot and GPTBot robots.txt tags to enable webmasters to manage how their sites and content work with AI."
+        },
+        "metric_definition": {
+          "value": "Each setting is independent of the others",
+          "quote": "Each setting is independent of the others"
+        },
+        "denominator": {
+          "value": "enable webmasters to manage how their sites and content work with AI",
+          "quote": "enable webmasters to manage how their sites and content work with AI"
+        },
+        "unit_of_analysis": {
+          "value": "OAI-SearchBot is used to surface websites in search results in ChatGPT's search features.",
+          "quote": "OAI-SearchBot is used to surface websites in search results in ChatGPT's search features."
+        },
+        "time_window": {
+          "value": "User agent Description & details",
+          "quote": "User agent Description & details"
+        },
+        "methodology_notes": {
+          "value": "OpenAI uses OAI-SearchBot and GPTBot robots.txt tags to enable webmasters to manage how their sites and content work with AI.",
+          "quote": "OpenAI uses OAI-SearchBot and GPTBot robots.txt tags to enable webmasters to manage how their sites and content work with AI."
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": null,
+        "limitations": [
+          "Documents stated crawler policy, not observed crawl frequency."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "openai_search_vs_training",
+          "label": "Search and training opt-out are independent",
+          "comparator": "policy_statement",
+          "definition": {
+            "value": "Each setting is independent of the others",
+            "quote": "Each setting is independent of the others"
+          },
+          "value": {
+            "value": true,
+            "quote": "Each setting is independent of the others"
+          },
+          "unit": {
+            "value": "independent",
+            "quote": "independent"
+          },
+          "window": {
+            "value": "robots.txt",
+            "quote": "robots.txt"
+          },
+          "scope": {
+            "value": "ChatGPT search results",
+            "quote": "surface websites in search results in ChatGPT's search features"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "published_at_selector": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "OpenAI uses OAI-SearchBot and GPTBot robots.txt tags to enable webmasters to manage how their sites and content work with AI."
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "openai_crawler_independence_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "high"
+    },
+    {
+      "source": {
+        "source_id": "google-search-central-ai",
+        "publisher": "Google",
+        "url": "https://developers.google.com/search/docs/appearance/ai-features",
+        "canonical_url": "https://developers.google.com/search/docs/appearance/ai-features",
+        "source_class": "official",
+        "robots_allowed": true
+      },
+      "topic": "retrieval_index",
+      "statement": "Google states there are no additional content requirements to appear in AI Overviews or AI Mode beyond existing SEO fundamentals and no special schema, while eligibility still requires a page to be indexed and snippet-eligible in Google Search.",
+      "surfaces": [
+        "google-ai-overviews",
+        "google-ai-mode"
+      ],
+      "methodology": {
+        "measurement_mode": "official_documentation",
+        "metric_family": {
+          "value": "The best practices for SEO remain relevant for AI features",
+          "quote": "The best practices for SEO remain relevant for AI features"
+        },
+        "metric_definition": {
+          "value": "There are no additional requirements to appear in AI Overviews or AI Mode, nor other special optimizations necessary",
+          "quote": "There are no additional requirements to appear in AI Overviews or AI Mode, nor other special optimizations necessary"
+        },
+        "denominator": {
+          "value": "As with Search overall",
+          "quote": "As with Search overall"
+        },
+        "unit_of_analysis": {
+          "value": "AI Overviews and AI Mode work in Google Search",
+          "quote": "AI Overviews and AI Mode work in Google Search"
+        },
+        "time_window": {
+          "value": "Last updated 2025-12-10 UTC",
+          "quote": "Last updated 2025-12-10 UTC"
+        },
+        "methodology_notes": {
+          "value": "Google Search Central | Documentation | Google for Developers",
+          "quote": "Google Search Central | Documentation | Google for Developers"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": null,
+        "limitations": [
+          "Documents stated policy, not actual inclusion rates in AI features."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "google_ai_no_special_opt",
+          "label": "No special optimisation needed for AI Overviews / AI Mode",
+          "comparator": "policy_statement",
+          "definition": {
+            "value": "There are no additional requirements to appear in AI Overviews or AI Mode, nor other special optimizations necessary",
+            "quote": "There are no additional requirements to appear in AI Overviews or AI Mode, nor other special optimizations necessary"
+          },
+          "value": {
+            "value": true,
+            "quote": "There are no additional requirements to appear in AI Overviews or AI Mode, nor other special optimizations necessary"
+          },
+          "unit": {
+            "value": "additional requirements",
+            "quote": "additional requirements"
+          },
+          "window": {
+            "value": "Last updated 2025-12-10 UTC",
+            "quote": "Last updated 2025-12-10 UTC"
+          },
+          "scope": {
+            "value": "AI Overviews or AI Mode",
+            "quote": "AI Overviews or AI Mode"
+          }
+        },
+        {
+          "metric_id": "google_ai_eligibility",
+          "label": "Eligibility for AI features requires indexing + snippet eligibility",
+          "comparator": "policy_statement",
+          "definition": {
+            "value": "page must be indexed and eligible to be shown in Google Search with a snippet",
+            "quote": "page must be indexed and eligible to be shown in Google Search with a snippet"
+          },
+          "value": {
+            "value": true,
+            "quote": "page must be indexed and eligible to be shown in Google Search with a snippet"
+          },
+          "unit": {
+            "value": "indexed and snippet-eligible",
+            "quote": "indexed and eligible to be shown in Google Search with a snippet"
+          },
+          "window": {
+            "value": "Last updated 2025-12-10 UTC",
+            "quote": "Last updated 2025-12-10 UTC"
+          },
+          "scope": {
+            "value": "AI Overviews or AI Mode",
+            "quote": "AI Overviews or AI Mode"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "published_at_selector": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "There are no additional requirements to appear in AI Overviews or AI Mode, nor other special optimizations necessary"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "google_ai_feature_eligibility_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "high"
+    },
+    {
+      "source": {
+        "source_id": "xai-docs",
+        "publisher": "xAI",
+        "url": "https://docs.x.ai/docs/overview",
+        "canonical_url": "https://docs.x.ai/docs/overview",
+        "source_class": "official",
+        "robots_allowed": true
+      },
+      "topic": "retrieval_index",
+      "statement": "xAI's developer documentation lists a Web search tool among Grok's server-side API capabilities, alongside function calling and structured outputs, on the Grok 4.6 flagship model.",
+      "surfaces": [
+        "grok"
+      ],
+      "methodology": {
+        "measurement_mode": "official_documentation",
+        "metric_family": {
+          "value": "Function calling Web search",
+          "quote": "Function calling Web search"
+        },
+        "metric_definition": {
+          "value": "Function calling Web search",
+          "quote": "Function calling Web search"
+        },
+        "denominator": {
+          "value": "Explore the documentation",
+          "quote": "Explore the documentation"
+        },
+        "unit_of_analysis": {
+          "value": "Web search",
+          "quote": "Web search"
+        },
+        "time_window": {
+          "value": "Grok 4.6",
+          "quote": "Grok 4.6"
+        },
+        "methodology_notes": {
+          "value": "Our flagship model for code and everything else: agentic tool calling, minimal hallucinations, configurable reasoning.",
+          "quote": "Our flagship model for code and everything else: agentic tool calling, minimal hallucinations, configurable reasoning."
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": null,
+        "limitations": [
+          "Documented capability, not measured retrieval behaviour."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "xai_web_search_tool",
+          "label": "Grok exposes a server-side Web search tool",
+          "comparator": "policy_statement",
+          "definition": {
+            "value": "Function calling Web search",
+            "quote": "Function calling Web search"
+          },
+          "value": {
+            "value": true,
+            "quote": "Function calling Web search"
+          },
+          "unit": {
+            "value": "Web search",
+            "quote": "Web search"
+          },
+          "window": {
+            "value": "Grok 4.6",
+            "quote": "Grok 4.6"
+          },
+          "scope": {
+            "value": "Grok developer platform",
+            "quote": "Try in playground"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "published_at_selector": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "Function calling Web search"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "xai_web_search_tool_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "low"
+    },
+    {
+      "source": {
+        "source_id": "alibaba-qwen-blog",
+        "publisher": "Alibaba Qwen",
+        "url": "https://qwenlm.github.io/blog/",
+        "canonical_url": "https://qwenlm.github.io/blog/",
+        "source_class": "official",
+        "robots_allowed": true
+      },
+      "topic": "audience_usage",
+      "statement": "Alibaba's Qwen-MT translation model supports 92 major official languages and prominent dialects, covering over 95% of the global population, per the Qwen team's release blog.",
+      "surfaces": [
+        "qwen-consumer"
+      ],
+      "methodology": {
+        "measurement_mode": "unknown",
+        "metric_family": {
+          "value": "92 major official languages",
+          "quote": "92 major official languages"
+        },
+        "metric_definition": {
+          "value": "covering over 95% of the global population",
+          "quote": "covering over 95% of the global population"
+        },
+        "denominator": {
+          "value": "over 95% of the global population",
+          "quote": "over 95% of the global population"
+        },
+        "unit_of_analysis": {
+          "value": "92 major official languages and prominent dialects",
+          "quote": "92 major official languages and prominent dialects"
+        },
+        "time_window": {
+          "value": "July 27, 2025",
+          "quote": "July 27, 2025"
+        },
+        "methodology_notes": {
+          "value": "Qwen-MT: Where Speed Meets Smart Translation",
+          "quote": "Qwen-MT: Where Speed Meets Smart Translation"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": null,
+        "limitations": [
+          "Vendor-stated coverage; no independent verification."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "qwen_mt_languages",
+          "label": "Languages supported by Qwen-MT",
+          "comparator": "exact",
+          "definition": {
+            "value": "92 major official languages",
+            "quote": "92 major official languages"
+          },
+          "value": {
+            "value": 92,
+            "quote": "92 major official languages"
+          },
+          "unit": {
+            "value": "languages",
+            "quote": "languages"
+          },
+          "window": {
+            "value": "July 2025",
+            "quote": "July 27, 2025"
+          },
+          "scope": {
+            "value": "Qwen-MT",
+            "quote": "Qwen-MT"
+          }
+        },
+        {
+          "metric_id": "qwen_mt_population",
+          "label": "Global population covered by Qwen-MT languages",
+          "comparator": "at_least",
+          "definition": {
+            "value": "over 95% of the global population",
+            "quote": "over 95% of the global population"
+          },
+          "value": {
+            "value": "95%+",
+            "quote": "over 95% of the global population"
+          },
+          "unit": {
+            "value": "%",
+            "quote": "%"
+          },
+          "window": {
+            "value": "July 2025",
+            "quote": "July 27, 2025"
+          },
+          "scope": {
+            "value": "global population",
+            "quote": "global population"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "published_at_selector": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "Qwen-MT enables high-quality translation across 92 major official languages and prominent dialects, covering over 95% of the global population"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "qwen_mt_language_reach_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "low"
+    },
+    {
+      "source": {
+        "source_id": "ahrefs-blog-ai",
+        "publisher": "Ahrefs",
+        "url": "https://ahrefs.com/blog/why-chatgpt-cites-pages/",
+        "canonical_url": "https://ahrefs.com/blog/why-chatgpt-cites-pages/",
+        "source_class": "vendor_research",
+        "robots_allowed": true
+      },
+      "topic": "citations_sources",
+      "statement": "Ahrefs' analysis of 1.4 million ChatGPT 5.2 prompts from February 2025 found ChatGPT retrieves dozens of URLs per response but ends up citing only about 50% of them (about 16.57 cited vs 16.58 non-cited URLs per prompt).",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "methodology": {
+        "measurement_mode": "vendor_panel",
+        "metric_family": {
+          "value": "it only ends up citing ~50% of them",
+          "quote": "it only ends up citing ~50% of them"
+        },
+        "metric_definition": {
+          "value": "Our 50% figure captures the full journey from retrieval to citation, not just the final decision after a page has been read.",
+          "quote": "Our 50% figure captures the full journey from retrieval to citation, not just the final decision after a page has been read."
+        },
+        "denominator": {
+          "value": "it only ends up citing ~50% of them",
+          "quote": "it only ends up citing ~50% of them"
+        },
+        "unit_of_analysis": {
+          "value": "~16.57 cited URLs and ~16.58 non-cited URLs per prompt",
+          "quote": "~16.57 cited URLs and ~16.58 non-cited URLs per prompt"
+        },
+        "time_window": {
+          "value": "February 2025",
+          "quote": "February 2025"
+        },
+        "methodology_notes": {
+          "value": "Why ChatGPT Cites One Page Over Another (Study of 1.4M Prompts)",
+          "quote": "Why ChatGPT Cites One Page Over Another (Study of 1.4M Prompts)"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": {
+          "value": "we analyzed 1.4 million ChatGPT 5.2 prompts from February 2025",
+          "quote": "we analyzed 1.4 million ChatGPT 5.2 prompts from February 2025"
+        },
+        "sample_size": {
+          "value": "we analyzed 1.4 million ChatGPT 5.2 prompts from February 2025",
+          "quote": "we analyzed 1.4 million ChatGPT 5.2 prompts from February 2025"
+        },
+        "limitations": [
+          "Vendor study; desktop prompts only."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "ahrefs_citation_rate",
+          "label": "Share of retrieved URLs that get cited",
+          "comparator": "approx",
+          "definition": {
+            "value": "it only ends up citing ~50% of them",
+            "quote": "it only ends up citing ~50% of them"
+          },
+          "value": {
+            "value": 50,
+            "quote": "it only ends up citing ~50% of them"
+          },
+          "unit": {
+            "value": "%",
+            "quote": "%"
+          },
+          "window": {
+            "value": "February 2025",
+            "quote": "February 2025"
+          },
+          "scope": {
+            "value": "ChatGPT 5.2 responses",
+            "quote": "1.4 million ChatGPT 5.2 prompts"
+          }
+        },
+        {
+          "metric_id": "ahrefs_cited_urls_per_prompt",
+          "label": "Cited URLs per ChatGPT prompt",
+          "comparator": "approx",
+          "definition": {
+            "value": "~16.57 cited URLs and ~16.58 non-cited URLs per prompt",
+            "quote": "~16.57 cited URLs and ~16.58 non-cited URLs per prompt"
+          },
+          "value": {
+            "value": 16.57,
+            "quote": "~16.57 cited URLs and ~16.58 non-cited URLs per prompt"
+          },
+          "unit": {
+            "value": "URLs per prompt",
+            "quote": "URLs per prompt"
+          },
+          "window": {
+            "value": "February 2025",
+            "quote": "February 2025"
+          },
+          "scope": {
+            "value": "cited URLs",
+            "quote": "cited URLs"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "published_at_selector": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "it only ends up citing ~50% of them"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "ahrefs_retrieval_to_citation_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "medium"
+    },
+    {
+      "source": {
+        "source_id": "peec-blog",
+        "publisher": "Peec AI",
+        "url": "https://peec.ai/blog",
+        "canonical_url": "https://peec.ai/blog",
+        "source_class": "vendor_research",
+        "robots_allowed": true
+      },
+      "topic": "citations_sources",
+      "statement": "Peec AI's analysis of 500,000 prompts found Google AI Overviews appear 86% of the time in its sample, which it calls the most undertracked AI search surface.",
+      "surfaces": [
+        "google-ai-overviews"
+      ],
+      "methodology": {
+        "measurement_mode": "vendor_panel",
+        "metric_family": {
+          "value": "AI Overviews appear 86% of the time in our sample",
+          "quote": "AI Overviews appear 86% of the time in our sample"
+        },
+        "metric_definition": {
+          "value": "AI Overviews appear 86% of the time in our sample",
+          "quote": "AI Overviews appear 86% of the time in our sample"
+        },
+        "denominator": {
+          "value": "500,000 prompts",
+          "quote": "500,000 prompts"
+        },
+        "unit_of_analysis": {
+          "value": "AI Overviews appear 86% of the time in our sample",
+          "quote": "AI Overviews appear 86% of the time in our sample"
+        },
+        "time_window": {
+          "value": "Jun 11, 2026",
+          "quote": "Jun 11, 2026"
+        },
+        "methodology_notes": {
+          "value": "AI Overviews is the most undertracked AI search",
+          "quote": "AI Overviews is the most undertracked AI search"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": {
+          "value": "500,000 prompts",
+          "quote": "500,000 prompts"
+        },
+        "sample_size": {
+          "value": "500,000 prompts",
+          "quote": "500,000 prompts"
+        },
+        "limitations": [
+          "Vendor sample; prompt selection not published on the index page."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "peec_aio_trigger_rate",
+          "label": "Share of tracked prompts that trigger an AI Overview",
+          "comparator": "share_of_total",
+          "definition": {
+            "value": "AI Overviews appear 86% of the time in our sample",
+            "quote": "AI Overviews appear 86% of the time in our sample"
+          },
+          "value": {
+            "value": 86,
+            "quote": "AI Overviews appear 86% of the time in our sample"
+          },
+          "unit": {
+            "value": "86%",
+            "quote": "86%"
+          },
+          "window": {
+            "value": "our sample",
+            "quote": "our sample"
+          },
+          "scope": {
+            "value": "AI Overviews",
+            "quote": "AI Overviews"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": "2026-06-11",
+        "published_at_selector": "page_stamp 'Jun 11, 2026'",
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "AI Overviews is the most undertracked AI search: 500,000 prompts show why AI Overviews appear 86% of the time in our sample"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "peec_aio_trigger_rate_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "medium"
+    },
+    {
+      "source": {
+        "source_id": "semrush-blog-ai",
+        "publisher": "Semrush",
+        "url": "https://www.semrush.com/blog/",
+        "canonical_url": "https://www.semrush.com/blog/",
+        "source_class": "vendor_research",
+        "robots_allowed": true
+      },
+      "topic": "commerce_ads",
+      "statement": "A Semrush survey of 2,338 US consumers found AI chatbots talked 57.5% of AI users out of a purchase, and 65% of AI users had replaced some product-related Google searches with chatbots.",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "methodology": {
+        "measurement_mode": "survey",
+        "metric_family": {
+          "value": "AI chatbots talked 57.5% of AI users out of buying",
+          "quote": "AI chatbots talked 57.5% of AI users out of buying"
+        },
+        "metric_definition": {
+          "value": "65% of AI users have replaced some product-related Google searches with chatbots",
+          "quote": "65% of AI users have replaced some product-related Google searches with chatbots"
+        },
+        "denominator": {
+          "value": "We surveyed 2,338 US consumers",
+          "quote": "We surveyed 2,338 US consumers"
+        },
+        "unit_of_analysis": {
+          "value": "AI users",
+          "quote": "AI users"
+        },
+        "time_window": {
+          "value": "September 10, 2026",
+          "quote": "September 10, 2026"
+        },
+        "methodology_notes": {
+          "value": "4 in 10 dislike chatbot ads",
+          "quote": "4 in 10 dislike chatbot ads"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": {
+          "value": "We surveyed 2,338 US consumers",
+          "quote": "We surveyed 2,338 US consumers"
+        },
+        "limitations": [
+          "Vendor survey of US consumers; self-reported behaviour."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "semrush_talked_out_of_buying",
+          "label": "AI users talked out of a purchase by chatbots",
+          "comparator": "share_of_total",
+          "definition": {
+            "value": "AI chatbots talked 57.5% of AI users out of buying",
+            "quote": "AI chatbots talked 57.5% of AI users out of buying"
+          },
+          "value": {
+            "value": 57.5,
+            "quote": "AI chatbots talked 57.5% of AI users out of buying"
+          },
+          "unit": {
+            "value": "57.5%",
+            "quote": "57.5%"
+          },
+          "window": {
+            "value": "September 2026",
+            "quote": "September 10, 2026"
+          },
+          "scope": {
+            "value": "US AI users",
+            "quote": "We surveyed 2,338 US consumers"
+          }
+        },
+        {
+          "metric_id": "semrush_replaced_google",
+          "label": "AI users who replaced product Google searches with chatbots",
+          "comparator": "share_of_total",
+          "definition": {
+            "value": "65% of AI users have replaced some product-related Google searches with chatbots",
+            "quote": "65% of AI users have replaced some product-related Google searches with chatbots"
+          },
+          "value": {
+            "value": 65,
+            "quote": "65% of AI users have replaced some product-related Google searches with chatbots"
+          },
+          "unit": {
+            "value": "65%",
+            "quote": "65%"
+          },
+          "window": {
+            "value": "September 2026",
+            "quote": "September 10, 2026"
+          },
+          "scope": {
+            "value": "US AI users",
+            "quote": "We surveyed 2,338 US consumers"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": "2026-09-10",
+        "published_at_selector": "page_stamp 'September 10, 2026'",
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "We surveyed 2,338 US consumers: 65% of AI users have replaced some product-related Google searches with chatbots"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "semrush_chatbot_commerce_survey_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "medium"
+    },
+    {
+      "source": {
+        "source_id": "sistrix-blog",
+        "publisher": "SISTRIX",
+        "url": "https://www.sistrix.com/blog/",
+        "canonical_url": "https://www.sistrix.com/blog/",
+        "source_class": "vendor_blog",
+        "robots_allowed": true
+      },
+      "topic": "measurement",
+      "statement": "SISTRIX built its Prompt Research feature on over 62 million real user questions, replacing keyword-level research with topic-level abstractions for AI search.",
+      "surfaces": [
+        "chatgpt",
+        "google-ai-mode"
+      ],
+      "methodology": {
+        "measurement_mode": "unknown",
+        "metric_family": {
+          "value": "over 62 million real user questions",
+          "quote": "over 62 million real user questions"
+        },
+        "metric_definition": {
+          "value": "topics instead of keywords",
+          "quote": "topics instead of keywords"
+        },
+        "denominator": {
+          "value": "over 62 million real user questions",
+          "quote": "over 62 million real user questions"
+        },
+        "unit_of_analysis": {
+          "value": "real user questions",
+          "quote": "real user questions"
+        },
+        "time_window": {
+          "value": "24.08.2026",
+          "quote": "24.08.2026"
+        },
+        "methodology_notes": {
+          "value": "Prompt Research: Keyword Research for AI Search",
+          "quote": "Prompt Research: Keyword Research for AI Search"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": {
+          "value": "over 62 million real user questions",
+          "quote": "over 62 million real user questions"
+        },
+        "limitations": [
+          "Vendor product description; underlying question set not published."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "sistrix_prompt_corpus",
+          "label": "Real user questions behind Prompt Research",
+          "comparator": "at_least",
+          "definition": {
+            "value": "over 62 million real user questions",
+            "quote": "over 62 million real user questions"
+          },
+          "value": {
+            "value": "62M+",
+            "quote": "over 62 million real user questions"
+          },
+          "unit": {
+            "value": "real user questions",
+            "quote": "real user questions"
+          },
+          "window": {
+            "value": "Aug 2026",
+            "quote": "24.08.2026"
+          },
+          "scope": {
+            "value": "SISTRIX prompt data",
+            "quote": "over 62 million real user questions"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "published_at_selector": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "topics instead of keywords, based on over 62 million real user questions"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "sistrix_prompt_research_corpus_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "low"
+    },
+    {
+      "source": {
+        "source_id": "statcounter-ai-chatbot",
+        "publisher": "Statcounter",
+        "url": "https://gs.statcounter.com/ai-chatbot-market-share",
+        "canonical_url": "https://gs.statcounter.com/ai-chatbot-market-share",
+        "source_class": "vendor_research",
+        "robots_allowed": true
+      },
+      "topic": "audience_usage",
+      "statement": "Statcounter's August 2026 AI-chatbot market-share measure puts ChatGPT at 79.4%, Google Gemini at 10.9%, Perplexity at 4.31%, Microsoft Copilot at 2.79%, Claude at 2.57% and DeepSeek at 0.02% worldwide.",
+      "surfaces": [
+        "chatgpt",
+        "google-gemini",
+        "perplexity",
+        "microsoft-copilot",
+        "claude",
+        "deepseek-chat"
+      ],
+      "methodology": {
+        "measurement_mode": "clickstream",
+        "metric_family": {
+          "value": "Percentage Market Share",
+          "quote": "Percentage Market Share"
+        },
+        "metric_definition": {
+          "value": "AI Chatbot Market Share Worldwide - August 2026",
+          "quote": "AI Chatbot Market Share Worldwide - August 2026"
+        },
+        "denominator": {
+          "value": "AI Chatbot Market Share Worldwide",
+          "quote": "AI Chatbot Market Share Worldwide"
+        },
+        "unit_of_analysis": {
+          "value": "Percentage Market Share",
+          "quote": "Percentage Market Share"
+        },
+        "time_window": {
+          "value": "August 2026",
+          "quote": "August 2026"
+        },
+        "methodology_notes": {
+          "value": "Source: Statcounter Global Stats",
+          "quote": "Source: Statcounter Global Stats"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": null,
+        "limitations": [
+          "Clickstream panel; visit-share denominator, not users."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "statcounter_chatgpt_share",
+          "label": "ChatGPT share of AI-chatbot market",
+          "comparator": "share_of_total",
+          "definition": {
+            "value": "ChatGPT 79.4 %",
+            "quote": "ChatGPT 79.4 %"
+          },
+          "value": {
+            "value": 79.4,
+            "quote": "ChatGPT 79.4 %"
+          },
+          "unit": {
+            "value": "79.4 %",
+            "quote": "79.4 %"
+          },
+          "window": {
+            "value": "August 2026",
+            "quote": "August 2026"
+          },
+          "scope": {
+            "value": "worldwide AI chatbots",
+            "quote": "AI Chatbot Market Share Worldwide"
+          }
+        },
+        {
+          "metric_id": "statcounter_gemini_share",
+          "label": "Google Gemini share of AI-chatbot market",
+          "comparator": "share_of_total",
+          "definition": {
+            "value": "Google Gemini 10.9 %",
+            "quote": "Google Gemini 10.9 %"
+          },
+          "value": {
+            "value": 10.9,
+            "quote": "Google Gemini 10.9 %"
+          },
+          "unit": {
+            "value": "10.9 %",
+            "quote": "10.9 %"
+          },
+          "window": {
+            "value": "August 2026",
+            "quote": "August 2026"
+          },
+          "scope": {
+            "value": "worldwide AI chatbots",
+            "quote": "AI Chatbot Market Share Worldwide"
+          }
+        },
+        {
+          "metric_id": "statcounter_perplexity_share",
+          "label": "Perplexity share of AI-chatbot market",
+          "comparator": "share_of_total",
+          "definition": {
+            "value": "Perplexity 4.31 %",
+            "quote": "Perplexity 4.31 %"
+          },
+          "value": {
+            "value": 4.31,
+            "quote": "Perplexity 4.31 %"
+          },
+          "unit": {
+            "value": "4.31 %",
+            "quote": "4.31 %"
+          },
+          "window": {
+            "value": "August 2026",
+            "quote": "August 2026"
+          },
+          "scope": {
+            "value": "worldwide AI chatbots",
+            "quote": "AI Chatbot Market Share Worldwide"
+          }
+        },
+        {
+          "metric_id": "statcounter_copilot_share",
+          "label": "Microsoft Copilot share of AI-chatbot market",
+          "comparator": "share_of_total",
+          "definition": {
+            "value": "Microsoft Copilot 2.79 %",
+            "quote": "Microsoft Copilot 2.79 %"
+          },
+          "value": {
+            "value": 2.79,
+            "quote": "Microsoft Copilot 2.79 %"
+          },
+          "unit": {
+            "value": "2.79 %",
+            "quote": "2.79 %"
+          },
+          "window": {
+            "value": "August 2026",
+            "quote": "August 2026"
+          },
+          "scope": {
+            "value": "worldwide AI chatbots",
+            "quote": "AI Chatbot Market Share Worldwide"
+          }
+        },
+        {
+          "metric_id": "statcounter_claude_share",
+          "label": "Claude share of AI-chatbot market",
+          "comparator": "share_of_total",
+          "definition": {
+            "value": "Claude 2.57 %",
+            "quote": "Claude 2.57 %"
+          },
+          "value": {
+            "value": 2.57,
+            "quote": "Claude 2.57 %"
+          },
+          "unit": {
+            "value": "2.57 %",
+            "quote": "2.57 %"
+          },
+          "window": {
+            "value": "August 2026",
+            "quote": "August 2026"
+          },
+          "scope": {
+            "value": "worldwide AI chatbots",
+            "quote": "AI Chatbot Market Share Worldwide"
+          }
+        },
+        {
+          "metric_id": "statcounter_deepseek_share",
+          "label": "DeepSeek share of AI-chatbot market",
+          "comparator": "share_of_total",
+          "definition": {
+            "value": "Deepseek 0.02 %",
+            "quote": "Deepseek 0.02 %"
+          },
+          "value": {
+            "value": 0.02,
+            "quote": "Deepseek 0.02 %"
+          },
+          "unit": {
+            "value": "0.02 %",
+            "quote": "0.02 %"
+          },
+          "window": {
+            "value": "August 2026",
+            "quote": "August 2026"
+          },
+          "scope": {
+            "value": "worldwide AI chatbots",
+            "quote": "AI Chatbot Market Share Worldwide"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "published_at_selector": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "AI Chatbot Market Share Worldwide - August 2026 ChatGPT 79.4 %"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "statcounter_ai_chatbot_share_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "medium"
+    },
+    {
+      "source": {
+        "source_id": "cloudflare-blog-ai",
+        "publisher": "Cloudflare",
+        "url": "https://blog.cloudflare.com/tag/ai/",
+        "canonical_url": "https://blog.cloudflare.com/tag/ai/",
+        "source_class": "vendor_blog",
+        "robots_allowed": true
+      },
+      "topic": "crawler_index_policy",
+      "statement": "Cloudflare announced a control that lets site owners stay discoverable in search while disallowing AI training, and separately detects MCP traffic via protocol-level heuristics.",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "methodology": {
+        "measurement_mode": "unknown",
+        "metric_family": {
+          "value": "stay discoverable in search while disallowing AI training",
+          "quote": "stay discoverable in search while disallowing AI training"
+        },
+        "metric_definition": {
+          "value": "Cloudflare is giving site owners a way to stay discoverable while disallowing AI training",
+          "quote": "Cloudflare is giving site owners a way to stay discoverable while disallowing AI training"
+        },
+        "denominator": {
+          "value": "site owners",
+          "quote": "site owners"
+        },
+        "unit_of_analysis": {
+          "value": "site owners",
+          "quote": "site owners"
+        },
+        "time_window": {
+          "value": "September 15, 2026",
+          "quote": "September 15, 2026"
+        },
+        "methodology_notes": {
+          "value": "How Cloudflare detects MCP traffic",
+          "quote": "How Cloudflare detects MCP traffic"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": null,
+        "limitations": [
+          "Vendor blog announcement; surface tag is contextual."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "cloudflare_ai_training_control",
+          "label": "Control to allow search crawl while disallowing AI training",
+          "comparator": "policy_statement",
+          "definition": {
+            "value": "stay discoverable in search while disallowing AI training",
+            "quote": "stay discoverable in search while disallowing AI training"
+          },
+          "value": {
+            "value": true,
+            "quote": "stay discoverable in search while disallowing AI training"
+          },
+          "unit": {
+            "value": "control",
+            "quote": "control"
+          },
+          "window": {
+            "value": "September 2026",
+            "quote": "September 15, 2026"
+          },
+          "scope": {
+            "value": "Cloudflare site owners",
+            "quote": "site owners"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "published_at_selector": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "Cloudflare is giving site owners a way to stay discoverable while disallowing AI training"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "cloudflare_search_vs_training_control_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "low"
+    },
+    {
+      "source": {
+        "source_id": "search-engine-journal",
+        "publisher": "Search Engine Journal",
+        "url": "https://www.searchenginejournal.com/",
+        "canonical_url": "https://www.searchenginejournal.com/",
+        "source_class": "news",
+        "robots_allowed": true
+      },
+      "topic": "commerce_ads",
+      "statement": "Search Engine Journal argues ChatGPT Ads should not be treated as paid search, advising advertisers to define a clear role, budget source and success criteria for ChatGPT Ads before shifting budget away from paid search.",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "methodology": {
+        "measurement_mode": "unknown",
+        "metric_family": {
+          "value": "ChatGPT Ads Aren't Paid Search",
+          "quote": "ChatGPT Ads Aren't Paid Search"
+        },
+        "metric_definition": {
+          "value": "Give ChatGPT Ads a clear role, budget source, and success criteria before pulling money from paid search",
+          "quote": "Give ChatGPT Ads a clear role, budget source, and success criteria before pulling money from paid search"
+        },
+        "denominator": {
+          "value": "paid search",
+          "quote": "paid search"
+        },
+        "unit_of_analysis": {
+          "value": "ChatGPT Ads",
+          "quote": "ChatGPT Ads"
+        },
+        "time_window": {
+          "value": "Sep 15, 2026",
+          "quote": "Sep 15, 2026"
+        },
+        "methodology_notes": {
+          "value": "ChatGPT Ads Aren't Paid Search - 5 Questions To Answer Before You Shift Budget",
+          "quote": "ChatGPT Ads Aren't Paid Search - 5 Questions To Answer Before You Shift Budget"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": null,
+        "limitations": [
+          "Editorial analysis, not a measurement."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "sej_chatgpt_ads_guidance",
+          "label": "Editorial guidance treating ChatGPT Ads distinctly from paid search",
+          "comparator": "qualitative_finding",
+          "definition": {
+            "value": "Give ChatGPT Ads a clear role, budget source, and success criteria before pulling money from paid search",
+            "quote": "Give ChatGPT Ads a clear role, budget source, and success criteria before pulling money from paid search"
+          },
+          "value": {
+            "value": true,
+            "quote": "Give ChatGPT Ads a clear role, budget source, and success criteria before pulling money from paid search"
+          },
+          "unit": {
+            "value": "editorial guidance",
+            "quote": "paid search"
+          },
+          "window": {
+            "value": "Sep 2026",
+            "quote": "Sep 15, 2026"
+          },
+          "scope": {
+            "value": "ChatGPT Ads",
+            "quote": "Give ChatGPT Ads a clear role, budget source, and success criteria before pulling money from paid search"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": "2026-09-15",
+        "published_at_selector": "page_stamp 'Sep 15, 2026'",
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "ChatGPT Ads Aren't Paid Search - 5 Questions To Answer Before You Shift Budget"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "sej_chatgpt_ads_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "low"
+    },
+    {
+      "source": {
+        "source_id": "tryprofound-research",
+        "publisher": "Profound",
+        "url": "https://www.tryprofound.com/research",
+        "canonical_url": "https://www.tryprofound.com/research",
+        "source_class": "vendor_research",
+        "robots_allowed": true
+      },
+      "topic": "audience_usage",
+      "statement": "Profound's research on travel decision-making found nearly eight in ten (79.7%) of respondents relied on answer engines for at least half of their decision making.",
+      "surfaces": [
+        "chatgpt",
+        "google-ai-overviews"
+      ],
+      "methodology": {
+        "measurement_mode": "survey",
+        "metric_family": {
+          "value": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making",
+          "quote": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making"
+        },
+        "metric_definition": {
+          "value": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making",
+          "quote": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making"
+        },
+        "denominator": {
+          "value": "The state of AI Search in travel",
+          "quote": "The state of AI Search in travel"
+        },
+        "unit_of_analysis": {
+          "value": "The state of AI Search in travel",
+          "quote": "The state of AI Search in travel"
+        },
+        "time_window": {
+          "value": "9 Jul, 2026",
+          "quote": "9 Jul, 2026"
+        },
+        "methodology_notes": {
+          "value": "The state of AI Search in travel",
+          "quote": "The state of AI Search in travel"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": {
+          "value": "Nearly eight in ten (79.7%)",
+          "quote": "Nearly eight in ten (79.7%)"
+        },
+        "limitations": [
+          "Vendor survey; single industry vertical (travel)."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "profound_travel_answer_engine_reliance",
+          "label": "Travel decision-makers relying on answer engines for >=half of decisions",
+          "comparator": "at_least",
+          "definition": {
+            "value": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making",
+            "quote": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making"
+          },
+          "value": {
+            "value": 79.7,
+            "quote": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making"
+          },
+          "unit": {
+            "value": "79.7%",
+            "quote": "79.7%"
+          },
+          "window": {
+            "value": "9 Jul, 2026",
+            "quote": "9 Jul, 2026"
+          },
+          "scope": {
+            "value": "travel decision-makers",
+            "quote": "The state of AI Search in travel"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "published_at_selector": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "profound_travel_reliance_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "medium"
+    },
+    {
+      "source": {
+        "source_id": "seer-ai-research",
+        "publisher": "Seer Interactive",
+        "url": "https://www.seerinteractive.com/insights",
+        "canonical_url": "https://www.seerinteractive.com/insights",
+        "source_class": "vendor_research",
+        "robots_allowed": true
+      },
+      "topic": "citations_sources",
+      "statement": "Seer Interactive's study found AI assistants declined to answer prompts about its brand 31% of the time, though answers were mostly correct when given.",
+      "surfaces": [
+        "chatgpt",
+        "google-ai-mode"
+      ],
+      "methodology": {
+        "measurement_mode": "vendor_panel",
+        "metric_family": {
+          "value": "AI Declined to Answer Prompts About Our Brand 31% of the Time",
+          "quote": "AI Declined to Answer Prompts About Our Brand 31% of the Time"
+        },
+        "metric_definition": {
+          "value": "Study: AI Declined to Answer Prompts About Our Brand 31% of the Time (But Got Our Info Mostly Right When It Answered)",
+          "quote": "Study: AI Declined to Answer Prompts About Our Brand 31% of the Time (But Got Our Info Mostly Right When It Answered)"
+        },
+        "denominator": {
+          "value": "AI Declined to Answer Prompts About Our Brand",
+          "quote": "AI Declined to Answer Prompts About Our Brand"
+        },
+        "unit_of_analysis": {
+          "value": "AI Declined to Answer Prompts About Our Brand",
+          "quote": "AI Declined to Answer Prompts About Our Brand"
+        },
+        "time_window": {
+          "value": "2026",
+          "quote": "2026"
+        },
+        "methodology_notes": {
+          "value": "AI Study",
+          "quote": "AI Study"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": null,
+        "limitations": [
+          "Single-brand vendor study; prompt set not published on the index page."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "seer_declined_to_answer",
+          "label": "Share of brand prompts the AI declined to answer",
+          "comparator": "share_of_total",
+          "definition": {
+            "value": "AI Declined to Answer Prompts About Our Brand 31% of the Time",
+            "quote": "AI Declined to Answer Prompts About Our Brand 31% of the Time"
+          },
+          "value": {
+            "value": 31,
+            "quote": "AI Declined to Answer Prompts About Our Brand 31% of the Time"
+          },
+          "unit": {
+            "value": "31%",
+            "quote": "31%"
+          },
+          "window": {
+            "value": "2026",
+            "quote": "2026"
+          },
+          "scope": {
+            "value": "prompts about Seer's own brand",
+            "quote": "AI Declined to Answer Prompts About Our Brand"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "published_at_selector": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "Study: AI Declined to Answer Prompts About Our Brand 31% of the Time (But Got Our Info Mostly Right When It Answered)"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "seer_brand_decline_rate_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "low"
+    },
+    {
+      "source": {
+        "source_id": "search-engine-roundtable",
+        "publisher": "Search Engine Roundtable",
+        "url": "https://www.seroundtable.com/",
+        "canonical_url": "https://www.seroundtable.com/",
+        "source_class": "news",
+        "robots_allowed": true
+      },
+      "topic": "commerce_ads",
+      "statement": "Search Engine Roundtable reports OpenAI is testing a ChatGPT ad format named Sponsored Agents, which lets people start a conversation with a business-sponsored agent after clicking an ad in ChatGPT.",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "methodology": {
+        "measurement_mode": "unknown",
+        "metric_family": {
+          "value": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents",
+          "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents"
+        },
+        "metric_definition": {
+          "value": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents",
+          "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents"
+        },
+        "denominator": {
+          "value": "Sponsored Agents",
+          "quote": "Sponsored Agents"
+        },
+        "unit_of_analysis": {
+          "value": "ChatGPT Ads",
+          "quote": "ChatGPT Ads"
+        },
+        "time_window": {
+          "value": "Sep 16, 2026",
+          "quote": "Sep 16, 2026"
+        },
+        "methodology_notes": {
+          "value": "let people start a conversation with a business-sponsored agent after clicking an ad in ChatGPT",
+          "quote": "let people start a conversation with a business-sponsored agent after clicking an ad in ChatGPT"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": null,
+        "limitations": [
+          "Industry news reporting stated testing; not an OpenAI primary source."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "ser_sponsored_agents_test",
+          "label": "ChatGPT Sponsored Agents ad format in testing",
+          "comparator": "qualitative_finding",
+          "definition": {
+            "value": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents",
+            "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents"
+          },
+          "value": {
+            "value": true,
+            "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents"
+          },
+          "unit": {
+            "value": "in testing",
+            "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents"
+          },
+          "window": {
+            "value": "Sep 16, 2026",
+            "quote": "Sep 16, 2026"
+          },
+          "scope": {
+            "value": "ChatGPT Ads",
+            "quote": "ChatGPT Ads"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": "2026-09-16",
+        "published_at_selector": "page_stamp 'Sep 16, 2026'",
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "ser_chatgpt_sponsored_agents_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "low"
+    }
+  ]
+}

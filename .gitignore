@@ -15,3 +15,6 @@ coverage/
 *.log
 artifacts/
 private-snapshots/
+# backend runtime state
+var/
+*.pyc

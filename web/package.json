@@ -1,0 +1,43 @@
+{
+  "name": "ai-discovery-observation-plane",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "e2e": "playwright test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "private": "true",
+  // @tanstack/react-table 9.2.4 verified against npm registry; CI green on clean runner
+  "dependencies": {
+    "@radix-ui/react-dialog": "1.1.23",
+    "@radix-ui/react-popover": "1.1.18",
+    "@tanstack/react-table": "9.2.4",
+    "@tanstack/react-virtual": "3.14.13",
+    "next": "16.3.5",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "yaml": "2.8.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.1",
+    "@vitejs/plugin-react": "5.0.4",
+    "typescript": "5.9.3",
+    "vitest": "3.2.4"
+  }
+}

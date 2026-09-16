@@ -1,0 +1,82 @@
+{
+  "generated_at": "2026-09-16T19:47:10.870658+00:00",
+  "total_candidates": 5,
+  "included": 1,
+  "excluded": 4,
+  "scorer_audit": {
+    "similarweb-most-visited-websites": {
+      "confidence_raw": 0.605,
+      "confidence_penalty": 0.0,
+      "confidence_penalised": 0.605,
+      "confidence_label": "medium",
+      "significance": 2.97
+    },
+    "sistrix-ai-citation-drift": {
+      "confidence_raw": 0.59,
+      "confidence_penalty": 0.0,
+      "confidence_penalised": 0.59,
+      "confidence_label": "medium",
+      "significance": 2.97
+    },
+    "yandex-ai-search-pretrain-2026-09": {
+      "confidence_raw": 0.505,
+      "confidence_penalty": 0.0,
+      "confidence_penalised": 0.505,
+      "confidence_label": "low",
+      "significance": 2.97
+    },
+    "naver-ai-tab-launch-2026-06": {
+      "confidence_raw": 0.505,
+      "confidence_penalty": 0.0,
+      "confidence_penalised": 0.505,
+      "confidence_label": "low",
+      "significance": 2.97
+    },
+    "reddit-conflict": {
+      "confidence_raw": 0.705,
+      "confidence_penalty": 0.15,
+      "confidence_penalised": 0.5549999999999999,
+      "confidence_label": "medium",
+      "significance": 3.68
+    }
+  },
+  "items": [
+    {
+      "change": "Reddit's ChatGPT citation share fell from 3.8% to 0.5% (Promptwatch/Semrush Aug 2026); Ahrefs Sep-2026 ranked Reddit as ChatGPT's largest cited domain at 16.8% mention share (US, different denominator).",
+      "why_it_matters": "Publisher/UGC visibility in ChatGPT is contested. Brands should not panic-exit Reddit; the drop is provisional.",
+      "agency_action": "Monitor only. Treat Reddit as contested until corroborated.",
+      "confidence": "medium",
+      "significance": 3.68,
+      "evidence_ids": [
+        "https://www.semrush.com/blog/reddits-citations-in-chatgpt-fall/",
+        "https://ahrefs.com/blog/most-cited-domains-in-chatgpt/"
+      ],
+      "surfaces": [
+        "chatgpt"
+      ],
+      "is_watch_item": false
+    }
+  ],
+  "excluded_items": [
+    {
+      "change": "Similarweb estimates ChatGPT at ~52.7% of all AI-chatbot web traffic in the mont",
+      "significance": 2.97,
+      "confidence": "medium"
+    },
+    {
+      "change": "SISTRIX's 17-week, six-country study of 82,619 prompts found ChatGPT replaces ~7",
+      "significance": 2.97,
+      "confidence": "medium"
+    },
+    {
+      "change": "Yandex reports that more than 49 million people use its AI answers in Search eac",
+      "significance": 2.97,
+      "confidence": "low"
+    },
+    {
+      "change": "NAVER's AI Tab surpassed 4 million cumulative users in ~2 months of beta, produc",
+      "significance": 2.97,
+      "confidence": "low"
+    }
+  ]
+}

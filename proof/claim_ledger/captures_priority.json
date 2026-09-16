@@ -1,0 +1,149 @@
+{
+  "google-search-central-ai": {
+    "url": "https://developers.google.com/search/docs/appearance/ai-features",
+    "robots_allowed": true,
+    "http_status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 179611,
+    "final_url": "https://developers.google.com/search/docs/appearance/ai-features",
+    "raw_sha256": "ff3b8d4655ceb740a9fab0a39da2749b6b8d5d7f93d252613a54d352a5d3975d"
+  },
+  "openai-platform-bots": {
+    "url": "https://platform.openai.com/docs/bots",
+    "robots_allowed": false,
+    "http_status": null
+  },
+  "perplexity-blog": {
+    "url": "https://www.perplexity.ai/hub/blog",
+    "robots_allowed": true,
+    "http_status": 403,
+    "content_type": "text/html; charset=UTF-8",
+    "bytes": 2000,
+    "final_url": "https://www.perplexity.ai/hub/blog",
+    "raw_sha256": "459981cd2012bcc6f83d2413a168d00b86701bfc5118c83dd1f6e42a62f65f06"
+  },
+  "xai-docs": {
+    "url": "https://docs.x.ai/docs/overview",
+    "robots_allowed": true,
+    "http_status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 531887,
+    "final_url": "https://docs.x.ai/overview",
+    "raw_sha256": "eba8213c03333a3ebb9b0b0bcd7f7383a6713f3fc58f2eacbe2a4c0de48d2992"
+  },
+  "meta-ai-news": {
+    "url": "https://ai.meta.com/blog/",
+    "robots_allowed": true,
+    "http_status": 200,
+    "content_type": "text/html; charset=\"utf-8\"",
+    "bytes": 232461,
+    "final_url": "https://ai.meta.com/blog/",
+    "raw_sha256": "c3b341c725db9bfda807f4e2284a00511dbee1106f656b5c4e4f4ce9a3552463"
+  },
+  "alibaba-qwen-blog": {
+    "url": "https://qwenlm.github.io/blog/",
+    "robots_allowed": true,
+    "http_status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 13828,
+    "final_url": "https://qwenlm.github.io/blog/",
+    "raw_sha256": "ea6345e313611b786c3a13b418128385d677cdd7b50609353654ff48025a7ab9"
+  },
+  "deepseek-docs": {
+    "url": "https://api-docs.deepseek.com/",
+    "robots_allowed": true,
+    "http_status": 200,
+    "content_type": "text/html",
+    "bytes": 46116,
+    "final_url": "https://api-docs.deepseek.com/",
+    "raw_sha256": "6e2eb037db92ebef6a8f6408d87c12318c973388d6e27321606bb0e67dd67a6c"
+  },
+  "ahrefs-blog-ai": {
+    "url": "https://ahrefs.com/blog/",
+    "robots_allowed": true,
+    "http_status": 200,
+    "content_type": "text/html; charset=UTF-8",
+    "bytes": 874916,
+    "final_url": "https://ahrefs.com/blog/",
+    "raw_sha256": "fa4a766dc46112b06939180351f882953e4f83b744831ec15dd16184eb3ef09d"
+  },
+  "semrush-blog-ai": {
+    "url": "https://www.semrush.com/blog/",
+    "robots_allowed": true,
+    "http_status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 271961,
+    "final_url": "https://www.semrush.com/blog/",
+    "raw_sha256": "ec1b7ca4155d8956e4febb7b8adbee51bb06472504c05fa94a615ffe23692dac"
+  },
+  "sistrix-blog": {
+    "url": "https://www.sistrix.com/blog/",
+    "robots_allowed": true,
+    "http_status": 200,
+    "content_type": "text/html; charset=UTF-8",
+    "bytes": 91061,
+    "final_url": "https://www.sistrix.com/blog/",
+    "raw_sha256": "47c10ee345c9d269a14699723d72c3349d0259514fe3b8b448cd4735944cd667"
+  },
+  "peec-blog": {
+    "url": "https://peec.ai/blog",
+    "robots_allowed": true,
+    "http_status": 200,
+    "content_type": "text/html",
+    "bytes": 760734,
+    "final_url": "https://peec.ai/blog",
+    "raw_sha256": "05b4adb26edbeb42304df6a8f5decfccaa7d6d9716ff834e76eb08ef2bb20151"
+  },
+  "profound-research": {
+    "url": "https://www.tryprofound.com/research",
+    "robots_allowed": false,
+    "http_status": null
+  },
+  "seer-ai-research": {
+    "url": "https://www.seerinteractive.com/insights",
+    "robots_allowed": false,
+    "http_status": null
+  },
+  "statcounter-ai-chatbot": {
+    "url": "https://gs.statcounter.com/ai-chatbot-market-share",
+    "robots_allowed": true,
+    "http_status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 88344,
+    "final_url": "https://gs.statcounter.com/ai-chatbot-market-share",
+    "raw_sha256": "8371327938a7901ab4d0f9864d5e09c906cb6aad1e8a7f52e49b41910eb83074"
+  },
+  "cloudflare-blog-ai": {
+    "url": "https://blog.cloudflare.com/tag/ai/",
+    "robots_allowed": false,
+    "http_status": null
+  },
+  "adobe-digital-insights": {
+    "url": "https://business.adobe.com/resources/digital-insights.html",
+    "robots_allowed": null,
+    "http_status": null,
+    "content_type": "The read operation timed out",
+    "bytes": 0,
+    "final_url": "https://business.adobe.com/resources/digital-insights.html",
+    "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "search-engine-land": {
+    "url": "https://searchengineland.com/",
+    "robots_allowed": false,
+    "http_status": null
+  },
+  "search-engine-roundtable": {
+    "url": "https://www.seroundtable.com/",
+    "robots_allowed": false,
+    "http_status": null
+  },
+  "search-engine-journal": {
+    "url": "https://www.searchenginejournal.com/",
+    "robots_allowed": true,
+    "http_status": 200,
+    "content_type": "text/html; charset=UTF-8",
+    "bytes": 398726,
+    "final_url": "https://www.searchenginejournal.com/",
+    "raw_sha256": "4f69fdcf530d64a1895a015d121cc3261e08daac62cecd171ad0c408c45cfe12"
+  }
+}
