@@ -1,5 +1,8 @@
 """Compare study contexts before interpreting a numerical disagreement.
 
+Test coverage: tests/test_reconciliation.py (30 tests).
+Merge base: main; see PR #11 for the issue-#4 product proof plan.
+
 This module returns a separate agency interpretation. Source claims are immutable;
 it never replaces a measured value or treats an unknown context as a match.
 """
