@@ -48,6 +48,7 @@ def test_later_period_qualifies_not_erases_and_argument_order_does_not_matter():
         result = compare_claims(first, second)
         assert result.state == "temporal_update"
         assert result.relationship == "updates"
+        assert result.claim_ids == ("b", "a")
         assert "Claim b" in result.interpretation
     assert older.value == 0.5
 

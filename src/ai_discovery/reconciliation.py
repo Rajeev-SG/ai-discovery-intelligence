@@ -52,7 +52,7 @@ class StudyClaim(BaseModel):
 
 class Reconciliation(BaseModel):
     model_config = ConfigDict(frozen=True)
-    claim_ids: tuple[str, str]
+    claim_ids: tuple[str, str]  # (subject, object): first claim updates/supports the second.
     evidence_ids: tuple[str, ...]
     relationship: Relationship
     state: ConflictState
@@ -109,8 +109,10 @@ def compare_claims(first: StudyClaim, second: StudyClaim) -> Reconciliation:
     assert first.period_start and first.period_end and second.period_start and second.period_end
     if first.period_end < second.period_start or second.period_end < first.period_start:
         newer = second if first.period_end < second.period_start else first
+        older = first if newer is second else second
         return Reconciliation(
-            **{**common, "differences": ("time_window",)}, relationship="updates",
+            **{**common, "claim_ids": (newer.id, older.id), "differences": ("time_window",)},
+            relationship="updates",
             state="possible_transient_change" if first.provisional or second.provisional
             else "temporal_update",
             interpretation=f"Claim {newer.id} describes a later, non-overlapping period. "
