@@ -7,22 +7,22 @@ from ai_discovery.reconciliation import StudyClaim, compare_claims
 
 
 def claim(id="a", **changes):
-    fields = dict(
-        id=id,
-        evidence_ids=(f"e-{id}",),
-        surface="chatgpt",
-        subject="reddit.com",
-        statement="Synthetic unit fixture, not product proof",
-        metric="citation_share",
-        denominator="all_citations",
-        geography="US",
-        mode="consumer_web",
-        sampling_frame="same-panel",
-        period_start=date(2026, 8, 14),
-        period_end=date(2026, 8, 17),
-        value=0.5,
-        unit="percent",
-    )
+    fields = {
+        "id": id,
+        "evidence_ids": (f"e-{id}",),
+        "surface": "chatgpt",
+        "subject": "reddit.com",
+        "statement": "Synthetic unit fixture, not product proof",
+        "metric": "citation_share",
+        "denominator": "all_citations",
+        "geography": "US",
+        "mode": "consumer_web",
+        "sampling_frame": "same-panel",
+        "period_start": date(2026, 8, 14),
+        "period_end": date(2026, 8, 17),
+        "value": 0.5,
+        "unit": "percent",
+    }
     return StudyClaim(**{**fields, **changes})
 
 
