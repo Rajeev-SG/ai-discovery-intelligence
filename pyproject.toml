@@ -3,8 +3,6 @@ name = "ai-discovery-intelligence"
 version = "0.0.1"
 description = "Source-backed intelligence on consumer AI discovery surfaces"
 requires-python = ">=3.12"
-# SQLAlchemy is used by the claim-ledger persistence layer (src/ai_discovery/claims.py)
-# and its migration-fidelity test (tests/test_migration.py); not by coverage.py itself.
 dependencies = ["PyYAML>=6.0,<7", "pydantic>=2.9,<3", "SQLAlchemy>=2.0.36,<3"]
 
 [project.optional-dependencies]
