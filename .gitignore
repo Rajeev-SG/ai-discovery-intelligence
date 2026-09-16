@@ -14,3 +14,4 @@ coverage/
 *.log
 artifacts/
 private-snapshots/
+proof/claim_ledger/*.sqlite3
