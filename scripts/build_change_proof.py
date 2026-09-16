@@ -1,10 +1,19 @@
 """Build the issue-#5 change-events proof from live captured evidence."""
-import json, hashlib, datetime as dt, os, sys
+
+import datetime as dt
+import json
+import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 from ai_discovery.change_events import ChangeEvent, EventStore, EventType
 
-UTC = dt.timezone.utc
-def D(s): return dt.datetime.fromisoformat(s).replace(tzinfo=UTC) if s else None
+UTC = dt.UTC
+
+
+def D(s):
+    return dt.datetime.fromisoformat(s).replace(tzinfo=UTC) if s else None
+
 
 events = [
     ChangeEvent(
@@ -13,7 +22,9 @@ events = [
         description="Similarweb May-2026 web report: ChatGPT fell from 76.4% to ~52.7% of all AI chatbot web traffic over 12 months; Gemini rose to 27.3% and Claude to 8.9%. DeepSeek at ~375.0M monthly visits.",
         surfaces=["chatgpt", "google-gemini", "claude", "deepseek-chat"],
         claims=["b3ab565f9b14"],
-        evidence_urls=["https://www.similarweb.com/blog/research/market-research/most-visited-websites/"],
+        evidence_urls=[
+            "https://www.similarweb.com/blog/research/market-research/most-visited-websites/"
+        ],
         observed_at=D("2026-09-16T17:26:50"),
         published_at=D("2026-05-14"),
         effective_from=D("2026-04-01"),
@@ -31,7 +42,11 @@ events = [
         published_at=D("2026-08-26"),
         effective_from=D("2026-08-14"),
         dedupe_key="semrush-promptwatch-reddit-decline",
-        metadata={"publisher": "Semrush (reporting Promptwatch)", "metric": "share of ChatGPT citations", "sample": "daily-panel windows"},
+        metadata={
+            "publisher": "Semrush (reporting Promptwatch)",
+            "metric": "share of ChatGPT citations",
+            "sample": "daily-panel windows",
+        },
     ),
     ChangeEvent(
         event_type=EventType.citation_source_shift,
@@ -44,7 +59,11 @@ events = [
         published_at=D("2026-09-02"),
         effective_from=D("2026-09-01"),
         dedupe_key="ahrefs-reddit-16-8-pct-sep-2026",
-        metadata={"publisher": "Ahrefs (Brand Radar)", "metric": "mention share among top sources", "sample": "810,887 pages cited"},
+        metadata={
+            "publisher": "Ahrefs (Brand Radar)",
+            "metric": "mention share among top sources",
+            "sample": "810,887 pages cited",
+        },
     ),
     ChangeEvent(
         event_type=EventType.audience_shift,
@@ -77,19 +96,27 @@ events = [
         description="SISTRIX 17-week multi-country study measured weekly citation churn at roughly 74% for ChatGPT and 56% for Google AI Mode — arguing against treating one citation snapshot as durable.",
         surfaces=["chatgpt", "google-ai-mode"],
         claims=["811a077fd62e"],
-        evidence_urls=["https://www.sistrix.com/blog/ai-citation-drift-how-stable-are-sources-in-ai-search-results/"],
+        evidence_urls=[
+            "https://www.sistrix.com/blog/ai-citation-drift-how-stable-are-sources-in-ai-search-results/"
+        ],
         observed_at=D("2026-09-16T17:26:50"),
         published_at=D("2026-05-01"),
         effective_from=D("2026-01-01"),
         dedupe_key="sistrix-74pct-weekly-churn",
-        metadata={"publisher": "SISTRIX", "metric": "weekly citation churn", "sample": "82,619 prompts; 17 weeks"},
+        metadata={
+            "publisher": "SISTRIX",
+            "metric": "weekly citation churn",
+            "sample": "82,619 prompts; 17 weeks",
+        },
     ),
 ]
 
 # The qualifying-event pair: #3 (Ahrefs Sep) updates/qualifies #2 (Promptwatch decline)
 # We link them explicitly so the timeline shows the qualification relationship.
 events[2].metadata["qualifies_event_dedupe_key"] = events[1].dedupe_key
-events[2].metadata["qualification_note"] = "Different denominator (mention share among top sources vs all-citations share), different time window (Sep vs Aug), US-only. Not a direct contradiction."
+events[2].metadata["qualification_note"] = (
+    "Different denominator (mention share among top sources vs all-citations share), different time window (Sep vs Aug), US-only. Not a direct contradiction."
+)
 
 store = EventStore()
 for e in events:

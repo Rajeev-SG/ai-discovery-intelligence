@@ -1,6 +1,8 @@
 import datetime as dt
+
 import pytest
-from ai_discovery.change_events import ChangeEvent, ChangeEvent as CE, EventStore, EventType
+
+from ai_discovery.change_events import ChangeEvent, EventStore, EventType
 
 
 def ev(**kw):
@@ -11,8 +13,8 @@ def ev(**kw):
         surfaces=["chatgpt"],
         claims=["c1"],
         evidence_urls=["https://example.com/s"],
-        observed_at=dt.datetime(2026, 9, 16, tzinfo=dt.timezone.utc),
-        published_at=dt.datetime(2026, 8, 26, tzinfo=dt.timezone.utc),
+        observed_at=dt.datetime(2026, 9, 16, tzinfo=dt.UTC),
+        published_at=dt.datetime(2026, 8, 26, tzinfo=dt.UTC),
         dedupe_key="test-key",
     )
     return ChangeEvent(**{**defaults, **kw})
@@ -59,8 +61,8 @@ def test_dedupe_removes_repeats():
 
 def test_timeline_global():
     store = EventStore()
-    store.append(ev(id="a", published_at=dt.datetime(2026, 9, 1, tzinfo=dt.timezone.utc), dedupe_key="sep"))
-    store.append(ev(id="b", published_at=dt.datetime(2026, 8, 26, tzinfo=dt.timezone.utc), dedupe_key="aug"))
+    store.append(ev(id="a", published_at=dt.datetime(2026, 9, 1, tzinfo=dt.UTC), dedupe_key="sep"))
+    store.append(ev(id="b", published_at=dt.datetime(2026, 8, 26, tzinfo=dt.UTC), dedupe_key="aug"))
     assert [e.id for e in store.timeline()] == ["b", "a"]
 
 
