@@ -1,0 +1,64 @@
+name: web-ci
+
+on:
+  push:
+    branches: ["**"]
+    paths: ["web/**", ".github/workflows/web-ci.yml"]
+  pull_request:
+    paths: ["web/**", ".github/workflows/web-ci.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Uses Playwright webServer config for e2e (no manual npm start or curl loop).
+jobs:
+  observation-plane:
+    name: observation-plane (typecheck, unit, build, e2e)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Registry invariants (python scaffold validator)
+        working-directory: .
+        run: |
+          python -m pip install --quiet "PyYAML>=6,<7"
+          python scripts/validate_scaffold.py
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end product proof
+        run: npx playwright test
+
+      - name: Upload proof screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: observation-plane-proof
+          path: |
+            web/proof
+            web/test-results
+          if-no-files-found: warn
+          retention-days: 14

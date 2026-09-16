@@ -38,6 +38,15 @@ The secondary product is a deliberately short executive weekly brief and a versi
 
 See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
+## Product surfaces (implemented)
+
+- **Observation plane** — `web/`, a Next.js App Router app rendering every
+  entry in `config/surfaces.yaml` with search, sort, faceted filters,
+  expandable rows/evidence cells, URL state and a responsive mobile view.
+  Run it with `cd web && npm ci && npm run dev` (or
+  `portless run --name ai-discovery-observation-plane`). See
+  [`web/README.md`](web/README.md) for the proof and the check commands.
+
 ## Repository bootstrap
 
 See [`docs/REPOSITORY_SETUP.md`](docs/REPOSITORY_SETUP.md). The scaffold includes an idempotent GitHub issue bootstrap script.
