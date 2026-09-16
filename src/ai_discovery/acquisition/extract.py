@@ -100,7 +100,6 @@ def extract_document(
     try:
         doc = trafilatura.bare_extraction(html, url=url, with_metadata=True, include_comments=False)
     except Exception:  # noqa: BLE001 — trafilatura raises varied types
-
         doc = None
 
     if doc is not None:

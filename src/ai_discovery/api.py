@@ -121,7 +121,7 @@ def list_sources(db: Session = Depends(get_db)) -> dict:  # noqa: B008 — FastA
 def source_checks(
     source_id: str,
     db: Session = Depends(get_db),  # noqa: B008 — FastAPI DI
-    limit: int = Query(20, ge=1, le=100)
+    limit: int = Query(20, ge=1, le=100),
 ) -> dict:
     if db.get(Source, source_id) is None:
         raise HTTPException(status_code=404, detail="source not found")

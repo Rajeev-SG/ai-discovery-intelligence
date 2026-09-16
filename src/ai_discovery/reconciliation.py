@@ -135,7 +135,15 @@ def compare_claims(first: StudyClaim, second: StudyClaim) -> Reconciliation:
             relationship="contextualises",
             state="unresolved",
             interpretation=f"Insufficient context to compare: {', '.join(unknown)}. "
-            "Missing methodology is not evidence of agreement or contradiction.",
+            "Missing methodology is not evidence of agreement or contradiction."
+            + (
+                f" Note: known values disagree ({first.value} vs {second.value} {first.unit}); "
+                "may indicate a genuine conflict once contexts are completed."
+                if first.value is not None
+                and second.value is not None
+                and first.value != second.value
+                else ""
+            ),
             confidence_adjustment=-0.15,
         )
     # All dates and values are known after the conservative missing-data branch.
@@ -172,7 +180,11 @@ def compare_claims(first: StudyClaim, second: StudyClaim) -> Reconciliation:
             "Corroborate the observation before treating it as a durable change.",
             confidence_adjustment=-0.15,
         )
-    agrees = first.value == second.value
+    # Independent measurements are never bit-identical; use a 1% relative
+    # tolerance so near-equal values from independent studies are classified as
+    # supporting rather than conflicting.
+    rel_diff = abs(first.value - second.value) / max(abs(first.value), 1e-12)
+    agrees = rel_diff <= 0.01
     return Reconciliation(
         **common,
         relationship="supports" if agrees else "contradicts",
