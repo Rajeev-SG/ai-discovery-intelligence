@@ -150,20 +150,31 @@ capture_hashes = {
     "naver-ai-tab-4m-ctr": _hash("Surpassed 4 million cumulative users; CTR exceeded 20%"),
     "sistrix-74pct-weekly-churn": _hash("Weekly citation churn ~74% for ChatGPT"),
 }
-for e in events:
-    if e.dedupe_key in capture_hashes:
-        e.metadata["source_hash"] = capture_hashes[e.dedupe_key]
+# Persist previous hashes to a file; a second run sees no changes and emits nothing.
+hash_file = os.path.join(os.path.dirname(__file__), "..", "proof", "change_events", "previous_hashes.json")
+previous_hashes: dict[str, str] = {}
+if os.path.exists(hash_file):
+    with open(hash_file) as f:
+        previous_hashes = json.load(f)
 
-# Demonstrate delta detection: a changed hash produces a new event, an unchanged one does not.
-previous_hashes = {k: v for k, v in capture_hashes.items()}
 changed_keys = [k for k, v in capture_hashes.items() if previous_hashes.get(k) != v]
 unchanged_keys = [k for k in capture_hashes if k not in changed_keys]
-print(
-    f"hash-diff: {len(changed_keys)} changed/new, {len(unchanged_keys)} unchanged (unchanged sources are skipped)"
-)
+print(f"hash-diff: {len(changed_keys)} changed/new, {len(unchanged_keys)} unchanged")
+
+# Only emit events whose hash changed (or first run when no previous hash exists).
+events_to_emit = [
+    e
+    for e in events
+    if e.dedupe_key in set(changed_keys) | set(k for k in capture_hashes if k not in previous_hashes)
+]
+print(f"events to emit: {len(events_to_emit)} (out of {len(events)})")
+
+os.makedirs(os.path.dirname(hash_file), exist_ok=True)
+with open(hash_file, "w") as f:
+    json.dump(capture_hashes, f, indent=2)
 
 store = EventStore()
-for e in events:
+for e in events_to_emit:
     store.append(e)
 
 timeline = store.timeline()
