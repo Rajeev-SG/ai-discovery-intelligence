@@ -6,7 +6,7 @@ from ai_discovery.change_events import ChangeEvent, EventStore, EventType
 
 
 def ev(**kw):
-    defaults = dict(
+    defaults = {
         event_type=EventType.citation_source_shift,
         title="Synthetic unit fixture, not product proof",
         description="fixture",
@@ -15,7 +15,7 @@ def ev(**kw):
         evidence_urls=["https://example.com/s"],
         observed_at=dt.datetime(2026, 9, 16, tzinfo=dt.UTC),
         published_at=dt.datetime(2026, 8, 26, tzinfo=dt.UTC),
-        dedupe_key="test-key",
+        
     )
     return ChangeEvent(**{**defaults, **kw})
 
@@ -75,7 +75,7 @@ def test_timeline_per_surface():
 
 def test_event_is_frozen():
     e = ev(id="x")
-    with pytest.raises(Exception):
+    with pytest.raises(ValidationError, TypeError, ValueError, AttributeError):
         e.title = "mutated"
 
 
