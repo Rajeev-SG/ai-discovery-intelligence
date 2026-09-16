@@ -49,8 +49,8 @@ def fetch_captures() -> None:
     CAPTURE_DIR.mkdir(parents=True, exist_ok=True)
     manifest: dict[str, dict] = {}
     with httpx.Client(
-            headers={"User-Agent": USER_AGENT}, follow_redirects=True, timeout=40.0
-        ) as client:
+        headers={"User-Agent": USER_AGENT}, follow_redirects=True, timeout=40.0
+    ) as client:
         for spec in specs:
             source = spec["source"]
             response = client.get(source["url"])
@@ -67,7 +67,9 @@ def fetch_captures() -> None:
                 "raw_sha256": hashlib.sha256(response.content).hexdigest(),
                 "fetched_at": dt.datetime.now(dt.UTC).isoformat(),
             }
-            print(f"fetched {source['source_id']}: {response.status_code} {len(response.content)} bytes")
+            print(
+                f"fetched {source['source_id']}: {response.status_code} {len(response.content)} bytes"
+            )
     MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
 
@@ -152,7 +154,9 @@ def render(rows: list[dict]) -> str:
 
     out.append("## Summary")
     out.append("")
-    out.append("| Claim | Topic | Source | Published | Measured window | Sample | Status | Confidence |")
+    out.append(
+        "| Claim | Topic | Source | Published | Measured window | Sample | Status | Confidence |"
+    )
     out.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
     for row in rows:
         out.append(
@@ -200,9 +204,15 @@ def render(rows: list[dict]) -> str:
             f"| published | {_cell((row['dates']['published_at'] or '')[:10])} | "
             f"{_cell(row['dates']['published_at_source'])} |"
         )
-        out.append(f"| modified | {_cell((row['dates']['modified_at'] or '')[:10])} | jsonld dateModified |")
-        out.append(f"| measured window | {_cell(row['dates']['measured_window'])} | body / page stamp |")
-        out.append(f"| observed (capture) | {_cell((row['dates']['observed_at'] or '')[:19])} | this run |")
+        out.append(
+            f"| modified | {_cell((row['dates']['modified_at'] or '')[:10])} | jsonld dateModified |"
+        )
+        out.append(
+            f"| measured window | {_cell(row['dates']['measured_window'])} | body / page stamp |"
+        )
+        out.append(
+            f"| observed (capture) | {_cell((row['dates']['observed_at'] or '')[:19])} | this run |"
+        )
         out.append("")
 
         out.append("**Methodology.**")
@@ -210,13 +220,24 @@ def render(rows: list[dict]) -> str:
         out.append("| Field | Value |")
         out.append("| --- | --- |")
         for key in (
-            "measurement_mode", "metric_family", "denominator", "prompt_universe",
-            "sample_size", "unit_of_analysis", "time_window", "geography",
-            "geography_basis", "language", "language_basis", "methodology_notes",
+            "measurement_mode",
+            "metric_family",
+            "denominator",
+            "prompt_universe",
+            "sample_size",
+            "unit_of_analysis",
+            "time_window",
+            "geography",
+            "geography_basis",
+            "language",
+            "language_basis",
+            "methodology_notes",
         ):
             out.append(f"| {key} | {_cell(row['methodology'][key])} |")
         limitations = row["methodology"]["limitations"] or []
-        out.append(f"| limitations | {_cell('; '.join(limitations)) if limitations else '_none recorded_'} |")
+        out.append(
+            f"| limitations | {_cell('; '.join(limitations)) if limitations else '_none recorded_'} |"
+        )
         out.append("")
 
         out.append("**Metrics.**")
