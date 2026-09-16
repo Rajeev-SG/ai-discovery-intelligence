@@ -1,8 +1,66 @@
 {
-  "generated_at": "2026-09-16T18:25:09.686863+00:00",
+  "generated_at": "2026-09-16T18:26:38.254616+00:00",
   "total_candidates": 8,
   "included": 2,
   "excluded": 6,
+  "scorer_audit": {
+    "reddit": {
+      "confidence_raw": 0.705,
+      "confidence_penalty": 0.15,
+      "confidence_penalised": 0.5549999999999999,
+      "confidence_label": "medium",
+      "significance": 3.68
+    },
+    "yandex": {
+      "confidence_raw": 0.65,
+      "confidence_penalty": 0.0,
+      "confidence_penalised": 0.65,
+      "confidence_label": "medium",
+      "significance": 3.6
+    },
+    "naver": {
+      "confidence_raw": 0.63,
+      "confidence_penalty": 0.0,
+      "confidence_penalised": 0.63,
+      "confidence_label": "medium",
+      "significance": 3.15
+    },
+    "similarweb": {
+      "confidence_raw": 0.62,
+      "confidence_penalty": 0.0,
+      "confidence_penalised": 0.62,
+      "confidence_label": "medium",
+      "significance": 3.4
+    },
+    "benchmark": {
+      "confidence_raw": 0.9,
+      "confidence_penalty": 0.0,
+      "confidence_penalised": 0.9,
+      "confidence_label": "high",
+      "significance": 1.35
+    },
+    "ui_tweak": {
+      "confidence_raw": 0.9,
+      "confidence_penalty": 0.0,
+      "confidence_penalised": 0.9,
+      "confidence_label": "high",
+      "significance": 0.75
+    },
+    "uncorroborated": {
+      "confidence_raw": 0.355,
+      "confidence_penalty": 0.0,
+      "confidence_penalised": 0.355,
+      "confidence_label": "low",
+      "significance": 3.68
+    },
+    "geo_tips": {
+      "confidence_raw": 0.31,
+      "confidence_penalty": 0.0,
+      "confidence_penalised": 0.31,
+      "confidence_label": "low",
+      "significance": 0.65
+    }
+  },
   "items": [
     {
       "change": "Reddit's ChatGPT citation share fell from 3.8% (Jul 18–Aug 7) to 0.5% (Aug 14–17) per Promptwatch/Semrush; Ahrefs' Sep-2026 US snapshot subsequently ranked Reddit as ChatGPT's largest cited domain at 16.8% mention share.",

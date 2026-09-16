@@ -285,6 +285,7 @@ result = {
     "total_candidates": len(candidates),
     "included": len(included),
     "excluded": len(excluded),
+    "scorer_audit": all_scores,
     "items": [i.model_dump(mode="json") for i in included],
     "excluded_items": [
         {"change": c.change[:80], "significance": c.significance, "confidence": c.confidence.value}
