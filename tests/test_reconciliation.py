@@ -7,11 +7,22 @@ from ai_discovery.reconciliation import StudyClaim, compare_claims
 
 
 def claim(id="a", **changes):
-    fields = dict(id=id, evidence_ids=(f"e-{id}",), surface="chatgpt", subject="reddit.com",
-                  statement="Synthetic unit fixture, not product proof", metric="citation_share",
-                  denominator="all_citations", geography="US", mode="consumer_web",
-                  sampling_frame="same-panel", period_start=date(2026, 8, 14),
-                  period_end=date(2026, 8, 17), value=0.5, unit="percent")
+    fields = dict(
+        id=id,
+        evidence_ids=(f"e-{id}",),
+        surface="chatgpt",
+        subject="reddit.com",
+        statement="Synthetic unit fixture, not product proof",
+        metric="citation_share",
+        denominator="all_citations",
+        geography="US",
+        mode="consumer_web",
+        sampling_frame="same-panel",
+        period_start=date(2026, 8, 14),
+        period_end=date(2026, 8, 17),
+        value=0.5,
+        unit="percent",
+    )
     return StudyClaim(**{**fields, **changes})
 
 
@@ -21,11 +32,19 @@ def test_same_context_same_value_supports_without_unearned_confidence_boost():
     assert result.confidence_adjustment == 0
 
 
-@pytest.mark.parametrize("field,value", [
-    ("metric", "mention_share"), ("denominator", "top_sources"), ("geography", "China"),
-    ("mode", "api"), ("sampling_frame", "other-panel"), ("surface", "gemini"),
-    ("subject", "wikipedia.org"), ("unit", "fraction"),
-])
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("metric", "mention_share"),
+        ("denominator", "top_sources"),
+        ("geography", "China"),
+        ("mode", "api"),
+        ("sampling_frame", "other-panel"),
+        ("surface", "gemini"),
+        ("subject", "wikipedia.org"),
+        ("unit", "fraction"),
+    ],
+)
 def test_different_contexts_are_not_direct_conflicts(field, value):
     result = compare_claims(claim(), claim("b", **{field: value, "value": 16.8}))
     assert result.state == "methodologically_incomparable"
@@ -33,8 +52,10 @@ def test_different_contexts_are_not_direct_conflicts(field, value):
     assert result.relationship == "contextualises"
 
 
-@pytest.mark.parametrize("field", ["geography", "denominator", "mode", "sampling_frame",
-                                   "period_start", "period_end", "value"])
+@pytest.mark.parametrize(
+    "field",
+    ["geography", "denominator", "mode", "sampling_frame", "period_start", "period_end", "value"],
+)
 def test_unknown_is_not_a_match(field):
     result = compare_claims(claim(**{field: None}), claim("b", **{field: None}))
     assert result.state == "unresolved"
@@ -77,9 +98,15 @@ def test_provisional_is_not_durable_change():
 def test_canonical_reddit_methodology_shape_is_incomparable_not_death_or_recovery():
     # Values are illustrative unit inputs; live captured evidence is separate proof.
     first = claim(geography=None, mode=None, sampling_frame="Promptwatch", provisional=True)
-    second = claim("b", metric="mention_share", denominator="summed_top_source_citations",
-                   sampling_frame="Ahrefs Brand Radar", value=16.8,
-                   period_start=date(2026, 9, 1), period_end=None)
+    second = claim(
+        "b",
+        metric="mention_share",
+        denominator="summed_top_source_citations",
+        sampling_frame="Ahrefs Brand Radar",
+        value=16.8,
+        period_start=date(2026, 9, 1),
+        period_end=None,
+    )
     result = compare_claims(first, second)
     assert result.state == "methodologically_incomparable"
     assert result.confidence_adjustment < 0
@@ -92,8 +119,9 @@ def test_self_relation_invalid():
         compare_claims(claim(), claim())
 
 
-@pytest.mark.parametrize("changes", [{"value": float("nan")}, {"value": float("inf")},
-                                      {"period_end": date(2025, 1, 1)}])
+@pytest.mark.parametrize(
+    "changes", [{"value": float("nan")}, {"value": float("inf")}, {"period_end": date(2025, 1, 1)}]
+)
 def test_bad_measurements_rejected(changes):
     with pytest.raises(ValidationError):
         claim(**changes)
