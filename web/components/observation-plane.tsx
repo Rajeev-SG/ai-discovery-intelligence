@@ -260,6 +260,24 @@ export function ObservationPlane({ rows, registryVersion, lastReviewed }: Observ
     }
   }, [encoded, pathname]);
 
+  // Reverse URL reads: browser back/forward and shared links opened after
+  // initial mount must reconcile incoming params into table state. We compare
+  // against the canonical URL we would write ourselves to avoid a feedback loop.
+  useEffect(() => {
+    const onPopState = () => {
+      const incoming = decodeUrlState(new URLSearchParams(window.location.search));
+      const current = decodeUrlState(new URLSearchParams(encodeUrlState(urlState)));
+      if (JSON.stringify(incoming) !== JSON.stringify(current)) {
+        // One-way reconcile: the table resets to the URL's state on popstate.
+        // Full two-way binding is deferred; this handles back/forward deterministically.
+        window.location.reload();
+      }
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, JSON.stringify(urlState)]);
+
   const visibleRows = allRows;
   const activeFilters = table.state.columnFilters as ColumnFiltersState;
 
