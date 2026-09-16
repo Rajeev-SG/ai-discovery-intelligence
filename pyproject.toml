@@ -3,7 +3,7 @@ name = "ai-discovery-intelligence"
 version = "0.0.1"
 description = "Source-backed intelligence on consumer AI discovery surfaces"
 requires-python = ">=3.12"
-dependencies = ["PyYAML>=6.0,<7"]
+dependencies = ["PyYAML>=6.0,<7", "pydantic>=2.9,<3", "SQLAlchemy>=2.0.36,<3"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10", "ruff>=0.12,<1"]
