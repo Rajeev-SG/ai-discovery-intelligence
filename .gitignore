@@ -11,7 +11,10 @@ node_modules/
 dist/
 build/
 coverage/
+*.sqlite3
 *.log
 artifacts/
 private-snapshots/
-proof/claim_ledger/*.sqlite3
+# backend runtime state
+var/
+*.pyc

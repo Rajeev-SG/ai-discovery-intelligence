@@ -38,6 +38,56 @@ The secondary product is a deliberately short executive weekly brief and a versi
 
 See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
+## Product surfaces (implemented)
+
+- **Observation plane** — `web/`, a Next.js App Router app rendering every
+  entry in `config/surfaces.yaml` with search, sort, faceted filters,
+  expandable rows/evidence cells, URL state and a responsive mobile view.
+  Run it with `cd web && npm ci && npm run dev` (or
+  `portless run --name ai-discovery-observation-plane`). See
+  [`web/README.md`](web/README.md) for the proof and the check commands.
+
 ## Repository bootstrap
 
 See [`docs/REPOSITORY_SETUP.md`](docs/REPOSITORY_SETUP.md). The scaffold includes an idempotent GitHub issue bootstrap script.
+
+## Current implementation status
+
+| Capability | Status | Where |
+|---|---|---|
+| Observation plane (35 surfaces) | ✅ Merged | PR #16 |
+| Source acquisition (backend + API) | ✅ Merged | PR #13 |
+| Claim ledger (15 claims / 15 sources) | 🔶 PR #12 open | `proof/claim_ledger/` |
+| Change events (6 dated events) | ✅ Merged | PR #14 |
+| Conflict reconciliation | 🔶 PR #11 open | `src/ai_discovery/reconciliation.py` |
+| Coverage gaps (35 registry-derived) | ✅ Merged | PR #15 |
+| Executive brief (scorer-derived) | ✅ Merged | PR #17 |
+| POV maintenance | 🔶 Issue #7 open | not started |
+| Production deployment | 🔶 Issue #9 open | not started |
+| Controlled consumer-surface observation | 🔶 Issue #10 open | deferred |
+
+## How to run locally
+
+```bash
+# Backend (source acquisition + evidence API)
+uv sync --all-extras
+uv run pytest tests/ -q
+
+# Claim ledger + proof
+uv run python scripts/build_claim_specs_expanded.py
+uv run python scripts/build_claim_proof.py
+cat proof/claim_ledger/PROOF.md
+
+# Frontend (observation plane)
+cd web
+npm ci
+npm run build
+npm start
+```
+
+## CI
+
+| Workflow | Scope |
+|---|---|
+| `claim-ledger-ci` | Regenerates the sqlite proof ledger, runs tests and lint |
+| `web-ci` | Typecheck, unit tests, build, e2e for the observation plane |
