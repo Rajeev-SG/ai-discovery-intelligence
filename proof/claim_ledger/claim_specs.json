@@ -1923,8 +1923,8 @@
           "quote": "Give ChatGPT Ads a clear role, budget source, and success criteria before pulling money from paid search"
         },
         "denominator": {
-          "value": "ChatGPT Ads",
-          "quote": "ChatGPT Ads"
+          "value": "paid search",
+          "quote": "paid search"
         },
         "unit_of_analysis": {
           "value": "ChatGPT Ads",
@@ -1992,6 +1992,436 @@
         "method": "deterministic_parser",
         "tool": "ai_discovery.claims",
         "rule_id": "sej_chatgpt_ads_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "low"
+    },
+    {
+      "source": {
+        "source_id": "tryprofound-research",
+        "publisher": "Profound",
+        "url": "https://www.tryprofound.com/research",
+        "canonical_url": "https://www.tryprofound.com/research",
+        "source_class": "vendor_research",
+        "robots_allowed": true
+      },
+      "topic": "audience_usage",
+      "statement": "Profound's research on travel decision-making found nearly eight in ten (79.7%) of respondents relied on answer engines for at least half of their decision making.",
+      "surfaces": [
+        "chatgpt",
+        "google-ai-overviews"
+      ],
+      "methodology": {
+        "measurement_mode": "survey",
+        "metric_family": {
+          "value": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making",
+          "quote": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making"
+        },
+        "metric_definition": {
+          "value": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making",
+          "quote": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making"
+        },
+        "denominator": {
+          "value": "The state of AI Search in travel",
+          "quote": "The state of AI Search in travel"
+        },
+        "unit_of_analysis": {
+          "value": "The state of AI Search in travel",
+          "quote": "The state of AI Search in travel"
+        },
+        "time_window": {
+          "value": "9 Jul, 2026",
+          "quote": "9 Jul, 2026"
+        },
+        "methodology_notes": {
+          "value": "The state of AI Search in travel",
+          "quote": "The state of AI Search in travel"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": {
+          "value": "Nearly eight in ten (79.7%)",
+          "quote": "Nearly eight in ten (79.7%)"
+        },
+        "limitations": [
+          "Vendor survey; single industry vertical (travel)."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "profound_travel_answer_engine_reliance",
+          "label": "Travel decision-makers relying on answer engines for >=half of decisions",
+          "comparator": "at_least",
+          "definition": {
+            "value": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making",
+            "quote": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making"
+          },
+          "value": {
+            "value": 79.7,
+            "quote": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making"
+          },
+          "unit": {
+            "value": "79.7%",
+            "quote": "79.7%"
+          },
+          "window": {
+            "value": "9 Jul, 2026",
+            "quote": "9 Jul, 2026"
+          },
+          "scope": {
+            "value": "travel decision-makers",
+            "quote": "The state of AI Search in travel"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "published_at_selector": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "profound_travel_reliance_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "medium"
+    },
+    {
+      "source": {
+        "source_id": "seer-ai-research",
+        "publisher": "Seer Interactive",
+        "url": "https://www.seerinteractive.com/insights",
+        "canonical_url": "https://www.seerinteractive.com/insights",
+        "source_class": "vendor_research",
+        "robots_allowed": true
+      },
+      "topic": "citations_sources",
+      "statement": "Seer Interactive's study found AI assistants declined to answer prompts about its brand 31% of the time, though answers were mostly correct when given.",
+      "surfaces": [
+        "chatgpt",
+        "google-ai-mode"
+      ],
+      "methodology": {
+        "measurement_mode": "vendor_panel",
+        "metric_family": {
+          "value": "AI Declined to Answer Prompts About Our Brand 31% of the Time",
+          "quote": "AI Declined to Answer Prompts About Our Brand 31% of the Time"
+        },
+        "metric_definition": {
+          "value": "Study: AI Declined to Answer Prompts About Our Brand 31% of the Time (But Got Our Info Mostly Right When It Answered)",
+          "quote": "Study: AI Declined to Answer Prompts About Our Brand 31% of the Time (But Got Our Info Mostly Right When It Answered)"
+        },
+        "denominator": {
+          "value": "AI Declined to Answer Prompts About Our Brand",
+          "quote": "AI Declined to Answer Prompts About Our Brand"
+        },
+        "unit_of_analysis": {
+          "value": "AI Declined to Answer Prompts About Our Brand",
+          "quote": "AI Declined to Answer Prompts About Our Brand"
+        },
+        "time_window": {
+          "value": "2026",
+          "quote": "2026"
+        },
+        "methodology_notes": {
+          "value": "AI Study",
+          "quote": "AI Study"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": null,
+        "limitations": [
+          "Single-brand vendor study; prompt set not published on the index page."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "seer_declined_to_answer",
+          "label": "Share of brand prompts the AI declined to answer",
+          "comparator": "share_of_total",
+          "definition": {
+            "value": "AI Declined to Answer Prompts About Our Brand 31% of the Time",
+            "quote": "AI Declined to Answer Prompts About Our Brand 31% of the Time"
+          },
+          "value": {
+            "value": 31,
+            "quote": "AI Declined to Answer Prompts About Our Brand 31% of the Time"
+          },
+          "unit": {
+            "value": "31%",
+            "quote": "31%"
+          },
+          "window": {
+            "value": "2026",
+            "quote": "2026"
+          },
+          "scope": {
+            "value": "prompts about Seer's own brand",
+            "quote": "AI Declined to Answer Prompts About Our Brand"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "published_at_selector": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "Study: AI Declined to Answer Prompts About Our Brand 31% of the Time (But Got Our Info Mostly Right When It Answered)"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "seer_brand_decline_rate_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "low"
+    },
+    {
+      "source": {
+        "source_id": "search-engine-roundtable",
+        "publisher": "Search Engine Roundtable",
+        "url": "https://www.seroundtable.com/",
+        "canonical_url": "https://www.seroundtable.com/",
+        "source_class": "news",
+        "robots_allowed": true
+      },
+      "topic": "commerce_ads",
+      "statement": "Search Engine Roundtable reports OpenAI is testing a ChatGPT ad format named Sponsored Agents, which lets people start a conversation with a business-sponsored agent after clicking an ad in ChatGPT.",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "methodology": {
+        "measurement_mode": "unknown",
+        "metric_family": {
+          "value": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents",
+          "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents"
+        },
+        "metric_definition": {
+          "value": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents",
+          "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents"
+        },
+        "denominator": {
+          "value": "Sponsored Agents",
+          "quote": "Sponsored Agents"
+        },
+        "unit_of_analysis": {
+          "value": "ChatGPT Ads",
+          "quote": "ChatGPT Ads"
+        },
+        "time_window": {
+          "value": "Sep 16, 2026",
+          "quote": "Sep 16, 2026"
+        },
+        "methodology_notes": {
+          "value": "let people start a conversation with a business-sponsored agent after clicking an ad in ChatGPT",
+          "quote": "let people start a conversation with a business-sponsored agent after clicking an ad in ChatGPT"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": null,
+        "limitations": [
+          "Industry news reporting stated testing; not an OpenAI primary source."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "ser_sponsored_agents_test",
+          "label": "ChatGPT Sponsored Agents ad format in testing",
+          "comparator": "qualitative_finding",
+          "definition": {
+            "value": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents",
+            "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents"
+          },
+          "value": {
+            "value": true,
+            "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents"
+          },
+          "unit": {
+            "value": "in testing",
+            "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents"
+          },
+          "window": {
+            "value": "Sep 16, 2026",
+            "quote": "Sep 16, 2026"
+          },
+          "scope": {
+            "value": "ChatGPT Ads",
+            "quote": "ChatGPT Ads"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": "2026-09-16",
+        "published_at_selector": "page_stamp 'Sep 16, 2026'",
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "ser_chatgpt_sponsored_agents_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "low"
+    },
+    {
+      "source": {
+        "source_id": "perplexity-blog",
+        "publisher": "Perplexity",
+        "url": "https://www.perplexity.ai/hub/blog",
+        "canonical_url": "https://www.perplexity.ai/hub/blog",
+        "source_class": "vendor_blog",
+        "robots_allowed": true
+      },
+      "topic": "retrieval_index",
+      "statement": "Perplexity Research published Q2D-Web, a first-stage retriever benchmark and leaderboard built from 70 thousand agent queries and 190 million web documents with three sets of relevance judgements.",
+      "surfaces": [
+        "perplexity"
+      ],
+      "methodology": {
+        "measurement_mode": "vendor_panel",
+        "metric_family": {
+          "value": "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements",
+          "quote": "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements"
+        },
+        "metric_definition": {
+          "value": "Q2D-Web: Evaluating First-Stage Retrievers at Scale",
+          "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+        },
+        "denominator": {
+          "value": "190 million web documents",
+          "quote": "190 million web documents"
+        },
+        "unit_of_analysis": {
+          "value": "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements",
+          "quote": "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements"
+        },
+        "time_window": {
+          "value": "Sep 9, 2026",
+          "quote": "Sep 9, 2026"
+        },
+        "methodology_notes": {
+          "value": "Q2D-Web: Evaluating First-Stage Retrievers at Scale",
+          "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": null,
+        "limitations": [
+          "Vendor benchmark; index page summarises the study."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "perplexity_q2d_queries",
+          "label": "Agent queries in the Q2D-Web benchmark",
+          "comparator": "exact",
+          "definition": {
+            "value": "70 thousand agent queries",
+            "quote": "70 thousand agent queries"
+          },
+          "value": {
+            "value": 70000,
+            "quote": "70 thousand agent queries"
+          },
+          "unit": {
+            "value": "agent queries",
+            "quote": "agent queries"
+          },
+          "window": {
+            "value": "Sep 2026",
+            "quote": "Sep 9, 2026"
+          },
+          "scope": {
+            "value": "Q2D-Web benchmark",
+            "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+          }
+        },
+        {
+          "metric_id": "perplexity_q2d_documents",
+          "label": "Web documents in the Q2D-Web benchmark",
+          "comparator": "exact",
+          "definition": {
+            "value": "190 million web documents",
+            "quote": "190 million web documents"
+          },
+          "value": {
+            "value": 190000000,
+            "quote": "190 million web documents"
+          },
+          "unit": {
+            "value": "web documents",
+            "quote": "web documents"
+          },
+          "window": {
+            "value": "Sep 2026",
+            "quote": "Sep 9, 2026"
+          },
+          "scope": {
+            "value": "Q2D-Web benchmark",
+            "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": "2026-09-09",
+        "published_at_selector": "page_stamp 'Sep 9, 2026'",
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "perplexity_q2d_web_benchmark_v1",
         "version": "claim-extraction-0.1.0"
       },
       "status": "current",

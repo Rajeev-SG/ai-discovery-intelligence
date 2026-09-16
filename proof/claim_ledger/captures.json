@@ -63,18 +63,18 @@
     "content_type": "text/html; charset=utf-8",
     "bytes": 179611,
     "raw_sha256": "081497c6cc91a542127ca1f2d04aa4b8a79886adf1dd79e3b08351da16938984",
-    "fetched_at": "2026-09-16T21:01:14.291020+00:00"
+    "fetched_at": "2026-09-16T21:11:43.725911+00:00"
   },
   "xai-docs": {
     "url": "https://docs.x.ai/docs/overview",
-    "canonical_url": "https://docs.x.ai/docs/overview",
+    "canonical_url": "https://docs.x.ai/overview",
     "publisher": "xAI",
     "http_status": 200,
     "final_url": "https://docs.x.ai/overview",
     "content_type": "text/html; charset=utf-8",
     "bytes": 531526,
     "raw_sha256": "6f29e7962d3e610666140db3a0bbad94cdc8662a4e78378dece6a2f565488d5f",
-    "fetched_at": "2026-09-16T21:01:14.772821+00:00"
+    "fetched_at": "2026-09-16T21:11:43.726769+00:00"
   },
   "alibaba-qwen-blog": {
     "url": "https://qwenlm.github.io/blog/",
@@ -85,18 +85,18 @@
     "content_type": "text/html; charset=utf-8",
     "bytes": 13828,
     "raw_sha256": "ea6345e313611b786c3a13b418128385d677cdd7b50609353654ff48025a7ab9",
-    "fetched_at": "2026-09-16T21:01:15.029555+00:00"
+    "fetched_at": "2026-09-16T21:11:43.727156+00:00"
   },
   "ahrefs-blog-ai": {
-    "url": "https://ahrefs.com/blog/why-chatgpt-cites-pages/",
-    "canonical_url": "https://ahrefs.com/blog/why-chatgpt-cites-pages/",
+    "url": "https://ahrefs.com/blog/",
+    "canonical_url": "https://ahrefs.com/blog/",
     "publisher": "Ahrefs",
     "http_status": 200,
-    "final_url": "https://ahrefs.com/blog/why-chatgpt-cites-pages/",
+    "final_url": "https://ahrefs.com/blog/",
     "content_type": "text/html; charset=UTF-8",
     "bytes": 902148,
     "raw_sha256": "2c939c6fe994033e65e3df4e2de1c903e6e8c6553689519b26610eee1095efb9",
-    "fetched_at": "2026-09-16T21:01:15.329889+00:00"
+    "fetched_at": "2026-09-16T21:11:43.727868+00:00"
   },
   "peec-blog": {
     "url": "https://peec.ai/blog",
@@ -107,7 +107,7 @@
     "content_type": "text/html",
     "bytes": 757394,
     "raw_sha256": "2ac92bb4e92e1e962ec59f595c88519413fe80ac5863f2d5b35fd8b1152b0492",
-    "fetched_at": "2026-09-16T21:01:15.684420+00:00"
+    "fetched_at": "2026-09-16T21:11:43.728841+00:00"
   },
   "semrush-blog-ai": {
     "url": "https://www.semrush.com/blog/",
@@ -118,7 +118,7 @@
     "content_type": "text/html; charset=utf-8",
     "bytes": 272017,
     "raw_sha256": "3d0bb8cb7d75890746fc623098994b580376abbb0465dd552acd270ccac3e810",
-    "fetched_at": "2026-09-16T21:01:16.374077+00:00"
+    "fetched_at": "2026-09-16T21:11:43.728174+00:00"
   },
   "sistrix-blog": {
     "url": "https://www.sistrix.com/blog/",
@@ -129,7 +129,7 @@
     "content_type": "text/html; charset=UTF-8",
     "bytes": 91061,
     "raw_sha256": "b278448b8277f2bcf3230e55e8a3b85ee3f28f61faacbd85710e6a4e64d8040b",
-    "fetched_at": "2026-09-16T21:01:16.966446+00:00"
+    "fetched_at": "2026-09-16T21:11:43.728352+00:00"
   },
   "statcounter-ai-chatbot": {
     "url": "https://gs.statcounter.com/ai-chatbot-market-share",
@@ -140,7 +140,7 @@
     "content_type": "text/html; charset=utf-8",
     "bytes": 88344,
     "raw_sha256": "a0944d6803d9eccefd0942a03fad5d5e0b05d21a3fc9beb70a43b8e87ba46f89",
-    "fetched_at": "2026-09-16T21:01:17.778997+00:00"
+    "fetched_at": "2026-09-16T21:11:43.729029+00:00"
   },
   "cloudflare-blog-ai": {
     "url": "https://blog.cloudflare.com/tag/ai/",
@@ -162,6 +162,72 @@
     "content_type": "text/html; charset=UTF-8",
     "bytes": 398726,
     "raw_sha256": "4f69fdcf530d64a1895a015d121cc3261e08daac62cecd171ad0c408c45cfe12",
-    "fetched_at": "2026-09-16T21:01:18.256588+00:00"
+    "fetched_at": "2026-09-16T21:11:43.729374+00:00"
+  },
+  "perplexity-blog": {
+    "url": "https://www.perplexity.ai/hub/blog",
+    "canonical_url": "https://www.perplexity.ai/hub/blog",
+    "publisher": "",
+    "http_status": 200,
+    "final_url": "https://www.perplexity.ai/hub/blog",
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 192251,
+    "raw_sha256": "de2b8649fa9a2a297271ec94f83abe830aefd000fd210d760021f24d23858887",
+    "fetched_at": "2026-09-16T21:11:43.730248+00:00"
+  },
+  "meta-ai-news": {
+    "url": "https://ai.meta.com/blog/",
+    "canonical_url": "https://ai.meta.com/blog/",
+    "publisher": "",
+    "http_status": 200,
+    "final_url": "https://ai.meta.com/blog/",
+    "content_type": "text/html; charset=\"utf-8\"",
+    "bytes": 233326,
+    "raw_sha256": "4f0463351d3e5f9649f4a1292f6b3c51b079b26f3e0c6c746be395769cd161dd",
+    "fetched_at": "2026-09-16T21:11:43.727020+00:00"
+  },
+  "deepseek-docs": {
+    "url": "https://api-docs.deepseek.com/",
+    "canonical_url": "https://api-docs.deepseek.com/",
+    "publisher": "",
+    "http_status": 200,
+    "final_url": "https://api-docs.deepseek.com/",
+    "content_type": "text/html",
+    "bytes": 46116,
+    "raw_sha256": "6e2eb037db92ebef6a8f6408d87c12318c973388d6e27321606bb0e67dd67a6c",
+    "fetched_at": "2026-09-16T21:11:43.727316+00:00"
+  },
+  "tryprofound-research": {
+    "url": "https://www.tryprofound.com/research",
+    "canonical_url": "https://www.tryprofound.com/research",
+    "publisher": "",
+    "http_status": 200,
+    "final_url": "https://www.tryprofound.com/research",
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 157921,
+    "raw_sha256": "5b8b3f1624e533740d4f962cedb09a50257ee38520a4df0130e7513f34cf66f1",
+    "fetched_at": "2026-09-16T21:11:43.729735+00:00"
+  },
+  "seer-ai-research": {
+    "url": "https://www.seerinteractive.com/insights",
+    "canonical_url": "https://www.seerinteractive.com/insights",
+    "publisher": "",
+    "http_status": 200,
+    "final_url": "https://www.seerinteractive.com/insights",
+    "content_type": "text/html; charset=UTF-8",
+    "bytes": 99199,
+    "raw_sha256": "7c42a52c2cfb2dafb4a66c619275a67b7a10a16cefbe7c0fc781bc21dc66cbd0",
+    "fetched_at": "2026-09-16T21:11:43.729929+00:00"
+  },
+  "search-engine-roundtable": {
+    "url": "https://www.seroundtable.com/",
+    "canonical_url": "https://www.seroundtable.com/",
+    "publisher": "",
+    "http_status": 200,
+    "final_url": "https://www.seroundtable.com/",
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 98261,
+    "raw_sha256": "cb7750f9d595cbefa6ecb67c0e6030a95b665ecffa3ad1aa84f1e7969b9842f6",
+    "fetched_at": "2026-09-16T21:11:43.730148+00:00"
   }
 }

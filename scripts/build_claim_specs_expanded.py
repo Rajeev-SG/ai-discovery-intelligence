@@ -650,6 +650,96 @@ new.append(
     )
 )
 
+# --- Additional priority sources (second fetch pass) ------------------------
+new.append(spec(
+    "tryprofound-research", "Profound", "https://www.tryprofound.com/research", "vendor_research",
+    "audience_usage",
+    "Profound's research on travel decision-making found nearly eight in ten (79.7%) of respondents relied on answer engines for at least half of their decision making.",
+    ["chatgpt", "google-ai-overviews"],
+    "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making",
+    "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making",
+    "The state of AI Search in travel",
+    "The state of AI Search in travel",
+    "9 Jul, 2026",
+    "The state of AI Search in travel",
+    "survey",
+    [M("profound_travel_answer_engine_reliance", "Travel decision-makers relying on answer engines for >=half of decisions",
+       "Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making",
+       79.7, "79.7%", "9 Jul, 2026", "travel decision-makers", "at_least",
+       scope_quote="The state of AI Search in travel")],
+    ["Nearly eight in ten (79.7%) relied on Answer Engines for at least half of their decision making"],
+    "profound_travel_reliance_v1", sample_size="Nearly eight in ten (79.7%)",
+    limitations=["Vendor survey; single industry vertical (travel)."],
+))
+
+new.append(spec(
+    "seer-ai-research", "Seer Interactive", "https://www.seerinteractive.com/insights", "vendor_research",
+    "citations_sources",
+    "Seer Interactive's study found AI assistants declined to answer prompts about its brand 31% of the time, though answers were mostly correct when given.",
+    ["chatgpt", "google-ai-mode"],
+    "AI Declined to Answer Prompts About Our Brand 31% of the Time",
+    "Study: AI Declined to Answer Prompts About Our Brand 31% of the Time (But Got Our Info Mostly Right When It Answered)",
+    "AI Declined to Answer Prompts About Our Brand",
+    "AI Declined to Answer Prompts About Our Brand",
+    "2026",
+    "AI Study",
+    "vendor_panel",
+    [M("seer_declined_to_answer", "Share of brand prompts the AI declined to answer",
+       "AI Declined to Answer Prompts About Our Brand 31% of the Time", 31, "31%", "2026",
+       "prompts about Seer's own brand", "share_of_total",
+       scope_quote="AI Declined to Answer Prompts About Our Brand")],
+    ["Study: AI Declined to Answer Prompts About Our Brand 31% of the Time (But Got Our Info Mostly Right When It Answered)"],
+    "seer_brand_decline_rate_v1", confidence="low",
+    limitations=["Single-brand vendor study; prompt set not published on the index page."],
+))
+
+new.append(spec(
+    "search-engine-roundtable", "Search Engine Roundtable", "https://www.seroundtable.com/",
+    "news", "commerce_ads",
+    "Search Engine Roundtable reports OpenAI is testing a ChatGPT ad format named Sponsored Agents, which lets people start a conversation with a business-sponsored agent after clicking an ad in ChatGPT.",
+    ["chatgpt"],
+    "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents",
+    "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents",
+    "Sponsored Agents",
+    "ChatGPT Ads",
+    "Sep 16, 2026",
+    "let people start a conversation with a business-sponsored agent after clicking an ad in ChatGPT",
+    "unknown",
+    [M("ser_sponsored_agents_test", "ChatGPT Sponsored Agents ad format in testing",
+       "OpenAI is testing a new ad format in ChatGPT named Sponsored Agents", True, "in testing",
+       "Sep 16, 2026", "ChatGPT Ads", "qualitative_finding",
+       unit_quote="OpenAI is testing a new ad format in ChatGPT named Sponsored Agents",
+       scope_quote="ChatGPT Ads")],
+    ["OpenAI is testing a new ad format in ChatGPT named Sponsored Agents"],
+    "ser_chatgpt_sponsored_agents_v1", confidence="low",
+    published_at="2026-09-16", published_selector="page_stamp 'Sep 16, 2026'",
+    limitations=["Industry news reporting stated testing; not an OpenAI primary source."],
+))
+
+new.append(spec(
+    "perplexity-blog", "Perplexity", "https://www.perplexity.ai/hub/blog", "vendor_blog",
+    "retrieval_index",
+    "Perplexity Research published Q2D-Web, a first-stage retriever benchmark and leaderboard built from 70 thousand agent queries and 190 million web documents with three sets of relevance judgements.",
+    ["perplexity"],
+    "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements",
+    "Q2D-Web: Evaluating First-Stage Retrievers at Scale",
+    "190 million web documents",
+    "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements",
+    "Sep 9, 2026",
+    "Q2D-Web: Evaluating First-Stage Retrievers at Scale",
+    "vendor_panel",
+    [M("perplexity_q2d_queries", "Agent queries in the Q2D-Web benchmark",
+       "70 thousand agent queries", 70000, "agent queries", "Sep 2026", "Q2D-Web benchmark", "exact",
+       window_quote="Sep 9, 2026", scope_quote="Q2D-Web: Evaluating First-Stage Retrievers at Scale"),
+     M("perplexity_q2d_documents", "Web documents in the Q2D-Web benchmark",
+       "190 million web documents", 190000000, "web documents", "Sep 2026", "Q2D-Web benchmark", "exact",
+       window_quote="Sep 9, 2026", scope_quote="Q2D-Web: Evaluating First-Stage Retrievers at Scale")],
+    ["A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements"],
+    "perplexity_q2d_web_benchmark_v1", confidence="low",
+    published_at="2026-09-09", published_selector="page_stamp 'Sep 9, 2026'",
+    limitations=["Vendor benchmark; index page summarises the study."],
+))
+
 bundle = {"extraction_version": "claim-extraction-0.1.0", "claims": original + new}
 OUT.write_text(json.dumps(bundle, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 print(f"wrote {len(bundle['claims'])} claims to {OUT.relative_to(ROOT)}")
