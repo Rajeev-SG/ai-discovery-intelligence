@@ -91,9 +91,7 @@ def list_evidence(
         else:
             topic_json = json.dumps([topic])
             stmt = stmt.where(
-                text("evidence_item.topics::jsonb @> :topic_json").bindparams(
-                    topic_json=topic_json
-                )
+                text("evidence_item.topics::jsonb @> :topic_json").bindparams(topic_json=topic_json)
             )
     total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
     rows = db.scalars(

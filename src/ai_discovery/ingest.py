@@ -122,9 +122,7 @@ def ingest_all(
     source_jobs = build_source_jobs(config, source_ids=source_ids, limit=limit)
     query_jobs = build_query_jobs(config)
     query_jobs = [{**q, "max_results": max_per_query} for q in query_jobs]
-    acq_sinks, disc_sinks = run_spiders(
-        acquisition_jobs=source_jobs, discovery_jobs=query_jobs
-    )
+    acq_sinks, disc_sinks = run_spiders(acquisition_jobs=source_jobs, discovery_jobs=query_jobs)
     acq_output = acq_sinks[0] if acq_sinks else {}
     disc_output = disc_sinks[0] if disc_sinks else {}
     session.flush()
@@ -143,8 +141,14 @@ def ingest_all(
 
 
 CONSENT_SHELL_TITLES = {
-    "guce", "consent", "before you continue", "access denied", "just a moment",
-    "latest world & national news & headlines", "news", "home",
+    "guce",
+    "consent",
+    "before you continue",
+    "access denied",
+    "just a moment",
+    "latest world & national news & headlines",
+    "news",
+    "home",
 }
 CONSENT_SHELL_MARKERS = (
     "guce",

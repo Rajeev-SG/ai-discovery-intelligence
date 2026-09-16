@@ -166,6 +166,12 @@ sources:
     url: https://aisearch.similarweb.com/blog/
     topics: [ai_usage, referrals, market_share]
     preferred_fetch: http
+    fetch:
+      mode: http
+      url: https://aisearch.similarweb.com/blog/
+      user_agent: ai-discovery-intelligence/0.1
+      robots_check: true
+      rate_limit_seconds: 2.0
   - id: statcounter-ai-chatbot
     publisher: Statcounter
     class: market_telemetry

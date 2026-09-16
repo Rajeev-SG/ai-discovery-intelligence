@@ -83,9 +83,19 @@ def test_evidence_feed_returns_required_shape(client):
     assert body["total"] == 1
     item = body["items"][0]
     for field in [
-        "id", "url", "title", "publisher", "source_class", "published_at",
-        "modified_at", "observed_at", "topics", "capture_hash", "excerpt",
-        "validation_status", "is_candidate",
+        "id",
+        "url",
+        "title",
+        "publisher",
+        "source_class",
+        "published_at",
+        "modified_at",
+        "observed_at",
+        "topics",
+        "capture_hash",
+        "excerpt",
+        "validation_status",
+        "is_candidate",
     ]:
         assert field in item, field
     assert item["published_at"].startswith("2025-09-10")

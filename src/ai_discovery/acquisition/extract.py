@@ -68,8 +68,6 @@ def _json_ld_dates(html: str) -> tuple[dt.datetime | None, dt.datetime | None, s
     return published, modified, author
 
 
-
-
 def _is_day_precision(value: dt.datetime, reference: dt.datetime) -> bool:
     """True when `value` is midnight on the same day as a more precise `reference`."""
     return (
@@ -118,9 +116,8 @@ def extract_document(
     # Trafilatura normalises a date to day precision (midnight). When structured
     # data carries the same day with a real time, keep the precise value so the
     # stored publication timestamp is not silently coarsened.
-    if (
-        html_published is not None
-        and (published is None or _is_day_precision(published, html_published))
+    if html_published is not None and (
+        published is None or _is_day_precision(published, html_published)
     ):
         published = html_published
         published_source = "json_ld"

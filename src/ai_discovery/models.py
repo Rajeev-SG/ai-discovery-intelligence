@@ -16,10 +16,10 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
+    Index,
     Integer,
     String,
     Text,
-    UniqueConstraint,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -116,9 +116,7 @@ class EvidenceItem(Base):
     """A captured, normalised piece of public evidence."""
 
     __tablename__ = "evidence_item"
-    __table_args__ = (
-        UniqueConstraint("canonical_url", "capture_hash", name="uq_evidence_capture"),
-    )
+    __table_args__ = (Index("ix_evidence_canonical_capture", "canonical_url", "capture_hash"),)
 
     id: Mapped[str] = mapped_column(String(40), primary_key=True)
     source_id: Mapped[str | None] = mapped_column(
