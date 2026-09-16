@@ -13,7 +13,10 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-Relationship = Literal["supports", "updates", "contradicts", "supersedes", "contextualises"]
+# Note: "supersedes" is intentionally absent — no code path currently produces it.
+# A future supersession path (later re-measurement of the same quantity) should
+# re-add it to this Literal and implement the branch.
+Relationship = Literal["supports", "updates", "contradicts", "contextualises"]
 ConflictState = Literal[
     "compatible_support",
     "directional_support",
@@ -137,11 +140,16 @@ def compare_claims(first: StudyClaim, second: StudyClaim) -> Reconciliation:
             interpretation=f"Insufficient context to compare: {', '.join(unknown)}. "
             "Missing methodology is not evidence of agreement or contradiction."
             + (
-                f" Note: known values disagree ({first.value} vs {second.value} {first.unit}); "
-                "may indicate a genuine conflict once contexts are completed."
+                f" Note: known values disagree ({round(first.value, 2)} vs "
+                f"{round(second.value, 2)}"
+                + (f" {first.unit}" if first.unit == second.unit and first.unit else "")
+                + "); may indicate a genuine conflict once contexts are completed."
                 if first.value is not None
                 and second.value is not None
-                and first.value != second.value
+                and abs(first.value - second.value) > 1e-6
+                and abs(first.value - second.value)
+                / max(abs(first.value), abs(second.value), 1e-12)
+                > 0.01
                 else ""
             ),
             confidence_adjustment=-0.15,
@@ -183,8 +191,10 @@ def compare_claims(first: StudyClaim, second: StudyClaim) -> Reconciliation:
     # Independent measurements are never bit-identical; use a 1% relative
     # tolerance so near-equal values from independent studies are classified as
     # supporting rather than conflicting.
-    rel_diff = abs(first.value - second.value) / max(abs(first.value), 1e-12)
-    agrees = rel_diff <= 0.01
+    abs_diff = abs(first.value - second.value)
+    scale = max(abs(first.value), abs(second.value), 1e-12)
+    rel_diff = abs_diff / scale
+    agrees = abs_diff <= 1e-6 or rel_diff <= 0.01
     return Reconciliation(
         **common,
         relationship="supports" if agrees else "contradicts",
