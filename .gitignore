@@ -15,10 +15,6 @@ coverage/
 *.log
 artifacts/
 private-snapshots/
-
-# Observation-plane web app
-web/.next/
-web/tsconfig.tsbuildinfo
-web/test-results/
-web/playwright-report/
-web/.playwright/
+# backend runtime state
+var/
+*.pyc
