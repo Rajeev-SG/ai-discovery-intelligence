@@ -15,6 +15,13 @@ sources:
     url: https://platform.openai.com/docs/bots
     topics: [crawlers, user_agents]
     preferred_fetch: http
+    fetch:
+      mode: http
+      url: https://platform.openai.com/docs/bots
+      rate_limit_per_minute: 10
+      verified_at: 2026-09-16
+      notes: Official crawler/user-agent documentation.
+
   - id: google-search-central-ai
     publisher: Google
     class: official
@@ -27,6 +34,12 @@ sources:
     url: https://blog.google/products/search/
     topics: [google_ai_mode, ai_overviews, shopping, search]
     preferred_fetch: rss_or_http
+    fetch:
+      mode: rss
+      url: https://blog.google/products/search/rss/
+      limit: 5
+      verified_at: 2026-09-16
+
   - id: google-gemini-updates
     publisher: Google
     class: official
@@ -117,6 +130,14 @@ sources:
     url: https://www.navercorp.com/en/media/pressReleases
     topics: [naver_ai, korea]
     preferred_fetch: http
+    region: KR
+    language: ko
+    fetch:
+      mode: http
+      url: https://www.navercorp.com/en/media/pressReleases
+      rate_limit_per_minute: 6
+      verified_at: 2026-09-16
+
   - id: yandex-company-news
     publisher: Yandex
     class: official
@@ -125,6 +146,14 @@ sources:
     preferred_fetch: http
 
   # Free audience / market telemetry
+    region: RU
+    language: ru
+    fetch:
+      mode: http
+      url: https://yandex.com/company/news
+      rate_limit_per_minute: 6
+      verified_at: 2026-09-16
+
   - id: similarweb-blog
     publisher: Similarweb
     class: market_telemetry
@@ -149,6 +178,15 @@ sources:
     url: https://www.questmobile.com.cn/research/report-new
     topics: [china, app_mau, market_share]
     preferred_fetch: http
+    region: CN
+    language: zh
+    fetch:
+      mode: http
+      url: https://www.questmobile.com.cn/research/report-new
+      rate_limit_per_minute: 6
+      verified_at: 2026-09-16
+      notes: No feed; static report index (regional/China source).
+
   - id: cloudflare-radar-ai
     publisher: Cloudflare
     class: market_telemetry
@@ -161,6 +199,12 @@ sources:
     url: https://blog.cloudflare.com/tag/ai/
     topics: [ai_bots, crawlers, economics]
     preferred_fetch: rss_or_http
+    fetch:
+      mode: rss
+      url: https://blog.cloudflare.com/tag/ai/rss/
+      limit: 5
+      verified_at: 2026-09-16
+
   - id: adobe-digital-insights
     publisher: Adobe
     class: market_telemetry
@@ -181,6 +225,13 @@ sources:
     url: https://peec.ai/blog
     topics: [citations, fanout, sources, shopping, referrals, geo]
     preferred_fetch: http
+    fetch:
+      mode: http
+      url: https://peec.ai/blog
+      rate_limit_per_minute: 6
+      verified_at: 2026-09-16
+      notes: No feed endpoint verified (404 on /feed/); static HTTP fetch of the blog index.
+
   - id: profound-research
     publisher: Profound
     class: visibility_research
@@ -193,18 +244,38 @@ sources:
     url: https://ahrefs.com/blog/
     topics: [citations, ai_visibility, seo, referrals]
     preferred_fetch: rss_or_http
+    fetch:
+      mode: rss
+      url: https://ahrefs.com/blog/feed/
+      limit: 5
+      verified_at: 2026-09-16
+      notes: Blog feed. The monthly most-cited-domains page is a LIVING page (see docs/INGESTION.md).
+
   - id: semrush-blog-ai
     publisher: Semrush
     class: visibility_research
     url: https://www.semrush.com/blog/
     topics: [citations, ai_visibility, seo, industry_news]
     preferred_fetch: rss_or_http
+    fetch:
+      mode: rss
+      url: https://www.semrush.com/blog/feed/
+      limit: 5
+      verified_at: 2026-09-16
+
   - id: sistrix-blog
     publisher: SISTRIX
     class: visibility_research
     url: https://www.sistrix.com/blog/
     topics: [citation_drift, ai_search, seo]
     preferred_fetch: rss_or_http
+    fetch:
+      mode: rss
+      # NOTE: /blog/feed/ is a comments-only feed (0 entries). /feed/ is the post feed.
+      url: https://www.sistrix.com/feed/
+      limit: 5
+      verified_at: 2026-09-16
+
   - id: scrunch-blog
     publisher: Scrunch AI
     class: visibility_research
@@ -231,6 +302,12 @@ sources:
     url: https://searchengineland.com/
     topics: [seo, ai_search, platform_changes]
     preferred_fetch: rss_or_http
+    fetch:
+      mode: rss
+      url: https://searchengineland.com/feed
+      limit: 5
+      verified_at: 2026-09-16
+
   - id: search-engine-roundtable
     publisher: Search Engine Roundtable
     class: editorial_discovery
@@ -306,3 +383,59 @@ sources:
     url: https://www.navercorp.com/media/pressReleasesDetail?seq=10034442
     topics: [naver_ai, korea, usage]
     preferred_fetch: http
+
+  # Substantive current research pages (canonical exemplars from
+  # docs/EVIDENCE_AND_PROVENANCE.md). Static HTTP: both robots-allowed.
+  - id: ahrefs-most-cited-domains
+    publisher: Ahrefs
+    class: visibility_research
+    url: https://ahrefs.com/blog/most-cited-domains-in-chatgpt/
+    topics: [citations, ai_visibility, chatgpt]
+    preferred_fetch: http
+    fetch:
+      mode: http
+      url: https://ahrefs.com/blog/most-cited-domains-in-chatgpt/
+      rate_limit_per_minute: 4
+      verified_at: 2026-09-16
+      notes: LIVING auto-updated page. datePublished 2025-09-10, dateModified 2026-09-02.
+        Capture hash makes each monthly snapshot auditable; modified is never shown as published.
+  - id: semrush-reddit-citations
+    publisher: Semrush
+    class: visibility_research
+    url: https://www.semrush.com/blog/reddits-citations-in-chatgpt-fall/
+    topics: [citations, chatgpt, reddit]
+    preferred_fetch: http
+    fetch:
+      mode: http
+      url: https://www.semrush.com/blog/reddits-citations-in-chatgpt-fall/
+      rate_limit_per_minute: 4
+      verified_at: 2026-09-16
+
+# Discovery lane: open/free discovery sources used to find candidate URLs that are
+# NOT in the curated registry above. Candidates are non-canonical until validated.
+# Fetch health for these lives on the `discovery-fetch-infra` pseudo-source.
+discovery_queries:
+  - id: gdelt-ai-search-citations
+    provider: gdelt
+    query: '"AI search" OR "AI Overviews" OR "AI citations"'
+    class_hint: editorial_discovery
+    topics: [news_discovery, ai_search, citations]
+  - id: gdelt-ai-referrals
+    provider: gdelt
+    query: '"AI referrals" OR "ChatGPT traffic" OR "answer engine optimization"'
+    class_hint: editorial_discovery
+    topics: [news_discovery, referrals, aeo]
+  - id: bing-news-ai-visibility
+    provider: bing_news
+    query: 'AI search visibility study'
+    class_hint: visibility_research
+    topics: [news_discovery, ai_visibility]
+  - id: bing-news-ai-referral-traffic
+    provider: bing_news
+    query: 'answer engine optimization'
+    class_hint: market_telemetry
+    topics: [news_discovery, referrals, aeo]
+# NOTE (2026-09-16): Google News RSS is NOT used - news.google.com/robots.txt
+# disallows /rss/search (verified). GDELT DOC API returns 429 when polled hard;
+# its queries run through Scrapy AutoThrottle with a 30d window.
+
