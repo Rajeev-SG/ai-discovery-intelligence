@@ -49,15 +49,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: End-to-end product proof
-        env:
-          PLANE_URL: http://127.0.0.1:3000/
-        run: |
-          npm start &
-          for i in $(seq 1 40); do
-            if curl -sf http://127.0.0.1:3000/ > /dev/null; then break; fi
-            sleep 1
-          done
-          npx playwright test
+        run: npx playwright test
 
       - name: Upload proof screenshots
         if: always()
