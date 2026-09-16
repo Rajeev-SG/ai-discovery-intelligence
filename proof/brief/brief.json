@@ -1,0 +1,78 @@
+{
+  "generated_at": "2026-09-16T17:52:37.348778+00:00",
+  "total_candidates": 8,
+  "included": 3,
+  "excluded": 5,
+  "items": [
+    {
+      "change": "A significant new retrieval architecture change was observed in a small, uncorroborated consumer test.",
+      "why_it_matters": "Potentially material but lacks independent corroboration — flagged as a watch item.",
+      "agency_action": "Monitor. Do not brief until corroborated.",
+      "confidence": "low",
+      "significance": 4.6,
+      "evidence_ids": [
+        "synthetic-uncorroborated-retrieval"
+      ],
+      "surfaces": [
+        "chatgpt"
+      ],
+      "is_watch_item": true
+    },
+    {
+      "change": "Reddit's ChatGPT citation share fell from 3.8% (Jul 18–Aug 7) to 0.5% (Aug 14–17) per Promptwatch/Semrush; Ahrefs' Sep-2026 US snapshot subsequently ranked Reddit as ChatGPT's largest cited domain at 16.8% mention share.",
+      "why_it_matters": "Publisher/UGC visibility in ChatGPT is contested. Brands should not panic-exit Reddit as a distribution channel; the drop is provisional and not confirmed by an independent September snapshot.",
+      "agency_action": "Monitor only. Treat Reddit as a contested/possibly-temporary ChatGPT visibility source until corroborated by a second independent dataset with the same denominator.",
+      "confidence": "medium",
+      "significance": 4.2,
+      "evidence_ids": [
+        "semrush-reddit-decline-2026-08",
+        "ahrefs-reddit-16-8-sep-2026"
+      ],
+      "surfaces": [
+        "chatgpt"
+      ],
+      "is_watch_item": false
+    },
+    {
+      "change": "Yandex AI answers exceeded 49M monthly users — the vendor's most widely used generative AI product.",
+      "why_it_matters": "A regionally dominant surface now has material generative-AI reach. Brands with Russia/CIS exposure should treat Yandex AI answers as a first-class discovery surface alongside conventional search.",
+      "agency_action": "For clients with Russia/CIS exposure: include Yandex AI answers in regional search strategy. Monitor-only for global-only accounts.",
+      "confidence": "medium",
+      "significance": 3.8,
+      "evidence_ids": [
+        "yandex-49m-monthly-2026-09"
+      ],
+      "surfaces": [
+        "yandex-search-ai"
+      ],
+      "is_watch_item": false
+    }
+  ],
+  "excluded_items": [
+    {
+      "change": "NAVER AI Tab surpassed 4M cumulative users in ~2 months post-beta; product and p",
+      "significance": 3.7,
+      "confidence": "medium"
+    },
+    {
+      "change": "Similarweb May-2026 report: ChatGPT share of AI-chatbot web traffic fell from 76",
+      "significance": 3.6,
+      "confidence": "medium_high"
+    },
+    {
+      "change": "A new OpenAI model version was released with higher benchmark scores.",
+      "significance": 1.2,
+      "confidence": "high"
+    },
+    {
+      "change": "A minor UI tweak in Gemini's chat layout.",
+      "significance": 0.8,
+      "confidence": "high"
+    },
+    {
+      "change": "A generic '10 GEO tips' blog post was published.",
+      "significance": 0.5,
+      "confidence": "medium"
+    }
+  ]
+}
