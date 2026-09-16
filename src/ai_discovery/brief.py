@@ -206,9 +206,14 @@ class BriefGenerator:
         for c in sorted(candidates, key=lambda x: -x.significance):
             rank = self._confidence_rank[c.confidence]
             if c.is_watch_item:
-                # Watch items need ≥ watch_item_min_significance but can have lower confidence.
-                if c.significance >= self.watch_item_min_significance:
+                # Cap at most 1 watch item per brief so uncorroborated items
+                # cannot displace corroborated material in the same week.
+                if c.significance >= self.watch_item_min_significance and not any(
+                    i.is_watch_item for i in included
+                ):
                     included.append(c)
+                    if len(included) >= self.target_items:
+                        break
                 continue
             if rank < min_rank:
                 continue
