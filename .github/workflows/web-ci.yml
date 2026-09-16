@@ -11,6 +11,7 @@ on:
 permissions:
   contents: read
 
+# Uses Playwright webServer config for e2e (no manual npm start or curl loop).
 jobs:
   observation-plane:
     name: observation-plane (typecheck, unit, build, e2e)

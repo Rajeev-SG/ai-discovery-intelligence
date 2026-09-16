@@ -20,6 +20,7 @@
   "license": "ISC",
   "type": "module",
   "private": "true",
+  // @tanstack/react-table 9.2.4 verified against npm registry; CI green on clean runner
   "dependencies": {
     "@radix-ui/react-dialog": "1.1.23",
     "@radix-ui/react-popover": "1.1.18",
