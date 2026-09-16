@@ -1,0 +1,46 @@
+{
+  "similarweb-most-visited-websites": {
+    "url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+    "canonical_url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+    "publisher": "Similarweb",
+    "http_status": 200,
+    "final_url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 408906,
+    "raw_sha256": "0e14ec71713a58c5a57260db2506ad46d60b3ea3ac6bd91319cc293e722db446",
+    "fetched_at": "2026-09-16T17:26:50.414991+00:00"
+  },
+  "sistrix-ai-citation-drift": {
+    "url": "https://www.sistrix.com/blog/ai-citation-drift-how-stable-are-sources-in-ai-search-results/",
+    "canonical_url": "https://www.sistrix.com/blog/ai-citation-drift-how-stable-are-sources-in-ai-search-results/",
+    "publisher": "SISTRIX",
+    "http_status": 200,
+    "final_url": "https://www.sistrix.com/blog/ai-citation-drift-how-stable-are-sources-in-ai-search-results/",
+    "content_type": "text/html; charset=UTF-8",
+    "bytes": 116865,
+    "raw_sha256": "3aa63e617aff80e0d81787572be90269cac3e92ddc4c8e0251a41ab5d524fc52",
+    "fetched_at": "2026-09-16T17:26:50.874912+00:00"
+  },
+  "yandex-ai-search-pretrain-2026-09": {
+    "url": "https://yandex.com/company/news/2026-09-14-01",
+    "canonical_url": "https://yandex.com/company/news/2026-09-14-01",
+    "publisher": "Yandex",
+    "http_status": 200,
+    "final_url": "https://yandex.com/company/news/2026-09-14-01",
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 42105,
+    "raw_sha256": "32bdc4d94256a43b3548e0b4503c380cc06692aff3808e6ccf9314d88b9eabd0",
+    "fetched_at": "2026-09-16T17:26:51.276199+00:00"
+  },
+  "naver-ai-tab-launch-2026-06": {
+    "url": "https://www.navercorp.com/media/pressReleasesDetail?seq=10034442",
+    "canonical_url": "https://www.navercorp.com/media/pressReleasesDetail?seq=10034442",
+    "publisher": "NAVER",
+    "http_status": 200,
+    "final_url": "https://www.navercorp.com/media/pressReleasesDetail?seq=10034442",
+    "content_type": "text/html; charset=utf-8",
+    "bytes": 96454,
+    "raw_sha256": "bfe34667e199e320459131de77c95541ac278168e4314f0c2489b751bd3e41ec",
+    "fetched_at": "2026-09-16T17:26:52.868235+00:00"
+  }
+}

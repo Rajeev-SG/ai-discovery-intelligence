@@ -1,0 +1,292 @@
+#!/usr/bin/env python3
+"""Build the issue #3 product proof: captures -> ledger -> rendered markdown.
+
+Usage::
+
+    python3 scripts/build_claim_proof.py                 # fetch live, then build
+    python3 scripts/build_claim_proof.py --captures-only # fetch captures only
+    python3 scripts/build_claim_proof.py --from-captures # rebuild from existing captures
+
+Captures are saved under ``proof/claim_ledger/captures/<source-id>.html`` with
+their sha256 recorded in ``captures.json``. Raw publisher HTML stays private
+(``.gitignore``d); only hashes, short quotes and the rendered table are committed.
+"""
+
+from __future__ import annotations
+
+import argparse
+import datetime as dt
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[1]
+SRC = REPO / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from ai_discovery import claims as C
+
+LEDGER_DIR = REPO / "proof" / "claim_ledger"
+CAPTURE_DIR = LEDGER_DIR / "captures"
+SPECS = LEDGER_DIR / "claim_specs.json"
+DB_PATH = LEDGER_DIR / "claim_ledger.sqlite3"
+MANIFEST = LEDGER_DIR / "captures.json"
+EXPANDED = LEDGER_DIR / "expanded_claims.json"
+RENDERED = LEDGER_DIR / "PROOF.md"
+
+USER_AGENT = (
+    "ai-discovery-intelligence/0.1 "
+    "(+https://github.com/Rajeev-SG/ai-discovery-intelligence; contact: rajeev.gill@omc.com)"
+)
+
+
+def fetch_captures() -> None:
+    import httpx
+
+    specs = C.load_spec_bundle(SPECS)
+    CAPTURE_DIR.mkdir(parents=True, exist_ok=True)
+    manifest: dict[str, dict] = {}
+    with httpx.Client(
+            headers={"User-Agent": USER_AGENT}, follow_redirects=True, timeout=40.0
+        ) as client:
+        for spec in specs:
+            source = spec["source"]
+            response = client.get(source["url"])
+            path = CAPTURE_DIR / f"{source['source_id']}.html"
+            path.write_bytes(response.content)
+            manifest[source["source_id"]] = {
+                "url": source["url"],
+                "canonical_url": source["canonical_url"],
+                "publisher": source["publisher"],
+                "http_status": response.status_code,
+                "final_url": str(response.url),
+                "content_type": response.headers.get("content-type"),
+                "bytes": len(response.content),
+                "raw_sha256": hashlib.sha256(response.content).hexdigest(),
+                "fetched_at": dt.datetime.now(dt.UTC).isoformat(),
+            }
+            print(f"fetched {source['source_id']}: {response.status_code} {len(response.content)} bytes")
+    MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+
+def _manifest() -> dict:
+    if MANIFEST.exists():
+        return json.loads(MANIFEST.read_text(encoding="utf-8"))
+    return {}
+
+
+def _capture_for(source_id: str) -> C.Capture:
+    raw = (CAPTURE_DIR / f"{source_id}.html").read_bytes()
+    return C.Capture(
+        raw=raw,
+        text=C.extract_capture_text(raw.decode("utf-8", "replace")),
+        fetched_at=_fetched_at(source_id),
+    )
+
+
+def _fetched_at(source_id: str) -> dt.datetime:
+    entry = _manifest().get(source_id) or {}
+    stamp = entry.get("fetched_at")
+    if stamp:
+        return dt.datetime.fromisoformat(stamp)
+    return dt.datetime.now(dt.UTC)
+
+
+def _apply_capture_meta(spec: dict) -> dict:
+    """Fold verified transport facts (status, content-type) from the manifest
+    into the spec, so the rendered proof shows the real HTTP status rather than
+    a blank cell. Absent manifest -> the field stays unknown."""
+
+    entry = _manifest().get(spec["source"]["source_id"])
+    if not entry:
+        return spec
+    spec = json.loads(json.dumps(spec))
+    spec["source"].setdefault("http_status", entry.get("http_status"))
+    spec["source"].setdefault("content_type", entry.get("content_type"))
+    return spec
+
+
+def build() -> list[dict]:
+    records = []
+    for spec in C.load_spec_bundle(SPECS):
+        source_id = spec["source"]["source_id"]
+        record = C.extract_claim(spec=_apply_capture_meta(spec), capture=_capture_for(source_id))
+        records.append(record)
+
+    if DB_PATH.exists():
+        DB_PATH.unlink()
+    engine = C.create_ledger_engine(f"sqlite+pysqlite:///{DB_PATH}")
+    C.init_ledger(engine)
+    for record in records:
+        C.persist_claim(engine, record)
+
+    expanded = C.load_expanded_claims(engine)
+    EXPANDED.write_text(json.dumps(expanded, indent=2) + "\n", encoding="utf-8")
+    RENDERED.write_text(render(expanded), encoding="utf-8")
+    print(f"built {len(expanded)} claims -> {RENDERED.relative_to(REPO)}")
+    return expanded
+
+
+def _cell(text: str | None) -> str:
+    if text is None or text == "":
+        return "_unknown_"
+    return str(text).replace("|", "\\|").replace("\n", " ")
+
+
+def render(rows: list[dict]) -> str:
+    out: list[str] = []
+    out.append("# Claim ledger - real product proof (issue #3)")
+    out.append("")
+    out.append(
+        "Generated by `scripts/build_claim_proof.py` from live public captures. "
+        "Every cell is traceable; `_unknown_` means the source does not publish it. "
+        "The full per-field quote for every value is in the provenance tables below."
+    )
+    out.append("")
+    out.append(f"- built: {dt.datetime.now(dt.UTC).isoformat(timespec='seconds')}")
+    out.append(f"- extraction version: `{C.EXTRACTION_VERSION}`")
+    out.append(f"- claims: {len(rows)}")
+    out.append("")
+
+    out.append("## Summary")
+    out.append("")
+    out.append("| Claim | Topic | Source | Published | Measured window | Sample | Status | Confidence |")
+    out.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
+    for row in rows:
+        out.append(
+            "| `{cid}` | {topic} | {pub} | {published} | {window} | {sample} | {status} | {conf} |".format(
+                cid=row["claim_id"][:12],
+                topic=row["topic"],
+                pub=_cell(row["source"]["publisher"]),
+                published=_cell((row["dates"]["published_at"] or "")[:10]),
+                window=_cell(row["dates"]["measured_window"]),
+                sample=_cell(row["methodology"]["sample_size"]),
+                status=row["status"],
+                conf=row["confidence"],
+            )
+        )
+    out.append("")
+
+    for row in rows:
+        out.append(f"## `{row['claim_id'][:12]}` - {row['topic']}")
+        out.append("")
+        out.append(f"**Statement.** {row['statement']}")
+        out.append("")
+        out.append("**Provenance (source and capture).**")
+        out.append("")
+        out.append("| Field | Value |")
+        out.append("| --- | --- |")
+        out.append(f"| source id | `{_cell(row['source']['source_id'])}` |")
+        out.append(f"| publisher | {_cell(row['source']['publisher'])} |")
+        out.append(f"| source class | {_cell(row['source']['source_class'])} |")
+        out.append(f"| URL | {_cell(row['source']['canonical_url'])} |")
+        out.append(f"| surfaces | {_cell(', '.join(row['surfaces']))} |")
+        for capture in row["evidence"]:
+            out.append(
+                f"| capture | `{_cell(capture['raw_sha256'])}` (extracted-text sha256 "
+                f"`{_cell(capture['capture_hash'][:16])}...`) HTTP {_cell(capture['http_status'])} "
+                f"robots_allowed={_cell(capture['robots_allowed'])} "
+                f"fetched {_cell((capture['fetched_at'] or '')[:19])} |"
+            )
+        out.append("")
+
+        out.append("**Dates (published / modified / measured / observed are distinct).**")
+        out.append("")
+        out.append("| Date kind | Value | Where from |")
+        out.append("| --- | --- | --- |")
+        out.append(
+            f"| published | {_cell((row['dates']['published_at'] or '')[:10])} | "
+            f"{_cell(row['dates']['published_at_source'])} |"
+        )
+        out.append(f"| modified | {_cell((row['dates']['modified_at'] or '')[:10])} | jsonld dateModified |")
+        out.append(f"| measured window | {_cell(row['dates']['measured_window'])} | body / page stamp |")
+        out.append(f"| observed (capture) | {_cell((row['dates']['observed_at'] or '')[:19])} | this run |")
+        out.append("")
+
+        out.append("**Methodology.**")
+        out.append("")
+        out.append("| Field | Value |")
+        out.append("| --- | --- |")
+        for key in (
+            "measurement_mode", "metric_family", "denominator", "prompt_universe",
+            "sample_size", "unit_of_analysis", "time_window", "geography",
+            "geography_basis", "language", "language_basis", "methodology_notes",
+        ):
+            out.append(f"| {key} | {_cell(row['methodology'][key])} |")
+        limitations = row["methodology"]["limitations"] or []
+        out.append(f"| limitations | {_cell('; '.join(limitations)) if limitations else '_none recorded_'} |")
+        out.append("")
+
+        out.append("**Metrics.**")
+        out.append("")
+        out.append("| Metric | Value | Unit | Comparator | Definition | Window | Scope |")
+        out.append("| --- | --- | --- | --- | --- | --- | --- |")
+        for metric in row["metrics"]:
+            out.append(
+                "| {label} | {value} | {unit} | {cmp} | {definition} | {window} | {scope} |".format(
+                    label=_cell(metric["label"]),
+                    value=_cell(metric["value_text"]),
+                    unit=_cell(metric["unit"]),
+                    cmp=metric["comparator"],
+                    definition=_cell(metric["definition"]),
+                    window=_cell(metric["window"]),
+                    scope=_cell(metric["scope"]),
+                )
+            )
+        out.append("")
+
+        out.append("**Field-level evidence locators.**")
+        out.append("")
+        out.append("| Field path | Locator | Quote / selector |")
+        out.append("| --- | --- | --- |")
+        for prov in row["provenance"]:
+            pointer = prov["quote"] or prov["selector"] or ""
+            out.append(
+                f"| `{_cell(prov['field_path'])}` | {prov['locator_kind']} | {_cell(pointer)} |"
+            )
+        out.append("")
+
+        out.append("**Extraction.**")
+        out.append("")
+        out.append(
+            f"- method `{row['extraction']['method']}` via `{row['extraction']['tool']}` "
+            f"version `{row['extraction']['version']}` rule `{_cell(row['extraction']['rule_id'])}`; "
+            f"human_reviewed={row['extraction']['human_reviewed']}"
+        )
+        out.append(
+            f"- relationship `{row['relationship']}`, supersedes "
+            f"`{_cell(row['supersedes_claim_id'])}`. A changed assertion gets a new claim id; "
+            "captures accumulate rather than overwrite."
+        )
+        out.append("")
+
+    out.append("## Reproduce")
+    out.append("")
+    out.append("```bash")
+    out.append("python3 scripts/build_claim_proof.py --from-captures")
+    out.append("PYTHONPATH=src pytest tests/test_claim_models.py tests/test_claims.py -q")
+    out.append("```")
+    out.append("")
+    return "\n".join(out)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--captures-only", action="store_true")
+    parser.add_argument("--from-captures", action="store_true")
+    args = parser.parse_args()
+    if args.captures_only:
+        fetch_captures()
+        return 0
+    if not args.from_captures:
+        fetch_captures()
+    elif not MANIFEST.exists():
+        print("warning: no captures.json manifest; HTTP status will render as unknown")
+    build()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

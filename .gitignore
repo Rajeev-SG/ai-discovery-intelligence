@@ -15,3 +15,6 @@ coverage/
 *.log
 artifacts/
 private-snapshots/
+# issue #3: raw publisher snapshots stay private; hashes + excerpts are committed
+proof/claim_ledger/captures/
+proof/claim_ledger/claim_ledger.sqlite3
