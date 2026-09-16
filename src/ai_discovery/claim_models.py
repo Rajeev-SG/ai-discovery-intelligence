@@ -51,9 +51,7 @@ CLAIM_TOPICS: tuple[str, ...] = (
 
 LocatorKind = Literal["verbatim_quote", "jsonld_field", "table_row", "page_stamp", "section"]
 ClaimStatus = Literal["current", "contested", "historical", "watch", "unknown"]
-Relationship = Literal[
-    "new", "supports", "updates", "contradicts", "supersedes", "contextualizes"
-]
+Relationship = Literal["new", "supports", "updates", "contradicts", "supersedes", "contextualizes"]
 Comparator = Literal["exact", "at_least", "at_most", "approx", "share_of_total"]
 Confidence = Literal["high", "medium", "low", "unknown"]
 ScopeBasis = Literal["source_stated", "publisher_scope", "inferred", "not_stated"]
@@ -165,8 +163,14 @@ def unknown() -> Provenanced[Any]:
     return Provenanced()
 
 
-def _field[T](value: T | None, *, quote: str | None = None, selector: str | None = None,
-              kind: LocatorKind = "verbatim_quote", note: str | None = None) -> Provenanced[T]:
+def _field[T](
+    value: T | None,
+    *,
+    quote: str | None = None,
+    selector: str | None = None,
+    kind: LocatorKind = "verbatim_quote",
+    note: str | None = None,
+) -> Provenanced[T]:
     """Build a Provenanced field; ``value=None`` yields an explicit unknown."""
 
     if value is None:
@@ -287,8 +291,10 @@ class StudyMethodology(BaseModel):
 
     @model_validator(mode="after")
     def _scope_basis(self) -> StudyMethodology:
-        for field, basis in (("geography", self.geography_basis),
-                             ("language", self.language_basis)):
+        for field, basis in (
+            ("geography", self.geography_basis),
+            ("language", self.language_basis),
+        ):
             if getattr(self, field).known and basis == "not_stated":
                 raise ValueError(
                     f"{field} is known, so its basis must be recorded "

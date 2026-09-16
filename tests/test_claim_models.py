@@ -49,10 +49,12 @@ def test_locator_quote_matching_normalises_typography_and_whitespace():
 def test_dates_are_four_distinct_fields():
     profile = DateProfile(
         published_at=Provenanced[dt.date](
-            value=dt.date(2026, 5, 14), locator=Locator(kind="jsonld_field", selector="datePublished")
+            value=dt.date(2026, 5, 14),
+            locator=Locator(kind="jsonld_field", selector="datePublished"),
         ),
         modified_at=Provenanced[dt.date](
-            value=dt.date(2026, 6, 11), locator=Locator(kind="jsonld_field", selector="dateModified")
+            value=dt.date(2026, 6, 11),
+            locator=Locator(kind="jsonld_field", selector="dateModified"),
         ),
         measured_window=Provenanced[str](
             value="~Apr 2026", locator=Locator(kind="verbatim_quote", quote="one month ago")
@@ -111,6 +113,10 @@ def test_claim_id_is_deterministic_and_content_addressed():
 def test_evidence_hash_must_be_sha256_hex():
     with pytest.raises(ValidationError):
         CaptureEvidence(
-            source_id="s", publisher="p", url="u", canonical_url="u",
-            source_class="vendor_research", capture_hash="not-a-hash",
+            source_id="s",
+            publisher="p",
+            url="u",
+            canonical_url="u",
+            source_class="vendor_research",
+            capture_hash="not-a-hash",
         )

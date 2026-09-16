@@ -174,7 +174,9 @@ class ClaimMetric(Base):
     __table_args__ = (UniqueConstraint("claim_id", "metric_id", name="uq_claim_metric"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    claim_id: Mapped[str] = mapped_column(ForeignKey("claim.claim_id", ondelete="CASCADE"), index=True)
+    claim_id: Mapped[str] = mapped_column(
+        ForeignKey("claim.claim_id", ondelete="CASCADE"), index=True
+    )
     metric_id: Mapped[str] = mapped_column(String(60))
     label: Mapped[str] = mapped_column(String(160))
     comparator: Mapped[str] = mapped_column(String(20), default="exact")
@@ -195,7 +197,9 @@ class ClaimLocator(Base):
     __table_args__ = (UniqueConstraint("claim_id", "field_path", name="uq_claim_locator_field"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    claim_id: Mapped[str] = mapped_column(ForeignKey("claim.claim_id", ondelete="CASCADE"), index=True)
+    claim_id: Mapped[str] = mapped_column(
+        ForeignKey("claim.claim_id", ondelete="CASCADE"), index=True
+    )
     field_path: Mapped[str] = mapped_column(String(200))
     locator_kind: Mapped[str] = mapped_column(String(30))
     quote: Mapped[str | None] = mapped_column(Text)
@@ -217,7 +221,9 @@ class ClaimEvidence(Base):
     __table_args__ = (UniqueConstraint("claim_id", "capture_hash", name="uq_claim_capture"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    claim_id: Mapped[str] = mapped_column(ForeignKey("claim.claim_id", ondelete="CASCADE"), index=True)
+    claim_id: Mapped[str] = mapped_column(
+        ForeignKey("claim.claim_id", ondelete="CASCADE"), index=True
+    )
     evidence_id: Mapped[str | None] = mapped_column(String(40), nullable=True, index=True)
     url: Mapped[str] = mapped_column(Text)
     canonical_url: Mapped[str] = mapped_column(Text, index=True)
@@ -232,13 +238,19 @@ class ClaimEvidence(Base):
     claim: Mapped[Claim] = sa_relationship(back_populates="captures")
 
 
-LEDGER_TABLES = (Study.__table__, Claim.__table__, ClaimMetric.__table__,
-                 ClaimLocator.__table__, ClaimEvidence.__table__)
+LEDGER_TABLES = (
+    Study.__table__,
+    Claim.__table__,
+    ClaimMetric.__table__,
+    ClaimLocator.__table__,
+    ClaimEvidence.__table__,
+)
 
 
 # --------------------------------------------------------------------------- #
 # Spec -> ClaimRecord extraction
 # --------------------------------------------------------------------------- #
+
 
 class ClaimSpecError(ValueError):
     """Raised when a spec is malformed or a quote is absent from the capture."""
@@ -343,11 +355,15 @@ def extract_claim(
         "methodology.metric_definition": _field_from_spec(
             (spec.get("methodology") or {}).get("metric_definition")
         ),
-        "methodology.denominator": _field_from_spec((spec.get("methodology") or {}).get("denominator")),
+        "methodology.denominator": _field_from_spec(
+            (spec.get("methodology") or {}).get("denominator")
+        ),
         "methodology.prompt_universe": _field_from_spec(
             (spec.get("methodology") or {}).get("prompt_universe")
         ),
-        "methodology.sample_size": _field_from_spec((spec.get("methodology") or {}).get("sample_size")),
+        "methodology.sample_size": _field_from_spec(
+            (spec.get("methodology") or {}).get("sample_size")
+        ),
         "methodology.unit_of_analysis": _field_from_spec(
             (spec.get("methodology") or {}).get("unit_of_analysis")
         ),
@@ -387,7 +403,9 @@ def extract_claim(
     dates_raw = spec.get("dates") or {}
     observed_raw = dates_raw.get("observed_at")
     if not observed_raw:
-        raise ClaimSpecError("dates.observed_at is required (a claim must record when it was captured)")
+        raise ClaimSpecError(
+            "dates.observed_at is required (a claim must record when it was captured)"
+        )
     dates = DateProfile(
         published_at=_date(dates_raw.get("published_at"), dates_raw.get("published_at_selector")),
         modified_at=_date(dates_raw.get("modified_at"), dates_raw.get("modified_at_selector")),
@@ -496,6 +514,7 @@ RULE_SOURCE_CLASS_DEFAULT = {
 # Ledger repository
 # --------------------------------------------------------------------------- #
 
+
 def create_ledger_engine(database_url: str) -> Engine:
     """Engine factory. Postgres is canonical; SQLite is accepted for tests/proof."""
 
@@ -576,7 +595,9 @@ def persist_claim(engine: Engine, record: ClaimRecord) -> tuple[str, bool]:
                     human_reviewed=record.extraction.human_reviewed,
                     published_at=_midnight(record.dates.published_at.value),
                     published_at_source=(
-                        record.dates.published_at.locator.selector if record.dates.published_at.locator else None
+                        record.dates.published_at.locator.selector
+                        if record.dates.published_at.locator
+                        else None
                     ),
                     modified_at=_midnight(record.dates.modified_at.value),
                     measured_window=record.dates.measured_window.value,
@@ -645,18 +666,37 @@ def load_expanded_claims(engine: Engine) -> list[dict[str, Any]]:
     session_factory = sessionmaker(bind=engine, future=True)
     out: list[dict[str, Any]] = []
     with session_factory() as session:
-        for claim in session.execute(select(Claim).order_by(Claim.created_at, Claim.claim_id)).scalars():
+        for claim in session.execute(
+            select(Claim).order_by(Claim.created_at, Claim.claim_id)
+        ).scalars():
             study = session.get(Study, claim.study_id)
-            metrics = session.execute(
-                select(ClaimMetric).where(ClaimMetric.claim_id == claim.claim_id)
-                .order_by(ClaimMetric.metric_id)
-            ).scalars().all()
-            locators = session.execute(
-                select(ClaimLocator).where(ClaimLocator.claim_id == claim.claim_id).order_by(ClaimLocator.id)
-            ).scalars().all()
-            captures = session.execute(
-                select(ClaimEvidence).where(ClaimEvidence.claim_id == claim.claim_id).order_by(ClaimEvidence.id)
-            ).scalars().all()
+            metrics = (
+                session.execute(
+                    select(ClaimMetric)
+                    .where(ClaimMetric.claim_id == claim.claim_id)
+                    .order_by(ClaimMetric.metric_id)
+                )
+                .scalars()
+                .all()
+            )
+            locators = (
+                session.execute(
+                    select(ClaimLocator)
+                    .where(ClaimLocator.claim_id == claim.claim_id)
+                    .order_by(ClaimLocator.id)
+                )
+                .scalars()
+                .all()
+            )
+            captures = (
+                session.execute(
+                    select(ClaimEvidence)
+                    .where(ClaimEvidence.claim_id == claim.claim_id)
+                    .order_by(ClaimEvidence.id)
+                )
+                .scalars()
+                .all()
+            )
             out.append(
                 {
                     "claim_id": claim.claim_id,
@@ -757,12 +797,13 @@ def _iso(value: dt.datetime | None) -> str | None:
 # Spec bundle helpers
 # --------------------------------------------------------------------------- #
 
+
 def load_spec_bundle(path: str | Path) -> list[dict[str, Any]]:
     data = json.loads(Path(path).read_text(encoding="utf-8"))
     if isinstance(data, Mapping):
         data = data.get("claims") or []
     if not isinstance(data, list):
-        raise ClaimSpecError("bundle must be a list of claim specs or {\"claims\": [...]}")
+        raise ClaimSpecError('bundle must be a list of claim specs or {"claims": [...]}')
     return list(data)
 
 

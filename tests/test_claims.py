@@ -35,34 +35,41 @@ SYNTHETIC = """
 
 
 def _synthetic_capture() -> C.Capture:
-    return C.Capture(
-        raw=SYNTHETIC.encode(), text=C.extract_capture_text(SYNTHETIC)
-    )
+    return C.Capture(raw=SYNTHETIC.encode(), text=C.extract_capture_text(SYNTHETIC))
 
 
 def _spec(**overrides):
     spec = {
         "source": {
-            "source_id": "widget", "publisher": "Widget Inc",
-            "url": "https://example.test/a", "canonical_url": "https://example.test/a",
+            "source_id": "widget",
+            "publisher": "Widget Inc",
+            "url": "https://example.test/a",
+            "canonical_url": "https://example.test/a",
             "source_class": "vendor_research",
         },
         "topic": "audience_usage",
         "statement": "Widget Search had 1.2M monthly visits in January 2026.",
         "surfaces": ["widget-search"],
         "methodology": {"measurement_mode": "vendor_estimate"},
-        "metrics": [{
-            "metric_id": "visits", "label": "Monthly visits",
-            "definition": {"value": "monthly visits", "quote": "1.2M monthly visits"},
-            "value": {"value": "1.2M", "quote": "1.2M monthly visits in January 2026"},
-            "unit": {"value": "visits", "quote": "monthly visits"},
-            "window": {"value": "Jan 2026", "quote": "in January 2026"},
-            "scope": {"value": "Widget Search", "quote": "Widget Search"},
-        }],
-        "dates": {"published_at": "2026-01-02", "published_at_selector": "datePublished",
-                  "modified_at": "2026-01-03", "modified_at_selector": "dateModified",
-                  "measured_window": {"value": "Jan 2026", "quote": "January 2026"},
-                  "observed_at": "2026-09-16T00:00:00+00:00"},
+        "metrics": [
+            {
+                "metric_id": "visits",
+                "label": "Monthly visits",
+                "definition": {"value": "monthly visits", "quote": "1.2M monthly visits"},
+                "value": {"value": "1.2M", "quote": "1.2M monthly visits in January 2026"},
+                "unit": {"value": "visits", "quote": "monthly visits"},
+                "window": {"value": "Jan 2026", "quote": "in January 2026"},
+                "scope": {"value": "Widget Search", "quote": "Widget Search"},
+            }
+        ],
+        "dates": {
+            "published_at": "2026-01-02",
+            "published_at_selector": "datePublished",
+            "modified_at": "2026-01-03",
+            "modified_at_selector": "dateModified",
+            "measured_window": {"value": "Jan 2026", "quote": "January 2026"},
+            "observed_at": "2026-09-16T00:00:00+00:00",
+        },
         "capture_anchors": [{"kind": "verbatim_quote", "quote": "1.2M monthly visits"}],
     }
     spec.update(overrides)
@@ -70,6 +77,7 @@ def _spec(**overrides):
 
 
 # --- deterministic negative controls --------------------------------------- #
+
 
 def test_a_supported_claim_extracts():
     record = C.extract_claim(spec=_spec(), capture=_synthetic_capture())
@@ -110,6 +118,7 @@ def test_llm_proposal_claim_is_blocked_without_human_review():
 
 # --- append-only ledger ----------------------------------------------------- #
 
+
 def test_ledger_is_append_only_and_expanded_view_is_complete():
     capture = _synthetic_capture()
     record = C.extract_claim(spec=_spec(), capture=capture)
@@ -143,6 +152,7 @@ def test_superseding_claim_requires_a_predecessor():
 
 # --- real public captures (acceptance evidence) ----------------------------- #
 
+
 @pytest.mark.parametrize("source_id", sorted(CAPTURE_FILES))
 def test_real_capture_quotes_all_trace(source_id):
     path = CAPTURE_DIR / CAPTURE_FILES[source_id]
@@ -150,10 +160,7 @@ def test_real_capture_quotes_all_trace(source_id):
         pytest.skip(f"capture {path} not present (run scripts/build_claim_proof.py)")
     raw = path.read_bytes()
     capture = C.Capture(raw=raw, text=C.extract_capture_text(raw.decode("utf-8", "replace")))
-    spec = next(
-        s for s in C.load_spec_bundle(SPECS)
-        if s["source"]["source_id"] == source_id
-    )
+    spec = next(s for s in C.load_spec_bundle(SPECS) if s["source"]["source_id"] == source_id)
     record = C.extract_claim(spec=spec, capture=capture)
     assert not C.check_against_capture(record, capture)
     assert record.evidence.raw_sha256 and len(record.evidence.raw_sha256) == 64
