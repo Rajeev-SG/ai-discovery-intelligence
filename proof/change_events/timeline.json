@@ -1,0 +1,154 @@
+{
+  "generated_at": "2026-09-16T17:40:02.815801+00:00",
+  "total_events": 6,
+  "after_dedupe": 6,
+  "surfaces_covered": [
+    "chatgpt",
+    "claude",
+    "deepseek-chat",
+    "google-ai-mode",
+    "google-gemini",
+    "naver-ai-tab",
+    "yandex-search-ai"
+  ],
+  "has_qualifying_pair": true,
+  "events": [
+    {
+      "id": "529f94d246b5",
+      "type": "citation_source_shift",
+      "title": "SISTRIX: ChatGPT weekly citation churn ~74%, Google AI Mode ~56%",
+      "surfaces": [
+        "chatgpt",
+        "google-ai-mode"
+      ],
+      "published_at": "2026-05-01T00:00:00+00:00",
+      "observed_at": "2026-09-16T17:26:50+00:00",
+      "effective_from": "2026-01-01T00:00:00+00:00",
+      "claims": [
+        "811a077fd62e"
+      ],
+      "evidence_urls": [
+        "https://www.sistrix.com/blog/ai-citation-drift-how-stable-are-sources-in-ai-search-results/"
+      ],
+      "dedupe_key": "sistrix-74pct-weekly-churn",
+      "metadata": {
+        "publisher": "SISTRIX",
+        "metric": "weekly citation churn",
+        "sample": "82,619 prompts; 17 weeks"
+      }
+    },
+    {
+      "id": "ccd5cdaf24ee",
+      "type": "audience_shift",
+      "title": "ChatGPT AI-chatbot web-traffic share fell from 76.4% to ~52.7%",
+      "surfaces": [
+        "chatgpt",
+        "google-gemini",
+        "claude",
+        "deepseek-chat"
+      ],
+      "published_at": "2026-05-14T00:00:00+00:00",
+      "observed_at": "2026-09-16T17:26:50+00:00",
+      "effective_from": "2026-04-01T00:00:00+00:00",
+      "claims": [
+        "b3ab565f9b14"
+      ],
+      "evidence_urls": [
+        "https://www.similarweb.com/blog/research/market-research/most-visited-websites/"
+      ],
+      "dedupe_key": "similarweb-may-2026-ai-chatbot-share",
+      "metadata": {
+        "publisher": "Similarweb",
+        "denominator": "all AI chatbot web traffic (visits)"
+      }
+    },
+    {
+      "id": "b07ad72b5b01",
+      "type": "commerce_ads",
+      "title": "NAVER AI Tab surpassed 4M cumulative users with >20% product/place CTR",
+      "surfaces": [
+        "naver-ai-tab"
+      ],
+      "published_at": "2026-06-26T00:00:00+00:00",
+      "observed_at": "2026-09-16T17:26:50+00:00",
+      "effective_from": "2026-04-01T00:00:00+00:00",
+      "claims": [
+        "11c44269d92b"
+      ],
+      "evidence_urls": [
+        "https://www.navercorp.com/media/pressReleasesDetail?seq=10034442"
+      ],
+      "dedupe_key": "naver-ai-tab-4m-ctr",
+      "metadata": {
+        "publisher": "NAVER",
+        "metric": "cumulative users (not MAU)"
+      }
+    },
+    {
+      "id": "61a0e5e05fa6",
+      "type": "citation_source_shift",
+      "title": "Reddit ChatGPT citation share fell from 3.8% to 0.5% (Promptwatch/Semrush)",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "published_at": "2026-08-26T00:00:00+00:00",
+      "observed_at": "2026-09-16T17:00:00+00:00",
+      "effective_from": "2026-08-14T00:00:00+00:00",
+      "claims": [],
+      "evidence_urls": [
+        "https://www.semrush.com/blog/reddits-citations-in-chatgpt-fall/"
+      ],
+      "dedupe_key": "semrush-promptwatch-reddit-decline",
+      "metadata": {
+        "publisher": "Semrush (reporting Promptwatch)",
+        "metric": "share of ChatGPT citations",
+        "sample": "daily-panel windows"
+      }
+    },
+    {
+      "id": "edc426631c9c",
+      "type": "citation_source_shift",
+      "title": "Ahrefs Sep-2026 snapshot: Reddit is largest cited domain at 16.8% (US)",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "published_at": "2026-09-02T00:00:00+00:00",
+      "observed_at": "2026-09-16T17:00:00+00:00",
+      "effective_from": "2026-09-01T00:00:00+00:00",
+      "claims": [],
+      "evidence_urls": [
+        "https://ahrefs.com/blog/most-cited-domains-in-chatgpt/"
+      ],
+      "dedupe_key": "ahrefs-reddit-16-8-pct-sep-2026",
+      "metadata": {
+        "publisher": "Ahrefs (Brand Radar)",
+        "metric": "mention share among top sources",
+        "sample": "810,887 pages cited",
+        "qualifies_event_dedupe_key": "semrush-promptwatch-reddit-decline",
+        "qualification_note": "Different denominator (mention share among top sources vs all-citations share), different time window (Sep vs Aug), US-only. Not a direct contradiction."
+      }
+    },
+    {
+      "id": "2f2f61f074d3",
+      "type": "audience_shift",
+      "title": "Yandex AI answers exceed 49M monthly users",
+      "surfaces": [
+        "yandex-search-ai"
+      ],
+      "published_at": "2026-09-14T00:00:00+00:00",
+      "observed_at": "2026-09-16T17:26:50+00:00",
+      "effective_from": null,
+      "claims": [
+        "ed8996433be3"
+      ],
+      "evidence_urls": [
+        "https://yandex.com/company/news/2026-09-14-01"
+      ],
+      "dedupe_key": "yandex-49m-monthly-ai-answers",
+      "metadata": {
+        "publisher": "Yandex",
+        "metric": "monthly feature users"
+      }
+    }
+  ]
+}
