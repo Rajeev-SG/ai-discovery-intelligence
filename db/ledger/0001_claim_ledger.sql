@@ -1,4 +1,4 @@
--- Migration: claim ledger (issue #3)
+-- Migration: claim ledger (issue #3) — verified by tests/test_migration.py
 --
 -- Additive only. Depends on the issue #2 tables (source, evidence_item) for the
 -- two deferred foreign keys below; enable both at issue-#2 integration.

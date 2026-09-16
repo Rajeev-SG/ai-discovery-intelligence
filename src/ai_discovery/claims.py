@@ -1,5 +1,7 @@
 """Evidence-bound claim extraction and the claim-ledger repository (issue #3).
 
+Test coverage: tests/test_claim_models.py, tests/test_claims.py, tests/test_parser_fidelity.py.
+
 Two responsibilities, both deterministic:
 
 * **Extraction** - ``extract_claim`` turns a *spec* into a :class:`ClaimRecord`.
