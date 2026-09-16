@@ -151,7 +151,9 @@ capture_hashes = {
     "sistrix-74pct-weekly-churn": _hash("Weekly citation churn ~74% for ChatGPT"),
 }
 # Persist previous hashes to a file; a second run sees no changes and emits nothing.
-hash_file = os.path.join(os.path.dirname(__file__), "..", "proof", "change_events", "previous_hashes.json")
+hash_file = os.path.join(
+    os.path.dirname(__file__), "..", "proof", "change_events", "previous_hashes.json"
+)
 previous_hashes: dict[str, str] = {}
 if os.path.exists(hash_file):
     with open(hash_file) as f:
@@ -165,7 +167,8 @@ print(f"hash-diff: {len(changed_keys)} changed/new, {len(unchanged_keys)} unchan
 events_to_emit = [
     e
     for e in events
-    if e.dedupe_key in set(changed_keys) | set(k for k in capture_hashes if k not in previous_hashes)
+    if e.dedupe_key
+    in set(changed_keys) | {k for k in capture_hashes if k not in previous_hashes}
 ]
 print(f"events to emit: {len(events_to_emit)} (out of {len(events)})")
 
