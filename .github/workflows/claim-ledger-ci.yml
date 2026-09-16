@@ -1,0 +1,52 @@
+name: claim-ledger-ci
+
+on:
+  push:
+    branches: ["**"]
+    paths: ["src/**", "scripts/**", "proof/**", "db/**", "tests/**", ".github/workflows/claim-ledger-ci.yml"]
+  pull_request:
+    paths: ["src/**", "scripts/**", "proof/**", "db/**", "tests/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: claim-ledger (extraction, proof, tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Regenerate claim ledger + sqlite proof
+        run: |
+          uv run python scripts/build_claim_specs_expanded.py
+          uv run python scripts/build_claim_proof.py
+
+      - name: Verify sqlite ledger was regenerated
+        run: |
+          if [ ! -f proof/claim_ledger/claim_ledger.sqlite3 ]; then
+            echo "::error::claim_ledger.sqlite3 was not regenerated"
+            exit 1
+          fi
+          echo "sqlite ledger regenerated: $(wc -c < proof/claim_ledger/claim_ledger.sqlite3) bytes"
+
+      - name: Run tests
+        run: uv run pytest tests/ -q --tb=short
+
+      - name: Lint
+        run: uv run ruff check src tests scripts
+
+      - name: Upload proof artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: claim-ledger-proof
+          path: proof/claim_ledger/
+          retention-days: 7
