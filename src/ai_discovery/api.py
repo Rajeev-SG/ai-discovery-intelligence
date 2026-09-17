@@ -46,7 +46,7 @@ def _iso(value: dt.datetime | None) -> str | None:
 
 
 @app.get("/health", tags=["health"])
-def health(db: Session = Depends(get_db)) -> dict:
+def health(db: Session = Depends(get_db)) -> dict:  # noqa: B008 — FastAPI DI
     evidence = db.scalar(select(func.count()).select_from(EvidenceItem)) or 0
     sources = db.scalar(select(func.count()).select_from(Source)) or 0
     degraded = (
@@ -64,7 +64,7 @@ def health(db: Session = Depends(get_db)) -> dict:
 
 @app.get("/evidence", tags=["evidence"])
 def list_evidence(
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db),  # noqa: B008 — FastAPI DI
     source_class: str | None = None,
     publisher: str | None = None,
     topic: str | None = None,
@@ -104,7 +104,7 @@ def list_evidence(
 
 
 @app.get("/evidence/{evidence_id}", tags=["evidence"])
-def get_evidence(evidence_id: str, db: Session = Depends(get_db)) -> dict:
+def get_evidence(evidence_id: str, db: Session = Depends(get_db)) -> dict:  # noqa: B008 — FastAPI DI
     row = db.get(EvidenceItem, evidence_id)
     if row is None:
         raise HTTPException(status_code=404, detail="evidence not found")
@@ -112,14 +112,16 @@ def get_evidence(evidence_id: str, db: Session = Depends(get_db)) -> dict:
 
 
 @app.get("/sources", tags=["sources"])
-def list_sources(db: Session = Depends(get_db)) -> dict:
+def list_sources(db: Session = Depends(get_db)) -> dict:  # noqa: B008 — FastAPI DI
     rows = db.scalars(select(Source).order_by(Source.source_class, Source.id)).all()
     return {"count": len(rows), "items": [serialise_source(row) for row in rows]}
 
 
 @app.get("/sources/{source_id}/checks", tags=["sources"])
 def source_checks(
-    source_id: str, db: Session = Depends(get_db), limit: int = Query(20, ge=1, le=100)
+    source_id: str,
+    db: Session = Depends(get_db),  # noqa: B008 — FastAPI DI
+    limit: int = Query(20, ge=1, le=100),
 ) -> dict:
     if db.get(Source, source_id) is None:
         raise HTTPException(status_code=404, detail="source not found")
@@ -148,7 +150,7 @@ def source_checks(
 
 @app.get("/candidates", tags=["discovery"])
 def list_candidates(
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db),  # noqa: B008 — FastAPI DI
     include_registry: bool = False,
     limit: int = Query(50, ge=1, le=200),
 ) -> dict:
@@ -235,4 +237,22 @@ def serialise_source(row: Source) -> dict:
         "consecutive_failures": row.consecutive_failures,
         "last_error": row.last_error,
         "enabled": row.enabled,
+    }
+
+
+@app.get("/reconciliation/canonical", tags=["reconciliation"])
+def get_canonical_reconciliation() -> dict:
+    """Agency interpretation of the contested Reddit/ChatGPT citation-share case."""
+    from .reconciliation import canonical_reconciliation
+
+    r = canonical_reconciliation()
+    return {
+        "topic": "reddit-chatgpt-citation-share",
+        "state": r.state,
+        "relationship": r.relationship,
+        "confidence_adjustment": r.confidence_adjustment,
+        "claim_ids": list(r.claim_ids),
+        "differences": list(r.differences),
+        "unknown_dimensions": list(r.unknown_dimensions),
+        "interpretation": r.interpretation,
     }

@@ -25,10 +25,8 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras
 
-      - name: Regenerate claim ledger + sqlite proof
-        run: |
-          uv run python scripts/build_claim_specs_expanded.py
-          uv run python scripts/build_claim_proof.py
+      - name: Regenerate claim ledger + sqlite proof (from committed captures; no live fetch)
+        run: uv run python scripts/build_claim_proof.py --from-captures
 
       - name: Verify sqlite ledger was regenerated
         run: |

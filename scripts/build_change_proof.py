@@ -167,8 +167,7 @@ print(f"hash-diff: {len(changed_keys)} changed/new, {len(unchanged_keys)} unchan
 events_to_emit = [
     e
     for e in events
-    if e.dedupe_key
-    in set(changed_keys) | {k for k in capture_hashes if k not in previous_hashes}
+    if e.dedupe_key in set(changed_keys) | {k for k in capture_hashes if k not in previous_hashes}
 ]
 print(f"events to emit: {len(events_to_emit)} (out of {len(events)})")
 
