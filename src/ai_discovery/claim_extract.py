@@ -1,0 +1,224 @@
+"""Map Instructor-extracted claims into the validated ledger schema.
+
+This module owns the *shaping* half of the rebuild: the model result
+(``ai_discovery.semantic``) becomes ``ClaimRecord`` rows whose every known
+field carries a verbatim-quote ``Locator``. The deterministic
+``Locator.present_in`` check runs before any record is returned, so a
+fabricated number or a hallucinated quote fails loudly instead of reaching
+the ledger.
+"""
+
+from __future__ import annotations
+
+import datetime as dt
+from typing import Any
+
+from pydantic import ValidationError
+
+from .claim_models import (
+    EXTRACTION_VERSION,
+    CaptureEvidence,
+    ClaimRecord,
+    DateProfile,
+    ExtractionProvenance,
+    Locator,
+    Metric,
+    Provenanced,
+    StudyMethodology,
+    claim_id_for,
+)
+from .claims import Capture, ClaimSpecError, check_against_capture
+from .semantic import ExtractedClaim, ExtractedMetric
+
+
+def _date(value: str | None, quote: str | None, *, kind: str = "page_stamp") -> Provenanced[dt.date]:
+    """A dated value must name where it came from; otherwise it stays unknown."""
+    if value is None:
+        return Provenanced[dt.date]()
+    parsed = dt.date.fromisoformat(str(value)[:10])
+    if not quote:
+        raise ClaimSpecError(f"date {value!r} needs a quote naming where it came from")
+    return Provenanced[dt.date](value=parsed, locator=Locator(kind=kind, quote=quote))
+
+
+def _metric_fields(index: int, raw: ExtractedMetric) -> Metric:
+    """One metric: value/unit/window/scope each carry their own quote."""
+    if raw.value is None:
+        raise ClaimSpecError(f"metric {raw.label!r} has no value; drop it instead of guessing")
+    fields: dict[str, Provenanced[Any]] = {}
+    for name, value, quote in (
+        ("definition", raw.definition, raw.definition_quote),
+        ("value", raw.value, raw.value_quote),
+        ("unit", raw.unit, raw.unit_quote),
+        ("window", raw.window, raw.window_quote),
+        ("scope", raw.scope, raw.scope_quote),
+    ):
+        if value is None:
+            fields[name] = Provenanced()
+        elif not quote:
+            raise ClaimSpecError(
+                f"metrics[{index}].{name} value {value!r} carries no verbatim quote"
+            )
+        else:
+            fields[name] = Provenanced(value=value, locator=Locator(kind="verbatim_quote", quote=quote))
+    return Metric(
+        metric_id=f"m{index + 1}",
+        label=raw.label,
+        definition=fields["definition"],
+        value=fields["value"],
+        unit=fields["unit"],
+        comparator=raw.comparator,
+        window=fields["window"],
+        scope=fields["scope"],
+    )
+
+
+def _methodology(claim: ExtractedClaim) -> StudyMethodology:
+    """Methodology block: every known field carries its own quote."""
+    def known(value: str | None, quote: str | None) -> Provenanced[str]:
+        if value is None:
+            return Provenanced()
+        if not quote:
+            raise ClaimSpecError(
+                f"methodology.{value!r} carries no verbatim quote; leave it unknown instead"
+            )
+        return Provenanced(value=value, locator=Locator(kind="verbatim_quote", quote=quote))
+
+    geography = known(claim.geography, claim.geography_quote)
+    language = known(claim.language, claim.language_quote)
+    geography_basis = "source_stated" if geography.known else "not_stated"
+    language_basis = "source_stated" if language.known else "not_stated"
+    return StudyMethodology(
+        surfaces=[s for s in claim.surfaces if s],
+        measurement_mode=claim.measurement_mode,
+        metric_family=known(claim.metric_family, claim.metric_family_quote),
+        metric_definition=known(claim.metric_definition, claim.metric_definition_quote),
+        denominator=known(claim.denominator, claim.denominator_quote),
+        prompt_universe=known(claim.prompt_universe, claim.prompt_universe_quote),
+        sample_size=known(claim.sample_size, claim.sample_size_quote),
+        unit_of_analysis=known(claim.unit_of_analysis, claim.unit_of_analysis_quote),
+        time_window=known(claim.time_window, claim.time_window_quote),
+        geography=geography,
+        geography_basis=geography_basis,
+        language=language,
+        language_basis=language_basis,
+        devices=known(claim.devices, claim.devices_quote),
+        limitations=[str(x) for x in claim.limitations],
+        methodology_notes=known(claim.methodology_notes, claim.methodology_notes_quote),
+    )
+
+
+def _evidence(
+    claim: ExtractedClaim,
+    *,
+    source: dict[str, Any],
+    capture: Capture,
+) -> CaptureEvidence:
+    return CaptureEvidence(
+        source_id=source["source_id"],
+        publisher=source["publisher"],
+        url=source["url"],
+        canonical_url=source["canonical_url"],
+        source_class=source["source_class"],
+        capture_hash=capture.capture_hash,
+        raw_sha256=capture.raw_sha256,
+        snapshot_path=source.get("snapshot_path"),
+        http_status=source.get("http_status"),
+        content_type=source.get("content_type"),
+        text_chars=capture.text_chars,
+        robots_allowed=source.get("robots_allowed"),
+        fetched_at=capture.fetched_at,
+    )
+
+
+def claim_from_extracted(
+    claim: ExtractedClaim,
+    *,
+    source: dict[str, Any],
+    capture: Capture,
+) -> ClaimRecord:
+    """Shape one extracted claim into a validated, quote-verified ClaimRecord."""
+    statement = claim.statement.strip()
+    topic = claim.topic
+    methodology = _methodology(claim)
+    if not methodology.surfaces:
+        raise ClaimSpecError(f"claim {statement[:60]!r}: surfaces must list at least one surface id")
+
+    metrics = [_metric_fields(i, raw) for i, raw in enumerate(claim.metrics)]
+
+    measured_window = claim.measured_window
+    if measured_window and not claim.measured_window_quote:
+        raise ClaimSpecError("dates.measured_window carries no verbatim quote")
+
+    # The model has no dedicated published_at quote field; reuse the
+    # methodology time_window quote (or the capture anchor) as the
+    # date-source locator when the model gave one, else the date stays unknown.
+    date_quote = claim.time_window_quote or claim.capture_anchor
+    dates = DateProfile(
+        published_at=(
+            _date(claim.published_at, date_quote) if claim.published_at else Provenanced[dt.date]()
+        ),
+        modified_at=(
+            _date(claim.modified_at, date_quote) if claim.modified_at else Provenanced[dt.date]()
+        ),
+        measured_window=(
+            Provenanced(
+                value=measured_window,
+                locator=Locator(kind="verbatim_quote", quote=claim.measured_window_quote),
+            )
+            if measured_window and claim.measured_window_quote
+            else Provenanced()
+        ),
+    )
+
+    extraction = ExtractionProvenance(
+        method="llm_proposal",
+        tool="ai_discovery.semantic",
+        version=EXTRACTION_VERSION,
+        rule_id=None,
+        human_reviewed=False,
+    )
+
+    anchors = [Locator(kind=claim.capture_anchor_kind, quote=claim.capture_anchor)]
+    evidence = _evidence(claim, source=source, capture=capture)
+    record = ClaimRecord(
+        claim_id=claim_id_for(evidence.source_id, topic, statement),
+        source_id=evidence.source_id,
+        topic=topic,
+        statement=statement,
+        surfaces=methodology.surfaces,
+        metrics=metrics,
+        methodology=methodology,
+        dates=dates,
+        evidence=evidence,
+        capture_anchors=anchors,
+        extraction=extraction,
+        status="current",
+        relationship="new",
+        confidence="medium",
+    )
+    missing = check_against_capture(record, capture)
+    if missing:
+        joined = "; ".join(missing)
+        raise ClaimSpecError(f"model quote not found in capture: {joined}")
+    return record
+
+
+def claims_from_extraction(
+    result: Any,
+    *,
+    source: dict[str, Any],
+    capture: Capture,
+) -> list[ClaimRecord]:
+    """Validate every extracted claim; return only the records that fully verify."""
+    records: list[ClaimRecord] = []
+    failures: list[str] = []
+    for index, extracted in enumerate(result.claims):
+        try:
+            records.append(claim_from_extracted(extracted, source=source, capture=capture))
+        except (ValidationError, ClaimSpecError) as error:
+            failures.append(f"claim {index}: {error}")
+    if not records:
+        detail = "\n".join(failures) or "extraction returned no claims"
+        raise ClaimSpecError(f"no verifiable claims from {source['source_id']}:\n{detail}")
+    return records
