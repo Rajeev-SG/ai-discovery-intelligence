@@ -28,6 +28,7 @@ jobs:
       - name: Regenerate claim ledger + sqlite proof
         run: |
           uv run python scripts/build_claim_specs_expanded.py
+true
           uv run python scripts/build_claim_proof.py
 
       - name: Verify sqlite ledger was regenerated
