@@ -209,3 +209,59 @@ def compare_claims(first: StudyClaim, second: StudyClaim) -> Reconciliation:
         ),
         confidence_adjustment=0 if agrees else -0.15,
     )
+
+
+# ---------------------------------------------------------------------------
+# Canonical case: Semrush/Promptwatch vs Ahrefs (Reddit citation share)
+# ---------------------------------------------------------------------------
+
+CANONICAL_SEMRUSH = StudyClaim(
+    id="semrush-promptwatch-reddit-decline",
+    evidence_ids=("semrush-reddits-citations-in-chatgpt-fall",),
+    surface="chatgpt",
+    subject="reddit.com",
+    statement=(
+        "Reddit's ChatGPT citation share fell from 3.8% (Jul 18 – Aug 7) to 0.5% "
+        "(Aug 14–17), an 86% decline. Promptwatch flagged the observation as provisional."
+    ),
+    metric="citation_share",
+    denominator="all ChatGPT citations",
+    geography="global",
+    mode="consumer_web",
+    sampling_frame="daily-panel",
+    period_start=date(2026, 8, 14),
+    period_end=date(2026, 8, 17),
+    value=0.5,
+    unit="percent",
+    provisional=True,
+)
+
+CANONICAL_AHREFS = StudyClaim(
+    id="ahrefs-reddit-16-8-pct-sep-2026",
+    evidence_ids=("ahrefs-most-cited-domains-in-chatgpt",),
+    surface="chatgpt",
+    subject="reddit.com",
+    statement=(
+        "Reddit is the largest cited domain in ChatGPT at 16.8% mention share "
+        "(US, all topics, September 2026 Brand Radar snapshot)."
+    ),
+    metric="mention_share",
+    denominator="summed citations of top sources",
+    geography="US",
+    mode="consumer_web",
+    sampling_frame="monthly-snapshot",
+    period_start=date(2026, 9, 1),
+    period_end=date(2026, 9, 2),
+    value=16.8,
+    unit="percent",
+    provisional=False,
+)
+
+
+def canonical_reconciliation() -> Reconciliation:
+    """Reconcile the two canonical Reddit/ChatGPT studies.
+
+    Returns the agency interpretation: methodologically incomparable (different
+    denominators, geographies and time windows), not a material conflict.
+    """
+    return compare_claims(CANONICAL_SEMRUSH, CANONICAL_AHREFS)

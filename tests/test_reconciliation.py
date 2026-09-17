@@ -130,3 +130,30 @@ def test_bad_measurements_rejected(changes):
 @pytest.mark.parametrize("value", ["", " ", "unknown", "Unknown", "undocumented"])
 def test_textual_unknown_does_not_make_comparison_known(value):
     assert compare_claims(claim(mode=value), claim("b", mode=value)).state == "unresolved"
+
+
+def test_canonical_case_semrush_vs_ahrefs():
+    """Integration test: the two real canonical studies reconcile as incomparable."""
+    from ai_discovery.reconciliation import CANONICAL_AHREFS, CANONICAL_SEMRUSH, compare_claims
+
+    result = compare_claims(CANONICAL_SEMRUSH, CANONICAL_AHREFS)
+    assert result.state == "methodologically_incomparable"
+    assert result.relationship == "contextualises"
+    assert result.confidence_adjustment < 0
+    assert "metric" in result.differences
+    assert "denominator" in result.differences
+    assert "geography" in result.differences
+
+
+def test_canonical_case_via_api():
+    """The API exposes the canonical reconciliation."""
+    from fastapi.testclient import TestClient
+
+    from ai_discovery.api import app
+
+    client = TestClient(app)
+    resp = client.get("/reconciliation/canonical")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["state"] == "methodologically_incomparable"
+    assert body["topic"] == "reddit-chatgpt-citation-share"

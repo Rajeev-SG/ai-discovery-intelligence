@@ -238,3 +238,21 @@ def serialise_source(row: Source) -> dict:
         "last_error": row.last_error,
         "enabled": row.enabled,
     }
+
+
+@app.get("/reconciliation/canonical", tags=["reconciliation"])
+def get_canonical_reconciliation() -> dict:
+    """Agency interpretation of the contested Reddit/ChatGPT citation-share case."""
+    from .reconciliation import canonical_reconciliation
+
+    r = canonical_reconciliation()
+    return {
+        "topic": "reddit-chatgpt-citation-share",
+        "state": r.state,
+        "relationship": r.relationship,
+        "confidence_adjustment": r.confidence_adjustment,
+        "claim_ids": list(r.claim_ids),
+        "differences": list(r.differences),
+        "unknown_dimensions": list(r.unknown_dimensions),
+        "interpretation": r.interpretation,
+    }
