@@ -136,6 +136,7 @@ def claim_from_extracted(
     *,
     source: dict[str, Any],
     capture: Capture,
+    human_reviewed: bool = False,
 ) -> ClaimRecord:
     """Shape one extracted claim into a validated, quote-verified ClaimRecord."""
     statement = claim.statement.strip()
@@ -176,7 +177,7 @@ def claim_from_extracted(
         tool="ai_discovery.semantic",
         version=EXTRACTION_VERSION,
         rule_id=None,
-        human_reviewed=False,
+        human_reviewed=human_reviewed,
     )
 
     anchors = [Locator(kind=claim.capture_anchor_kind, quote=claim.capture_anchor)]
@@ -209,13 +210,23 @@ def claims_from_extraction(
     *,
     source: dict[str, Any],
     capture: Capture,
+    human_reviewed: bool = False,
 ) -> list[ClaimRecord]:
-    """Validate every extracted claim; return only the records that fully verify."""
+    """Validate every extracted claim; return only the records that fully verify.
+
+    ``human_reviewed=True`` marks the extraction as reviewed against the source
+    capture; without it, the record is an ``llm_proposal`` that the ledger's
+    provenance validator keeps out of evidence status.
+    """
     records: list[ClaimRecord] = []
     failures: list[str] = []
     for index, extracted in enumerate(result.claims):
         try:
-            records.append(claim_from_extracted(extracted, source=source, capture=capture))
+            records.append(
+                claim_from_extracted(
+                    extracted, source=source, capture=capture, human_reviewed=human_reviewed
+                )
+            )
         except (ValidationError, ClaimSpecError) as error:
             failures.append(f"claim {index}: {error}")
     if not records:
