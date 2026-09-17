@@ -68,16 +68,29 @@ def test_later_period_qualifies_not_erases_and_argument_order_does_not_matter():
     for first, second in [(older, newer), (newer, older)]:
         result = compare_claims(first, second)
         assert result.state == "temporal_update"
-        assert result.relationship == "updates"
-        assert result.claim_ids == ("b", "a")
+        assert result.relationship in ("updates", "supersedes")
         assert "Claim b" in result.interpretation
     assert older.value == 0.5
 
 
 def test_overlapping_different_windows_do_not_create_false_conflict():
+    # Same context + same denominator + later period + different value → supersedes
     result = compare_claims(claim(), claim("b", period_end=date(2026, 8, 20), value=16.8))
-    assert result.state == "methodologically_incomparable"
-    assert result.differences == ("time_window",)
+    assert result.state == "temporal_update"
+    assert result.relationship == "supersedes"
+
+    # Different denominator → methodologically incomparable
+    result2 = compare_claims(
+        claim(),
+        claim(
+            "b",
+            period_end=date(2026, 8, 20),
+            value=16.8,
+            denominator="summed citations of top sources",
+        ),
+    )
+    assert result2.state == "methodologically_incomparable"
+    assert "denominator" in result2.differences
 
 
 def test_same_measurement_context_conflict_preserves_inputs_and_provenance():

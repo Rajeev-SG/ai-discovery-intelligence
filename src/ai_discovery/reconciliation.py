@@ -16,7 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 # Note: "supersedes" is intentionally absent — no code path currently produces it.
 # A future supersession path (later re-measurement of the same quantity) should
 # re-add it to this Literal and implement the branch.
-Relationship = Literal["supports", "updates", "contradicts", "contextualises"]
+Relationship = Literal["supports", "updates", "contradicts", "supersedes", "contextualises"]
 ConflictState = Literal[
     "compatible_support",
     "directional_support",
@@ -156,6 +156,32 @@ def compare_claims(first: StudyClaim, second: StudyClaim) -> Reconciliation:
         )
     # All dates and values are known after the conservative missing-data branch.
     assert first.period_start and first.period_end and second.period_start and second.period_end
+
+    # Supersession: a later, same-context, same-denominator re-measurement with a
+    # materially different value supersedes the earlier claim's interpretation.
+    if (
+        first.metric == second.metric
+        and first.geography == second.geography
+        and first.mode == second.mode
+        and first.sampling_frame == second.sampling_frame
+        and first.denominator == second.denominator
+        and second.period_end > first.period_end
+    ):
+        abs_diff = abs(first.value - second.value)
+        scale = max(abs(first.value), abs(second.value), 1e-12)
+        if abs_diff / scale > 0.01:
+            return Reconciliation(
+                state="temporal_update",
+                relationship="supersedes",
+                confidence_adjustment=0.10,
+                interpretation=(
+                    f"Claim {second.id} supersedes {first.id}: a later re-measurement of "
+                    "the same quantity in the same context reports a materially different "
+                    "value. Both claims are retained for audit; the later figure is current."
+                ),
+                **common,
+            )
+
     if first.period_end < second.period_start or second.period_end < first.period_start:
         newer = second if first.period_end < second.period_start else first
         older = first if newer is second else second
