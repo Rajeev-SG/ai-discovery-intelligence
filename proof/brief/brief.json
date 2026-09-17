@@ -1,82 +1,104 @@
 {
-  "generated_at": "2026-09-16T19:47:10.870658+00:00",
-  "total_candidates": 5,
-  "included": 1,
-  "excluded": 4,
+  "generated_at": "2026-09-17T18:58:21.899143+00:00",
+  "cycle": "registry source → robots gate → Crawl4AI render → snapshot store → Instructor+OpenRouter → quote-verified claims → ledger",
+  "model": "google/gemini-2.5-flash via OpenRouter",
+  "total_candidates": 6,
+  "included": 3,
+  "excluded": 3,
   "scorer_audit": {
-    "similarweb-most-visited-websites": {
-      "confidence_raw": 0.605,
-      "confidence_penalty": 0.0,
-      "confidence_penalised": 0.605,
+    "b2f5dc3f7eff37a17a003829d928d130": {
+      "confidence_raw": 0.64,
       "confidence_label": "medium",
-      "significance": 2.97
+      "significance": 3.73
     },
-    "sistrix-ai-citation-drift": {
-      "confidence_raw": 0.59,
-      "confidence_penalty": 0.0,
-      "confidence_penalised": 0.59,
+    "135e036ff41dfb8d3720b7cd28727bce": {
+      "confidence_raw": 0.64,
       "confidence_label": "medium",
-      "significance": 2.97
+      "significance": 3.73
     },
-    "yandex-ai-search-pretrain-2026-09": {
-      "confidence_raw": 0.505,
-      "confidence_penalty": 0.0,
-      "confidence_penalised": 0.505,
-      "confidence_label": "low",
-      "significance": 2.97
-    },
-    "naver-ai-tab-launch-2026-06": {
-      "confidence_raw": 0.505,
-      "confidence_penalty": 0.0,
-      "confidence_penalised": 0.505,
-      "confidence_label": "low",
-      "significance": 2.97
-    },
-    "reddit-conflict": {
-      "confidence_raw": 0.705,
-      "confidence_penalty": 0.15,
-      "confidence_penalised": 0.5549999999999999,
+    "989b05b6d6f4a95b4348b4e1aec73270": {
+      "confidence_raw": 0.64,
       "confidence_label": "medium",
-      "significance": 3.68
+      "significance": 3.73
+    },
+    "f10d8120c6f51b587d4e3ad5f6476d11": {
+      "confidence_raw": 0.64,
+      "confidence_label": "medium",
+      "significance": 3.73
+    },
+    "3feafa47a3741024534b6b401e0347a9": {
+      "confidence_raw": 0.64,
+      "confidence_label": "medium",
+      "significance": 3.73
+    },
+    "f959399011ca9b3b7f991975201f8351": {
+      "confidence_raw": 0.66,
+      "confidence_label": "medium",
+      "significance": 3.73
     }
   },
   "items": [
     {
-      "change": "Reddit's ChatGPT citation share fell from 3.8% to 0.5% (Promptwatch/Semrush Aug 2026); Ahrefs Sep-2026 ranked Reddit as ChatGPT's largest cited domain at 16.8% mention share (US, different denominator).",
-      "why_it_matters": "Publisher/UGC visibility in ChatGPT is contested. Brands should not panic-exit Reddit; the drop is provisional.",
-      "agency_action": "Monitor only. Treat Reddit as contested until corroborated.",
+      "change": "ChatGPT's web traffic share of all AI chatbot web traffic fell from 76.4% twelve months ago to approximately 52.7% one month ago.",
+      "why_it_matters": "Similarweb (vendor_research) published this audience_usage finding, captured 2026-09-17 with verbatim-quote provenance.",
+      "agency_action": "Include in GEO monitoring; re-verify on the next capture cycle before client action.",
       "confidence": "medium",
-      "significance": 3.68,
+      "significance": 3.73,
       "evidence_ids": [
-        "https://www.semrush.com/blog/reddits-citations-in-chatgpt-fall/",
-        "https://ahrefs.com/blog/most-cited-domains-in-chatgpt/"
+        "b2f5dc3f7eff37a17a003829d928d130",
+        "https://www.similarweb.com/blog/research/market-research/most-visited-websites/"
       ],
       "surfaces": [
         "chatgpt"
+      ],
+      "is_watch_item": false
+    },
+    {
+      "change": "Gemini's share of AI chatbot web traffic rose from roughly 9% to 27.3% over the past year.",
+      "why_it_matters": "Similarweb (vendor_research) published this audience_usage finding, captured 2026-09-17 with verbatim-quote provenance.",
+      "agency_action": "Include in GEO monitoring; re-verify on the next capture cycle before client action.",
+      "confidence": "medium",
+      "significance": 3.73,
+      "evidence_ids": [
+        "135e036ff41dfb8d3720b7cd28727bce",
+        "https://www.similarweb.com/blog/research/market-research/most-visited-websites/"
+      ],
+      "surfaces": [
+        "gemini"
+      ],
+      "is_watch_item": false
+    },
+    {
+      "change": "Claude's share of AI chatbot web traffic climbed from 1.6% to 8.9% over the past year.",
+      "why_it_matters": "Similarweb (vendor_research) published this audience_usage finding, captured 2026-09-17 with verbatim-quote provenance.",
+      "agency_action": "Include in GEO monitoring; re-verify on the next capture cycle before client action.",
+      "confidence": "medium",
+      "significance": 3.73,
+      "evidence_ids": [
+        "989b05b6d6f4a95b4348b4e1aec73270",
+        "https://www.similarweb.com/blog/research/market-research/most-visited-websites/"
+      ],
+      "surfaces": [
+        "claude"
       ],
       "is_watch_item": false
     }
   ],
   "excluded_items": [
     {
-      "change": "Similarweb estimates ChatGPT at ~52.7% of all AI-chatbot web traffic in the mont",
-      "significance": 2.97,
+      "change": "The Gemini app has over 900 million monthly active users, up from 400 million a ",
+      "significance": 3.73,
       "confidence": "medium"
     },
     {
-      "change": "SISTRIX's 17-week, six-country study of 82,619 prompts found ChatGPT replaces ~7",
-      "significance": 2.97,
+      "change": "People Inc., a large multi-brand publisher, reported a total loss of 800 million",
+      "significance": 3.73,
       "confidence": "medium"
     },
     {
-      "change": "Yandex reports that more than 49 million people use its AI answers in Search eac",
-      "significance": 2.97,
-      "confidence": "low"
-    },
-    {
-      "change": "NAVER's AI Tab surpassed 4 million cumulative users in ~2 months of beta, produc",
-      "significance": 2.97,
-      "confidence": "low"
+      "change": "It can take approximately 24 hours from a site’s robots.txt update for OpenAI's ",
+      "significance": 3.73,
+      "confidence": "medium"
     }
   ]
 }
