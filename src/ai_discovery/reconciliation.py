@@ -17,6 +17,15 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 # A future supersession path (later re-measurement of the same quantity) should
 # re-add it to this Literal and implement the branch.
 Relationship = Literal["supports", "updates", "contradicts", "supersedes", "contextualises"]
+
+
+def _norm(value: str | None) -> str | None:
+    """Normalise free-text context fields for comparison (case, whitespace)."""
+    if value is None:
+        return None
+    return " ".join(value.strip().lower().split())
+
+
 ConflictState = Literal[
     "compatible_support",
     "directional_support",
@@ -157,15 +166,17 @@ def compare_claims(first: StudyClaim, second: StudyClaim) -> Reconciliation:
     # All dates and values are known after the conservative missing-data branch.
     assert first.period_start and first.period_end and second.period_start and second.period_end
 
-    # Supersession: a later, same-context, same-denominator re-measurement with a
-    # materially different value supersedes the earlier claim's interpretation.
+    # Supersession: a later, non-overlapping, same-context, same-denominator
+    # re-measurement with a materially different value supersedes the earlier
+    # claim's interpretation. Requires the second period to start AFTER the
+    # first period ends (true temporal supersession, not concurrent observation).
     if (
-        first.metric == second.metric
-        and first.geography == second.geography
-        and first.mode == second.mode
-        and first.sampling_frame == second.sampling_frame
-        and first.denominator == second.denominator
-        and second.period_end > first.period_end
+        _norm(first.metric) == _norm(second.metric)
+        and _norm(first.geography) == _norm(second.geography)
+        and _norm(first.mode) == _norm(second.mode)
+        and _norm(first.sampling_frame) == _norm(second.sampling_frame)
+        and _norm(first.denominator) == _norm(second.denominator)
+        and second.period_start > first.period_end
     ):
         abs_diff = abs(first.value - second.value)
         scale = max(abs(first.value), abs(second.value), 1e-12)

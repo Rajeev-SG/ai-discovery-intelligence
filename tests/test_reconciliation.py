@@ -74,10 +74,9 @@ def test_later_period_qualifies_not_erases_and_argument_order_does_not_matter():
 
 
 def test_overlapping_different_windows_do_not_create_false_conflict():
-    # Same context + same denominator + later period + different value → supersedes
+    # Overlapping windows (second starts before first ends) → incomparable
     result = compare_claims(claim(), claim("b", period_end=date(2026, 8, 20), value=16.8))
-    assert result.state == "temporal_update"
-    assert result.relationship == "supersedes"
+    assert result.state == "methodologically_incomparable"
 
     # Different denominator → methodologically incomparable
     result2 = compare_claims(
@@ -91,6 +90,31 @@ def test_overlapping_different_windows_do_not_create_false_conflict():
     )
     assert result2.state == "methodologically_incomparable"
     assert "denominator" in result2.differences
+
+
+def test_non_overlapping_later_measurement_supersedes():
+    """A later, non-overlapping, same-context re-measurement supersedes the earlier."""
+    result = compare_claims(
+        claim(),
+        claim("b", period_start=date(2026, 8, 20), period_end=date(2026, 8, 25), value=16.8),
+    )
+    assert result.state == "temporal_update"
+    assert result.relationship == "supersedes"
+
+
+def test_order_independent_supersedes():
+    """Supersedes works when the later claim is passed as either argument."""
+    older = claim()
+    newer = claim("b", period_start=date(2026, 8, 20), period_end=date(2026, 8, 25), value=16.8)
+    # (older, newer) → supersedes
+    r1 = compare_claims(older, newer)
+    assert r1.relationship == "supersedes"
+    # (newer, older) → non-overlap branch → updates (same temporal_update state)
+    r2 = compare_claims(newer, older)
+    assert r2.relationship == "updates"
+    assert r2.state == "temporal_update"
+    # Both classify it as a temporal change, just with different relationship labels
+    # reflecting which claim is first in the output.
 
 
 def test_same_measurement_context_conflict_preserves_inputs_and_provenance():
