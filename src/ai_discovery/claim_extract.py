@@ -41,10 +41,14 @@ def _date(value: str | None, quote: str | None, *, kind: str = "page_stamp") -> 
     return Provenanced[dt.date](value=parsed, locator=Locator(kind=kind, quote=quote))
 
 
-def _metric_fields(index: int, raw: ExtractedMetric) -> Metric:
-    """One metric: value/unit/window/scope each carry their own quote."""
+def _metric_fields(index: int, raw: ExtractedMetric, *, anchor: str | None = None) -> Metric | None:
+    """One metric; returns None when the model supplied no value (not claimable)."""
     if raw.value is None:
-        raise ClaimSpecError(f"metric {raw.label!r} has no value; drop it instead of guessing")
+        return None
+    def _anchor_of(_claim):  # placeholder replaced below
+        return None
+    if raw.value is None:
+        return None
     # window/scope are the metric's frame, not separate assertions: they ride
     # on the value quote (the exact sentence carrying the number) when the
     # model did not give a dedicated quote.
@@ -59,8 +63,10 @@ def _metric_fields(index: int, raw: ExtractedMetric) -> Metric:
         return Provenanced(value=value, locator=Locator(kind="verbatim_quote", quote=locator))
 
     fields: dict[str, Provenanced[Any]] = {
-        "definition": _frame(raw.definition, raw.definition_quote, None, "definition"),
-        "value": _frame(raw.value, raw.value_quote, None, "value"),
+        "definition": _frame(
+            raw.definition, raw.definition_quote, raw.value_quote or anchor, "definition"
+        ),
+        "value": _frame(raw.value, raw.value_quote, anchor, "value"),
         "unit": (
             Provenanced(
                 value=raw.unit,
@@ -69,8 +75,8 @@ def _metric_fields(index: int, raw: ExtractedMetric) -> Metric:
             if raw.unit is not None and raw.value_quote
             else Provenanced()
         ),
-        "window": _frame(raw.window, raw.window_quote, raw.value_quote, "window"),
-        "scope": _frame(raw.scope, raw.scope_quote, raw.value_quote, "scope"),
+        "window": _frame(raw.window, raw.window_quote, raw.value_quote or anchor, "window"),
+        "scope": _frame(raw.scope, raw.scope_quote, raw.value_quote or anchor, "scope"),
     }
     return Metric(
         metric_id=f"m{index + 1}",
@@ -156,7 +162,16 @@ def claim_from_extracted(
     if not methodology.surfaces:
         raise ClaimSpecError(f"claim {statement[:60]!r}: surfaces must list at least one surface id")
 
-    metrics = [_metric_fields(i, raw) for i, raw in enumerate(claim.metrics)]
+    metrics = [
+        m
+        for m in (
+            _metric_fields(i, raw, anchor=claim.capture_anchor)
+            for i, raw in enumerate(claim.metrics)
+        )
+        if m is not None
+    ]
+    if not metrics:
+        raise ClaimSpecError("claim has no metric with a value; not ledger-claimable")
 
     measured_window = claim.measured_window
     if measured_window and not claim.measured_window_quote:

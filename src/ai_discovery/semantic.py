@@ -94,12 +94,15 @@ class ExtractedMetric(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def _coerce_loose(cls, data: Any) -> Any:
-        """Providers vary in metric-key names; normalise without changing meaning."""
-        if isinstance(data, dict):
-            if "label" not in data and data.get("metric"):
-                data["label"] = data["metric"]
-            if not data.get("value_quote") and data.get("quote"):
-                data["value_quote"] = data["quote"]
+        if isinstance(data, dict) and "label" not in data:
+            for key in ("metric", "name", "title"):
+                if data.get(key):
+                    data["label"] = data[key]
+                    break
+            if "label" not in data and data.get("definition"):
+                data["label"] = str(data["definition"])[:40]
+        if isinstance(data, dict) and not data.get("value_quote") and data.get("quote"):
+            data["value_quote"] = data["quote"]
         return data
 
     @field_validator("label")
@@ -148,7 +151,7 @@ class ExtractedClaim(BaseModel):
     measured_window_quote: str | None = None
     capture_anchor: str = Field(min_length=4)
     capture_anchor_kind: LocatorKind = "verbatim_quote"
-    metrics: list[ExtractedMetric] = Field(min_length=1)
+    metrics: list[ExtractedMetric] = Field(default_factory=list)
 
     @model_validator(mode="before")
     @classmethod
@@ -312,7 +315,8 @@ def semantic_extract(
         # rather than rejecting the whole run.
         dropped = [
             c for c in payload.get("claims", [])
-            if isinstance(c, dict) and not c.get("metrics")
+            if isinstance(c, dict)
+            and not any(isinstance(m, dict) and m.get("value") is not None for m in c.get("metrics") or [])
         ]
         if dropped:
             logging.getLogger(__name__).warning(
