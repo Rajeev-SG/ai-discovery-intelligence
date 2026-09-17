@@ -34,6 +34,8 @@ jobs:
       - name: Verify Instructor claim pipeline is importable and scheduleable
         run: |
           uv run python - <<'PY'
+          import sys
+          sys.path.insert(0, "src")
           from ai_discovery.pipeline import defs
           assert {s.name for s in defs.schedules} == {
               "daily_high_value_sources", "weekly_discovery_lane", "weekly_coverage_audit"
