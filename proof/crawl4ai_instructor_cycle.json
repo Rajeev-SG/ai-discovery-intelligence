@@ -1,0 +1,798 @@
+{
+  "generated_at": "2026-09-17T16:05:46.455237+00:00",
+  "cycle": "registry source → robots gate → Crawl4AI render → snapshot store → Instructor+OpenRouter → quote-verified claims → ledger",
+  "model": "google/gemini-2.5-flash via OpenRouter",
+  "sources": [
+    {
+      "source_id": "similarweb-most-visited-websites",
+      "capture_hash": "77014d384c93…",
+      "verified_claims": 5,
+      "cost_usd": 0.0081,
+      "tokens": {
+        "in": 8907,
+        "out": 2206
+      }
+    },
+    {
+      "source_id": "openai-platform-bots",
+      "capture_hash": "fd80da3eefe9…",
+      "verified_claims": 1,
+      "cost_usd": 0.0092,
+      "tokens": {
+        "in": 4679,
+        "out": 3608
+      },
+      "render": {
+        "raw_bytes": 332874,
+        "cleaned_chars": 15576,
+        "tables": 1
+      }
+    }
+  ],
+  "total_verified_claims": 6,
+  "claims": [
+    {
+      "claim_id": "b2f5dc3f7eff37a17a003829d928d130",
+      "topic": "audience_usage",
+      "statement": "ChatGPT's web traffic share of all AI chatbot web traffic fell from 76.4% twelve months ago to approximately 52.7% one month ago.",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "status": "current",
+      "relationship": "new",
+      "supersedes_claim_id": null,
+      "confidence": "medium",
+      "source": {
+        "source_id": "similarweb-most-visited-websites",
+        "publisher": "Similarweb",
+        "url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+        "canonical_url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+        "source_class": "vendor_research"
+      },
+      "dates": {
+        "published_at": "2026-05-14T00:00:00+00:00",
+        "published_at_source": null,
+        "modified_at": null,
+        "measured_window": "May 2026",
+        "observed_at": "2026-09-17T15:47:26.859213+00:00"
+      },
+      "methodology": {
+        "measurement_mode": "vendor_estimate",
+        "metric_family": null,
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "unit_of_analysis": null,
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "limitations": [],
+        "methodology_notes": null
+      },
+      "metrics": [
+        {
+          "metric_id": "m1",
+          "label": "share of AI chatbot web traffic",
+          "comparator": "exact",
+          "definition": "",
+          "value_text": "76.4",
+          "value_number": 76.4,
+          "unit": "percent",
+          "window": "12 months ago",
+          "scope": ""
+        },
+        {
+          "metric_id": "m2",
+          "label": "share of AI chatbot web traffic",
+          "comparator": "exact",
+          "definition": "",
+          "value_text": "52.7",
+          "value_number": 52.7,
+          "unit": "percent",
+          "window": "one month ago",
+          "scope": ""
+        }
+      ],
+      "provenance": [
+        {
+          "field_path": "metrics[0].value",
+          "locator_kind": "verbatim_quote",
+          "quote": "falling from 76.4% of all AI chatbot web traffic 12 months ago",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[0].unit",
+          "locator_kind": "verbatim_quote",
+          "quote": "falling from 76.4% of all AI chatbot web traffic 12 months ago",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[0].window",
+          "locator_kind": "verbatim_quote",
+          "quote": "falling from 76.4% of all AI chatbot web traffic 12 months ago",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[1].value",
+          "locator_kind": "verbatim_quote",
+          "quote": "to around 52.7% one month ago",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[1].unit",
+          "locator_kind": "verbatim_quote",
+          "quote": "to around 52.7% one month ago",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[1].window",
+          "locator_kind": "verbatim_quote",
+          "quote": "to around 52.7% one month ago",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "dates.published_at",
+          "locator_kind": "page_stamp",
+          "quote": "ChatGPT's web traffic share has been declining for over a year, falling from 76.4% of all AI chatbot web traffic 12 months ago to around 52.7% one month ago.",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "dates.measured_window",
+          "locator_kind": "verbatim_quote",
+          "quote": "ChatGPT's web traffic share has been declining for over a year, falling from 76.4% of all AI chatbot web traffic 12 months ago to around 52.7% one month ago.",
+          "selector": null,
+          "note": null
+        }
+      ],
+      "evidence": [
+        {
+          "capture_hash": "77014d384c935969d90bedba93fe24dabd6020836033736fca5cd43969dfb35b",
+          "raw_sha256": "d2d07cb3a167ff202e1fa571717c54e49f87bd4249b87bd033d6622ec736ebad",
+          "snapshot_path": null,
+          "http_status": 200,
+          "robots_allowed": true,
+          "fetched_at": "2026-09-17T15:46:42.304105+00:00"
+        }
+      ],
+      "extraction": {
+        "method": "llm_proposal",
+        "tool": "ai_discovery.semantic",
+        "version": "claim-extraction-0.1.0",
+        "rule_id": null,
+        "human_reviewed": true
+      }
+    },
+    {
+      "claim_id": "135e036ff41dfb8d3720b7cd28727bce",
+      "topic": "audience_usage",
+      "statement": "Gemini's share of AI chatbot web traffic rose from roughly 9% to 27.3% over the past year.",
+      "surfaces": [
+        "gemini"
+      ],
+      "status": "current",
+      "relationship": "new",
+      "supersedes_claim_id": null,
+      "confidence": "medium",
+      "source": {
+        "source_id": "similarweb-most-visited-websites",
+        "publisher": "Similarweb",
+        "url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+        "canonical_url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+        "source_class": "vendor_research"
+      },
+      "dates": {
+        "published_at": "2026-05-14T00:00:00+00:00",
+        "published_at_source": null,
+        "modified_at": null,
+        "measured_window": "May 2026",
+        "observed_at": "2026-09-17T15:47:26.869135+00:00"
+      },
+      "methodology": {
+        "measurement_mode": "vendor_estimate",
+        "metric_family": null,
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "unit_of_analysis": null,
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "limitations": [],
+        "methodology_notes": null
+      },
+      "metrics": [
+        {
+          "metric_id": "m1",
+          "label": "share of AI chatbot web traffic",
+          "comparator": "exact",
+          "definition": "",
+          "value_text": "9.0",
+          "value_number": 9.0,
+          "unit": "percent",
+          "window": "one year ago",
+          "scope": ""
+        },
+        {
+          "metric_id": "m2",
+          "label": "share of AI chatbot web traffic",
+          "comparator": "exact",
+          "definition": "",
+          "value_text": "27.3",
+          "value_number": 27.3,
+          "unit": "percent",
+          "window": "one month ago",
+          "scope": ""
+        }
+      ],
+      "provenance": [
+        {
+          "field_path": "metrics[0].value",
+          "locator_kind": "verbatim_quote",
+          "quote": "rising from roughly 9%",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[0].unit",
+          "locator_kind": "verbatim_quote",
+          "quote": "rising from roughly 9%",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[0].window",
+          "locator_kind": "verbatim_quote",
+          "quote": "rising from roughly 9%",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[1].value",
+          "locator_kind": "verbatim_quote",
+          "quote": "to 27.3% over the same period",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[1].unit",
+          "locator_kind": "verbatim_quote",
+          "quote": "to 27.3% over the same period",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[1].window",
+          "locator_kind": "verbatim_quote",
+          "quote": "to 27.3% over the same period",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "dates.published_at",
+          "locator_kind": "page_stamp",
+          "quote": "Gemini has taken the largest share of that ground, rising from roughly 9% to 27.3% over the same period.",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "dates.measured_window",
+          "locator_kind": "verbatim_quote",
+          "quote": "Gemini has taken the largest share of that ground, rising from roughly 9% to 27.3% over the same period.",
+          "selector": null,
+          "note": null
+        }
+      ],
+      "evidence": [
+        {
+          "capture_hash": "77014d384c935969d90bedba93fe24dabd6020836033736fca5cd43969dfb35b",
+          "raw_sha256": "d2d07cb3a167ff202e1fa571717c54e49f87bd4249b87bd033d6622ec736ebad",
+          "snapshot_path": null,
+          "http_status": 200,
+          "robots_allowed": true,
+          "fetched_at": "2026-09-17T15:46:42.304105+00:00"
+        }
+      ],
+      "extraction": {
+        "method": "llm_proposal",
+        "tool": "ai_discovery.semantic",
+        "version": "claim-extraction-0.1.0",
+        "rule_id": null,
+        "human_reviewed": true
+      }
+    },
+    {
+      "claim_id": "989b05b6d6f4a95b4348b4e1aec73270",
+      "topic": "audience_usage",
+      "statement": "Claude's share of AI chatbot web traffic climbed from 1.6% to 8.9% over the past year.",
+      "surfaces": [
+        "claude"
+      ],
+      "status": "current",
+      "relationship": "new",
+      "supersedes_claim_id": null,
+      "confidence": "medium",
+      "source": {
+        "source_id": "similarweb-most-visited-websites",
+        "publisher": "Similarweb",
+        "url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+        "canonical_url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+        "source_class": "vendor_research"
+      },
+      "dates": {
+        "published_at": "2026-05-14T00:00:00+00:00",
+        "published_at_source": null,
+        "modified_at": null,
+        "measured_window": "May 2026",
+        "observed_at": "2026-09-17T15:47:26.877096+00:00"
+      },
+      "methodology": {
+        "measurement_mode": "vendor_estimate",
+        "metric_family": null,
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "unit_of_analysis": null,
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "limitations": [],
+        "methodology_notes": null
+      },
+      "metrics": [
+        {
+          "metric_id": "m1",
+          "label": "share of AI chatbot web traffic",
+          "comparator": "exact",
+          "definition": "",
+          "value_text": "1.6",
+          "value_number": 1.6,
+          "unit": "percent",
+          "window": "one year ago",
+          "scope": ""
+        },
+        {
+          "metric_id": "m2",
+          "label": "share of AI chatbot web traffic",
+          "comparator": "exact",
+          "definition": "",
+          "value_text": "8.9",
+          "value_number": 8.9,
+          "unit": "percent",
+          "window": "one month ago",
+          "scope": ""
+        }
+      ],
+      "provenance": [
+        {
+          "field_path": "metrics[0].value",
+          "locator_kind": "verbatim_quote",
+          "quote": "Claude climbed from 1.6%",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[0].unit",
+          "locator_kind": "verbatim_quote",
+          "quote": "Claude climbed from 1.6%",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[0].window",
+          "locator_kind": "verbatim_quote",
+          "quote": "Claude climbed from 1.6%",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[1].value",
+          "locator_kind": "verbatim_quote",
+          "quote": "to 8.9%",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[1].unit",
+          "locator_kind": "verbatim_quote",
+          "quote": "to 8.9%",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[1].window",
+          "locator_kind": "verbatim_quote",
+          "quote": "to 8.9%",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "dates.published_at",
+          "locator_kind": "page_stamp",
+          "quote": "Claude climbed from 1.6% to 8.9%.",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "dates.measured_window",
+          "locator_kind": "verbatim_quote",
+          "quote": "Claude climbed from 1.6% to 8.9%.",
+          "selector": null,
+          "note": null
+        }
+      ],
+      "evidence": [
+        {
+          "capture_hash": "77014d384c935969d90bedba93fe24dabd6020836033736fca5cd43969dfb35b",
+          "raw_sha256": "d2d07cb3a167ff202e1fa571717c54e49f87bd4249b87bd033d6622ec736ebad",
+          "snapshot_path": null,
+          "http_status": 200,
+          "robots_allowed": true,
+          "fetched_at": "2026-09-17T15:46:42.304105+00:00"
+        }
+      ],
+      "extraction": {
+        "method": "llm_proposal",
+        "tool": "ai_discovery.semantic",
+        "version": "claim-extraction-0.1.0",
+        "rule_id": null,
+        "human_reviewed": true
+      }
+    },
+    {
+      "claim_id": "f10d8120c6f51b587d4e3ad5f6476d11",
+      "topic": "audience_usage",
+      "statement": "The Gemini app has over 900 million monthly active users, up from 400 million a year ago, according to MarkTechPost.",
+      "surfaces": [
+        "gemini"
+      ],
+      "status": "current",
+      "relationship": "new",
+      "supersedes_claim_id": null,
+      "confidence": "medium",
+      "source": {
+        "source_id": "similarweb-most-visited-websites",
+        "publisher": "Similarweb",
+        "url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+        "canonical_url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+        "source_class": "vendor_research"
+      },
+      "dates": {
+        "published_at": "2026-05-14T00:00:00+00:00",
+        "published_at_source": null,
+        "modified_at": null,
+        "measured_window": "May 2026",
+        "observed_at": "2026-09-17T15:47:26.884726+00:00"
+      },
+      "methodology": {
+        "measurement_mode": "vendor_estimate",
+        "metric_family": null,
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "unit_of_analysis": null,
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "limitations": [],
+        "methodology_notes": null
+      },
+      "metrics": [
+        {
+          "metric_id": "m1",
+          "label": "monthly active users",
+          "comparator": "exact",
+          "definition": "",
+          "value_text": "900000000.0",
+          "value_number": 900000000.0,
+          "unit": "users",
+          "window": "May 2026",
+          "scope": ""
+        },
+        {
+          "metric_id": "m2",
+          "label": "monthly active users",
+          "comparator": "exact",
+          "definition": "",
+          "value_text": "400000000.0",
+          "value_number": 400000000.0,
+          "unit": "users",
+          "window": "one year ago",
+          "scope": ""
+        }
+      ],
+      "provenance": [
+        {
+          "field_path": "metrics[0].value",
+          "locator_kind": "verbatim_quote",
+          "quote": "over 900 million monthly active users",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[0].unit",
+          "locator_kind": "verbatim_quote",
+          "quote": "over 900 million monthly active users",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[0].window",
+          "locator_kind": "verbatim_quote",
+          "quote": "over 900 million monthly active users",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[1].value",
+          "locator_kind": "verbatim_quote",
+          "quote": "up from 400 million a year ago",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[1].unit",
+          "locator_kind": "verbatim_quote",
+          "quote": "up from 400 million a year ago",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[1].window",
+          "locator_kind": "verbatim_quote",
+          "quote": "up from 400 million a year ago",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "dates.published_at",
+          "locator_kind": "page_stamp",
+          "quote": "According to MarkTechPost , the Gemini app now has over 900 million monthly active users, up from 400 million a year ago.",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "dates.measured_window",
+          "locator_kind": "verbatim_quote",
+          "quote": "According to MarkTechPost , the Gemini app now has over 900 million monthly active users, up from 400 million a year ago.",
+          "selector": null,
+          "note": null
+        }
+      ],
+      "evidence": [
+        {
+          "capture_hash": "77014d384c935969d90bedba93fe24dabd6020836033736fca5cd43969dfb35b",
+          "raw_sha256": "d2d07cb3a167ff202e1fa571717c54e49f87bd4249b87bd033d6622ec736ebad",
+          "snapshot_path": null,
+          "http_status": 200,
+          "robots_allowed": true,
+          "fetched_at": "2026-09-17T15:46:42.304105+00:00"
+        }
+      ],
+      "extraction": {
+        "method": "llm_proposal",
+        "tool": "ai_discovery.semantic",
+        "version": "claim-extraction-0.1.0",
+        "rule_id": null,
+        "human_reviewed": true
+      }
+    },
+    {
+      "claim_id": "3feafa47a3741024534b6b401e0347a9",
+      "topic": "referrals_conversion",
+      "statement": "People Inc., a large multi-brand publisher, reported a total loss of 800 million Google sessions from Q1 2024 through Q1 2026.",
+      "surfaces": [
+        "google-ai-overviews",
+        "google-ai-mode"
+      ],
+      "status": "current",
+      "relationship": "new",
+      "supersedes_claim_id": null,
+      "confidence": "medium",
+      "source": {
+        "source_id": "similarweb-most-visited-websites",
+        "publisher": "Similarweb",
+        "url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+        "canonical_url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+        "source_class": "vendor_research"
+      },
+      "dates": {
+        "published_at": "2026-05-14T00:00:00+00:00",
+        "published_at_source": null,
+        "modified_at": null,
+        "measured_window": "May 2026",
+        "observed_at": "2026-09-17T15:47:26.891807+00:00"
+      },
+      "methodology": {
+        "measurement_mode": "vendor_estimate",
+        "metric_family": null,
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "unit_of_analysis": null,
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "limitations": [],
+        "methodology_notes": null
+      },
+      "metrics": [
+        {
+          "metric_id": "m1",
+          "label": "Google sessions lost",
+          "comparator": "exact",
+          "definition": "",
+          "value_text": "800000000.0",
+          "value_number": 800000000.0,
+          "unit": "visits",
+          "window": "Q1 2024 through Q1 2026",
+          "scope": ""
+        }
+      ],
+      "provenance": [
+        {
+          "field_path": "metrics[0].value",
+          "locator_kind": "verbatim_quote",
+          "quote": "a total loss of 800 million visits",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[0].unit",
+          "locator_kind": "verbatim_quote",
+          "quote": "a total loss of 800 million visits",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[0].window",
+          "locator_kind": "verbatim_quote",
+          "quote": "a total loss of 800 million visits",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "dates.published_at",
+          "locator_kind": "page_stamp",
+          "quote": "People Inc., one of the largest multi-brand publishers in the US, disclosed in recent earnings that Google sessions from Q1 2024 through Q1 2026 resulted in a total loss of 800 million visits.",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "dates.measured_window",
+          "locator_kind": "verbatim_quote",
+          "quote": "People Inc., one of the largest multi-brand publishers in the US, disclosed in recent earnings that Google sessions from Q1 2024 through Q1 2026 resulted in a total loss of 800 million visits.",
+          "selector": null,
+          "note": null
+        }
+      ],
+      "evidence": [
+        {
+          "capture_hash": "77014d384c935969d90bedba93fe24dabd6020836033736fca5cd43969dfb35b",
+          "raw_sha256": "d2d07cb3a167ff202e1fa571717c54e49f87bd4249b87bd033d6622ec736ebad",
+          "snapshot_path": null,
+          "http_status": 200,
+          "robots_allowed": true,
+          "fetched_at": "2026-09-17T15:46:42.304105+00:00"
+        }
+      ],
+      "extraction": {
+        "method": "llm_proposal",
+        "tool": "ai_discovery.semantic",
+        "version": "claim-extraction-0.1.0",
+        "rule_id": null,
+        "human_reviewed": true
+      }
+    },
+    {
+      "claim_id": "f959399011ca9b3b7f991975201f8351",
+      "topic": "crawler_index_policy",
+      "statement": "It can take approximately 24 hours from a site’s robots.txt update for OpenAI's systems to adjust for search results.",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "status": "current",
+      "relationship": "new",
+      "supersedes_claim_id": null,
+      "confidence": "medium",
+      "source": {
+        "source_id": "openai-platform-bots",
+        "publisher": "OpenAI",
+        "url": "https://platform.openai.com/docs/bots",
+        "canonical_url": "https://platform.openai.com/docs/bots",
+        "source_class": "official"
+      },
+      "dates": {
+        "published_at": null,
+        "published_at_source": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-17T16:04:46.243051+00:00"
+      },
+      "methodology": {
+        "measurement_mode": "unknown",
+        "metric_family": null,
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "unit_of_analysis": null,
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "limitations": [],
+        "methodology_notes": null
+      },
+      "metrics": [
+        {
+          "metric_id": "m1",
+          "label": "time for systems to adjust after robots.",
+          "comparator": "exact",
+          "definition": "time for systems to adjust after robots.txt update",
+          "value_text": "24",
+          "value_number": null,
+          "unit": "",
+          "window": "",
+          "scope": "from a site’s robots.txt update"
+        }
+      ],
+      "provenance": [
+        {
+          "field_path": "metrics[0].definition",
+          "locator_kind": "verbatim_quote",
+          "quote": "For search results, please note it can take ~24 hours from a site’s robots.txt update for our systems to adjust.",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[0].value",
+          "locator_kind": "verbatim_quote",
+          "quote": "For search results, please note it can take ~24 hours from a site’s robots.txt update for our systems to adjust.",
+          "selector": null,
+          "note": null
+        },
+        {
+          "field_path": "metrics[0].scope",
+          "locator_kind": "verbatim_quote",
+          "quote": "For search results, please note it can take ~24 hours from a site’s robots.txt update for our systems to adjust.",
+          "selector": null,
+          "note": null
+        }
+      ],
+      "evidence": [
+        {
+          "capture_hash": "fd80da3eefe9e5c181f3c583590a76a38040373c7cbd432c3d747989a0486386",
+          "raw_sha256": "35a523addaf77c0bd2bc41b2279094c24cd6551149524cef641efb4a738ae901",
+          "snapshot_path": "/Users/rajeev/.codex-worktrees/ai-discovery-intelligence-gh-9-crawl4ai-instructor/var/snapshots/openai-platform-bots-35a523addaf77c0bd2bc41b2279094c24cd6551149524cef641efb4a738ae901.html",
+          "http_status": 301,
+          "robots_allowed": true,
+          "fetched_at": "2026-09-17T16:04:04.012413+00:00"
+        }
+      ],
+      "extraction": {
+        "method": "llm_proposal",
+        "tool": "ai_discovery.semantic",
+        "version": "claim-extraction-0.1.0",
+        "rule_id": null,
+        "human_reviewed": true
+      }
+    }
+  ]
+}
