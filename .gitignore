@@ -18,3 +18,5 @@ private-snapshots/
 # backend runtime state
 var/
 *.pyc
+web/test-results/
+web/tsconfig.tsbuildinfo
