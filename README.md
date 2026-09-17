@@ -91,3 +91,20 @@ npm start
 |---|---|
 | `claim-ledger-ci` | Regenerates the sqlite proof ledger, runs tests and lint |
 | `web-ci` | Typecheck, unit tests, build, e2e for the observation plane |
+
+## Architecture change (2026-09-17)
+
+The acquisition layer is being rebuilt on the proven **Crawl4AI → snapshot store → Instructor + OpenRouter** pattern from [ad-platform-intelligence](https://github.com/Rajeev-SG/ad-platform-intelligence). The Scrapy/Trafilatura layer shipped in issue #2 is bespoke scaffolding that requires hand-written claim specs — it does not scale to automated intelligence production.
+
+**Target stack:**
+
+| Layer | Tool | Why |
+|---|---|---|
+| Change detection | changedetection.io + sitemap/RSS | Vendor-maintained signals before scraping |
+| Web render + clean | Crawl4AI | Browser rendering, main-content identification, HTML→Markdown |
+| Snapshot store | Hash-addressed private files | Raw + cleaned hash; only changed documents re-extract |
+| Semantic extraction | Instructor + OpenRouter | Schema-validated claims with verbatim-quote locators |
+| Orchestration | Dagster | Assets, schedules, retries, lineage |
+| Durable store | PostgreSQL | Canonical claims, evidence, events |
+| API | FastAPI | Evidence feed, reconciliation, brief |
+| Observation plane | Next.js + TanStack Table v9 | Global surface map |
