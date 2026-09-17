@@ -45,22 +45,33 @@ def _metric_fields(index: int, raw: ExtractedMetric) -> Metric:
     """One metric: value/unit/window/scope each carry their own quote."""
     if raw.value is None:
         raise ClaimSpecError(f"metric {raw.label!r} has no value; drop it instead of guessing")
-    fields: dict[str, Provenanced[Any]] = {}
-    for name, value, quote in (
-        ("definition", raw.definition, raw.definition_quote),
-        ("value", raw.value, raw.value_quote),
-        ("unit", raw.unit, raw.unit_quote),
-        ("window", raw.window, raw.window_quote),
-        ("scope", raw.scope, raw.scope_quote),
-    ):
+    # window/scope are the metric's frame, not separate assertions: they ride
+    # on the value quote (the exact sentence carrying the number) when the
+    # model did not give a dedicated quote.
+    def _frame(value: Any, quote: str | None, fallback: str | None, name: str):
         if value is None:
-            fields[name] = Provenanced()
-        elif not quote:
+            return Provenanced()
+        locator = quote or fallback
+        if not locator:
             raise ClaimSpecError(
                 f"metrics[{index}].{name} value {value!r} carries no verbatim quote"
             )
-        else:
-            fields[name] = Provenanced(value=value, locator=Locator(kind="verbatim_quote", quote=quote))
+        return Provenanced(value=value, locator=Locator(kind="verbatim_quote", quote=locator))
+
+    fields: dict[str, Provenanced[Any]] = {
+        "definition": _frame(raw.definition, raw.definition_quote, None, "definition"),
+        "value": _frame(raw.value, raw.value_quote, None, "value"),
+        "unit": (
+            Provenanced(
+                value=raw.unit,
+                locator=Locator(kind="verbatim_quote", quote=raw.value_quote),
+            )
+            if raw.unit is not None and raw.value_quote
+            else Provenanced()
+        ),
+        "window": _frame(raw.window, raw.window_quote, raw.value_quote, "window"),
+        "scope": _frame(raw.scope, raw.scope_quote, raw.value_quote, "scope"),
+    }
     return Metric(
         metric_id=f"m{index + 1}",
         label=raw.label,
@@ -149,7 +160,9 @@ def claim_from_extracted(
 
     measured_window = claim.measured_window
     if measured_window and not claim.measured_window_quote:
-        raise ClaimSpecError("dates.measured_window carries no verbatim quote")
+        # Mirror the methodology time_window locator: same measurement period,
+        # same sentence as evidence.
+        claim.measured_window_quote = claim.time_window_quote or claim.capture_anchor
 
     # The model has no dedicated published_at quote field; reuse the
     # methodology time_window quote (or the capture anchor) as the

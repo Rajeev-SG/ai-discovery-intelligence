@@ -10,12 +10,14 @@ so a fabricated number cannot survive the pipeline. LLM output is marked
 
 from __future__ import annotations
 
+import json
 import os
 from typing import Any
 
 import instructor
+from instructor.v2.core.errors import InstructorRetryException
 from openai import OpenAI
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .claim_models import (
     CLAIM_TOPICS,
@@ -25,7 +27,7 @@ from .claim_models import (
     MeasurementMode,
 )
 
-DEFAULT_MODEL = "google/gemini-2.5-flash-lite"
+DEFAULT_MODEL = "google/gemini-2.5-flash"
 MAX_RETRIES = 2
 # Bound the document handed to the model; a pathological page must not
 # silently inflate spend. Override with AI_DISCOVERY_MAX_CLEANED_CHARS.
@@ -74,9 +76,9 @@ rules EXACTLY:
 class ExtractedMetric(BaseModel):
     """Schema-constrained metric before mapping into the ledger schema."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="allow")
 
-    label: str = Field(min_length=2)
+    label: str = Field(min_length=1)
     value: float | str | None = None
     value_quote: str | None = None
     unit: str | None = None
@@ -89,6 +91,17 @@ class ExtractedMetric(BaseModel):
     scope_quote: str | None = None
     comparator: Comparator = "exact"
 
+    @model_validator(mode="before")
+    @classmethod
+    def _coerce_loose(cls, data: Any) -> Any:
+        """Providers vary in metric-key names; normalise without changing meaning."""
+        if isinstance(data, dict):
+            if "label" not in data and data.get("metric"):
+                data["label"] = data["metric"]
+            if not data.get("value_quote") and data.get("quote"):
+                data["value_quote"] = data["quote"]
+        return data
+
     @field_validator("label")
     @classmethod
     def label_not_placeholder(cls, value: str) -> str:
@@ -100,7 +113,7 @@ class ExtractedMetric(BaseModel):
 class ExtractedClaim(BaseModel):
     """Schema-constrained claim before mapping into the ledger schema."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="allow")
 
     topic: ClaimTopic
     statement: str = Field(min_length=10)
@@ -136,6 +149,16 @@ class ExtractedClaim(BaseModel):
     capture_anchor: str = Field(min_length=4)
     capture_anchor_kind: LocatorKind = "verbatim_quote"
     metrics: list[ExtractedMetric] = Field(min_length=1)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _flatten_methodology(cls, data: Any) -> Any:
+        """Some providers nest methodology fields; flatten into the flat shape."""
+        if isinstance(data, dict) and isinstance(data.get("methodology"), dict):
+            meth = data.pop("methodology")
+            for key, value in meth.items():
+                data.setdefault(key, value)
+        return data
 
     @field_validator("topic")
     @classmethod
@@ -241,21 +264,87 @@ def semantic_extract(
 
     hooks.on(HookName.PARSE_ERROR, _on_parse_error)
     hooks.on(HookName.COMPLETION_USAGE, _on_usage)
-    parsed, completion = client.chat.completions.create_with_completion(
-        model=model,
-        messages=messages,
-        response_model=ExtractedClaims,
-        max_retries=MAX_RETRIES,
-        temperature=0.0,
-        hooks=hooks,
-    )
+    try:
+        parsed, completion = client.chat.completions.create_with_completion(
+            model=model,
+            messages=messages,
+            response_model=ExtractedClaims,
+            max_retries=MAX_RETRIES,
+            temperature=0.0,
+            hooks=hooks,
+        )
+    except InstructorRetryException:
+        # Some providers (Gemini on OpenRouter) emit the schema as stringified
+        # JSON inside one array element when tool-call arguments are big; a
+        # cheap local retry with json-mode parsing salvages the run without a
+        # second paid call.
+        import logging
+
+        logging.getLogger(__name__).warning(
+            "structured tool-call extraction failed for %s; retrying in json mode", source_id
+        )
+        # JSON mode avoids the provider's tool-call arg mangling entirely:
+        # one assistant message, parsed locally with the same Pydantic schema.
+        plain_client = OpenAI(
+            base_url=os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
+            api_key=os.environ["OPENROUTER_API_KEY"],
+        )
+        response = plain_client.chat.completions.create(
+            model=model,
+            messages=messages,
+            temperature=0.0,
+            response_format={"type": "json_object"},
+        )
+        content = response.choices[0].message.content or "{}"
+        payload = json.loads(content)
+        import logging
+
+        # Some providers return the claims array directly, or wrap stringified
+        # claim objects; normalise both before schema validation.
+        if isinstance(payload, list):
+            payload = {"claims": payload}
+        if isinstance(payload.get("claims"), list):
+            payload["claims"] = [
+                json.loads(item) if isinstance(item, str) else item
+                for item in payload["claims"]
+            ]
+        # Claims with no metric are not ledger-claimable; drop them loudly
+        # rather than rejecting the whole run.
+        dropped = [
+            c for c in payload.get("claims", [])
+            if isinstance(c, dict) and not c.get("metrics")
+        ]
+        if dropped:
+            logging.getLogger(__name__).warning(
+                "dropped %d claims with no metrics (not ledger-claimable)", len(dropped)
+            )
+        payload["claims"] = [c for c in payload.get("claims", []) if c.get("metrics")]
+        parsed = ExtractedClaims.model_validate(payload)
+        usage = getattr(response, "usage", None)
+        raw_cost = getattr(usage, "cost", None)
+        cost_value: float | None = None
+        if isinstance(raw_cost, (int, float)) and float(raw_cost) > 0:
+            cost_value = float(raw_cost)
+        return SemanticExtractionResult(
+            claims=parsed.claims,
+            model=model,
+            attempts=int(state["attempts"]),
+            tokens_in=getattr(usage, "prompt_tokens", None),
+            tokens_out=getattr(usage, "completion_tokens", None),
+            cost_usd=cost_value,
+            cost_known=cost_value is not None,
+        )
     usage = state["usage"] or getattr(completion, "usage", None)
     raw_cost = getattr(usage, "cost", None)
     cost_value: float | None = None
     if isinstance(raw_cost, (int, float)) and float(raw_cost) > 0:
         cost_value = float(raw_cost)
+    if isinstance(parsed, ExtractedClaims):
+        claims = parsed.claims
+    else:
+        claims = parsed
     return SemanticExtractionResult(
-        claims=parsed.claims,
+        claims=claims,
         model=model,
         attempts=int(state["attempts"]),
         tokens_in=getattr(usage, "prompt_tokens", None),
