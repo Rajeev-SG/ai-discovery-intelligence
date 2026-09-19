@@ -161,6 +161,7 @@ class BriefGenerator:
         min_confidence: ConfidenceLabel = ConfidenceLabel.MEDIUM,
         normal_min_significance: float = 3.5,
         watch_item_min_significance: float = 4.5,
+        beyond_target_min_significance: float | None = None,
     ):
         if (
             max_items == 5
@@ -168,6 +169,7 @@ class BriefGenerator:
             and min_confidence is ConfidenceLabel.MEDIUM
             and normal_min_significance == 3.5
             and watch_item_min_significance == 4.5
+            and beyond_target_min_significance is None
         ):
             # Load defaults from config only when caller did not override any threshold.
             policy_path = Path(__file__).resolve().parents[2] / "config" / "executive_policy.yaml"
@@ -184,6 +186,9 @@ class BriefGenerator:
                 watch_item_min_significance = policy.get(
                     "watch_item_minimum_significance", watch_item_min_significance
                 )
+                beyond_target_min_significance = policy.get(
+                    "beyond_target_minimum_significance", beyond_target_min_significance
+                )
         self.confidence_scorer = confidence_scorer or ConfidenceScorer.from_config()
         self.significance_scorer = significance_scorer or SignificanceScorer.from_config()
         self.max_items = max_items
@@ -191,6 +196,13 @@ class BriefGenerator:
         self.min_confidence = min_confidence
         self.normal_min_significance = normal_min_significance
         self.watch_item_min_significance = watch_item_min_significance
+        # A soft target needs a stricter bar past the target; default to a full
+        # point above the normal bar so weak extras cannot pad the brief.
+        self.beyond_target_min_significance = (
+            beyond_target_min_significance
+            if beyond_target_min_significance is not None
+            else normal_min_significance + 1.0
+        )
 
     _confidence_rank: ClassVar[dict[ConfidenceLabel, int]] = {
         ConfidenceLabel.HIGH: 4,
@@ -201,25 +213,57 @@ class BriefGenerator:
     }
 
     def generate(self, candidates: list[BriefItem]) -> list[BriefItem]:
-        """Filter + sort + cap. High-noise/low-significance items are excluded."""
+        """Filter + rank + cap with soft-target / hard-max and watch-item semantics.
+
+        * ``max_items`` is the hard ceiling; nothing may exceed it.
+        * ``target_items`` is a soft target, not a cap: the brief aims for it, but
+          emits more (up to ``max_items``) when more material clears the bar, so a
+          configured hard maximum is reachable instead of being dead config.
+        * at most one watch item is admitted;
+        * a watch item never displaces corroborated material — corroborated items
+          are selected first, and a watch item only fills a slot that is still free
+          below ``max_items``.
+        """
+
         min_rank = self._confidence_rank[self.min_confidence]
+
+        qualifying = sorted(
+            (
+                c
+                for c in candidates
+                if not c.is_watch_item
+                and self._confidence_rank[c.confidence] >= min_rank
+                and c.significance >= self.normal_min_significance
+            ),
+            key=lambda x: -x.significance,
+        )
+
+        # ``target_items`` is a soft target, not a cap: the first ``target_items``
+        # slots admit anything clearing the normal bar, and any slot beyond it must
+        # clear a stricter bar (``beyond_target_min_significance``). So the soft
+        # target governs *quality* past the target rather than being dead config,
+        # and the brief extends to ``max_items`` only for genuinely stronger items.
+        beyond_bar = self.beyond_target_min_significance
         included: list[BriefItem] = []
-        for c in sorted(candidates, key=lambda x: -x.significance):
-            rank = self._confidence_rank[c.confidence]
-            if c.is_watch_item:
-                # Cap at most 1 watch item per brief so uncorroborated items
-                # cannot displace corroborated material in the same week.
-                if c.significance >= self.watch_item_min_significance and not any(
-                    i.is_watch_item for i in included
-                ):
-                    included.append(c)
-                    if len(included) >= self.target_items:
-                        break
-                continue
-            if rank < min_rank:
-                continue
-            if c.significance >= self.normal_min_significance:
-                included.append(c)
-            if len(included) >= self.target_items:
+        for c in qualifying:
+            if len(included) >= self.max_items:
                 break
-        return included[: self.max_items]
+            if len(included) >= self.target_items and c.significance < beyond_bar:
+                continue  # not strong enough to extend past the soft target
+            included.append(c)
+
+        # A watch item is uncorroborated by definition: it may only use a slot no
+        # corroborated item wanted, and only one may appear in a brief.
+        if len(included) < self.max_items:
+            watch = next(
+                (
+                    c
+                    for c in sorted(candidates, key=lambda x: -x.significance)
+                    if c.is_watch_item and c.significance >= self.watch_item_min_significance
+                ),
+                None,
+            )
+            if watch is not None:
+                included.append(watch)
+
+        return included

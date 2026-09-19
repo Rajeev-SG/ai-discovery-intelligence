@@ -6,6 +6,7 @@ weekly_brief:
   minimum_confidence: medium
   normal_minimum_significance: 3.5
   watch_item_minimum_significance: 4.5
+  beyond_target_minimum_significance: 4.5
 include_topics:
   - consumer_audience_shift
   - retrieval_or_index_architecture
