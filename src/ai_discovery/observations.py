@@ -123,6 +123,10 @@ def claim_view(row: dict[str, Any]) -> dict[str, Any]:
             "source_class": (row.get("source") or {}).get("source_class"),
         },
         "provenance": provenance_view(row.get("provenance") or []),
+        # How the claim was produced, stated honestly: an unattended lane reports
+        # verified_against_capture (every locator checked against the capture),
+        # never human_reviewed (no person read the model output).
+        "extraction": row.get("extraction") or {},
         # Private captures: hash + availability only.
         "evidence": [
             {
@@ -150,7 +154,9 @@ def _parse(value: Any) -> dt.datetime | None:
         return None
 
 
-def surface_evidence(claims: list[dict[str, Any]], change_events: list[ChangeEvent]) -> dict[str, dict]:
+def surface_evidence(
+    claims: list[dict[str, Any]], change_events: list[ChangeEvent]
+) -> dict[str, dict]:
     """Per-surface view: claims + latest material change, or an explicit no-evidence state."""
 
     by_surface: dict[str, dict] = {}
@@ -204,9 +210,7 @@ def load_events(db: Session) -> list[ChangeEvent]:
     from .claims import ChangeEventRow  # local import: optional table
 
     try:
-        rows = db.scalars(
-            select(ChangeEventRow).order_by(ChangeEventRow.observed_at.desc())
-        ).all()
+        rows = db.scalars(select(ChangeEventRow).order_by(ChangeEventRow.observed_at.desc())).all()
     except OperationalError:
         # An existing ledger predating migration 0004 has no change_event table.
         # Warn rather than silently returning nothing, so an operator sees why the
@@ -251,7 +255,14 @@ def persist_brief(db: Session, payload: dict[str, Any]) -> None:
 
 
 def persist_events(db: Session, events: list[ChangeEvent]) -> int:
-    """Append change events (idempotent by id) and return how many were added."""
+    """Append change events and return how many were added.
+
+    Conflict semantics: append-only and idempotent by event id. Event ids are
+    content-addressed (claim id + content fingerprint), so re-deriving the same
+    claim content is a no-op (the row already exists) while a *corrected* claim
+    yields a distinct id and is appended as a new event. An id collision with
+    different content cannot occur silently: the id embeds the content hash.
+    """
 
     from .claims import ChangeEventRow
 

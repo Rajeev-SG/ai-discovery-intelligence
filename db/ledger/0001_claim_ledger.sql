@@ -58,8 +58,10 @@ CREATE TABLE claim (
     extraction_tool     varchar(80) NOT NULL,
     extraction_version  varchar(40) NOT NULL,
     rule_id             varchar(80),
-    -- LLM extraction is never evidence: an llm_proposal row must be human-reviewed.
+    -- LLM extraction is never evidence: an llm_proposal row must be either
+    -- human-reviewed or deterministically verified against the capture.
     human_reviewed      boolean NOT NULL DEFAULT false,
+    verified_against_capture boolean NOT NULL DEFAULT false,
     published_at        timestamptz,
     published_at_source varchar(30),
     modified_at         timestamptz,
@@ -67,7 +69,7 @@ CREATE TABLE claim (
     observed_at         timestamptz NOT NULL,
     created_at          timestamptz NOT NULL DEFAULT now(),
     CONSTRAINT ck_claim_llm_reviewed CHECK (
-        extraction_method <> 'llm_proposal' OR human_reviewed),
+        extraction_method <> 'llm_proposal' OR human_reviewed OR verified_against_capture),
     CONSTRAINT ck_claim_supersede CHECK (
         relationship = 'new' OR supersedes_claim_id IS NOT NULL),
     CONSTRAINT ck_claim_supersede_new CHECK (

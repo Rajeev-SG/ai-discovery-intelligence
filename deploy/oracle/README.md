@@ -6,6 +6,25 @@ Docker container driven by a systemd timer, mirroring the proven
 ad-platform-intelligence pattern. The durable evidence Postgres stays on the
 Hetzner/Coolify host; Oracle owns no unique durable state.
 
+Oracle reaches Hetzner over the **tailnet**, never the public internet. The
+default `:22` on Hetzner is served by Tailscale SSH, which requires interactive
+browser auth and so cannot be used by an unattended timer. A second sshd listener
+is bound to the Tailscale interface only (`ssh.socket.d/60-adi-tunnel.conf`,
+`/etc/ssh/sshd_config.d/60-adi-tunnel.conf`) on port `2222`; it is real sshd, so
+per-key restrictions apply and it refuses root.
+
+Both restricted keys belong to a dedicated **non-root** `adi-worker` account on
+Hetzner:
+
+- tunnel key — `from="<tailnet>,<oracle-egress>",command="/bin/false",no-pty,
+  no-agent-forwarding,no-X11-forwarding,permitopen="127.0.0.1:55432"`
+- replica key — `from="<tailnet>,<oracle-egress>",command="/usr/bin/rrsync
+  /var/lib/ai-discovery/snapshots",no-pty,no-agent-forwarding,no-X11-forwarding`
+
+The Postgres publish stays loopback-only on Hetzner (`127.0.0.1:55432`); the
+tunnel key can open only that one forward, so the database is never exposed
+publicly. Oracle no longer needs, and no longer holds, a root key on Hetzner.
+
 ## Layout on the host
 
 | Path | Purpose |
@@ -26,12 +45,20 @@ Hetzner/Coolify host; Oracle owns no unique durable state.
 1. Env file on Oracle: `ssh oracle 'sudoedit /etc/ai-discovery/env && chmod 600 /etc/ai-discovery/env'`
 2. Tunnel key: `ssh oracle 'ssh-keygen -t ed25519 -f /etc/ai-discovery/db-tunnel-key -N "" -C adi-db-tunnel'`
    then append its public key to Hetzner `authorized_keys` with options:
-   `from="100.112.158.79",command="echo tunnel-only",no-pty,no-agent-forwarding,no-X11-forwarding,permitopen="127.0.0.1:55432"`
+   `from="100.112.158.79,140.238.91.73",command="/bin/false",no-pty,no-agent-forwarding,no-X11-forwarding,permitopen="127.0.0.1:55432"`
+   into `/var/lib/adi-worker/.ssh/authorized_keys` (owner `adi-worker`). The
+   tailnet IP is the traffic source; keep the Oracle public egress IP so a
+   public-IP fallback still authenticates.
 3. Replica key: `ssh oracle 'ssh-keygen -t ed25519 -f /etc/ai-discovery/replica-key -N "" -C adi-replica'`
-   then append its public key to Hetzner `authorized_keys` with options:
-   `from="100.112.158.79",command="rrsync /var/lib/ai-discovery",no-pty,no-agent-forwarding,no-X11-forwarding`
-   (fall back to `from=` + `no-pty` only if `rrsync` is not installed).
-4. Enable: `ssh oracle 'systemctl enable --now adi-db-tunnel && systemctl enable --now adi-run.timer'`
+   then append its public key to `/var/lib/adi-worker/.ssh/authorized_keys` with:
+   `from="100.112.158.79,140.238.91.73",command="/usr/bin/rrsync /var/lib/ai-discovery/snapshots",no-pty,no-agent-forwarding,no-X11-forwarding`
+   (`rrsync` is chrooted at that dir; the target path in `adi-run.sh` is `.`).
+4. Enable: `ssh oracle 'sudo systemctl enable --now adi-db-tunnel && sudo systemctl enable --now adi-run.timer'`
+5. Seed the root known_hosts so the tunnel's BatchMode ssh trusts Hetzner:
+   `ssh oracle 'sudo mkdir -p /root/.ssh && sudo ssh-keyscan -t ed25519,rsa 100.109.237.19 | sudo tee -a /root/.ssh/known_hosts'`
+6. Hetzner side: create the non-root account, its `authorized_keys` (above), the
+   tailnet-only sshd listener (socket + sshd_config drop-ins), and make
+   `/var/lib/ai-discovery/snapshots` owned by `adi-worker`.
 
 ## Deploy
 
