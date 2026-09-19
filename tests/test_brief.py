@@ -208,3 +208,51 @@ def test_generator_sorts_by_significance():
     ]
     result = bg.generate(candidates)
     assert [i.change for i in result] == ["high", "mid", "low"]
+
+
+# --- issue #27: the brief reasons over event time, not ingestion time ------- #
+
+import datetime as dt
+
+
+def test_brief_excludes_newly_ingested_old_study_and_includes_new_event():
+    """An old study first ingested this week is not this week's change."""
+
+    bg = BriefGenerator(target_items=3, max_items=5)
+    old_study = item(
+        change="2024 study, ingested this week",
+        significance=5.0,
+        published_at=dt.datetime(2024, 1, 1, tzinfo=dt.UTC),
+        observed_at=dt.datetime(2026, 9, 16, tzinfo=dt.UTC),
+    )
+    new_event = item(
+        change="genuinely new this week",
+        significance=4.2,
+        published_at=dt.datetime(2026, 9, 15, tzinfo=dt.UTC),
+        observed_at=dt.datetime(2026, 9, 16, tzinfo=dt.UTC),
+    )
+    out = bg.generate(
+        [old_study, new_event],
+        window_start=dt.datetime(2026, 9, 10, tzinfo=dt.UTC),
+        window_end=dt.datetime(2026, 9, 17, tzinfo=dt.UTC),
+    )
+    assert [x.change for x in out] == ["genuinely new this week"]
+
+
+def test_windowed_brief_drops_undated_items():
+    """Without an effective time an item cannot be claimed as this week's change."""
+
+    bg = BriefGenerator(target_items=3, max_items=5)
+    undated = item(change="undated", significance=5.0)
+    out = bg.generate(
+        [undated],
+        window_start=dt.datetime(2026, 9, 10, tzinfo=dt.UTC),
+        window_end=dt.datetime(2026, 9, 17, tzinfo=dt.UTC),
+    )
+    assert out == []
+
+
+def test_no_window_keeps_previous_behaviour():
+    bg = BriefGenerator(target_items=3, max_items=5)
+    out = bg.generate([item(change="x", significance=4.0)])
+    assert len(out) == 1

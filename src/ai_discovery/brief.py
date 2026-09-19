@@ -8,6 +8,7 @@ self-reported confidence.
 
 from __future__ import annotations
 
+import datetime as dt
 from enum import Enum
 from pathlib import Path
 from typing import ClassVar
@@ -145,6 +146,19 @@ class BriefItem(BaseModel):
     evidence_ids: list[str] = Field(default_factory=list)
     surfaces: list[str] = Field(default_factory=list)
     is_watch_item: bool = False
+    # Event-time semantics (issue #27): when the change took hold / was announced,
+    # distinct from ``observed_at`` (when we ingested it). A weekly brief reasons
+    # over effective time, so an old study ingested this week is not "this week's
+    # change".
+    effective_from: dt.datetime | None = None
+    published_at: dt.datetime | None = None
+    observed_at: dt.datetime | None = None
+
+    @property
+    def effective_at(self) -> dt.datetime | None:
+        """When the change happened: publisher-stated effective time, else publication."""
+
+        return self.effective_from or self.published_at
 
 
 # BriefGenerator resolves all thresholds from config/executive_policy.yaml via None sentinels.
@@ -212,8 +226,20 @@ class BriefGenerator:
         ConfidenceLabel.UNRESOLVED: 0,
     }
 
-    def generate(self, candidates: list[BriefItem]) -> list[BriefItem]:
+    def generate(
+        self,
+        candidates: list[BriefItem],
+        *,
+        window_start: dt.datetime | None = None,
+        window_end: dt.datetime | None = None,
+    ) -> list[BriefItem]:
         """Filter + rank + cap with soft-target / hard-max and watch-item semantics.
+
+        When a window is supplied, an item is only considered when its *effective*
+        time (``effective_from`` or ``published_at``) falls inside it. An item with
+        no effective time is excluded from a windowed brief: we cannot assert it is
+        this week's change, and first-ingesting an old study is not a market change.
+        
 
         * ``max_items`` is the hard ceiling; nothing may exceed it.
         * ``target_items`` is a soft target, not a cap: the brief aims for it, but
@@ -224,6 +250,8 @@ class BriefGenerator:
           are selected first, and a watch item only fills a slot that is still free
           below ``max_items``.
         """
+
+        candidates = _apply_window(candidates, window_start, window_end)
 
         min_rank = self._confidence_rank[self.min_confidence]
 
@@ -267,3 +295,31 @@ class BriefGenerator:
                 included.append(watch)
 
         return included
+
+
+def _apply_window(
+    candidates: list[BriefItem],
+    window_start: dt.datetime | None,
+    window_end: dt.datetime | None,
+) -> list[BriefItem]:
+    """Keep only items whose effective time is inside ``[start, end]``.
+
+    A no-window call is unchanged. A windowed call drops items with no effective
+    time (an undated item cannot be claimed as this week's change).
+    """
+
+    if window_start is None and window_end is None:
+        return candidates
+    out: list[BriefItem] = []
+    for item in candidates:
+        effective = item.effective_at
+        if effective is None:
+            continue
+        if effective.tzinfo is None:
+            effective = effective.replace(tzinfo=dt.UTC)
+        if window_start is not None and effective < window_start:
+            continue
+        if window_end is not None and effective > window_end:
+            continue
+        out.append(item)
+    return out
