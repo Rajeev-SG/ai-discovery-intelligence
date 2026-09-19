@@ -49,15 +49,23 @@ def build_source_jobs(
     source_ids: list[str] | None = None,
     limit: int | None = None,
 ) -> list[dict]:
-    """Build acquisition jobs from the verified fetch plans in config."""
+    """Build acquisition jobs for every enabled source.
+
+    A hand-verified ``fetch:`` block is preferred, but it is not a precondition:
+    when a source has none, its ``preferred_fetch`` already resolves to a concrete
+    mode (``resolve_fetch_mode``), so the source still joins the lane. Previously
+    only the handful of sources with a hand-written ``fetch:`` block were
+    acquired, which is why 39 of 51 configured sources never produced evidence on
+    the 2026-09-19 run (issue #48). Robots and quote-verification gates are
+    unchanged: an unreachable or robots-denied source simply reports that status.
+    """
+    from .registry import resolve_fetch_mode
+
     jobs: list[dict] = []
     for cfg in config.enabled_sources():
         if source_ids and cfg.id not in source_ids:
             continue
-        if cfg.fetch is None and not source_ids:
-            continue  # only verified fetch plans join the scheduled lane
-        mode = cfg.fetch.mode if cfg.fetch else cfg.preferred_fetch
-        fetch_url = cfg.fetch.url if cfg.fetch and cfg.fetch.url else cfg.url
+        mode, fetch_url = resolve_fetch_mode(cfg)
         jobs.append(
             {
                 "id": cfg.id,
