@@ -50,6 +50,9 @@ jobs:
           fi
           echo "sqlite ledger regenerated: $(wc -c < proof/claim_ledger/claim_ledger.sqlite3) bytes"
 
+      - name: Evidence-integrity scorecard (issue #29)
+        run: uv run python scripts/build_integrity_scorecard.py
+
       - name: Run tests
         run: uv run pytest tests/ -q --tb=short
 
