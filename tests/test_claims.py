@@ -94,6 +94,53 @@ def test_a_fabricated_number_is_rejected():
         C.extract_claim(spec=spec, capture=_synthetic_capture())
 
 
+def test_a_fabricated_selector_is_rejected():
+    """Issue #24: a non-existent selector must fail, exactly like a fake quote.
+
+    Before the fix a claim could carry ``{"kind": "jsonld_field",
+    "selector": "div#never-exists"}`` and pass with nothing checked against the
+    capture, because ``present_in`` returned True for any locator without a quote.
+    """
+
+    spec = _spec()
+    spec["capture_anchors"] = [{"kind": "jsonld_field", "selector": "div#never-exists"}]
+    with pytest.raises(C.ClaimSpecError, match="not found in capture"):
+        C.extract_claim(spec=spec, capture=_synthetic_capture())
+
+
+def test_a_fabricated_selector_on_a_metric_field_is_rejected():
+    """The guard covers structured selectors on any provenanced field, not just anchors."""
+
+    spec = _spec()
+    spec["metrics"][0]["value"] = {
+        "value": "9.9M",
+        "kind": "jsonld_field",
+        "selector": "datePublished.neverThere",
+    }
+    with pytest.raises(C.ClaimSpecError, match="not found in capture"):
+        C.extract_claim(spec=spec, capture=_synthetic_capture())
+
+
+def test_a_resolvable_selector_still_verifies():
+    """Issue #24 acceptance: a selector that genuinely resolves is accepted."""
+
+    spec = _spec()
+    spec["capture_anchors"] = [{"kind": "jsonld_field", "selector": "datePublished"}]
+    record = C.extract_claim(spec=spec, capture=_synthetic_capture())
+    assert record.capture_anchors[0].kind == "jsonld_field"
+    assert not C.check_against_capture(record, _synthetic_capture())
+
+
+def test_selector_resolution_uses_raw_markup_not_parsed_text():
+    """A JSON-LD selector lives in markup that text extraction strips (issue #24)."""
+
+    capture = _synthetic_capture()
+    loc = C.Locator(kind="jsonld_field", selector="datePublished")
+    assert "datePublished" not in capture.text
+    assert loc.present_in(capture.text, capture.raw_text)
+    assert not loc.present_in(capture.text)
+
+
 def test_a_value_without_a_locator_is_rejected():
     spec = _spec()
     spec["metrics"][0]["value"] = {"value": "1.2M"}  # no quote

@@ -767,6 +767,30 @@ new.append(
 )
 
 
+new.append(spec(
+    "perplexity-blog", "Perplexity", "https://www.perplexity.ai/hub/blog", "vendor_blog",
+    "retrieval_index",
+    "Perplexity Research published Q2D-Web, a first-stage retriever benchmark and leaderboard built from 70 thousand agent queries and 190 million web documents with three sets of relevance judgements.",
+    ["perplexity"],
+    "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements",
+    "Q2D-Web: Evaluating First-Stage Retrievers at Scale",
+    "190 million web documents",
+    "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements",
+    "Sep 9, 2026",
+    "Q2D-Web: Evaluating First-Stage Retrievers at Scale",
+    "vendor_panel",
+    [M("perplexity_q2d_queries", "Agent queries in the Q2D-Web benchmark",
+       "70 thousand agent queries", 70000, "agent queries", "Sep 2026", "Q2D-Web benchmark", "exact",
+       window_quote="Sep 9, 2026", scope_quote="Q2D-Web: Evaluating First-Stage Retrievers at Scale"),
+     M("perplexity_q2d_documents", "Web documents in the Q2D-Web benchmark",
+       "190 million web documents", 190000000, "web documents", "Sep 2026", "Q2D-Web benchmark", "exact",
+       window_quote="Sep 9, 2026", scope_quote="Q2D-Web: Evaluating First-Stage Retrievers at Scale")],
+    ["A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements"],
+    "perplexity_q2d_web_benchmark_v1", confidence="low",
+    published_at="2026-09-09", published_selector="page_stamp 'Sep 9, 2026'",
+    limitations=["Vendor benchmark; index page summarises the study."],
+))
+
 bundle = {"extraction_version": "claim-extraction-0.1.0", "claims": original + new}
 OUT.write_text(json.dumps(bundle, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 print(f"wrote {len(bundle['claims'])} claims to {OUT.relative_to(ROOT)}")

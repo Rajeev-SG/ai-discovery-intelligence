@@ -267,6 +267,18 @@ class Capture:
         self.fetched_at = fetched_at or _utcnow()
 
     @property
+    def raw_text(self) -> str:
+        """The raw capture as text.
+
+        Structured selectors (``jsonld_field`` / ``table_row`` / ``section`` /
+        ``page_stamp``) name markup that ``text`` has had stripped, so they are
+        resolved against this. Undecodable bytes are replaced rather than raising,
+        because a locator check must never be the thing that crashes extraction.
+        """
+
+        return self.raw.decode("utf-8", errors="replace")
+
+    @property
     def raw_sha256(self) -> str:
         return hashlib.sha256(self.raw).hexdigest()
 
@@ -495,16 +507,43 @@ def extract_claim(
 
 
 def check_against_capture(record: ClaimRecord, capture: Capture) -> list[str]:
-    """Return human-readable failures for every locator not found in the capture."""
+    """Return human-readable failures for every locator not found in the capture.
+
+    Every locator kind is re-verified: a verbatim quote against the parsed text, a
+    structured selector against the raw capture (with the parsed text as fallback)
+    because the markup it names — JSON-LD, attributes, stamps — is stripped by
+    parsing. A selector that does not resolve fails, so a claim cannot pass on a
+    locator that points at nothing.
+    """
 
     failures: list[str] = []
     for anchor in record.capture_anchors:
-        if not anchor.present_in(capture.text):
+        if not anchor.present_in(capture.text, capture.raw_text):
             failures.append(f"capture_anchors: {anchor.quote or anchor.selector}")
     for path, locator in record.field_locators():
-        if locator.kind == "verbatim_quote" and not locator.present_in(capture.text):
-            failures.append(f"{path}: {locator.quote}")
+        value = _value_at_path(record, path)
+        if not locator.verifies(value, capture.text, capture.raw_text):
+            failures.append(f"{path}: {locator.quote or locator.selector}")
     return failures
+
+
+def _value_at_path(record: ClaimRecord, path: str) -> Any:
+    """The claimed value at a dotted ``field_locators()`` path, or ``None``.
+
+    ``field_locators`` walks the model, so a path like ``metrics[0].value`` names
+    the provenance entry directly; this returns the value it supports so
+    ``Locator.verifies`` can check the value against the resolved content.
+    """
+
+    node: Any = record
+    for part in path.split("."):
+        if "[" in part:
+            name, _, index = part.partition("[")
+            node = getattr(node, name)
+            node = node[int(index.rstrip("]"))]
+        else:
+            node = getattr(node, part)
+    return getattr(node, "value", None)
 
 
 RULE_SOURCE_CLASS_DEFAULT = {
