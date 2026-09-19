@@ -127,6 +127,6 @@ export function fixtureDetail(surfaceId: string): SurfaceDetail {
   };
   return {
     evidence: { ...evidence, history: surfaceId === "chatgpt" ? CHATGPT_EVENTS : [] },
-    historyStatus: { claims: "ok", events: "ok" },
+    status: { evidence: "ok", claims: "ok", events: "ok" },
   };
 }

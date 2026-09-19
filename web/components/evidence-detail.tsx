@@ -10,7 +10,8 @@ import {
   valueDisplay,
   type EvidenceClaim,
   type EvidenceValue,
-  type HistoryStatus,
+  type DetailStatus,
+  statusProblems,
   type SurfaceDetail,
   type SurfaceEvidence,
 } from "@/lib/evidence";
@@ -177,27 +178,28 @@ function ClaimCard({ claim, index }: { claim: EvidenceClaim; index: number }) {
 }
 
 /**
- * F1: make a degraded history source visible. Never implies "no history" when
- * an endpoint actually errored, and never fabricates entries.
+ * F1/F1': make a degraded source visible. Names every endpoint that failed —
+ * including the PRIMARY `/surfaces/{id}/evidence` — so a failed fetch is never
+ * presented as a validated "no claim" state. Never fabricates entries.
  */
-function HistoryStatusNote({ status }: { status: HistoryStatus }) {
-  const parts: string[] = [];
-  if (status.claims === "error") parts.push("claims");
-  if (status.events === "error") parts.push("change events");
+function SourceStatusNote({ status }: { status: DetailStatus }) {
+  const parts = statusProblems(status);
   if (!parts.length) return null;
+  const primaryFailed = status.evidence === "error";
   return (
-    <p className="detail-hint" data-testid="history-unavailable">
-      History source unavailable ({parts.join(" + ")}); showing what the backend returned.
+    <p className="detail-hint" data-testid="evidence-unavailable">
+      Evidence source unavailable ({parts.join(" + ")});
+      {primaryFailed ? " the validated claim state is unknown, not confirmed empty." : " showing what the backend returned."}
     </p>
   );
 }
 
-function History({ evidence, status }: { evidence: SurfaceEvidence; status: HistoryStatus }) {
+function History({ evidence, status }: { evidence: SurfaceEvidence; status: DetailStatus }) {
   const history = buildHistory(evidence.claims ?? [], evidence.history ?? []);
   return (
     <section className="detail-section">
       <h3>History</h3>
-      <HistoryStatusNote status={status} />
+      <SourceStatusNote status={status} />
       {history.length ? (
         <ol className="evidence-history" data-testid="evidence-history">
           {history.map((item) => (
@@ -251,7 +253,11 @@ function LatestChange({ evidence }: { evidence: SurfaceEvidence }) {
  * concise summary.
  */
 export function EvidenceDetail({ surfaceId, summary }: { surfaceId: string; summary?: SurfaceEvidence }) {
-  const [detail, setDetail] = useState<SurfaceDetail | null>(summary ? { evidence: summary, historyStatus: { claims: "skipped", events: "skipped" } } : null);
+  const [detail, setDetail] = useState<SurfaceDetail | null>(
+    summary
+      ? { evidence: summary, status: { evidence: "skipped", claims: "skipped", events: "skipped" } }
+      : null,
+  );
   const [error, setError] = useState(false);
 
   useEffect(() => {
@@ -290,7 +296,7 @@ export function EvidenceDetail({ surfaceId, summary }: { surfaceId: string; summ
     );
   }
 
-  const { evidence, historyStatus } = detail;
+  const { evidence, status } = detail;
   const claims = evidence.claims ?? [];
   const lead = leadingClaim(claims);
   const hasEvents = (evidence.history?.length ?? 0) > 0;
@@ -298,20 +304,28 @@ export function EvidenceDetail({ surfaceId, summary }: { surfaceId: string; summ
   if (evidence.evidence_state === "no_evidence" || claims.length === 0) {
     // F5: no contradictory chrome. If change events exist, say so explicitly;
     // otherwise show only the no-evidence statement (no empty History block).
+    const primaryFailed = status.evidence === "error";
     return (
       <section className="detail-section">
         <h3>Evidence</h3>
-        <p className="detail-lead" data-testid="no-evidence">
-          <strong>No validated claim.</strong>{" "}
-          {evidence.evidence_note ?? "No validated claim is linked to this surface yet."}
-        </p>
-        <HistoryStatusNote status={historyStatus} />
+        {primaryFailed ? (
+          <p className="detail-lead" data-testid="no-evidence-unknown">
+            <strong>Evidence unavailable.</strong> The primary evidence endpoint failed, so no
+            validated claim state can be confirmed. This is an unknown state, not an empty one.
+          </p>
+        ) : (
+          <p className="detail-lead" data-testid="no-evidence">
+            <strong>No validated claim.</strong>{" "}
+            {evidence.evidence_note ?? "No validated claim is linked to this surface yet."}
+          </p>
+        )}
+        <SourceStatusNote status={status} />
         {hasEvents ? (
           <>
             <p className="detail-hint">
               Change events exist for this surface, but none has been validated into a claim yet.
             </p>
-            <History evidence={evidence} status={historyStatus} />
+            <History evidence={evidence} status={status} />
           </>
         ) : null}
       </section>
@@ -340,7 +354,7 @@ export function EvidenceDetail({ surfaceId, summary }: { surfaceId: string; summ
       </section>
 
       <LatestChange evidence={evidence} />
-      <History evidence={evidence} status={historyStatus} />
+      <History evidence={evidence} status={status} />
     </>
   );
 }

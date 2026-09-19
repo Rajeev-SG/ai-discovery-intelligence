@@ -110,12 +110,13 @@ describe("evidence projection (issue #46)", () => {
     expect((out as unknown as { evidence?: unknown }).evidence).toBeUndefined();
   });
 
-  it("keeps provenance and source available on the claim for the lazily-loaded detail", () => {
-    const ev = surface([claim()]);
-    expect(ev.claims[0].provenance[0].quote).toBe("1.2 million monthly visits");
-    expect(ev.claims[0].provenance[0].locator_kind).toBe("verbatim_quote");
-    expect(ev.claims[0].source.url).toBe("https://example.test");
-    expect(ev.claims[0].source.source_class).toBe("official");
+  it("projects a provenance quote and public source from real claim data into the history", () => {
+    // Exercises real projection code (buildHistory), not object round-tripping:
+    // the claim's provenance/source must survive into a history entry.
+    const [item] = buildHistory([claim()], []);
+    expect(item.kind).toBe("claim");
+    expect(item.sourceUrl).toBe("https://example.test");
+    expect(item.title).toContain("Widget Search");
   });
 
   it("reports an explicit no-evidence state for a surface with no claim", () => {

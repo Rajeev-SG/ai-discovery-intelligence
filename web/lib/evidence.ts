@@ -8,10 +8,15 @@
  */
 import type { SurfaceRow } from "@/lib/surfaces";
 
-export const EVIDENCE_API_BASE = process.env.EVIDENCE_API_URL ?? "";
+/** Base URL of the read-only evidence API, read lazily so tests can stub it. */
+export function evidenceApiBase(): string {
+  return process.env.EVIDENCE_API_URL ?? "";
+}
 
 /** Recorded-fixture mode for tests/CI without the live API. Never set in prod. */
-export const FIXTURE_MODE = process.env.EVIDENCE_FIXTURE === "1";
+export function fixtureMode(): boolean {
+  return process.env.EVIDENCE_FIXTURE === "1";
+}
 
 export interface EvidenceValue {
   metric_id: string;
@@ -92,15 +97,35 @@ export interface SurfaceEvidence {
   history?: EvidenceEvent[];
 }
 
-/** Per-endpoint outcome for the lazily-fetched history, so failure is visible. */
-export interface HistoryStatus {
+/** Per-endpoint fetch outcome, so a failed source is never invisible. */
+export interface DetailStatus {
+  /** The PRIMARY endpoint: `/surfaces/{id}/evidence`. */
+  evidence: "ok" | "error" | "skipped";
   claims: "ok" | "error" | "skipped";
   events: "ok" | "error" | "skipped";
 }
 
 export interface SurfaceDetail {
   evidence: SurfaceEvidence;
-  historyStatus: HistoryStatus;
+  status: DetailStatus;
+}
+
+const STATUS_LABELS: Record<string, string> = {
+  evidence: "surface evidence",
+  claims: "claims",
+  events: "change events",
+};
+
+export const NO_EVIDENCE_CLAIM_NOTE = "No validated claim is linked to this surface yet.";
+
+/**
+ * Human labels for every endpoint that failed, so the drawer can name them.
+ * An empty list means every source responded (or was skipped by config).
+ */
+export function statusProblems(status: DetailStatus): string[] {
+  return (Object.keys(STATUS_LABELS) as Array<keyof DetailStatus>)
+    .filter((key) => status[key] === "error")
+    .map((key) => STATUS_LABELS[key]);
 }
 
 export const NO_EVIDENCE_NOTE =
@@ -275,7 +300,7 @@ interface FetchOutcome<T> {
 /** Fetch JSON and make a failure loud: log the status/URL, never swallow it. */
 async function fetchJson<T>(path: string): Promise<FetchOutcome<T>> {
   try {
-    const res = await fetch(`${EVIDENCE_API_BASE}${path}`, { cache: "no-store" });
+    const res = await fetch(`${evidenceApiBase()}${path}`, { cache: "no-store" });
     if (!res.ok) {
       console.error(`[evidence] GET ${path} failed: HTTP ${res.status}`);
       return { status: "error", data: null, code: res.status };
@@ -294,13 +319,13 @@ async function fetchJson<T>(path: string): Promise<FetchOutcome<T>> {
  * fan-out is needed at render time.
  */
 export async function fetchSurfaceEvidence(): Promise<Record<string, SurfaceEvidence>> {
-  if (FIXTURE_MODE) {
+  if (fixtureMode()) {
     const { fixtureSurfaces } = await import("./evidence-fixtures");
     return fixtureSurfaces();
   }
-  if (!EVIDENCE_API_BASE) return {};
+  if (!evidenceApiBase()) return {};
   try {
-    const res = await fetch(`${EVIDENCE_API_BASE}/surface-evidence`, { next: { revalidate: 60 } });
+    const res = await fetch(`${evidenceApiBase()}/surface-evidence`, { next: { revalidate: 60 } });
     if (!res.ok) {
       console.error(`[evidence] GET /surface-evidence failed: HTTP ${res.status}`);
       return {};
@@ -319,13 +344,15 @@ export async function fetchSurfaceEvidence(): Promise<Record<string, SurfaceEvid
  * endpoints failed so the UI can say so rather than implying "no history".
  */
 export async function fetchSurfaceDetail(surfaceId: string): Promise<SurfaceDetail> {
-  if (FIXTURE_MODE) {
+  if (fixtureMode()) {
     const { fixtureDetail } = await import("./evidence-fixtures");
     return fixtureDetail(surfaceId);
   }
-  const empty = emptySurfaceEvidence(surfaceId);
-  if (!EVIDENCE_API_BASE) {
-    return { evidence: empty, historyStatus: { claims: "skipped", events: "skipped" } };
+  if (!evidenceApiBase()) {
+    return {
+      evidence: emptySurfaceEvidence(surfaceId),
+      status: { evidence: "skipped", claims: "skipped", events: "skipped" },
+    };
   }
   const encoded = encodeURIComponent(surfaceId);
   const [evidenceOutcome, claimsOutcome, eventsOutcome] = await Promise.all([
@@ -334,16 +361,29 @@ export async function fetchSurfaceDetail(surfaceId: string): Promise<SurfaceDeta
     fetchJson<{ items?: EvidenceEvent[] }>(`/events?surface=${encoded}`),
   ]);
 
-  const evidence = evidenceOutcome.data ?? empty;
+  const status: DetailStatus = {
+    evidence: evidenceOutcome.status,
+    claims: claimsOutcome.status,
+    events: eventsOutcome.status,
+  };
+
+  const evidence = evidenceOutcome.data ?? emptySurfaceEvidence(surfaceId);
   const byId = new Map<string, EvidenceClaim>();
   for (const claim of [...(evidence.claims ?? []), ...(claimsOutcome.data?.items ?? [])]) {
     byId.set(claim.claim_id, claim);
   }
-  evidence.claims = [...byId.values()];
+  const merged = [...byId.values()];
+  evidence.claims = merged;
   evidence.history = eventsOutcome.data?.items ?? [];
 
-  return {
-    evidence,
-    historyStatus: { claims: claimsOutcome.status, events: eventsOutcome.status },
-  };
+  // Never synthesize a "no evidence" verdict from the empty projection when real
+  // claim data was obtained (from the primary OR a secondary endpoint). When the
+  // primary failed and no claim was found, the state stays no_evidence but
+  // `status.evidence === "error"` tells the UI it is UNKNOWN, not validated.
+  if (merged.length > 0) {
+    evidence.evidence_state = "evidenced";
+    evidence.evidence_note = null;
+  }
+
+  return { evidence, status };
 }
