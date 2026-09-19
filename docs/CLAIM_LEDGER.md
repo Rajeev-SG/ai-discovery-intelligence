@@ -13,6 +13,8 @@ study methodology. Claims are the unit the observation plane shows.
 | `scripts/build_claim_proof.py` | Fetches captures, builds the ledger, renders `proof/claim_ledger/PROOF.md` |
 | `db/ledger/0001_claim_ledger.sql` | Additive Postgres DDL (Alembic-shaped) for the five ledger tables |
 | `db/ledger/0002_claim_metric_value_text_nullable.sql` | Forward migration for pre-#25 ledgers: relaxes `claim_metric.value_text NOT NULL` and backfills the legacy `'None'` sentinel to NULL |
+| `db/ledger/0003_claim_confidence_inputs.sql` | Forward migration for pre-#28A ledgers: adds `claim.confidence_score/_inputs/_rationale` |
+| `src/ai_discovery/confidence.py` | Deterministic, evidence-derived claim confidence + its persisted audit inputs (#28A) |
 | `tests/test_claim_models.py`, `tests/test_claims.py` | Invariants + rule behaviour against real captures |
 
 ## Tables

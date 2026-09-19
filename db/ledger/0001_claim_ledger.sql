@@ -50,6 +50,10 @@ CREATE TABLE claim (
     relationship        varchar(30) NOT NULL DEFAULT 'new',
     supersedes_claim_id varchar(32) REFERENCES claim(claim_id),
     confidence          varchar(20) NOT NULL DEFAULT 'medium',
+    -- Derived-confidence audit trail (issue #28A): scorer inputs + rationale.
+    confidence_score    double precision,
+    confidence_inputs   jsonb NOT NULL DEFAULT '{}'::jsonb,
+    confidence_rationale jsonb NOT NULL DEFAULT '[]'::jsonb,
     extraction_method   varchar(30) NOT NULL CHECK (extraction_method IN ('deterministic_parser','llm_proposal')),
     extraction_tool     varchar(80) NOT NULL,
     extraction_version  varchar(40) NOT NULL,

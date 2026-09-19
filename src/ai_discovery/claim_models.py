@@ -527,7 +527,13 @@ class ClaimRecord(BaseModel):
     status: ClaimStatus = "current"
     relationship: Relationship = "new"
     supersedes_claim_id: str | None = None
+    # Derived, not asserted: assess_confidence() computes these from evidence
+    # inputs. ``confidence`` mirrors the label for compatibility; ``confidence_inputs``
+    # is the audit trail that makes the label reproducible (issue #28A).
     confidence: Confidence = "medium"
+    confidence_score: float | None = None
+    confidence_inputs: dict[str, float] = Field(default_factory=dict)
+    confidence_rationale: list[str] = Field(default_factory=list)
     created_at: dt.datetime = Field(default_factory=utcnow)
 
     @model_validator(mode="after")
