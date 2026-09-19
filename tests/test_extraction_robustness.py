@@ -27,7 +27,7 @@ from __future__ import annotations
 
 import json
 
-from ai_discovery.claim_models import CLAIM_TOPICS, ClaimRecord
+from ai_discovery.claim_models import CLAIM_TOPICS
 from ai_discovery.confidence import SOURCE_AUTHORITY
 from ai_discovery.semantic import (
     ExtractedClaim,
@@ -35,16 +35,30 @@ from ai_discovery.semantic import (
     _validate_claims_individually,
 )
 
-# Every source class the acquisition registry uses must be a valid ledger class,
-# or that source's claims can never reach the ledger.
-REGISTRY_SOURCE_CLASSES = [
-    "official",
-    "market_telemetry",
-    "visibility_research",
-    "editorial_discovery",
-    "open_research",
-    "open_discovery",
-]
+
+def real_config_path():
+    from pathlib import Path
+
+    return Path(__file__).resolve().parents[1] / "config" / "sources.yaml"
+
+
+def tmp_path_file():
+    import tempfile
+    from pathlib import Path
+
+    return Path(tempfile.mkdtemp()) / "sources.yaml"
+
+
+def _configured_source_classes() -> set[str]:
+    """Every source class actually used by config/sources.yaml.
+
+    Derived from the real config (no network) so a class added to the registry
+    without a ledger counterpart fails here — the exact drift this guards.
+    """
+
+    from ai_discovery.registry import load_sources_config
+
+    return {s.source_class for s in load_sources_config().sources}
 
 
 def _good_claim() -> dict:
@@ -64,18 +78,41 @@ def _good_claim() -> dict:
 
 
 def test_registry_source_classes_are_valid_ledger_classes():
-    """The acquisition vocabulary is a subset of the ledger vocabulary."""
+    """Every class config/sources.yaml actually uses is a valid ledger class."""
 
-    literal = set(ClaimRecord.model_fields["evidence"].annotation.model_fields["source_class"].annotation.__args__)  # type: ignore[attr-defined]
-    missing = [c for c in REGISTRY_SOURCE_CLASSES if c not in literal]
+    from typing import get_args
+
+    from ai_discovery.claim_models import SourceClass
+
+    literal = set(get_args(SourceClass))
+    missing = sorted(_configured_source_classes() - literal)
     assert not missing, f"registry source classes absent from SourceClass literal: {missing}"
 
 
 def test_registry_source_classes_have_confidence_authority():
-    """No registry class silently falls through to the weakest default."""
+    """No class config/sources.yaml actually uses falls through to the default."""
 
-    for cls in REGISTRY_SOURCE_CLASSES:
+    for cls in _configured_source_classes():
         assert cls in SOURCE_AUTHORITY, f"{cls} missing from SOURCE_AUTHORITY"
+
+
+def test_loader_rejects_unknown_source_class():
+    """A registry class with no ledger counterpart fails loudly at load time."""
+
+    import yaml
+
+    from ai_discovery.registry import load_sources_config
+
+    raw = yaml.safe_load(real_config_path().read_text())
+    raw["sources"][0]["class"] = "totally_unmapped_class"
+    tmp = tmp_path_file()
+    tmp.write_text(yaml.safe_dump(raw))
+    try:
+        load_sources_config(tmp)
+    except ValueError as error:
+        assert "totally_unmapped_class" in str(error)
+    else:  # pragma: no cover - the guard must fire
+        raise AssertionError("loader accepted an unmapped source class")
 
 
 def test_stringified_json_claim_objects_are_normalised():
@@ -96,6 +133,27 @@ def test_unparseable_string_claim_is_skipped_not_fatal():
     payload = json.dumps({"claims": ["{not json", _good_claim()]})
     loaded = _load_claims_payload(payload)
     assert len(loaded["claims"]) == 1
+
+
+def test_malformed_aggregate_claims_string_does_not_raise():
+    """A malformed stringified `claims` value degrades, never raises (F1)."""
+
+    loaded = _load_claims_payload('{"claims": "[not json"}')
+    assert loaded == {"claims": []}
+
+
+def test_malformed_top_level_payload_does_not_raise():
+    assert _load_claims_payload("{not json at all") == {"claims": []}
+
+
+def test_null_valued_metric_claims_are_not_admitted():
+    """A claim whose only metric value is null stays unknown, not claimable (F2)."""
+
+    from ai_discovery.semantic import _has_valued_metric
+
+    assert not _has_valued_metric({"metrics": [{"label": "x", "value": None}]})
+    assert not _has_valued_metric({"metrics": []})
+    assert _has_valued_metric({"metrics": [{"label": "x", "value": 0}]})
 
 
 def test_one_malformed_claim_does_not_discard_valid_siblings():

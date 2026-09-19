@@ -224,14 +224,23 @@ def _load_claims_payload(content: str) -> dict[str, Any]:
     dicts and stringified-JSON claim objects; normalise all of them.
     """
 
-    payload = json.loads(content)
+    # Every parse level is guarded: a malformed aggregate string must degrade to
+    # an empty/partial payload, never raise and discard an otherwise good capture
+    # (the all-or-nothing failure this function exists to remove).
+    try:
+        payload = json.loads(content)
+    except json.JSONDecodeError:
+        return {"claims": []}
     if isinstance(payload, list):
         payload = {"claims": payload}
     if not isinstance(payload, dict):
         return {"claims": []}
     claims = payload.get("claims")
     if isinstance(claims, str):
-        claims = json.loads(claims)
+        try:
+            claims = json.loads(claims)
+        except json.JSONDecodeError:
+            return {"claims": []}
     if not isinstance(claims, list):
         return {"claims": []}
     normalised: list[Any] = []
@@ -244,6 +253,14 @@ def _load_claims_payload(content: str) -> dict[str, Any]:
         if isinstance(item, dict):
             normalised.append(item)
     return {"claims": normalised}
+
+
+def _has_valued_metric(claim: dict[str, Any]) -> bool:
+    """True when the claim carries at least one metric with a non-null value."""
+
+    return any(
+        isinstance(m, dict) and m.get("value") is not None for m in claim.get("metrics") or []
+    )
 
 
 def _validate_claims_individually(
@@ -361,14 +378,16 @@ def semantic_extract(
                 "dropped %d individually-invalid claims for %s (kept %d)",
                 len(rejected), source_id, len(good),
             )
-        # Claims with no metric at all are not ledger-claimable; drop them loudly
-        # rather than rejecting the whole run.
-        without_metrics = [c for c in good if not c.get("metrics")]
+        # A claim is only ledger-claimable when at least one metric carries a
+        # real value (not null/absent). Preserve the original semantic exactly:
+        # a null-valued metric is 'unknown', not a value, and must not be admitted.
+        without_metrics = [c for c in good if not _has_valued_metric(c)]
         if without_metrics:
             logger.warning(
-                "dropped %d claims with no metrics (not ledger-claimable)", len(without_metrics)
+                "dropped %d claims with no metric value (not ledger-claimable)",
+                len(without_metrics),
             )
-        good = [c for c in good if c.get("metrics")]
+        good = [c for c in good if _has_valued_metric(c)]
         parsed = ExtractedClaims(claims=[ExtractedClaim.model_validate(c) for c in good])
         usage = getattr(response, "usage", None)
         raw_cost = getattr(usage, "cost", None)

@@ -41,6 +41,8 @@ def _engine():
 
 
 def measure(*, semantic: bool = False, limit: int | None = None) -> dict:
+    """Measure the funnel. ``limit`` caps captures measured per source (semantic
+    re-extraction is the only expensive step), bounding cost on a large corpus."""
     from ai_discovery.registry import load_sources_config
 
     config = load_sources_config()
@@ -59,7 +61,7 @@ def measure(*, semantic: bool = False, limit: int | None = None) -> dict:
         claim_counts = dict(
             conn.execute(text("select source_id, count(*) from claim group by 1")).all()
         )
-        claim_ids = [r[0] for r in conn.execute(text("select claim_id from claim")).all()]
+        claim_total = conn.execute(text("select count(*) from claim")).scalar() or 0
 
     by_source: dict[str, list] = {}
     for r in rows:
@@ -72,7 +74,8 @@ def measure(*, semantic: bool = False, limit: int | None = None) -> dict:
         items = by_source.get(source_id, [])
         text_present = 0
         re_extractable: int | None = None
-        for item in items:
+        measured_items = items[:limit] if limit else items
+        for item in measured_items:
             stored = read_extracted_text(item[2])
             if stored:
                 text_present += 1
@@ -80,14 +83,20 @@ def measure(*, semantic: bool = False, limit: int | None = None) -> dict:
         if semantic and items:
             import logging
 
-            logging.disable(logging.WARNING)
+            # Reduce third-party chatter for the duration of this source without
+            # silencing the extraction pipeline's own diagnostics: raise only the
+            # noisy HTTP/client loggers and restore them afterwards.
+            _noisy = ("httpx", "httpx2", "httpcore", "urllib3", "openai", "instructor")
+            _prev_levels = {name: logging.getLogger(name).level for name in _noisy}
+            for name in _noisy:
+                logging.getLogger(name).setLevel(logging.ERROR)
             from ai_discovery.claim_extract import claims_from_extraction
             from ai_discovery.claims import Capture
             from ai_discovery.semantic import semantic_extract
 
             ok = 0
             re_extraction_failures: list[dict] = []
-            for item in items:
+            for item in measured_items:
                 stored = read_extracted_text(item[2])
                 if not stored:
                     continue
@@ -119,6 +128,8 @@ def measure(*, semantic: bool = False, limit: int | None = None) -> dict:
                         {"capture_hash": item[2][:12], "error": str(error)[:200]}
                     )
                     continue
+            for _name, _lvl in _prev_levels.items():
+                logging.getLogger(_name).setLevel(_lvl)
             re_extractable = ok
             total_re_extractable += ok
         per_source.append(
@@ -144,7 +155,7 @@ def measure(*, semantic: bool = False, limit: int | None = None) -> dict:
             "sources_with_capture": sources_with_evidence,
             "captures_with_extracted_text": total_text_present,
             "captures_re_extractable": (total_re_extractable if semantic else None),
-            "validated_claims": len(claim_ids),
+            "validated_claims": claim_total,
             "sources_with_validated_claim": sources_with_claims,
         },
         "per_source": per_source,
