@@ -125,17 +125,20 @@ def claim_id_for(source_id: str, topic: str, statement: str) -> str:
 
 _SELECTOR_SPLIT = re.compile(r"\s+/\s+|;|\n")
 _PAREN = re.compile(r"\([^)]*\)")
+_QUOTED = re.compile(r"[\u2018\u2019'\"]([^\u2018\u2019'\"]{2,})[\u2018\u2019'\"]")
 
 
 def _selector_needles(selector: str) -> list[tuple[str | None, str]]:
     """Split a selector into ``(required_name, required_value)`` needles.
 
     A selector may name several anchors (``datePublished=A / dateModified=B``),
-    each possibly annotated in parentheses (``inLanguage=en-US (article JSON-LD)``),
-    or a bare stamp (``2026.06.26``). A ``key=value`` anchor requires both the key
-    name and the value, which binds the value to the attribute it came from rather
-    than letting a short value match an unrelated substring. Returns ``[]`` when
-    nothing usable remains, which the caller treats as unresolvable.
+    annotate one in parentheses (``inLanguage=en-US (article JSON-LD)``), quote a
+    literal stamp (``page stamp 'September 14, 2026'``), or give a bare stamp
+    (``2026.06.26``). A ``key=value`` anchor requires both the key name and the
+    value, which binds the value to the attribute it came from rather than letting
+    a short value match an unrelated substring; a quoted literal is used as-is with
+    its descriptive prefix treated as a label, not required text. Returns ``[]``
+    when nothing usable remains, which the caller treats as unresolvable.
     """
 
     needles: list[tuple[str | None, str]] = []
@@ -143,16 +146,22 @@ def _selector_needles(selector: str) -> list[tuple[str | None, str]]:
         segment = _PAREN.sub("", segment).strip()
         if not segment:
             continue
+        quoted = _QUOTED.findall(segment)
+        if quoted:
+            needles.extend((None, value.strip()) for value in quoted)
+            continue
         if "=" in segment:
             name, _, value = segment.partition("=")
+            # ``document element lang=ko`` -> the attribute name is the last word.
             name = name.strip().split()[-1] if name.strip() else ""
             value = value.strip().strip("\"'").strip()
             if value:
                 needles.append((name or None, value))
-        else:
-            value = segment.strip("\"'").strip()
-            if len(value) >= 2:
-                needles.append((None, value))
+            continue
+        # Bare stamp: drop a leading descriptive label (e.g. ``page stamp``).
+        value = segment.strip().strip("\"'").strip()
+        if len(value) >= 2:
+            needles.append((None, value))
     return needles
 
 
