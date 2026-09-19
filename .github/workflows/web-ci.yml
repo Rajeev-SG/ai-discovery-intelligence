@@ -63,6 +63,11 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: End-to-end product proof
+        # The reconciliation view (issue #47) is verified against the live
+        # evidence API; without this the page degrades to its explicit
+        # unavailable state and the reconciliation e2e cannot pass.
+        env:
+          EVIDENCE_API_URL: http://iyercyduhzplx2m7ldqqz0cp.89.167.5.185.sslip.io
         run: npx playwright test
 
       - name: Upload proof screenshots
