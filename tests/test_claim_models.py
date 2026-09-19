@@ -67,6 +67,50 @@ def test_selector_value_is_bound_to_its_key():
     assert not loc.present_in("", '"dateModified":"2026-05-14T01:54:23+00:00"')
 
 
+def test_name_only_selector_must_not_validate_an_arbitrary_value():
+    """F1: a name-only selector resolves a location, not a licence for any number.
+
+    ``value.verifies`` requires the claimed value to appear in the content the
+    selector resolves to, so a fabricated number on ``datePublished`` fails.
+    """
+
+    raw = '<script>{"datePublished":"2026-05-14T01:54:23+00:00"}</script>'
+    loc = Locator(kind="jsonld_field", selector="datePublished")
+    assert loc.present_in("", raw)  # the key exists...
+    import datetime as _dt
+
+    assert loc.verifies(_dt.date(2026, 5, 14), "", raw)  # ...and the value is consistent
+    assert not loc.verifies("9.9M", "", raw)  # a fabricated value is not
+
+
+def test_value_must_bind_to_its_own_key_not_the_whole_page():
+    """F2: key and value must co-occur, not be two independent substring hits."""
+
+    raw = '{"datePublished":"2026-05-14"} <p>in 2026 the market grew</p> <span>dateModified</span>'
+    stray = Locator(kind="jsonld_field", selector="dateModified=2026")
+    # 'dateModified' and '2026' both appear, but never as a pair.
+    assert not stray.present_in("", raw)
+
+
+def test_css_section_and_table_row_selectors_resolve():
+    """F3: section/table_row use real CSS, not verbatim literals."""
+
+    html = '<section id="results">Result body</section>'
+    section = Locator(kind="section", selector="section#results")
+    assert section.present_in("", html)
+    assert not Locator(kind="section", selector="section#missing").present_in("", html)
+    table = '<table><tr><td>1.2M</td></tr></table>'
+    assert Locator(kind="table_row", selector="table tr").present_in("", table)
+
+
+def test_selector_present_in_fails_closed_without_raw_text():
+    """F4: a selector with only parsed text must not read as success."""
+
+    loc = Locator(kind="jsonld_field", selector="datePublished")
+    assert loc.present_in("datePublished") is False
+    assert loc.verifies("2026-05-14", "datePublished") is False
+
+
 def test_selector_with_multiple_anchors_requires_all():
     loc = Locator(kind="jsonld_field", selector="datePublished=A / dateModified=B")
     assert loc.present_in("", '"datePublished":"A","dateModified":"B"')

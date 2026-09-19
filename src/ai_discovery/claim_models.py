@@ -126,67 +126,133 @@ def claim_id_for(source_id: str, topic: str, statement: str) -> str:
 _SELECTOR_SPLIT = re.compile(r"\s+/\s+|;|\n")
 _PAREN = re.compile(r"\([^)]*\)")
 _QUOTED = re.compile(r"[\u2018\u2019'\"]([^\u2018\u2019'\"]{2,})[\u2018\u2019'\"]")
+# ``"key": "value"`` (JSON / JSON-LD) or ``key="value"`` / ``key=value`` (markup).
+_JSON_PAIR = re.compile(r'["\']?(?P<key>[A-Za-z_@][\w:@-]*)["\']?\s*[:=]\s*["\']?(?P<value>[^"\'<>\s,]+)')
 
 
-def _selector_needles(selector: str) -> list[tuple[str | None, str]]:
-    """Split a selector into ``(required_name, required_value)`` needles.
+def _anchor_resolves(segment: str, haystack: str) -> tuple[bool, str | None]:
+    """Resolve one selector anchor against ``haystack``; return (ok, resolved_text).
 
-    A selector may name several anchors (``datePublished=A / dateModified=B``),
-    annotate one in parentheses (``inLanguage=en-US (article JSON-LD)``), quote a
-    literal stamp (``page stamp 'September 14, 2026'``), or give a bare stamp
-    (``2026.06.26``). A ``key=value`` anchor requires both the key name and the
-    value, which binds the value to the attribute it came from rather than letting
-    a short value match an unrelated substring; a quoted literal is used as-is with
-    its descriptive prefix treated as a label, not required text. Returns ``[]``
-    when nothing usable remains, which the caller treats as unresolvable.
+    Grammar, per anchor shape — a value is bound to the key it came from, so a
+    value cannot be satisfied by an unrelated occurrence elsewhere in the page:
+
+    * ``key=value`` — a ``key``/``value`` pair must occur **together** in the
+      markup, and the observed value must equal the expected one.
+    * ``key``        — the key must occur as a JSON-LD field or a markup
+      attribute; the resolved text is its observed value.
+    * ``'literal'``  — a quoted literal (e.g. ``page stamp 'Sep 9, 2026'``) must
+      appear verbatim; the descriptive prefix is a label, not required text.
+    * bare stamp     — must appear verbatim.
     """
 
-    needles: list[tuple[str | None, str]] = []
-    for segment in _SELECTOR_SPLIT.split(selector):
-        segment = _PAREN.sub("", segment).strip()
-        if not segment:
-            continue
-        quoted = _QUOTED.findall(segment)
-        if quoted:
-            needles.extend((None, value.strip()) for value in quoted)
-            continue
-        if "=" in segment:
-            name, _, value = segment.partition("=")
-            # ``document element lang=ko`` -> the attribute name is the last word.
-            name = name.strip().split()[-1] if name.strip() else ""
-            value = value.strip().strip("\"'").strip()
-            if value:
-                needles.append((name or None, value))
-            continue
-        # Bare stamp: drop a leading descriptive label (e.g. ``page stamp``).
-        value = segment.strip().strip("\"'").strip()
-        if len(value) >= 2:
-            needles.append((None, value))
-    return needles
+    segment = segment.strip()
+    if not segment:
+        return False, None
+
+    quoted = _QUOTED.findall(segment)
+    if quoted:
+        hay = normalize_text(haystack).lower()
+        for literal in quoted:
+            if normalize_text(literal).lower() in hay:
+                return True, literal
+        return False, None
+
+    if "=" in segment:
+        name, _, expected = segment.partition("=")
+        # ``document element lang=ko`` -> the attribute key is the last word.
+        name = name.strip().split()[-1] if name.strip() else ""
+        expected = expected.strip().strip("\"'").strip()
+        if not name:
+            return False, None
+        for match in _JSON_PAIR.finditer(haystack):
+            if match.group("key").lower() != name.lower():
+                continue
+            observed = match.group("value")
+            if not expected or expected.lower() in observed.lower():
+                return True, observed
+        return False, None
+
+    # Bare key: must exist as a JSON-LD field or a markup attribute.
+    for match in _JSON_PAIR.finditer(haystack):
+        if match.group("key").lower() == segment.lower():
+            return True, match.group("value")
+    # Bare literal (a page stamp such as ``September 14, 2026``): verbatim match.
+    if len(segment) >= 2 and normalize_text(segment).lower() in normalize_text(haystack).lower():
+        return True, segment
+    return False, None
 
 
-def resolve_selector(selector: str, haystacks: list[str]) -> bool:
-    """True when every anchor in ``selector`` resolves in one of ``haystacks``."""
+def resolve_selector(selector: str, haystacks: list[str]) -> tuple[bool, list[str]]:
+    """Resolve every anchor in ``selector``; return ``(ok, resolved_texts)``.
 
-    needles = _selector_needles(selector)
-    if not needles:
-        return False
-    normalised = [normalize_text(h).lower() for h in haystacks if h]
-    if not normalised:
-        return False
-    for name, value in needles:
-        value_l = normalize_text(value).lower()
+    Every anchor must resolve in one of the haystacks. ``resolved_texts`` carries
+    the content each anchor actually matched, so the caller can verify a
+    value-bearing field's value at the location the selector names.
+    """
+
+    anchors = [a for a in (_PAREN.sub("", seg).strip() for seg in _SELECTOR_SPLIT.split(selector)) if a]
+    if not anchors:
+        return False, []
+    candidates = [h for h in haystacks if h]
+    if not candidates:
+        return False, []
+    resolved: list[str] = []
+    for anchor in anchors:
         found = False
-        for text in normalised:
-            if value_l not in text:
-                continue
-            if name and normalize_text(name).lower() not in text:
-                continue
-            found = True
-            break
+        for haystack in candidates:
+            ok, text = _anchor_resolves(anchor, haystack)
+            if ok:
+                found = True
+                if text is not None:
+                    resolved.append(text)
+                break
         if not found:
-            return False
-    return True
+            return False, []
+    return True, resolved
+
+
+def _value_consistent(value: Any, haystack: str) -> bool:
+    """True when the claimed value is demonstrably present in the resolved content.
+
+    Dates are compared in ISO form (and their digits), so a JSON-LD
+    ``datePublished`` of ``2026-05-14T01:54:23+00:00`` validates a claimed
+    ``2026-05-14``. Numbers are compared by their string form. Everything else is a
+    case-insensitive substring test.
+    """
+
+    import datetime as _dt
+
+    if isinstance(value, _dt.date):
+        iso = value.isoformat()
+        return iso in haystack or iso.replace("-", "") in haystack.replace("-", "")
+    text = normalize_text(str(value)).lower()
+    return bool(text) and text in haystack
+
+
+def _css_selector_resolves(selector: str, raw_html: str) -> str | None:
+    """Resolve a CSS selector (``section#results``, ``table tr``) via lxml.
+
+    Returns the matched element's text (possibly empty) or ``None`` when the
+    selector matches nothing. Used for the ``section`` / ``table_row`` kinds, whose
+    selectors are real CSS rather than JSON-LD keys.
+    """
+
+    try:
+        from cssselect.parser import SelectorError
+        from lxml import html as _lxml_html
+        from lxml.cssselect import CSSSelector
+    except ImportError:  # pragma: no cover - lxml is a hard dep in practice
+        return None
+    try:
+        document = _lxml_html.fromstring(raw_html)
+        matches = CSSSelector(selector)(document)
+    except (SelectorError, ValueError, TypeError, _lxml_html.etree.ParserError):
+        # An invalid CSS selector (syntax error, unparsable document) can never be
+        # evidence; fail closed rather than letting a malformed selector raise.
+        return None
+    if not matches:
+        return None
+    return " ".join(el.text_content() for el in matches)
 
 
 class Locator(BaseModel):
@@ -220,22 +286,59 @@ class Locator(BaseModel):
         """Re-verify this locator against the capture it claims to point at.
 
         A verbatim quote is matched (typography- and whitespace-normalised) against
-        the parsed text. A structured selector (``jsonld_field``/``table_row``/
-        ``section``/``page_stamp``) is resolved against the **raw** capture — the
-        JSON-LD, attributes and stamps it names live in markup that parsing strips —
-        falling back to the parsed text when no raw capture is supplied.
+        the parsed text. A structured selector is resolved against the **raw**
+        capture — the JSON-LD, attributes and stamps it names live in markup that
+        parsing strips. There is no "assume true" path, and a selector without the
+        raw capture fails closed: parsed text alone cannot resolve it, so passing it
+        alone must not read as success.
 
-        There is no "assume true" path: a selector that does not resolve fails, so a
-        fabricated number attached to a non-existent selector is rejected exactly
-        like a fabricated quote.
+        This checks *presence* only. Value-bearing fields are additionally checked
+        with :meth:`verifies`, which compares the claimed value against the content
+        the selector actually names.
         """
 
         if self.quote:
             return normalize_text(self.quote) in normalize_text(capture_text)
         if not self.selector:
             return False
-        haystacks = [s for s in (raw_text, capture_text) if s]
-        return resolve_selector(self.selector, haystacks)
+        if raw_text is None:
+            return False  # selectors need raw markup; never silently pass parsed-only text
+        return self._resolve(raw_text)[0]
+
+    def _resolve(self, raw_text: str) -> tuple[bool, list[str]]:
+        """Resolve this locator's selector against the raw capture."""
+
+        if self.kind in ("section", "table_row"):
+            hit = _css_selector_resolves(self.selector or "", raw_text)
+            return (hit is not None), ([hit] if hit is not None else [])
+        return resolve_selector(self.selector or "", [raw_text])
+
+    def verifies(self, value: Any, capture_text: str, raw_text: str | None = None) -> bool:
+        """Presence **and**, for value-bearing fields, value consistency.
+
+        A selector that only names a location (``datePublished``) must not validate
+        an arbitrary number: the claimed value has to appear in the content the
+        selector resolves to. A selector that carries its own expected content
+        (``key=value``, or a quoted literal stamp) already binds the evidence when it
+        resolves, so the claimed value may be a derived reading of it.
+        """
+
+        if not self.present_in(capture_text, raw_text):
+            return False
+        if self.quote or value is None:
+            return True
+        if raw_text is None:
+            return False
+        anchors = [a for a in (_PAREN.sub("", seg).strip() for seg in _SELECTOR_SPLIT.split(self.selector or "")) if a]
+        # An anchor that carries its own content (a value after ``=`` or a quoted
+        # literal) is self-binding; only name-only anchors need the value check.
+        if any("=" in a or _QUOTED.search(a) for a in anchors):
+            return True
+        ok, resolved = self._resolve(raw_text)
+        if not ok:
+            return False
+        haystack = normalize_text(" ".join([*resolved, capture_text])).lower()
+        return _value_consistent(value, haystack)
 
 
 class Provenanced[T](BaseModel):

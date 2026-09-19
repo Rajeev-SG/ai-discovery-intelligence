@@ -521,9 +521,29 @@ def check_against_capture(record: ClaimRecord, capture: Capture) -> list[str]:
         if not anchor.present_in(capture.text, capture.raw_text):
             failures.append(f"capture_anchors: {anchor.quote or anchor.selector}")
     for path, locator in record.field_locators():
-        if not locator.present_in(capture.text, capture.raw_text):
+        value = _value_at_path(record, path)
+        if not locator.verifies(value, capture.text, capture.raw_text):
             failures.append(f"{path}: {locator.quote or locator.selector}")
     return failures
+
+
+def _value_at_path(record: ClaimRecord, path: str) -> Any:
+    """The claimed value at a dotted ``field_locators()`` path, or ``None``.
+
+    ``field_locators`` walks the model, so a path like ``metrics[0].value`` names
+    the provenance entry directly; this returns the value it supports so
+    ``Locator.verifies`` can check the value against the resolved content.
+    """
+
+    node: Any = record
+    for part in path.split("."):
+        if "[" in part:
+            name, _, index = part.partition("[")
+            node = getattr(node, name)
+            node = node[int(index.rstrip("]"))]
+        else:
+            node = getattr(node, part)
+    return getattr(node, "value", None)
 
 
 RULE_SOURCE_CLASS_DEFAULT = {

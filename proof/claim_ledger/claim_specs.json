@@ -2302,6 +2302,131 @@
       "status": "current",
       "relationship": "new",
       "confidence": "low"
+    },
+    {
+      "source": {
+        "source_id": "perplexity-blog",
+        "publisher": "Perplexity",
+        "url": "https://www.perplexity.ai/hub/blog",
+        "canonical_url": "https://www.perplexity.ai/hub/blog",
+        "source_class": "vendor_blog",
+        "robots_allowed": true
+      },
+      "topic": "retrieval_index",
+      "statement": "Perplexity Research published Q2D-Web, a first-stage retriever benchmark and leaderboard built from 70 thousand agent queries and 190 million web documents with three sets of relevance judgements.",
+      "surfaces": [
+        "perplexity"
+      ],
+      "methodology": {
+        "measurement_mode": "vendor_panel",
+        "metric_family": {
+          "value": "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements",
+          "quote": "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements"
+        },
+        "metric_definition": {
+          "value": "Q2D-Web: Evaluating First-Stage Retrievers at Scale",
+          "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+        },
+        "denominator": {
+          "value": "190 million web documents",
+          "quote": "190 million web documents"
+        },
+        "unit_of_analysis": {
+          "value": "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements",
+          "quote": "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements"
+        },
+        "time_window": {
+          "value": "Sep 9, 2026",
+          "quote": "Sep 9, 2026"
+        },
+        "methodology_notes": {
+          "value": "Q2D-Web: Evaluating First-Stage Retrievers at Scale",
+          "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "prompt_universe": null,
+        "sample_size": null,
+        "limitations": [
+          "Vendor benchmark; index page summarises the study."
+        ]
+      },
+      "metrics": [
+        {
+          "metric_id": "perplexity_q2d_queries",
+          "label": "Agent queries in the Q2D-Web benchmark",
+          "comparator": "exact",
+          "definition": {
+            "value": "70 thousand agent queries",
+            "quote": "70 thousand agent queries"
+          },
+          "value": {
+            "value": 70000,
+            "quote": "70 thousand agent queries"
+          },
+          "unit": {
+            "value": "agent queries",
+            "quote": "agent queries"
+          },
+          "window": {
+            "value": "Sep 2026",
+            "quote": "Sep 9, 2026"
+          },
+          "scope": {
+            "value": "Q2D-Web benchmark",
+            "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+          }
+        },
+        {
+          "metric_id": "perplexity_q2d_documents",
+          "label": "Web documents in the Q2D-Web benchmark",
+          "comparator": "exact",
+          "definition": {
+            "value": "190 million web documents",
+            "quote": "190 million web documents"
+          },
+          "value": {
+            "value": 190000000,
+            "quote": "190 million web documents"
+          },
+          "unit": {
+            "value": "web documents",
+            "quote": "web documents"
+          },
+          "window": {
+            "value": "Sep 2026",
+            "quote": "Sep 9, 2026"
+          },
+          "scope": {
+            "value": "Q2D-Web benchmark",
+            "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": "2026-09-09",
+        "published_at_selector": "page_stamp 'Sep 9, 2026'",
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "A benchmark and leaderboard with 70 thousand agent queries, 190 million web documents, and three sets of relevance judgements"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "perplexity_q2d_web_benchmark_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new",
+      "confidence": "low"
     }
   ]
 }
