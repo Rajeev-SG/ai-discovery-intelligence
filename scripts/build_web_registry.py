@@ -12,7 +12,6 @@ Run: uv run python scripts/build_web_registry.py (CI checks it is current).
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
 
 import yaml
