@@ -164,6 +164,33 @@ def test_llm_proposal_claim_is_blocked_without_human_review():
     assert record.extraction.human_reviewed
 
 
+def test_unknown_metric_value_persists_as_null_not_the_string_none():
+    """Issue #25: an unknown value must round-trip as NULL, never as ``"None"``.
+
+    ``Provenanced.known`` is ``value is not None``, so ``unknown()`` yields
+    ``value=None``. ``str(None)`` would store the literal string ``"None"`` while
+    ``value_number`` stayed NULL, breaking the "unknown is first-class" contract.
+    """
+
+    spec = _spec()
+    spec["metrics"][0]["value"] = None  # explicit unknown: no value, no locator
+    record = C.extract_claim(spec=spec, capture=_synthetic_capture())
+    assert record.metrics[0].value.known is False
+
+    engine = C.create_ledger_engine("sqlite+pysqlite:///:memory:")
+    C.init_ledger(engine)
+    C.persist_claim(engine, record)
+
+    row = C.load_expanded_claims(engine)[0]
+    metric = row["metrics"][0]
+    assert metric["value_text"] is None
+    assert metric["value_number"] is None
+    # The persisted value is None, not the string "None"; assert on the field
+    # itself rather than scanning the whole JSON blob.
+    assert not isinstance(metric["value_text"], str)
+    assert repr(metric["value_text"]) == "None"
+
+
 # --- append-only ledger ----------------------------------------------------- #
 
 
