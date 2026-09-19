@@ -39,7 +39,6 @@ function row(id: string): SurfaceRow {
     confidenceLabel: "Unknown — no validated claim",
     freshnessLabel: "No capture yet",
     evidenceClaimCount: 0,
-    evidence: emptySurfaceEvidence(id),
     lastReviewed: "2026-09-01",
     searchHaystack: "widget search",
   };
@@ -100,26 +99,23 @@ describe("value projection", () => {
 });
 
 describe("evidence projection (issue #46)", () => {
-  it("renders ALL claims for a surface, not claims[0] only", () => {
+  it("reports ALL claims on the summary row, never claims[0] only", () => {
     const second = claim({ claim_id: "c2", statement: "Widget Search crawler honours robots.txt.", topic: "crawler_policy" });
-    const ev = surface([claim(), second]);
-    const [out] = applyEvidence([row("widget-search")], { "widget-search": ev });
+    const [out] = applyEvidence([row("widget-search")], { "widget-search": surface([claim(), second]) });
 
+    // The row is a lightweight summary: the count reflects every claim, and the
+    // full payload is no longer embedded on the client row (loaded lazily).
     expect(out.evidenceClaimCount).toBe(2);
-    expect(out.evidence.claims.map((c) => c.claim_id)).toEqual(["c1", "c2"]);
-    // The second claim's statement is present somewhere in the projection, so
-    // the first-claim-only behaviour is genuinely gone.
     expect(out.evidenceNote).toContain("2 validated claims");
-    expect(out.evidence.claims.some((c) => c.statement.includes("robots.txt"))).toBe(true);
+    expect((out as unknown as { evidence?: unknown }).evidence).toBeUndefined();
   });
 
-  it("keeps provenance and source on every projected claim", () => {
-    const [out] = applyEvidence([row("widget-search")], { "widget-search": surface([claim()]) });
-    const projected = out.evidence.claims[0];
-    expect(projected.provenance[0].quote).toBe("1.2 million monthly visits");
-    expect(projected.provenance[0].locator_kind).toBe("verbatim_quote");
-    expect(projected.source.url).toBe("https://example.test");
-    expect(projected.source.source_class).toBe("official");
+  it("keeps provenance and source available on the claim for the lazily-loaded detail", () => {
+    const ev = surface([claim()]);
+    expect(ev.claims[0].provenance[0].quote).toBe("1.2 million monthly visits");
+    expect(ev.claims[0].provenance[0].locator_kind).toBe("verbatim_quote");
+    expect(ev.claims[0].source.url).toBe("https://example.test");
+    expect(ev.claims[0].source.source_class).toBe("official");
   });
 
   it("reports an explicit no-evidence state for a surface with no claim", () => {
@@ -127,8 +123,7 @@ describe("evidence projection (issue #46)", () => {
     expect(out.evidenceStatus).toBe("no_evidence");
     expect(out.evidenceClaimCount).toBe(0);
     expect(out.evidenceLabel).toBe("No evidence");
-    expect(out.evidence.evidence_state).toBe("no_evidence");
-    expect(out.evidence.claims).toEqual([]);
+    expect(out.evidenceNote).toMatch(/no validated claim/i);
   });
 
   it("surfaces an unknown-only claim without inventing a value", () => {

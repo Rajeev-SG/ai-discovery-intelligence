@@ -2,13 +2,16 @@
  * Client for the read-only evidence API (issues #23/#46). Server-only: it makes
  * an HTTP call to the FastAPI evidence service. When no service is configured
  * the plane degrades to its explicit no-evidence state rather than inventing
- * data. The projection keeps every claim, its provenance and the surface's
- * chronological history so the drill-down shows the intelligence the backend
- * already holds instead of a first-claim-only summary.
+ * data. The page render fetches the bulk projection in ONE request; per-surface
+ * claim/event history is fetched lazily by the drill-down (see
+ * `evidence-actions.ts`), so request volume never scales with the surface count.
  */
 import type { SurfaceRow } from "@/lib/surfaces";
 
 export const EVIDENCE_API_BASE = process.env.EVIDENCE_API_URL ?? "";
+
+/** Recorded-fixture mode for tests/CI without the live API. Never set in prod. */
+export const FIXTURE_MODE = process.env.EVIDENCE_FIXTURE === "1";
 
 export interface EvidenceValue {
   metric_id: string;
@@ -87,6 +90,17 @@ export interface SurfaceEvidence {
   } | null;
   /** Persisted change events for the history view (may be empty). */
   history?: EvidenceEvent[];
+}
+
+/** Per-endpoint outcome for the lazily-fetched history, so failure is visible. */
+export interface HistoryStatus {
+  claims: "ok" | "error" | "skipped";
+  events: "ok" | "error" | "skipped";
+}
+
+export interface SurfaceDetail {
+  evidence: SurfaceEvidence;
+  historyStatus: HistoryStatus;
 }
 
 export const NO_EVIDENCE_NOTE =
@@ -208,10 +222,10 @@ function newestObserved(claims: EvidenceClaim[]): string | null {
 }
 
 /**
- * Overlays real evidence onto the registry rows and attaches the full
- * per-surface payload for the drill-down. Registry fields are untouched; a
- * surface with no claim keeps an explicit no-evidence state, and a surface with
- * several claims reports all of them (never `claims[0]`-only).
+ * Overlays real evidence onto the registry rows. Only lightweight summary
+ * fields reach the row (and therefore the client prop): the full claims,
+ * provenance quotes, rationale and capture metadata are loaded lazily by the
+ * drill-down, so the collapsed table never carries unbounded free text.
  */
 export function applyEvidence(rows: SurfaceRow[], bySurface: Record<string, SurfaceEvidence>): SurfaceRow[] {
   return rows.map((row) => {
@@ -226,7 +240,6 @@ export function applyEvidence(rows: SurfaceRow[], bySurface: Record<string, Surf
         confidenceLabel: "Unknown — no validated claim",
         freshnessLabel: "No capture yet",
         evidenceClaimCount: 0,
-        evidence: ev,
       };
     }
 
@@ -249,56 +262,88 @@ export function applyEvidence(rows: SurfaceRow[], bySurface: Record<string, Surf
       confidenceLabel: `${lead.confidence} (${lead.confidence_detail.score ?? "n/a"})`,
       freshnessLabel: newest ? `${humaniseFreshness(lead.freshness.state)} — ${newest.slice(0, 10)}` : "No capture date",
       evidenceClaimCount: claims.length,
-      evidence: ev,
     };
   });
 }
 
-async function getJson<T>(path: string): Promise<T | null> {
+interface FetchOutcome<T> {
+  status: "ok" | "error";
+  data: T | null;
+  code?: number;
+}
+
+/** Fetch JSON and make a failure loud: log the status/URL, never swallow it. */
+async function fetchJson<T>(path: string): Promise<FetchOutcome<T>> {
   try {
     const res = await fetch(`${EVIDENCE_API_BASE}${path}`, { cache: "no-store" });
-    if (!res.ok) return null;
-    return (await res.json()) as T;
-  } catch {
-    return null;
+    if (!res.ok) {
+      console.error(`[evidence] GET ${path} failed: HTTP ${res.status}`);
+      return { status: "error", data: null, code: res.status };
+    }
+    return { status: "ok", data: (await res.json()) as T };
+  } catch (error) {
+    console.error(`[evidence] GET ${path} failed:`, error);
+    return { status: "error", data: null };
   }
 }
 
 /**
- * Fetch the persisted claim/event history for one surface. A failing endpoint
- * (the live `/claims?surface=` route currently 500s) degrades to whatever the
- * other endpoint returns rather than inventing entries.
+ * Bulk evidence projection for the whole plane. ONE request, independent of the
+ * number of surfaces, cached with a short revalidate instead of `no-store`.
+ * The response already carries each surface's claims, so no per-surface
+ * fan-out is needed at render time.
  */
-export async function fetchSurfaceHistory(
-  surfaceId: string,
-): Promise<{ claims: EvidenceClaim[]; events: EvidenceEvent[] }> {
-  if (!EVIDENCE_API_BASE) return { claims: [], events: [] };
-  const encoded = encodeURIComponent(surfaceId);
-  const [claims, events] = await Promise.all([
-    getJson<{ items?: EvidenceClaim[] }>(`/claims?surface=${encoded}&limit=100`),
-    getJson<{ items?: EvidenceEvent[] }>(`/events?surface=${encoded}`),
-  ]);
-  return { claims: claims?.items ?? [], events: events?.items ?? [] };
+export async function fetchSurfaceEvidence(): Promise<Record<string, SurfaceEvidence>> {
+  if (FIXTURE_MODE) {
+    const { fixtureSurfaces } = await import("./evidence-fixtures");
+    return fixtureSurfaces();
+  }
+  if (!EVIDENCE_API_BASE) return {};
+  try {
+    const res = await fetch(`${EVIDENCE_API_BASE}/surface-evidence`, { next: { revalidate: 60 } });
+    if (!res.ok) {
+      console.error(`[evidence] GET /surface-evidence failed: HTTP ${res.status}`);
+      return {};
+    }
+    const body = (await res.json()) as { surfaces?: Record<string, SurfaceEvidence> };
+    return body.surfaces ?? {};
+  } catch (error) {
+    console.error("[evidence] GET /surface-evidence failed:", error);
+    return {};
+  }
 }
 
 /**
- * Fetch the bulk evidence projection and, for every evidenced surface, attach
- * the chronological history. A network error is an explicit no-evidence state.
+ * Lazy full detail for ONE surface, fetched only when its drill-down opens.
+ * Combines the surface evidence with claim/event history and reports which
+ * endpoints failed so the UI can say so rather than implying "no history".
  */
-export async function fetchSurfaceEvidence(): Promise<Record<string, SurfaceEvidence>> {
-  if (!EVIDENCE_API_BASE) return {};
-  const body = await getJson<{ surfaces?: Record<string, SurfaceEvidence> }>("/surface-evidence");
-  const surfaces = body?.surfaces ?? {};
-  await Promise.all(
-    Object.values(surfaces).map(async (ev) => {
-      const { claims, events } = await fetchSurfaceHistory(ev.surface);
-      if (claims.length) {
-        const byId = new Map<string, EvidenceClaim>();
-        for (const claim of [...claims, ...(ev.claims ?? [])]) byId.set(claim.claim_id, claim);
-        ev.claims = [...byId.values()];
-      }
-      ev.history = events;
-    }),
-  );
-  return surfaces;
+export async function fetchSurfaceDetail(surfaceId: string): Promise<SurfaceDetail> {
+  if (FIXTURE_MODE) {
+    const { fixtureDetail } = await import("./evidence-fixtures");
+    return fixtureDetail(surfaceId);
+  }
+  const empty = emptySurfaceEvidence(surfaceId);
+  if (!EVIDENCE_API_BASE) {
+    return { evidence: empty, historyStatus: { claims: "skipped", events: "skipped" } };
+  }
+  const encoded = encodeURIComponent(surfaceId);
+  const [evidenceOutcome, claimsOutcome, eventsOutcome] = await Promise.all([
+    fetchJson<SurfaceEvidence>(`/surfaces/${encoded}/evidence`),
+    fetchJson<{ items?: EvidenceClaim[] }>(`/claims?surface=${encoded}&limit=100`),
+    fetchJson<{ items?: EvidenceEvent[] }>(`/events?surface=${encoded}`),
+  ]);
+
+  const evidence = evidenceOutcome.data ?? empty;
+  const byId = new Map<string, EvidenceClaim>();
+  for (const claim of [...(evidence.claims ?? []), ...(claimsOutcome.data?.items ?? [])]) {
+    byId.set(claim.claim_id, claim);
+  }
+  evidence.claims = [...byId.values()];
+  evidence.history = eventsOutcome.data?.items ?? [];
+
+  return {
+    evidence,
+    historyStatus: { claims: claimsOutcome.status, events: eventsOutcome.status },
+  };
 }

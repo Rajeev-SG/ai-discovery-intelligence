@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   buildHistory,
   formatDate,
@@ -9,8 +10,11 @@ import {
   valueDisplay,
   type EvidenceClaim,
   type EvidenceValue,
+  type HistoryStatus,
+  type SurfaceDetail,
   type SurfaceEvidence,
 } from "@/lib/evidence";
+import { loadSurfaceDetail } from "@/lib/evidence-actions";
 
 /** Public source link — new tab, no referrer, never a private capture path. */
 function SourceLink({ url, label }: { url: string | null | undefined; label?: string }) {
@@ -34,7 +38,7 @@ function Meta({ label, value }: { label: string; value: React.ReactNode }) {
 function ValueRow({ value }: { value: EvidenceValue }) {
   const unknown = isUnknownValue(value);
   return (
-    <li className={unknown ? "evidence-value evidence-value-unknown" : "evidence-value"}>
+    <li className={unknown ? "evidence-value evidence-value-unknown" : "evidence-value"} data-testid="evidence-value">
       <div className="evidence-value-head">
         <span className="evidence-value-label">{value.label || value.metric_id}</span>
         <span className={unknown ? "evidence-value-num is-unknown" : "evidence-value-num"}>
@@ -86,10 +90,7 @@ function ClaimCard({ claim, index }: { claim: EvidenceClaim; index: number }) {
         <dl className="evidence-grid">
           <Meta label="Publisher" value={claim.source?.publisher ?? "Unknown"} />
           <Meta label="Class" value={claim.source?.source_class ?? "Unknown"} />
-          <Meta
-            label="Public URL"
-            value={<SourceLink url={claim.source?.url ?? null} />}
-          />
+          <Meta label="Public URL" value={<SourceLink url={claim.source?.url ?? null} />} />
           <Meta
             label="Freshness"
             value={`${humaniseFreshness(claim.freshness.state)}${
@@ -141,7 +142,7 @@ function ClaimCard({ claim, index }: { claim: EvidenceClaim; index: number }) {
                       <span className="chip">{entry.locator_kind}</span>
                       {entry.selector ? <code>{entry.selector}</code> : null}
                     </div>
-                    {entry.quote ? <blockquote>{entry.quote}</blockquote> : null}
+                    {entry.quote ? <blockquote data-testid="provenance-quote">{entry.quote}</blockquote> : null}
                   </li>
                 ))}
               </ul>
@@ -175,11 +176,28 @@ function ClaimCard({ claim, index }: { claim: EvidenceClaim; index: number }) {
   );
 }
 
-function History({ evidence }: { evidence: SurfaceEvidence }) {
+/**
+ * F1: make a degraded history source visible. Never implies "no history" when
+ * an endpoint actually errored, and never fabricates entries.
+ */
+function HistoryStatusNote({ status }: { status: HistoryStatus }) {
+  const parts: string[] = [];
+  if (status.claims === "error") parts.push("claims");
+  if (status.events === "error") parts.push("change events");
+  if (!parts.length) return null;
+  return (
+    <p className="detail-hint" data-testid="history-unavailable">
+      History source unavailable ({parts.join(" + ")}); showing what the backend returned.
+    </p>
+  );
+}
+
+function History({ evidence, status }: { evidence: SurfaceEvidence; status: HistoryStatus }) {
   const history = buildHistory(evidence.claims ?? [], evidence.history ?? []);
   return (
     <section className="detail-section">
       <h3>History</h3>
+      <HistoryStatusNote status={status} />
       {history.length ? (
         <ol className="evidence-history" data-testid="evidence-history">
           {history.map((item) => (
@@ -225,24 +243,77 @@ function LatestChange({ evidence }: { evidence: SurfaceEvidence }) {
 }
 
 /**
- * Per-surface evidence drill-down. Shows every validated claim (never
- * `claims[0]`-only), its values/units/scope with explicit unknown states, the
- * public source, confidence, provenance behind expandable detail, and the
- * surface's chronological history. All technical provenance is collapsed by
- * default so the top of the drawer stays a concise summary.
+ * Per-surface evidence drill-down. Fetches the full payload lazily on mount via
+ * the server action, then shows every validated claim (never `claims[0]`-only),
+ * its values with explicit unknown states, the public source, confidence,
+ * provenance behind expandable detail, the latest change and the chronological
+ * history. Technical provenance is collapsed by default so the top stays a
+ * concise summary.
  */
-export function EvidenceDetail({ evidence }: { evidence: SurfaceEvidence }) {
+export function EvidenceDetail({ surfaceId, summary }: { surfaceId: string; summary?: SurfaceEvidence }) {
+  const [detail, setDetail] = useState<SurfaceDetail | null>(summary ? { evidence: summary, historyStatus: { claims: "skipped", events: "skipped" } } : null);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    loadSurfaceDetail(surfaceId)
+      .then((result) => {
+        if (active) setDetail(result);
+      })
+      .catch(() => {
+        if (active) setError(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [surfaceId]);
+
+  if (error) {
+    return (
+      <section className="detail-section">
+        <h3>Evidence</h3>
+        <p className="detail-empty" data-testid="evidence-error">
+          Evidence detail could not be loaded. No data is invented.
+        </p>
+      </section>
+    );
+  }
+
+  if (!detail) {
+    return (
+      <section className="detail-section">
+        <h3>Evidence</h3>
+        <p className="detail-empty" data-testid="evidence-loading">
+          Loading evidence…
+        </p>
+      </section>
+    );
+  }
+
+  const { evidence, historyStatus } = detail;
   const claims = evidence.claims ?? [];
   const lead = leadingClaim(claims);
+  const hasEvents = (evidence.history?.length ?? 0) > 0;
 
   if (evidence.evidence_state === "no_evidence" || claims.length === 0) {
+    // F5: no contradictory chrome. If change events exist, say so explicitly;
+    // otherwise show only the no-evidence statement (no empty History block).
     return (
       <section className="detail-section">
         <h3>Evidence</h3>
         <p className="detail-lead" data-testid="no-evidence">
-          <strong>No evidence.</strong> {evidence.evidence_note ?? "No validated claim is linked to this surface."}
+          <strong>No validated claim.</strong>{" "}
+          {evidence.evidence_note ?? "No validated claim is linked to this surface yet."}
         </p>
-        <History evidence={evidence} />
+        <HistoryStatusNote status={historyStatus} />
+        {hasEvents ? (
+          <>
+            <p className="detail-hint">
+              Change events exist for this surface, but none has been validated into a claim yet.
+            </p>
+            <History evidence={evidence} status={historyStatus} />
+          </>
+        ) : null}
       </section>
     );
   }
@@ -252,8 +323,14 @@ export function EvidenceDetail({ evidence }: { evidence: SurfaceEvidence }) {
       <section className="detail-section">
         <h3>Evidence</h3>
         <p className="detail-lead" data-testid="evidence-summary">
-          <strong>{claims.length} validated claim{claims.length === 1 ? "" : "s"}.</strong>{" "}
-          {lead ? `Leading confidence ${lead.confidence}${lead.confidence_detail.score != null ? ` (${lead.confidence_detail.score})` : ""}.` : null}
+          <strong>
+            {claims.length} validated claim{claims.length === 1 ? "" : "s"}.
+          </strong>{" "}
+          {lead
+            ? `Leading confidence ${lead.confidence}${
+                lead.confidence_detail.score != null ? ` (${lead.confidence_detail.score})` : ""
+              }.`
+            : null}
         </p>
         <ul className="evidence-claims" data-testid="evidence-claims">
           {claims.map((claim, index) => (
@@ -263,7 +340,7 @@ export function EvidenceDetail({ evidence }: { evidence: SurfaceEvidence }) {
       </section>
 
       <LatestChange evidence={evidence} />
-      <History evidence={evidence} />
+      <History evidence={evidence} status={historyStatus} />
     </>
   );
 }

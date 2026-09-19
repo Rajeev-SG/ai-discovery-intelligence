@@ -51,7 +51,6 @@ describe("canonical registry", () => {
     for (const row of rows) {
       expect(row.evidenceStatus).toBe("no_evidence");
       expect(row.evidenceClaimCount).toBe(0);
-      expect(row.evidence.claims).toEqual([]);
       expect(row.confidenceLabel).toMatch(/Unknown/);
       expect(row.evidenceNote).toMatch(/no validated claim/i);
       // No fabricated figures: the registry surface row carries no metrics.

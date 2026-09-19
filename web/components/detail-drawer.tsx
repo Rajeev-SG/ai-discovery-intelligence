@@ -107,7 +107,7 @@ export function DetailDrawer({ row, open, onOpenChange, label }: DetailDrawerPro
                   )}
                 </Section>
 
-                <EvidenceDetail evidence={row.evidence} />
+                <EvidenceDetail surfaceId={row.id} />
               </div>
             </>
           ) : null}

@@ -1,5 +1,3 @@
-import { emptySurfaceEvidence, type SurfaceEvidence } from "./evidence";
-
 /**
  * Client-safe projection of the canonical surface registry. Contains no Node
  * built-ins, so it can be imported from client components. The YAML loader
@@ -60,12 +58,6 @@ export interface SurfaceRow {
   freshnessLabel: string;
   /** Number of validated claims backing this surface (0 = explicit no-evidence). */
   evidenceClaimCount: number;
-  /**
-   * Full evidence payload for the drill-down (all claims, provenance, history).
-   * Always present: a surface with no claim carries its explicit no-evidence
-   * projection rather than an undefined field.
-   */
-  evidence: SurfaceEvidence;
   lastReviewed: string;
   /** Pre-built lowercase haystack covering every searchable field. */
   searchHaystack: string;
@@ -206,8 +198,9 @@ export function buildHaystack(surface: RegistrySurface, lastReviewed: string): s
 
 /**
  * Projects registry entries into observation-plane rows. Registry facts are
- * kept verbatim; evidence fields default to an explicit no-evidence state and
- * are overwritten by `applyEvidence` when the evidence API returns a claim.
+ * kept verbatim; evidence fields carry only lightweight summary state — the
+ * full claim/provenance payload is loaded lazily by the drill-down so the
+ * client prop for the collapsed table stays bounded.
  */
 export function toSurfaceRows(registry: Registry): SurfaceRow[] {
   const lastReviewed = registry.lastReviewed;
@@ -234,11 +227,10 @@ export function toSurfaceRows(registry: Registry): SurfaceRow[] {
     officialUrls: surface.official_urls ?? [],
     evidenceStatus: "no_evidence",
     evidenceLabel: "No evidence",
-    evidenceNote: emptySurfaceEvidence(surface.id).evidence_note ?? "",
+    evidenceNote: "No validated claim is linked to this surface yet.",
     confidenceLabel: "Unknown — no validated claim",
     freshnessLabel: "No capture yet",
     evidenceClaimCount: 0,
-    evidence: emptySurfaceEvidence(surface.id),
     lastReviewed,
     searchHaystack: buildHaystack(surface, lastReviewed),
   }));

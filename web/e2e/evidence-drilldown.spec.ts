@@ -4,54 +4,72 @@ import { mkdirSync } from "node:fs";
 const SHOTS = "proof";
 
 /**
- * Live proof for issue #46 against the real read-only evidence API
- * (EVIDENCE_API_URL). Skips unless the API is configured so the suite stays
- * green in environments without production evidence.
+ * Structural proof for issue #46. Assertions are structural (testids, presence
+ * of non-empty values/quotes, link href origin) rather than brittle literals,
+ * so the drawer contract is verified without depending on exact backend text.
+ *
+ * - `EVIDENCE_API_URL` set  -> runs against the live read-only API.
+ * - `EVIDENCE_FIXTURE=1`    -> runs against recorded fixtures (works offline/CI).
+ * One mode is always active in the job that owns this suite; both must be
+ * configured there, so these tests never silently no-op.
  */
-const HAS_API = Boolean(process.env.EVIDENCE_API_URL);
+const HAS_API = Boolean(process.env.EVIDENCE_API_URL || process.env.EVIDENCE_FIXTURE);
+const DESKTOP_ONLY = "server row path is the desktop layout";
 
 test.beforeAll(() => {
   mkdirSync(SHOTS, { recursive: true });
 });
 
-test("chatgpt drawer shows the real claim, value, source, provenance, confidence and history", async ({ page }) => {
-  test.skip(!HAS_API, "requires EVIDENCE_API_URL");
-  test.skip((page.viewportSize()?.width ?? 0) < 861, "desktop row path");
+test("evidenced surface: every claim, value, source link, provenance and confidence", async ({ page }) => {
+  test.skip(!HAS_API, "requires EVIDENCE_API_URL or EVIDENCE_FIXTURE=1");
+  test.skip((page.viewportSize()?.width ?? 0) < 861, DESKTOP_ONLY);
 
   await page.goto("/");
+  await page.getByTestId("search-input").fill("ChatGPT");
   await page.getByTestId("row-chatgpt").scrollIntoViewIfNeeded();
   await page.getByTestId("cell-chatgpt-evidence").click();
 
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
 
-  // Real claim statement + value + unit/scope.
-  await expect(dialog.getByTestId("evidence-claims")).toBeVisible();
-  await expect(dialog).toContainText("robots.txt");
-  await expect(dialog).toContainText("24");
+  // Detail is loaded lazily on drawer open; await it before asserting.
+  const claims = dialog.getByTestId("evidence-claims").locator("> li");
+  await expect(claims.first()).toBeVisible();
+  expect(await claims.count()).toBeGreaterThanOrEqual(1);
 
-  // Public source link with the safe rel attributes.
-  const link = dialog.locator('a[href="https://developers.openai.com/api/docs/bots"]').first();
-  await expect(link).toBeVisible();
-  await expect(link).toHaveAttribute("target", "_blank");
-  await expect(link).toHaveAttribute("rel", /noreferrer noopener/);
+  // At least one non-empty, non-"Unknown" value is shown.
+  const values = dialog.getByTestId("evidence-value");
+  expect(await values.count()).toBeGreaterThanOrEqual(1);
+  const valueTexts = await values.locator(".evidence-value-num").allInnerTexts();
+  expect(valueTexts.some((text) => text.trim() && text.trim() !== "Unknown")).toBe(true);
 
-  // Confidence is evidence-derived and inspectable.
+  // Public source link: present, opens in a new tab, no referrer.
+  const sourceLink = dialog.locator(".evidence-grid a").first();
+  await expect(sourceLink).toBeVisible();
+  await expect(sourceLink).toHaveAttribute("target", "_blank");
+  await expect(sourceLink).toHaveAttribute("rel", /noreferrer noopener/);
+  const href = await sourceLink.getAttribute("href");
+  expect(href).toMatch(/^https?:\/\//);
+
+  // Confidence is visible in the concise view and in the technical detail.
   await expect(dialog).toContainText("confidence");
 
-  // Expansion reveals provenance quote; no private filesystem path leaks.
+  // Expansion reveals a non-empty provenance quote and capture availability.
   await dialog.locator("summary", { hasText: "Technical provenance" }).first().click();
-  await expect(dialog).toContainText("For search results, please note it can take ~24 hours");
+  const quote = dialog.getByTestId("provenance-quote").first();
+  await expect(quote).toBeVisible();
+  expect((await quote.innerText()).trim().length).toBeGreaterThan(0);
   await expect(dialog).toContainText("snapshot");
+  // Never leak a private filesystem path.
   await expect(dialog).not.toContainText("/var/");
   await expect(dialog).not.toContainText("/home/");
 
   await page.screenshot({ path: `${SHOTS}/evidence-chatgpt.png`, fullPage: false });
 });
 
-test("a no-evidence surface shows the explicit no-evidence state", async ({ page }) => {
-  test.skip(!HAS_API, "requires EVIDENCE_API_URL");
-  test.skip((page.viewportSize()?.width ?? 0) < 861, "desktop row path");
+test("no-evidence surface: explicit state, no contradictory chrome", async ({ page }) => {
+  test.skip(!HAS_API, "requires EVIDENCE_API_URL or EVIDENCE_FIXTURE=1");
+  test.skip((page.viewportSize()?.width ?? 0) < 861, DESKTOP_ONLY);
 
   await page.goto("/");
   await page.getByTestId("search-input").fill("DeepSeek");
@@ -61,7 +79,8 @@ test("a no-evidence surface shows the explicit no-evidence state", async ({ page
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
   await expect(dialog.getByTestId("no-evidence")).toBeVisible();
-  await expect(dialog).toContainText("No evidence");
+  // A bare no-evidence surface must not render an empty History block.
+  await expect(dialog.getByTestId("evidence-history")).toHaveCount(0);
 
   await page.screenshot({ path: `${SHOTS}/evidence-no-evidence.png`, fullPage: false });
 });
