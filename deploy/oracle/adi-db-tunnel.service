@@ -13,7 +13,7 @@ ExecStart=/usr/bin/ssh -N -o ServerAliveInterval=30 -o ServerAliveCountMax=3 \
   -o ExitOnForwardFailure=yes -o BatchMode=yes \
   -i /etc/ai-discovery/db-tunnel-key \
   -L 127.0.0.1:55432:127.0.0.1:55432 \
-  root@100.109.237.19
+  root@89.167.5.185
 Restart=always
 RestartSec=10
 

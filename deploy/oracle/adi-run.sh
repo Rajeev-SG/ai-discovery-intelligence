@@ -17,7 +17,13 @@ LOG_DIR=$STATE_DIR/runs
 ENV_FILE=/etc/ai-discovery/env
 IMAGE=adi:current
 API_HEALTH_URL=${ADI_API_HEALTH_URL:-http://iyercyduhzplx2m7ldqqz0cp.89.167.5.185.sslip.io/health}
-REPLICA_TARGET=${ADI_SNAPSHOT_REPLICA_TARGET:-root@100.109.237.19}
+# Hetzner public IP, not the tailnet IP: the Hetzner host runs Tailscale SSH,
+# which intercepts :22 on the tailnet address and demands interactive browser
+# auth, so a key-restricted, unattended systemd tunnel can never authenticate
+# over the tailnet. The public IP uses plain sshd with the restricted keys.
+REPLICA_TARGET=${ADI_SNAPSHOT_REPLICA_TARGET:-root@89.167.5.185}
+# rrsync roots at /var/lib/ai-discovery, so the target path is relative.
+REPLICA_PATH=${ADI_SNAPSHOT_REPLICA_PATH:-snapshots/}
 REPLICA_KEY=${ADI_SNAPSHOT_REPLICA_KEY:-/etc/ai-discovery/replica-key}
 
 mkdir -p "$STATUS_DIR" "$LOG_DIR" "$STATE_DIR/snapshots" "$STATE_DIR/dagster-home"
@@ -39,7 +45,7 @@ docker run --rm --name adi-run \
 replicated=0
 if [ "$run_rc" -eq 0 ]; then
   if rsync -a --delete -e "ssh -i $REPLICA_KEY -o BatchMode=yes -o ConnectTimeout=15" \
-      "$STATE_DIR/snapshots/" "$REPLICA_TARGET:/var/lib/ai-discovery/snapshots/" \
+      "$STATE_DIR/snapshots/" "$REPLICA_TARGET:$REPLICA_PATH" \
       >>"$log" 2>&1; then
     replicated=1
   else

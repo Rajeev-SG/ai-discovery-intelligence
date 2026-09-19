@@ -6,6 +6,14 @@ Docker container driven by a systemd timer, mirroring the proven
 ad-platform-intelligence pattern. The durable evidence Postgres stays on the
 Hetzner/Coolify host; Oracle owns no unique durable state.
 
+Oracle reaches Hetzner over its **public IP** (`89.167.5.185`), not the
+tailnet IP. The Hetzner host runs Tailscale SSH, which intercepts `:22` on the
+tailnet address and requires interactive browser auth — an unattended systemd
+tunnel or `rrsync` can never satisfy that, so key-restricted paths are pinned
+to the public IP. The Postgres publish stays loopback-only on Hetzner
+(`127.0.0.1:55432`); the tunnel key is restricted to that one forward, so the
+database is never exposed publicly.
+
 ## Layout on the host
 
 | Path | Purpose |
@@ -26,12 +34,16 @@ Hetzner/Coolify host; Oracle owns no unique durable state.
 1. Env file on Oracle: `ssh oracle 'sudoedit /etc/ai-discovery/env && chmod 600 /etc/ai-discovery/env'`
 2. Tunnel key: `ssh oracle 'ssh-keygen -t ed25519 -f /etc/ai-discovery/db-tunnel-key -N "" -C adi-db-tunnel'`
    then append its public key to Hetzner `authorized_keys` with options:
-   `from="100.112.158.79",command="echo tunnel-only",no-pty,no-agent-forwarding,no-X11-forwarding,permitopen="127.0.0.1:55432"`
+   `from="100.112.158.79,140.238.91.73",restrict,permitopen="127.0.0.1:55432"`
+   (`140.238.91.73` is the Oracle public egress IP the tunnel connects from;
+   keep the tailnet IP too so either path authenticates.)
 3. Replica key: `ssh oracle 'ssh-keygen -t ed25519 -f /etc/ai-discovery/replica-key -N "" -C adi-replica'`
    then append its public key to Hetzner `authorized_keys` with options:
-   `from="100.112.158.79",command="rrsync /var/lib/ai-discovery",no-pty,no-agent-forwarding,no-X11-forwarding`
+   `from="100.112.158.79,140.238.91.73",command="rrsync /var/lib/ai-discovery",no-pty,no-agent-forwarding,no-X11-forwarding`
    (fall back to `from=` + `no-pty` only if `rrsync` is not installed).
-4. Enable: `ssh oracle 'systemctl enable --now adi-db-tunnel && systemctl enable --now adi-run.timer'`
+4. Enable: `ssh oracle 'sudo systemctl enable --now adi-db-tunnel && sudo systemctl enable --now adi-run.timer'`
+5. Seed the root known_hosts so the tunnel's BatchMode ssh trusts Hetzner:
+   `ssh oracle 'sudo mkdir -p /root/.ssh && sudo ssh-keyscan -t ed25519,rsa 89.167.5.185 | sudo tee -a /root/.ssh/known_hosts'`
 
 ## Deploy
 
