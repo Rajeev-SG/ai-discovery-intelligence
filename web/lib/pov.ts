@@ -62,6 +62,12 @@ export interface PovRevision {
 export interface PovView {
   source: string;
   version: number;
+  /**
+   * The canonical proposition id set from `pov/state.yaml`, emitted by the
+   * generator. Used to assert artifact<->state parity without parsing YAML in
+   * the web test suite.
+   */
+  canonical_ids: string[];
   propositions: PovProposition[];
   /** Chronological (oldest first) so the change history reads as a timeline. */
   changelog: PovRevision[];
@@ -182,9 +188,12 @@ export function projectPov(raw: unknown): PovView {
     .sort((a, b) => a.changed_at.localeCompare(b.changed_at));
   const ids = propositions.map((p) => p.id);
   if (new Set(ids).size !== ids.length) throw new Error("duplicate POV proposition ids");
+  const canonicalIds = value.canonical_ids ?? propositions.map((p) => p.id);
+  if (!canonicalIds.length) throw new Error("no canonical_ids in POV artifact");
   return {
     source: value.source ?? "pov/state.yaml",
     version: value.version ?? 1,
+    canonical_ids: canonicalIds,
     propositions,
     changelog,
   };

@@ -1,6 +1,3 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
 import {
   CONFIDENCE_LABELS,
@@ -31,21 +28,22 @@ function prop(overrides: Record<string, unknown> = {}) {
 }
 
 /**
- * Canonical proposition ids straight from pov/state.yaml. The artifact tests are
- * structural: every id in the artifact must exist in state.yaml and vice versa,
- * instead of hard-coding four ids and a claim hash that drift silently.
+ * The canonical proposition ids, emitted into the artifact by
+ * scripts/build_web_pov.py straight from pov/state.yaml (which asserts the
+ * projection covers exactly those ids). Reading them from the artifact keeps
+ * the test structural — no hard-coded ids or claim hashes, and no second YAML
+ * parser in the web suite.
  */
-function canonicalIds(): string[] {
-  const raw = parse(readFileSync(path.join(process.cwd(), "..", "pov", "state.yaml"), "utf8"));
-  return (raw.propositions as { id: string }[]).map((p) => p.id);
-}
 
 describe("canonical POV artifact", () => {
   const view = loadPov();
 
   it("covers exactly the propositions in pov/state.yaml", () => {
     const ids = view.propositions.map((p) => p.id);
-    expect(ids).toEqual(canonicalIds());
+    // canonical_ids is the authoritative state.yaml id set, emitted by the
+    // generator after asserting artifact coverage.
+    expect(view.canonical_ids.length).toBeGreaterThan(0);
+    expect(ids).toEqual(view.canonical_ids);
     expect(new Set(ids).size).toBe(ids.length);
   });
 

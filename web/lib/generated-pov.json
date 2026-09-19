@@ -1,6 +1,12 @@
 {
   "source": "pov/state.yaml",
   "version": 1,
+  "canonical_ids": [
+    "pov-retrieval-systems",
+    "pov-channel-prioritisation",
+    "pov-commerce-ads",
+    "pov-measurement"
+  ],
   "propositions": [
     {
       "id": "pov-retrieval-systems",

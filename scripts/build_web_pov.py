@@ -77,6 +77,10 @@ def build_payload(state) -> dict:
     return {
         "source": "pov/state.yaml",
         "version": state.version,
+        # The canonical proposition id set, emitted from state.yaml so the web
+        # test can assert artifact<->state parity without a second YAML parser.
+        # `source_ids` is the authoritative state.yaml order, asserted above.
+        "canonical_ids": source_ids,
         "propositions": propositions,
         "changelog": changelog,
     }
