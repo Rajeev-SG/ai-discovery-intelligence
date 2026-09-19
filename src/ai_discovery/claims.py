@@ -245,12 +245,40 @@ class ClaimEvidence(Base):
     claim: Mapped[Claim] = sa_relationship(back_populates="captures")
 
 
+class ChangeEventRow(Base):
+    """Persisted change event (issue #23). Append-only; payload is the event JSON."""
+
+    __tablename__ = "change_event"
+
+    id: Mapped[str] = mapped_column(String(12), primary_key=True)
+    event_type: Mapped[str] = mapped_column(String(40), index=True)
+    title: Mapped[str] = mapped_column(Text)
+    surfaces: Mapped[list[str]] = mapped_column(JSON, default=list)
+    dedupe_key: Mapped[str | None] = mapped_column(String(200), index=True)
+    payload: Mapped[str] = mapped_column(Text)
+    observed_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), index=True)
+    published_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True))
+    effective_from: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class BriefSnapshotRow(Base):
+    """One generated weekly brief, persisted so the product reads real output."""
+
+    __tablename__ = "brief_snapshot"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    generated_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+    payload: Mapped[str] = mapped_column(Text)
+
+
 LEDGER_TABLES = (
     Study.__table__,
     Claim.__table__,
     ClaimMetric.__table__,
     ClaimLocator.__table__,
     ClaimEvidence.__table__,
+    ChangeEventRow.__table__,
+    BriefSnapshotRow.__table__,
 )
 
 

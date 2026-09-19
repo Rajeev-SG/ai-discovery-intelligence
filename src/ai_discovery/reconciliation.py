@@ -302,3 +302,86 @@ def canonical_reconciliation() -> Reconciliation:
     denominators, geographies and time windows), not a material conflict.
     """
     return compare_claims(CANONICAL_SEMRUSH, CANONICAL_AHREFS)
+
+
+# ---------------------------------------------------------------------------
+# Real reconciliation over the persisted ledger (issue #23)
+# ---------------------------------------------------------------------------
+
+
+def study_claim_from_view(row: dict) -> StudyClaim | None:
+    """Build a ``StudyClaim`` from an expanded-ledger view, or ``None`` if it lacks context.
+
+    Only claims that name a surface and a subject can be compared at all: an
+    absent context is not a match, so we refuse to invent one.
+    """
+
+    surfaces = row.get("surfaces") or []
+    if not surfaces:
+        return None
+    metrics = [m for m in (row.get("metrics") or []) if m.get("value_number") is not None]
+    if not metrics:
+        return None
+    metric = metrics[0]
+    source = row.get("source") or {}
+    dates = row.get("dates") or {}
+    period_start = _iso_date(dates.get("published_at"))
+    return StudyClaim(
+        id=row["claim_id"],
+        evidence_ids=(row["claim_id"],),
+        surface=surfaces[0],
+        subject=_subject_of(row, source),
+        statement=row.get("statement") or "",
+        metric=metric.get("label"),
+        denominator=(row.get("methodology") or {}).get("denominator"),
+        geography=(row.get("methodology") or {}).get("geography"),
+        mode=(row.get("methodology") or {}).get("measurement_mode"),
+        sampling_frame=(row.get("methodology") or {}).get("unit_of_analysis"),
+        period_start=period_start,
+        period_end=period_start,
+        value=metric.get("value_number"),
+        unit=metric.get("unit"),
+        provisional=row.get("status") in {"contested", "watch"},
+    )
+
+
+def _iso_date(value: str | None):
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(str(value)[:10])
+    except ValueError:
+        return None
+
+
+def _subject_of(row: dict, source: dict) -> str:
+    """The entity two claims must share to be comparable at all."""
+
+    import re
+
+    for surface in row.get("surfaces") or []:
+        if surface:
+            return surface
+    url = source.get("canonical_url") or source.get("url") or ""
+    host = re.sub(r"^https?://", "", str(url)).split("/")[0]
+    return host or row["claim_id"]
+
+
+def reconcile_persisted(rows: list[dict]) -> list[Reconciliation]:
+    """Compare persisted claims that share a surface and subject but disagree.
+
+    This is real reconciliation over the ledger: each comparison is grounded in
+    stored, validated claims, and an interpreted conflict still preserves both
+    sides rather than overwriting one.
+    """
+
+    claims = [sc for sc in (study_claim_from_view(r) for r in rows) if sc is not None]
+    out: list[Reconciliation] = []
+    for i, first in enumerate(claims):
+        for second in claims[i + 1 :]:
+            if (first.surface, first.subject) != (second.surface, second.subject):
+                continue
+            if first.value == second.value:
+                continue
+            out.append(compare_claims(first, second))
+    return out

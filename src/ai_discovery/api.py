@@ -240,19 +240,143 @@ def serialise_source(row: Source) -> dict:
     }
 
 
-@app.get("/reconciliation/canonical", tags=["reconciliation"])
-def get_canonical_reconciliation() -> dict:
-    """Agency interpretation of the contested Reddit/ChatGPT citation-share case."""
-    from .reconciliation import canonical_reconciliation
+def _ledger_engine(db: Session):
+    """The engine backing the request session, for the ledger read helpers."""
 
-    r = canonical_reconciliation()
+    return db.get_bind()
+
+
+@app.get("/claims", tags=["claims"])
+def list_claims(
+    db: Session = Depends(get_db),  # noqa: B008 — FastAPI DI
+    surface: str | None = None,
+    topic: str | None = None,
+    min_confidence: str | None = None,
+    limit: int = Query(100, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+) -> dict:
+    """Validated claims from the ledger, newest first.
+
+    Raw captures stay private: each claim carries the evidence hash and
+    availability plus source-derived confidence and freshness, never a snapshot
+    path or capture text.
+    """
+
+    from .claims import load_expanded_claims
+    from .observations import claim_view
+
+    rows = [claim_view(r) for r in load_expanded_claims(_ledger_engine(db))]
+    if surface:
+        rows = [r for r in rows if surface in (r.get("surfaces") or [])]
+    if topic:
+        rows = [r for r in rows if r.get("topic") == topic]
+    if min_confidence:
+        rank = {"unknown": 0, "low": 1, "medium": 2, "high": 3}
+        floor = rank.get(min_confidence, 0)
+        rows = [r for r in rows if rank.get(r.get("confidence"), 0) >= floor]
+    total = len(rows)
+    page = rows[offset : offset + limit]
+    return {"total": total, "count": len(page), "limit": limit, "offset": offset, "items": page}
+
+
+@app.get("/events", tags=["events"])
+def list_events(
+    db: Session = Depends(get_db),  # noqa: B008 — FastAPI DI
+    surface: str | None = None,
+    event_type: str | None = None,
+    limit: int = Query(100, ge=1, le=500),
+) -> dict:
+    """Typed change events, newest first, deduplicated by stable key."""
+
+    from .observations import event_view, load_events
+
+    events = load_events(db)
+    if surface:
+        events = [e for e in events if surface in e.surfaces]
+    if event_type:
+        events = [e for e in events if e.event_type.value == event_type]
+    items = [event_view(e) for e in events[:limit]]
+    return {"count": len(items), "limit": limit, "items": items}
+
+
+@app.get("/brief", tags=["brief"])
+def get_brief(db: Session = Depends(get_db)) -> dict:  # noqa: B008 — FastAPI DI
+    """The latest persisted weekly brief, or an explicit empty state."""
+
+    from .observations import load_brief
+
+    brief = load_brief(db)
+    if brief is None:
+        return {"state": "empty", "items": [], "note": "No weekly brief has been generated yet."}
+    return {"state": "ready", **brief}
+
+
+@app.get("/reconciliation", tags=["reconciliation"])
+def list_reconciliation(db: Session = Depends(get_db)) -> dict:  # noqa: B008 — FastAPI DI
+    """Real reconciliation over the persisted ledger.
+
+    Compares stored claims that share a surface and subject but disagree. Empty
+    when no persisted claims conflict — the endpoint never returns a fixed,
+    hardcoded case.
+    """
+
+    from .claims import load_expanded_claims
+    from .reconciliation import reconcile_persisted
+
+    results = reconcile_persisted(load_expanded_claims(_ledger_engine(db)))
     return {
-        "topic": "reddit-chatgpt-citation-share",
-        "state": r.state,
-        "relationship": r.relationship,
-        "confidence_adjustment": r.confidence_adjustment,
-        "claim_ids": list(r.claim_ids),
-        "differences": list(r.differences),
-        "unknown_dimensions": list(r.unknown_dimensions),
-        "interpretation": r.interpretation,
+        "count": len(results),
+        "items": [
+            {
+                "claim_ids": list(r.claim_ids),
+                "state": r.state,
+                "relationship": r.relationship,
+                "confidence_adjustment": r.confidence_adjustment,
+                "differences": list(r.differences),
+                "unknown_dimensions": list(r.unknown_dimensions),
+                "interpretation": r.interpretation,
+            }
+            for r in results
+        ],
     }
+
+
+@app.get("/surface-evidence", tags=["surfaces"])
+def list_surface_evidence(db: Session = Depends(get_db)) -> dict:  # noqa: B008 — FastAPI DI
+    """Evidence projection for every surface with a claim or change event.
+
+    One request instead of one per surface; surfaces with neither are absent so
+    the caller renders its own explicit no-evidence state.
+    """
+
+    from .claims import load_expanded_claims
+    from .observations import claim_view, load_events, surface_evidence
+
+    claims = [claim_view(r) for r in load_expanded_claims(_ledger_engine(db))]
+    events = load_events(db)
+    by_surface = surface_evidence(claims, events)
+    return {"count": len(by_surface), "surfaces": by_surface}
+
+
+@app.get("/surfaces/{surface_id}/evidence", tags=["surfaces"])
+def get_surface_evidence(
+    surface_id: str,
+    db: Session = Depends(get_db),  # noqa: B008 — FastAPI DI
+) -> dict:
+    """Claims + latest material change for one surface, or an explicit no-evidence state."""
+
+    from .claims import load_expanded_claims
+    from .observations import claim_view, load_events, surface_evidence
+
+    claims = [claim_view(r) for r in load_expanded_claims(_ledger_engine(db))]
+    events = load_events(db)
+    entry = surface_evidence(claims, events).get(surface_id)
+    if entry is None:
+        return {
+            "surface": surface_id,
+            "evidence_state": "no_evidence",
+            "evidence_note": "No validated claim is linked to this surface yet.",
+            "claims": [],
+            "latest_change": None,
+        }
+    return entry
