@@ -7,6 +7,11 @@
 -- bytes — without falsely claiming a human reviewed the model output. Additive and
 -- safe to re-run.
 --
+-- This migration is schema-only: it does not correct rows already written with a
+-- forged human_reviewed flag. That data correction is the companion migration
+-- ``0006_correct_forged_human_review.sql``; apply both to remediate an existing
+-- production ledger produced by the pre-fix automated lane.
+--
 -- Note: ADD COLUMN IF NOT EXISTS and DROP CONSTRAINT IF EXISTS are supported by
 -- PostgreSQL 9.6+.
 
