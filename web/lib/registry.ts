@@ -35,11 +35,10 @@ export function loadRegistry(filePath: string = resolveRegistryPath()): Registry
   const raw = (
     filePath
       ? parse(readFileSync(filePath, "utf8"))
-      : (generated as { version?: number; lastReviewed?: string; surfaces?: RegistrySurface[] })
+      : (generated as { version?: number; last_reviewed?: string; surfaces?: RegistrySurface[] })
   ) as {
     version?: number;
     last_reviewed?: string;
-    lastReviewed?: string;
     surfaces?: RegistrySurface[];
   };
   const surfaces = raw.surfaces ?? [];
@@ -55,7 +54,7 @@ export function loadRegistry(filePath: string = resolveRegistryPath()): Registry
   if (new Set(ids).size !== ids.length) throw new Error("duplicate surface ids in registry");
   return {
     version: raw.version ?? 1,
-    lastReviewed: raw.last_reviewed ?? raw.lastReviewed ?? "unknown",
+    lastReviewed: raw.last_reviewed ?? "unknown",
     surfaces,
   };
 }

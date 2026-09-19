@@ -25,7 +25,7 @@ def main() -> int:
     raw = yaml.safe_load(SOURCE.read_text())
     payload = {
         "version": raw.get("version", 1),
-        "lastReviewed": str(raw.get("last_reviewed", "unknown")),
+        "last_reviewed": str(raw.get("last_reviewed", "unknown")),
         "surfaces": raw.get("surfaces", []),
     }
     OUT.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
