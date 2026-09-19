@@ -762,11 +762,14 @@ def load_expanded_claims(engine: Engine) -> list[dict[str, Any]]:
                         }
                         for loc in locators
                     ],
+                    # Raw captures are private. The product payload exposes only
+                    # availability plus the content hashes — never the server
+                    # filesystem path (issue #26).
                     "evidence": [
                         {
                             "capture_hash": c.capture_hash,
                             "raw_sha256": c.raw_sha256,
-                            "snapshot_path": c.snapshot_path,
+                            "snapshot_available": c.snapshot_path is not None,
                             "http_status": c.http_status,
                             "robots_allowed": c.robots_allowed,
                             "fetched_at": _iso(c.fetched_at),

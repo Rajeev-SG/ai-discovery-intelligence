@@ -8,6 +8,7 @@ negative controls; the real captures are acceptance evidence, never fixtures.
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -142,6 +143,32 @@ def test_ledger_is_append_only_and_expanded_view_is_complete():
     assert len(row["provenance"]) >= 6  # methodology + metric locators, not just a sentence
     assert row["methodology"]["measurement_mode"] == "vendor_estimate"
     assert row["dates"]["measured_window"] == "Jan 2026"
+
+
+def test_expanded_claims_never_expose_the_private_snapshot_path():
+    """Issue #26: the claims payload exposes availability + hash, never the path.
+
+    Raw captures are private evidence; a server filesystem path leaks internal
+    layout and is the first half of leaking capture contents.
+    """
+
+    capture = _synthetic_capture()
+    spec = _spec()
+    spec["source"]["snapshot_path"] = "/srv/private-snapshots/abc123.html"
+    record = C.extract_claim(spec=spec, capture=capture)
+    engine = C.create_ledger_engine("sqlite+pysqlite:///:memory:")
+    C.init_ledger(engine)
+    C.persist_claim(engine, record)
+
+    rows = C.load_expanded_claims(engine)
+    assert len(rows) == 1
+    evidence = rows[0]["evidence"]
+    assert evidence, "expected at least one evidence row"
+    for entry in evidence:
+        assert "snapshot_path" not in entry
+        assert entry["snapshot_available"] is True
+        assert entry["capture_hash"]
+    assert "/srv/private-snapshots" not in json.dumps(rows)
 
 
 def test_superseding_claim_requires_a_predecessor():
