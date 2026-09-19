@@ -23,11 +23,19 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import os
 import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "src"))
+# Overridable so tests can point at an isolated copy of the package instead of
+# mutating the real tree, and write the artifact elsewhere.
+SRC_ROOT = Path(os.environ.get("INTEGRITY_SRC_ROOT", REPO / "src"))
+sys.path.insert(0, str(SRC_ROOT))
+# The scorer resolves config/significance.yaml relative to the imported package, so
+# when the package is an isolated copy point it at the real repo's config.
+if SRC_ROOT != REPO / "src":
+    os.environ.setdefault("AI_DISCOVERY_CONFIG_DIR", str(REPO / "config"))
 
 from ai_discovery import claims as C
 from ai_discovery import confidence as CONF
@@ -40,7 +48,9 @@ from ai_discovery.brief import (
 from ai_discovery.change_events import ChangeEvent, EventStore, EventType
 
 UTC = dt.UTC
-OUT = REPO / "proof" / "integrity" / "scorecard.json"
+OUT = Path(
+    os.environ.get("INTEGRITY_SCORECARD_OUT", REPO / "proof" / "integrity" / "scorecard.json")
+)
 FIXTURES = REPO / "proof" / "integrity" / "fixtures"
 
 
@@ -367,9 +377,13 @@ def main() -> int:
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(scorecard, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    try:
+        shown = OUT.relative_to(REPO)
+    except ValueError:  # artifact written outside the repo (isolated test copy)
+        shown = OUT
     print(
         f"integrity scorecard: {scorecard['checks_passed']}/{len(checks)} passed "
-        f"({len(failures)} failed) -> {OUT.relative_to(REPO)}"
+        f"({len(failures)} failed) -> {shown}"
     )
     for c in checks:
         print(f"  [{'PASS' if c['result'] == 'pass' else 'FAIL'}] {c['name']}")

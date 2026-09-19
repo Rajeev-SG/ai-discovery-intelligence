@@ -38,9 +38,12 @@ class ConfidenceScorer(BaseModel):
 
     @classmethod
     def from_config(cls, config_path: str | None = None) -> ConfidenceScorer:
-        path = Path(
-            config_path or Path(__file__).resolve().parents[2] / "config" / "significance.yaml"
+        import os as _os
+
+        _cfg_root = Path(
+            _os.environ.get("AI_DISCOVERY_CONFIG_DIR", Path(__file__).resolve().parents[2] / "config")
         )
+        path = Path(config_path or _cfg_root / "significance.yaml")
         cfg = yaml.safe_load(path.read_text())
         cd = cfg["confidence_dimensions"]
         return cls(
