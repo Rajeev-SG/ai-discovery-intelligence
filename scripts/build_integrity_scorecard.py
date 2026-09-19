@@ -22,6 +22,7 @@ scorecard fail (exit non-zero).
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
 import json
 import os
 import sys
@@ -34,8 +35,6 @@ SRC_ROOT = Path(os.environ.get("INTEGRITY_SRC_ROOT", REPO / "src"))
 sys.path.insert(0, str(SRC_ROOT))
 # The scorer resolves config/significance.yaml relative to the imported package, so
 # when the package is an isolated copy point it at the real repo's config.
-if SRC_ROOT != REPO / "src":
-    os.environ.setdefault("AI_DISCOVERY_CONFIG_DIR", str(REPO / "config"))
 
 from ai_discovery import claims as C
 from ai_discovery import confidence as CONF
@@ -362,8 +361,9 @@ def main() -> int:
     verified = [c for c in checks if c["status"] == "verified"]
     warnings = [c for c in checks if c["status"] != "verified"]
 
-    scorecard = {
-        "generated_at": dt.datetime.now(UTC).isoformat(),
+    # Deterministic: no wall-clock timestamp, so regenerating an unchanged
+    # scorecard produces zero diff (and any real content change is visible).
+    body = {
         "checks_total": len(checks),
         "checks_passed": len(checks) - len(failures),
         "checks_failed": len(failures),
@@ -375,6 +375,12 @@ def main() -> int:
         ],
         "checks": checks,
     }
+    # A content hash instead of a timestamp: stable for identical results, and it
+    # changes exactly when a check result does.
+    body["content_hash"] = hashlib.sha256(
+        json.dumps(body, sort_keys=True, ensure_ascii=False).encode()
+    ).hexdigest()[:16]
+    scorecard = body
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(scorecard, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     try:

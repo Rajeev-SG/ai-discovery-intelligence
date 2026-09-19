@@ -50,7 +50,9 @@ def test_scorecard_writes_its_artifact_and_matches_the_committed_one(tmp_path):
     assert body["checks_failed"] == 0, body["checks"]
     assert len(body["negative_controls"]) >= 2
     committed = json.loads(SCORECARD.read_text())
-    assert [c["name"] for c in committed["checks"]] == [c["name"] for c in body["checks"]]
+    # The artifact is deterministic: regenerating it must reproduce the committed
+    # content exactly (same checks AND same content hash), so CI leaves no diff.
+    assert committed == body, "committed scorecard is stale; regenerate it"
     assert committed["checks_failed"] == 0
 
 
