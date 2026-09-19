@@ -236,9 +236,11 @@ def test_contradicting_evidence_is_retained_and_caps_confidence():
             confidence=ConfidenceLabel.HIGH,
         )
     )
-    state.processed_events["e-sup"] = __import__(
-        "ai_discovery.pov", fromlist=["ProcessedEvent"]
-    ).ProcessedEvent(event_id="e-sup", claim_id="sup", proposition_id=proposition.id, slot="retrieval_index")
+    from ai_discovery.pov import ProcessedEvent, watermark_key
+
+    state.processed_events[watermark_key("e-sup", "sup")] = ProcessedEvent(
+        event_id="e-sup", claim_id="sup", proposition_id=proposition.id, slot="retrieval_index"
+    )
     assert proposition.confidence() == ConfidenceLabel.HIGH
 
     # A contradicting claim must be retained, not overwrite the supporting one.
@@ -326,3 +328,110 @@ def test_proposition_confidence_reports_weakest_supporting():
         ],
     )
     assert proposition.confidence() == ConfidenceLabel.LOW
+
+
+# --- review #2 fixes -------------------------------------------------------- #
+
+def test_tiny_relative_change_is_rejected_distinct_from_large():
+    """A 24.0 -> 24.1 change is noise; 24 -> 96 is material. The gate must differ."""
+    from ai_discovery.pov import _magnitude
+
+    policy = load_policy()
+    tiny = dict(_NUMERIC, value=[{"value_number": 24.1}])
+    large = dict(_NUMERIC, value=[{"value_number": 96.0}])
+    m_tiny, why_tiny = _magnitude(claim=tiny, prior_value=24.0, policy=policy)
+    m_large, _ = _magnitude(claim=large, prior_value=24.0, policy=policy)
+
+    assert m_tiny == 0.0, f"tiny delta must be non-material: {why_tiny}"
+    assert m_large > policy.min_relative_change
+    assert m_large > m_tiny
+
+    # And through the gate: the tiny delta is a skip, the large one adopts.
+    state = _state()
+    from ai_discovery.pov import PovEvidenceBullet
+
+    state.proposition("pov-retrieval-systems").supporting.append(
+        PovEvidenceBullet(
+            slot="crawler_index_policy",
+            text="incumbent 24",
+            claim_id="inc",
+            event_id="e0",
+            confidence=ConfidenceLabel.MEDIUM,
+            value_number=24.0,
+        )
+    )
+    tiny_decision = evaluate_event(
+        event=_Event(id="tiny"),
+        claim=dict(tiny, claim_id="ct", confidence="medium", statement="x"),
+        state=state,
+        policy=policy,
+    )
+    assert tiny_decision.adopt is False
+    assert "no material change" in tiny_decision.reason
+
+
+def test_qualitative_only_claim_is_not_a_measured_change():
+    """A policy/qualitative reading has text but is not a measured change."""
+    policy = load_policy()
+    from ai_discovery.pov import _magnitude
+
+    qualitative = {
+        "topic": "crawler_index_policy",
+        "value": [{"value_text": "docs were updated", "comparator": "policy_statement"}],
+    }
+    magnitude, why = _magnitude(claim=qualitative, prior_value=None, policy=policy)
+    assert magnitude == policy.magnitude_without_value
+    assert "unquantified" in why
+
+
+def test_one_bullet_per_slot_keeps_the_pov_bounded():
+    """Many events on one topic keep exactly one supporting bullet for that slot."""
+    state = _state()
+    policy = load_policy()
+    for index in range(3):
+        # Distinct claim ids, distinct values so each is a change.
+        apply_event(
+            state=state,
+            event=_Event(id=f"e{index}"),
+            claim=_claim(
+                claim_id=f"c{index}",
+                topic="crawler_index_policy",
+                value=[{"value_number": 100.0 + index}],
+            ),
+            policy=policy,
+        )
+    slot_bullets = [
+        b for b in state.proposition("pov-retrieval-systems").supporting if b.slot == "crawler_index_policy"
+    ]
+    assert len(slot_bullets) == 1, "one current position per slot"
+    # Rendered statement stays bounded (base + one bullet line).
+    statement_lines = state.proposition("pov-retrieval-systems").statement().splitlines()
+    assert len(statement_lines) == 2
+
+
+def test_save_is_atomic_and_locked(tmp_path):
+    """save_state writes atomically; update_state serialises read-modify-write."""
+    import threading
+
+    from ai_discovery.pov import load_state, save_state, update_state
+
+    path = tmp_path / "state.yaml"
+    save_state(_state(), path)
+    assert path.exists()
+    assert not (tmp_path / "state.yaml.tmp").exists()
+
+    # Concurrent increments must all land (no lost update) thanks to the lock.
+    def bump(state):
+        state.version += 1
+
+    def worker():
+        for _ in range(25):
+            update_state(path, bump)
+
+    threads = [threading.Thread(target=worker) for _ in range(4)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    assert load_state(path).version == 1 + 100, "all updates must be preserved"

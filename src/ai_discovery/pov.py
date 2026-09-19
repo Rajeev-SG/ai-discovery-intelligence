@@ -19,6 +19,10 @@ outcome: an event that fails any gate leaves the POV untouched.
 from __future__ import annotations
 
 import datetime as dt
+import fcntl
+import os
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Literal
 
@@ -61,6 +65,16 @@ _CONFIDENCE_ORDER = [
 ]
 _CONFIDENCE_RANK = {label: len(_CONFIDENCE_ORDER) - i for i, label in enumerate(_CONFIDENCE_ORDER)}
 
+# Comparators whose "value" is a qualitative reading, not a measured quantity.
+# A claim whose only evidence is qualitative is not a measured change and must
+# not clear the gate on the strength of "has some text".
+_QUALITATIVE_COMPARATORS = {
+    "policy_statement",
+    "qualitative_finding",
+    "qualitative_signal",
+    "absence_of_documentation",
+}
+
 # Claim `confidence` values (claim_models.Confidence) -> POV label.
 _CLAIM_CONFIDENCE = {
     "high": ConfidenceLabel.HIGH,
@@ -101,10 +115,17 @@ class PovPolicy(BaseModel):
     min_significance: float = 3.5
     min_confidence: ConfidenceLabel = ConfidenceLabel.MEDIUM
     require_topic_match: bool = True
-    # Magnitude applied to a first-seen quantified claim; a repeat of the
-    # incumbent value scores magnitude 0 and cannot clear the gate.
+    # Magnitude applied to a first-seen quantified claim (the proposition had no
+    # prior position for this slot, so adding evidence *is* a change); a repeat of
+    # the incumbent value scores magnitude 0 and cannot clear the gate.
     magnitude_with_value: float = 0.8
     magnitude_without_value: float = 0.4
+    # A changed value must move at least this relative amount to count as a
+    # change; below it the two readings are noise and nothing is adopted.
+    min_relative_change: float = 0.10
+    # Magnitude is 0.4 at the threshold and rises with the relative change up to
+    # 1.0 (a doubling or more).
+    magnitude_change_floor: float = 0.4
     # Cap on how much a proposition's confidence may be raised by a single
     # quantified claim with no stated comparison — a number alone is not proof
     # of materiality.
@@ -224,6 +245,16 @@ def _bullet_line(bullet: PovEvidenceBullet, *, contradicting: bool = False) -> s
     return f"- {bullet.text} ({label} {bullet.claim_id}; {stamp}; {bullet.confidence.value})"
 
 
+def watermark_key(event_id: str, claim_id: str) -> str:
+    """The durable idempotency key for one (event, claim) pair.
+
+    An event may ground several claims; keying by the pair means every claim on
+    an event is processed, and a replay of any pair is skipped.
+    """
+
+    return f"{event_id}::{claim_id}"
+
+
 class ProcessedEvent(BaseModel):
     """A durable record that an event was evaluated and adopted.
 
@@ -249,7 +280,8 @@ class PovState(BaseModel):
     version: int = 1
     propositions: list[PovProposition]
     changelog: list[PovRevision] = Field(default_factory=list)
-    # event_id -> ProcessedEvent. Durable idempotency watermark (issue #7 fix).
+    # watermark_key(event_id, claim_id) -> ProcessedEvent. Durable idempotency
+    # watermark (issue #7 fix).
     processed_events: dict[str, ProcessedEvent] = Field(default_factory=dict)
 
     def proposition(self, proposition_id: str) -> PovProposition | None:
@@ -272,9 +304,53 @@ def load_state(path: str | Path) -> PovState:
 
 
 def save_state(state: PovState, path: str | Path) -> None:
-    Path(path).write_text(
+    """Write the state atomically (temp file + rename) under an exclusive lock.
+
+    A reader never sees a half-written file, and two overlapping runs cannot
+    interleave: each takes the lock for the whole read-modify-write in
+    ``update_state``, so an adoption cannot be silently lost.
+    """
+
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    tmp = target.with_suffix(target.suffix + ".tmp")
+    tmp.write_text(
         yaml.safe_dump(state.model_dump(mode="json"), sort_keys=False, allow_unicode=True)
     )
+    os.replace(tmp, target)
+
+
+def _lock_path(path: str | Path) -> Path:
+    return Path(str(path) + ".lock")
+
+
+@contextmanager
+def _state_lock(path: str | Path) -> Iterator[None]:
+    """An exclusive advisory lock around a state read-modify-write."""
+
+    lock = _lock_path(path)
+    lock.parent.mkdir(parents=True, exist_ok=True)
+    with open(lock, "w") as handle:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+
+def update_state(path: str | Path, apply: Callable[[PovState], Any]) -> PovState:
+    """Lock, load, mutate, atomically save, and return the state.
+
+    ``apply`` receives the loaded state and may mutate it in place; its return
+    value is discarded. This is the only supported read-modify-write path, so the
+    lock cannot be forgotten by a caller.
+    """
+
+    with _state_lock(path):
+        state = load_state(path)
+        apply(state)
+        save_state(state, path)
+        return state
 
 
 def _incumbent_number(proposition: PovProposition | None, slot: str) -> float | None:
@@ -305,16 +381,38 @@ def _magnitude(
         if metric.get("value_number") is not None:
             number = float(metric["value_number"])
             break
+    # A "measured value" means a number, or a value_text on a metric whose
+    # comparator is not one of the qualitative ones. A policy statement or
+    # qualitative finding carries text but is not a measured change.
     has_value = any(
-        (m.get("value_number") is not None) or bool(m.get("value_text")) for m in metrics
+        (m.get("value_number") is not None)
+        or (
+            bool(m.get("value_text"))
+            and (m.get("comparator") or "exact") not in _QUALITATIVE_COMPARATORS
+        )
+        for m in metrics
     )
 
     if number is not None and prior_value is not None:
         denom = max(abs(prior_value), 1e-9)
         relative = abs(number - prior_value) / denom
-        if relative == 0:
-            return 0.0, "value unchanged vs incumbent (not a change)"
-        return min(1.0, 0.4 + relative), f"relative change {relative:.2f} vs incumbent"
+        if relative < policy.min_relative_change:
+            # A change smaller than the stated threshold is treated as noise:
+            # magnitude 0 means the gate rejects it, so a trivial numeric delta
+            # cannot adopt a position.
+            return (
+                0.0,
+                (
+                    f"relative change {relative:.4f} below threshold "
+                    f"{policy.min_relative_change:.2f} (not a material change)"
+                ),
+            )
+        # Map [threshold, 2x threshold..] to [floor, 1.0].
+        span = max(1.0 - policy.magnitude_change_floor, 1e-9)
+        scaled = policy.magnitude_change_floor + span * min(
+            1.0, (relative - policy.min_relative_change) / max(relative, 1e-9)
+        )
+        return min(1.0, scaled), f"relative change {relative:.2f} vs incumbent"
     if has_value:
         return policy.magnitude_with_value, "first-seen quantified claim"
     return policy.magnitude_without_value, "unquantified claim"
@@ -511,12 +609,19 @@ def apply_decision(
         added_at=stamp,
     )
 
-    # Replace any bullet for the same claim id; never evict a different claim.
-    proposition.supporting = [b for b in proposition.supporting if b.claim_id != claim_id]
-    proposition.contradicting = [b for b in proposition.contradicting if b.claim_id != claim_id]
+    # One current position per slot: a new claim for a slot replaces that slot's
+    # existing bullet (deterministic — the newest effective reading wins), so the
+    # rendered POV stays bounded. Other slots and the opposite polarity are kept:
+    # a supporting claim never evicts contradicting evidence, and vice versa.
     if polarity == "contradicting":
+        proposition.contradicting = [
+            b for b in proposition.contradicting if b.slot != topic and b.claim_id != claim_id
+        ]
         proposition.contradicting.append(bullet)
     else:
+        proposition.supporting = [
+            b for b in proposition.supporting if b.slot != topic and b.claim_id != claim_id
+        ]
         proposition.supporting.append(bullet)
     proposition.last_reviewed = stamp
 
@@ -532,7 +637,7 @@ def apply_decision(
         confidence=decision.confidence,
     )
     state.changelog.append(revision)
-    state.processed_events[revision.event_id] = ProcessedEvent(
+    state.processed_events[watermark_key(revision.event_id, claim_id)] = ProcessedEvent(
         event_id=revision.event_id,
         claim_id=claim_id,
         proposition_id=proposition.id,
@@ -558,10 +663,11 @@ def apply_event(
     """
 
     event_id = getattr(event, "id", "") or ""
-    if event_id and event_id in state.processed_events:
+    claim_id = (claim or {}).get("claim_id") or ""
+    if event_id and watermark_key(event_id, claim_id) in state.processed_events:
         return PovDecision(
             adopt=False,
-            reason=f"event {event_id!r} already processed",
+            reason=f"event/claim {event_id!r}/{claim_id!r} already processed",
             significance=0.0,
             confidence="unresolved",
         )

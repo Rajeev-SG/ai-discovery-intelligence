@@ -28,10 +28,9 @@ from ai_discovery.pov import (
     GENERATED_START,
     apply_event,
     load_policy,
-    load_state,
     render_changelog,
     render_pov_body,
-    save_state,
+    update_state,
 )
 
 STATE_PATH = Path(os.environ.get("ADI_POV_STATE", REPO / "pov" / "state.yaml"))
@@ -81,7 +80,6 @@ def _load_events():
 
 
 def main() -> int:
-    state = load_state(STATE_PATH)
     policy = load_policy()
 
     claims = {c["claim_id"]: c for c in _load_claims()}
@@ -89,21 +87,26 @@ def main() -> int:
     # Oldest first so the changelog reads in adoption order.
     events = sorted(events, key=lambda e: e.observed_at)
 
-    adopted = 0
-    skipped = 0
-    for event in events:
-        claim_id = event.claims[0] if event.claims else None
-        claim = claims.get(claim_id) if claim_id else None
-        # Idempotent via the durable processed-event watermark: replaying the full
-        # history converges to the same state with no new changelog entries,
-        # however many events share a topic.
-        decision = apply_event(state=state, event=event, claim=claim, policy=policy)
-        if decision.adopt:
-            adopted += 1
-        else:
-            skipped += 1
+    counters = {"adopted": 0, "skipped": 0}
 
-    save_state(state, STATE_PATH)
+    def _apply(state):
+        # Every claim an event grounds is considered, not just claims[0].
+        for event in events:
+            event_claims = list(getattr(event, "claims", []) or [])
+            if not event_claims:
+                event_claims = [None]
+            for claim_id in event_claims:
+                claim = claims.get(claim_id) if claim_id else None
+                # Idempotent via the durable (event, claim) watermark: replaying
+                # the full history converges with no new changelog entries.
+                decision = apply_event(
+                    state=state, event=event, claim=claim, policy=policy
+                )
+                counters["adopted" if decision.adopt else "skipped"] += 1
+
+    # Locked read-modify-write so overlapping runs cannot lose an adoption.
+    state = update_state(STATE_PATH, _apply)
+    adopted, skipped = counters["adopted"], counters["skipped"]
 
     # Re-render ONLY the block between the markers. Unrelated editorial text is
     # preserved byte-for-byte: we never rewrite the rest of the document.

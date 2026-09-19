@@ -21,9 +21,9 @@ propositions:
     value_number: null
     value_text: '24'
     effective_at: '2026-09-19T16:44:43.507845Z'
-    added_at: '2026-09-19T18:18:12.869211Z'
+    added_at: '2026-09-19T18:33:41.589716Z'
   contradicting: []
-  last_reviewed: '2026-09-19T18:18:12.869211Z'
+  last_reviewed: '2026-09-19T18:33:41.589716Z'
 - id: pov-channel-prioritisation
   section: Channel/surface prioritisation by geography/category
   base_text: Prioritise by measured audience and referral behaviour, not by press
@@ -59,7 +59,7 @@ propositions:
   last_reviewed: null
 changelog:
 - proposition_id: pov-retrieval-systems
-  changed_at: '2026-09-19T18:18:12.869211Z'
+  changed_at: '2026-09-19T18:33:41.589716Z'
   reason: 'material crawler_index_policy change: significance 3.63 >= 3.50, confidence
     medium (first-seen quantified claim)'
   event_id: 9f7e8c586b05
@@ -80,9 +80,9 @@ changelog:
   significance: 3.63
   confidence: medium
 processed_events:
-  9f7e8c586b05:
+  9f7e8c586b05::0b187a5b6f942c1d2a3fcb12285238e5:
     event_id: 9f7e8c586b05
     claim_id: 0b187a5b6f942c1d2a3fcb12285238e5
     proposition_id: pov-retrieval-systems
     slot: crawler_index_policy
-    adopted_at: '2026-09-19T18:18:12.869211Z'
+    adopted_at: '2026-09-19T18:33:41.589716Z'

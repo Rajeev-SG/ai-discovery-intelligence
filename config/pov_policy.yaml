@@ -20,6 +20,15 @@ pov:
   # quantified change is more material than a qualitative one).
   magnitude_with_value: 0.8
   magnitude_without_value: 0.4
+  # A changed value must move at least this relative amount to count as a change;
+  # below it the two readings are noise and nothing is adopted. Magnitude is
+  # `magnitude_change_floor` at the threshold and rises toward 1.0 as the change
+  # grows. This is the gate's real discrimination power, stated so it is not
+  # oversold: for a first-seen value (no incumbent) adoption still requires a
+  # medium-confidence, non-qualitative claim on an owned topic, and any later
+  # reading below this threshold is rejected.
+  min_relative_change: 0.10
+  magnitude_change_floor: 0.4
 
   # Per-topic significance profile (config/significance.yaml axes, each 0-1).
   # These are stated editorial weights, not model output. `magnitude` is set from

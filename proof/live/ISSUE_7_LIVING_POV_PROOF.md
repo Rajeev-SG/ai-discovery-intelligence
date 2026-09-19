@@ -57,18 +57,30 @@ Three real, deterministic skip paths, each covered in `tests/test_pov.py`:
    `min_confidence`; an `optimisation_implication` (an implication, not a change)
    is excluded by its stated significance profile.
 
-## Review-driven hardening (frontier review of #44)
+## Review-driven hardening (frontier reviews of #44)
 
-- **Durable idempotency.** A `processed_events` watermark in `pov/state.yaml`
-  makes a full-history replay converge to the same state with zero new changelog
-  entries, even with two qualifying events on one topic.
-- **Event-specific significance.** Magnitude is now the relative change of the
-  claim's value against the incumbent (0 for a repeat), and breadth/persistence
-  are derived from surfaces and claim status, so the gate distinguishes a
-  material change from a trivial quantified one.
+- **Durable idempotency.** A `processed_events` watermark keyed by
+  `(event_id, claim_id)` makes a full-history replay converge with zero new
+  changelog entries — even with multiple qualifying events on one topic, and even
+  when one event grounds several claims.
+- **Event-specific significance, calibrated.** Magnitude is the relative change of
+  the claim's value against the incumbent. A change below
+  `min_relative_change` (default 0.10) is treated as noise and rejected; a change
+  at or above it rises toward 1.0 as the delta grows. So `24.0 → 24.1` is rejected
+  while `24 → 96` adopts — the rejecting counterexample is asserted in the CI gate
+  step, not just described. A `policy_statement`/qualitative reading is not a
+  measured change and cannot clear the bar. Breadth and persistence are
+  claim-derived (surfaces, contested status).
+- **Bounded POV.** One current bullet per slot per polarity: a new claim for a
+  slot replaces that slot's bullet (newest effective reading wins); a supporting
+  claim never evicts contradicting evidence, and vice versa. The rendered
+  statement stays bounded.
 - **Supporting/contradicting evidence.** Bullets carry a polarity; contradictions
-  are retained and cap the proposition at `low` confidence (marked *contested*)
-  rather than silently overwriting support.
+  are retained and cap the proposition at `low` confidence (marked *contested*).
+- **Atomic, locked state.** `save_state` writes via temp-file + `os.replace`;
+  `update_state` takes an `fcntl` exclusive lock around the read-modify-write, so
+  overlapping runs cannot lose an adoption. Verified by a concurrency test
+  (4 threads × 25 updates, all preserved).
 - **Claim statement precedence.** The bullet quotes the validated claim
   statement, not the event's ingest title.
 - **Validated confidence + no dead config.** `to_pov_confidence` rejects unknown
@@ -78,5 +90,7 @@ Three real, deterministic skip paths, each covered in `tests/test_pov.py`:
 
 Confidence is the claim's own evidence-derived label (validated into the POV
 vocabulary, never a model label); significance uses stated per-topic editorial
-weights plus claim-derived magnitude/breadth/persistence. Edits are surgical. 15
-POV tests; whole suite green.
+weights plus claim-derived magnitude/breadth/persistence, and the gate's actual
+discrimination power (relative-change threshold, qualitative-exclusion) is
+stated in `config/pov_policy.yaml` rather than oversold. Edits are surgical and
+bounded. 19 POV tests; whole suite green.

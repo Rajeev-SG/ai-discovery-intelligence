@@ -107,7 +107,13 @@ jobs:
           # A topic the proposition does not own yields no change.
           other = dict(claim, claim_id="c3", topic="commerce_ads")
           assert not evaluate_event(event=E("e3"), claim=other, state=state, policy=policy).adopt
-          print("POV gate OK: adopt + idempotent replay + repeat + unowned topic")
+          # Rejecting counterexample: a tiny relative change on an owned topic is
+          # NOT material, while a large one is — the gate discriminates.
+          from ai_discovery.pov import _magnitude
+          tiny, _ = _magnitude(claim={"value":[{"value_number":24.1}]}, prior_value=24.0, policy=policy)
+          large, _ = _magnitude(claim={"value":[{"value_number":96.0}]}, prior_value=24.0, policy=policy)
+          assert tiny == 0.0 and large > policy.min_relative_change
+          print("POV gate OK: adopt + idempotent replay + repeat + unowned topic + tiny-delta reject")
           PY
 
       - name: Build the evidence-API image (issue #9)
