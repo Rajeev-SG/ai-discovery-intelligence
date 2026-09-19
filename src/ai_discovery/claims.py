@@ -183,7 +183,7 @@ class ClaimMetric(Base):
     label: Mapped[str] = mapped_column(String(160))
     comparator: Mapped[str] = mapped_column(String(20), default="exact")
     definition: Mapped[str] = mapped_column(Text)
-    value_text: Mapped[str] = mapped_column(Text)
+    value_text: Mapped[str | None] = mapped_column(Text)
     value_number: Mapped[float | None] = mapped_column(Float)
     unit: Mapped[str] = mapped_column(String(40))
     window: Mapped[str] = mapped_column(Text)
@@ -535,6 +535,17 @@ def _as_float(value: Any) -> float | None:
     return float(value) if isinstance(value, (int, float)) and not isinstance(value, bool) else None
 
 
+def _value_text(value: Provenanced[Any]) -> str | None:
+    """Persist a provenanced value as text, keeping "unknown" unknown.
+
+    ``str(None)`` is the literal string ``"None"``, which would turn a first-class
+    unknown into a value a drill-down renders or a consumer parses (issue #25).
+    An unknown value persists as SQL NULL, matching ``value_number``.
+    """
+
+    return None if value.value is None else str(value.value)
+
+
 def persist_claim(engine: Engine, record: ClaimRecord) -> tuple[str, bool]:
     """Insert a study + claim + metrics + locators + capture. Append-only.
 
@@ -614,7 +625,7 @@ def persist_claim(engine: Engine, record: ClaimRecord) -> tuple[str, bool]:
                         label=metric.label,
                         comparator=metric.comparator,
                         definition=metric.definition.value or "",
-                        value_text=str(metric.value.value),
+                        value_text=_value_text(metric.value),
                         value_number=_as_float(metric.value.value),
                         unit=metric.unit.value or "",
                         window=metric.window.value or "",
