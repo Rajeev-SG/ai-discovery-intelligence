@@ -1,0 +1,12 @@
+[Unit]
+Description=ai-discovery-intelligence acquisition run (Docker, issue #9)
+Wants=network-online.target adi-db-tunnel.service
+After=network-online.target docker.service adi-db-tunnel.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+# Browser renders + Instructor extraction over the full registry: allow hours.
+TimeoutStartSec=4h
+ExecStart=/usr/local/sbin/adi-run
+OnFailure=adi-alert@%n.service

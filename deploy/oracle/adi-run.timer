@@ -1,0 +1,15 @@
+[Unit]
+Description=Daily ai-discovery-intelligence acquisition run
+
+[Timer]
+# Daily high-value-source cadence (matches the in-code Dagster schedule
+# daily_high_value_sources, 0 6 * * * UTC; offset +10 min away from the
+# ad-platform weekly run). Unchanged sources are skipped without a model
+# call: the claims asset only extracts for captures with no claim yet, so
+# model spend is bounded by change detection.
+OnCalendar=*-*-* 06:10:00 UTC
+Persistent=true
+RandomizedDelaySec=600
+
+[Install]
+WantedBy=timers.target
