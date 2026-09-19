@@ -52,6 +52,13 @@ jobs:
           python scripts/build_web_registry.py
           git diff --exit-code web/lib/generated-registry.json
 
+      - name: Vendored POV artifact is current
+        working-directory: .
+        run: |
+          python -m pip install --quiet "PyYAML>=6,<7" "pydantic>=2.9,<3"
+          python scripts/build_web_pov.py
+          git diff --exit-code web/lib/generated-pov.json
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
