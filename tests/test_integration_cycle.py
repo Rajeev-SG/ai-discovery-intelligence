@@ -134,6 +134,13 @@ def test_full_cycle_capture_extraction_claims_and_api():
     with pytest.raises(ClaimSpecError):
         claims_from_extraction(bad, source=_source(capture), capture=capture, human_reviewed=True)
 
+    # 4b. Fabrication gate: a hallucinated field (anchor naming markup that
+    # does not exist in the capture) must be rejected the same way.
+    ghost = result.model_copy(deep=True)
+    ghost.claims[0].capture_anchor = "GhostMetric reported 99.9 percent adoption"
+    with pytest.raises(ClaimSpecError):
+        claims_from_extraction(ghost, source=_source(capture), capture=capture, human_reviewed=True)
+
     # 5. Ledger: persist and reload the expanded view.
     engine = create_ledger_engine("sqlite+pysqlite:///:memory:")
     init_ledger(engine)

@@ -13,8 +13,22 @@ permissions:
 
 jobs:
   build:
-    name: claim-ledger (extraction, tests, lint)
+    name: claim-ledger (extraction, integrity, tests, lint)
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: ai_discovery
+          POSTGRES_PASSWORD: ai_discovery
+          POSTGRES_DB: ai_discovery
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U ai_discovery -d ai_discovery"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      AI_DISCOVERY_TEST_DATABASE_URL: postgresql://ai_discovery:ai_discovery@127.0.0.1:55432/ai_discovery
     steps:
       - uses: actions/checkout@v4
 
@@ -25,8 +39,23 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras
 
+      - name: Evidence-integrity scorecard (issue #29)
+        run: uv run python scripts/build_integrity_scorecard.py
+
       - name: Run tests
         run: uv run pytest tests/ -q --tb=short
+
+      - name: Instructor claim cycle end-to-end (capture → extraction → quote gate → ledger)
+        run: uv run pytest tests/test_integration_cycle.py -q --tb=short
+
+      - name: Postgres-backed persistence tests must run, not skip
+        run: |
+          output=$(uv run pytest tests/test_migration.py -q -rs --tb=short)
+          echo "$output"
+          if echo "$output" | grep -qi "skipped"; then
+            echo "::error::Postgres-backed tests skipped; the CI database service is unavailable"
+            exit 1
+          fi
 
       - name: Lint
         run: uv run ruff check src tests scripts
@@ -44,6 +73,9 @@ jobs:
           assert "claims" in assets and "feed_items" in assets
           print("dagster defs OK:", sorted(assets))
           PY
+
+      - name: Build the evidence-API image (issue #9)
+        run: docker build -t ai-discovery-evidence-api:ci .
 
       - name: Upload proof artifacts
         uses: actions/upload-artifact@v4
