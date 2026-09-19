@@ -4,8 +4,12 @@ Crawl4AI owns browser rendering, readiness, lazy-load handling, main-content
 identification and HTML -> Markdown conversion. This module only maps the
 source registry's configuration onto Crawl4AI configuration and returns both
 the raw rendered HTML and the cleaned Markdown document. Source-specific
-behaviour belongs in Crawl4AI configuration (selectors, waits, waits), not in
+behaviour belongs in Crawl4AI configuration (selectors, waits), not in
 custom parsing code.
+
+crawl4ai lives behind the optional ``acquisition`` extra: a base install keeps
+HTTP-only acquisition, and the render lane raises with install guidance when
+it is actually requested.
 """
 
 from __future__ import annotations
@@ -14,11 +18,23 @@ import asyncio
 from dataclasses import dataclass
 from typing import Any, Self
 
-from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig
-from crawl4ai.content_filter_strategy import PruningContentFilter
-from crawl4ai.markdown_generation_strategy import DefaultMarkdownGenerator
-
 from .normalise import normalise_markdown
+
+INSTALL_HINT = (
+    "The Crawl4AI render lane needs the 'acquisition' extra and its browser runtime: "
+    "uv sync --extra acquisition && uv run playwright install --with-deps chromium"
+)
+
+
+def _crawl4ai():
+    """Import crawl4ai lazily so a base install stays HTTP-only and browser-free."""
+    try:
+        from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig
+        from crawl4ai.content_filter_strategy import PruningContentFilter
+        from crawl4ai.markdown_generation_strategy import DefaultMarkdownGenerator
+    except ImportError as error:  # pragma: no cover - exercised without the extra
+        raise RuntimeError(INSTALL_HINT) from error
+    return AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig, PruningContentFilter, DefaultMarkdownGenerator
 
 
 @dataclass
@@ -46,6 +62,7 @@ def crawl_config_for(
     content_filter_threshold: float | None = None,
 ) -> CrawlerRunConfig:
     """Build a Crawl4AI config from source-registry settings."""
+    _, _, CacheMode, CrawlerRunConfig, PruningContentFilter, DefaultMarkdownGenerator = _crawl4ai()
     threshold = content_filter_threshold if content_filter_threshold is not None else 0.45
     generator = DefaultMarkdownGenerator(
         content_filter=PruningContentFilter(threshold=threshold),
@@ -77,6 +94,7 @@ class RenderClient:
     """
 
     def __init__(self, *, headless: bool = True) -> None:
+        AsyncWebCrawler, BrowserConfig, *_ = _crawl4ai()
         self._loop = asyncio.new_event_loop()
         self._crawler = AsyncWebCrawler(config=BrowserConfig(headless=headless, verbose=False))
 
