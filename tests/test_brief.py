@@ -109,6 +109,40 @@ def test_generator_watch_item():
     assert result[0].is_watch_item
 
 
+def test_target_is_a_soft_quality_gate_not_dead_config():
+    """Issue #28B F1: target_items must change behaviour, not be unused.
+
+    Two generators differing only in target_items must produce different output
+    for a candidate set whose items straddle the beyond-target bar.
+    """
+
+    # Items: 3 strong (>= 4.5 beyond-bar) and 2 weaker (>= 3.5 normal bar).
+    cands = [
+        item(change="strong1", significance=5.0),
+        item(change="strong2", significance=4.9),
+        item(change="strong3", significance=4.6),
+        item(change="weak1", significance=3.9),
+        item(change="weak2", significance=3.6),
+    ]
+    # target 5 -> all 5 qualify at the normal bar.
+    wide = BriefGenerator(target_items=5, max_items=5)
+    assert len(wide.generate(cands)) == 5
+    # target 3 -> the two weaker items fall below the beyond-target bar.
+    narrow = BriefGenerator(target_items=3, max_items=5)
+    out = narrow.generate(cands)
+    assert len(out) == 3, [x.change for x in out]
+    assert {x.change for x in out} == {"strong1", "strong2", "strong3"}
+
+
+def test_default_config_can_emit_the_hard_max():
+    """Regression: the original bug — default config could never reach max_items."""
+
+    bg = BriefGenerator()  # target_items=3 (soft), max_items=5 (hard)
+    cands = [item(change=f"c{i}", significance=5.0 - i * 0.01) for i in range(5)]
+    out = bg.generate(cands)
+    assert len(out) == 5, "default config must be able to emit max_items when warranted"
+
+
 def test_target_is_soft_and_max_is_hard():
     """Issue #28B: target_items is a soft target; max_items is the hard ceiling."""
 
@@ -120,8 +154,9 @@ def test_target_is_soft_and_max_is_hard():
     assert out[0].significance == max(c.significance for c in candidates)
 
     # The hard ceiling is never exceeded even when everything qualifies.
+    strong = [item(change=f"c{i}", significance=5.0) for i in range(9)]
     bg2 = BriefGenerator(target_items=2, max_items=3)
-    assert len(bg2.generate([item(change=f"c{i}") for i in range(9)])) == 3
+    assert len(bg2.generate(strong)) == 3
 
     # Fewer qualifying items than the target is fine (soft, not a floor).
     bg3 = BriefGenerator(target_items=3, max_items=5)
