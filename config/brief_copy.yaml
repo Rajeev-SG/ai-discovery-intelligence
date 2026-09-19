@@ -1,0 +1,35 @@
+# Deterministic executive-brief copy (issue #48 wiring of docs/PIPELINES.md step 14).
+#
+# The weekly brief must not be an LLM essay. Each item's framing is chosen
+# deterministically from the change event's type — the same event always yields
+# the same change/why_it_matters/agency_action text. Facts (numbers, dates,
+# surfaces, evidence ids) come from the validated claim; the words below only
+# state the *kind* of change and its standard strategic implication.
+#
+# `{surface}` and `{detail}` are the only substitutions; `detail` is the claim
+# statement, quoted verbatim, never rewritten.
+version: 1
+
+default:
+  why_it_matters: "Material change to how consumer AI discovery surfaces behave; it can move which brands are found, retrieved, cited or recommended."
+  agency_action: "Review affected surface playbooks and brief the client on the implication before the next planning cycle."
+
+by_event_type:
+  audience_shift:
+    why_it_matters: "A shift in where audiences actually spend attention changes which surfaces are commercially worth prioritising."
+    agency_action: "Re-weight platform and channel investment where the measured audience has moved."
+  retrieval_or_index_change:
+    why_it_matters: "Retrieval and index changes alter what content a surface can even see, regardless of content quality."
+    agency_action: "Check technical eligibility (indexing, rendering, structured data) for the affected surface."
+  citation_source_shift:
+    why_it_matters: "Where a surface sources its citations determines which domains can earn presence in its answers."
+    agency_action: "Audit owned and earned presence against the newly dominant source ecosystem."
+  crawler_policy:
+    why_it_matters: "Crawler and robots policy controls whether a surface may ingest and cite a site at all."
+    agency_action: "Verify robots/user-agent handling and confirm intended crawl access on affected properties."
+  commerce_ads:
+    why_it_matters: "Where discovery carries shopping or ad placements, it is also a commercial pipeline rather than a citation only."
+    agency_action: "Align feed, product-data and paid placement strategy to the surface's commerce behaviour."
+  referral_measurement:
+    why_it_matters: "Referral and measurement behaviour determines whether AI discovery can be attributed and defended commercially."
+    agency_action: "Update measurement and attribution to capture the referral path where it is observable."

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
+from typing import get_args
 
 import yaml
 from pydantic import BaseModel, Field
@@ -70,7 +71,22 @@ def load_sources_config(path: Path | None = None) -> SourcesConfig:
     config_path = path or get_settings().sources_config
     with Path(config_path).open(encoding="utf-8") as handle:
         raw = yaml.safe_load(handle)
-    return SourcesConfig.model_validate(raw)
+    config = SourcesConfig.model_validate(raw)
+    # Fail at load time when the registry uses a source class the ledger cannot
+    # represent: otherwise every otherwise-verified claim from that source is
+    # silently rejected at record construction (issue #48's second root cause).
+    # This is the drift guard the failure needs, in the loader, not a copy in a test.
+    from .claim_models import SourceClass
+
+    valid = set(get_args(SourceClass))
+    unknown = sorted({s.source_class for s in config.sources} - valid)
+    if unknown:
+        raise ValueError(
+            f"config/{config_path.name} uses source classes absent from the ledger "
+            f"SourceClass literal: {unknown}. Add them to SourceClass (and "
+            f"SOURCE_AUTHORITY) or correct the config."
+        )
+    return config
 
 
 def resolve_fetch_mode(source: SourceConfig) -> tuple[str, str]:

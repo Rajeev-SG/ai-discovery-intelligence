@@ -61,6 +61,24 @@ def claims(context) -> dict:
 
 
 @asset(
+    group_name="claims",
+    deps=[claims],
+    description=(
+        "Deterministic weekly executive brief (docs/PIPELINES.md step 14) from the "
+        "persisted change events. Persisted for GET /brief; a valid empty week "
+        "persists nothing rather than fabricating an item."
+    ),
+)
+def weekly_brief(context) -> dict:
+    from .brief_wiring import build_and_persist_brief
+
+    with session_scope() as session:
+        payload = build_and_persist_brief(session)
+        context.add_asset_metadata({"brief_items": len(payload["items"]) if payload else 0})
+        return payload or {"state": "empty", "items": []}
+
+
+@asset(
     group_name="discovery",
     deps=[source_registry],
     description="Discovers candidate URLs not yet in the curated registry.",
@@ -159,6 +177,7 @@ defs = Definitions(
         source_registry,
         feed_items,
         claims,
+        weekly_brief,
         discovered_urls,
         source_health,
         coverage_gaps,

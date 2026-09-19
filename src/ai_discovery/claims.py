@@ -820,7 +820,7 @@ def load_expanded_claims(
                 stmt = stmt.where(func.json_extract(Claim.surfaces, "$").like(f'%"{surface}"%'))
             else:
                 stmt = stmt.where(
-                    text("claim.surfaces::jsonb @> :surface_json").bindparams(
+                    text("claim.surfaces::jsonb @> CAST(:surface_json AS jsonb)").bindparams(
                         surface_json=json.dumps([surface])
                     )
                 )

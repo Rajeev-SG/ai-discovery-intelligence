@@ -31,11 +31,18 @@ from .claim_models import ClaimRecord
 SOURCE_AUTHORITY: dict[str, float] = {
     "official": 1.0,
     "market_telemetry": 0.9,
+    # Independent visibility/citation research and open research report a
+    # methodology and are second only to official/market telemetry.
+    "visibility_research": 0.75,
+    "open_research": 0.75,
     "industry_report": 0.75,
     "vendor_research": 0.7,
+    "editorial_discovery": 0.55,
     "news": 0.55,
     "press_release": 0.5,
     "vendor_blog": 0.45,
+    # Discovery-only aggregators are never canonical, so they score lowest.
+    "open_discovery": 0.3,
     "other": 0.3,
 }
 

@@ -17,7 +17,7 @@ from typing import Any
 import instructor
 from instructor.v2.core.errors import InstructorRetryException
 from openai import OpenAI
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
 from .claim_models import (
     CLAIM_TOPICS,
@@ -217,6 +217,73 @@ def _prompt() -> str:
     return _EXTRACT_PROMPT.format(topics=", ".join(CLAIM_TOPICS))
 
 
+def _load_claims_payload(content: str) -> dict[str, Any]:
+    """Parse the JSON-mode assistant message into a ``{"claims": [...]}`` dict.
+
+    Providers variously return the array directly, a wrapped object, or a mix of
+    dicts and stringified-JSON claim objects; normalise all of them.
+    """
+
+    # Every parse level is guarded: a malformed aggregate string must degrade to
+    # an empty/partial payload, never raise and discard an otherwise good capture
+    # (the all-or-nothing failure this function exists to remove).
+    try:
+        payload = json.loads(content)
+    except json.JSONDecodeError:
+        return {"claims": []}
+    if isinstance(payload, list):
+        payload = {"claims": payload}
+    if not isinstance(payload, dict):
+        return {"claims": []}
+    claims = payload.get("claims")
+    if isinstance(claims, str):
+        try:
+            claims = json.loads(claims)
+        except json.JSONDecodeError:
+            return {"claims": []}
+    if not isinstance(claims, list):
+        return {"claims": []}
+    normalised: list[Any] = []
+    for item in claims:
+        if isinstance(item, str):
+            try:
+                item = json.loads(item)
+            except json.JSONDecodeError:
+                continue
+        if isinstance(item, dict):
+            normalised.append(item)
+    return {"claims": normalised}
+
+
+def _has_valued_metric(claim: dict[str, Any]) -> bool:
+    """True when the claim carries at least one metric with a non-null value."""
+
+    return any(
+        isinstance(m, dict) and m.get("value") is not None for m in claim.get("metrics") or []
+    )
+
+
+def _validate_claims_individually(
+    raw_claims: list[Any],
+) -> tuple[list[dict[str, Any]], list[str]]:
+    """Validate each claim on its own; keep the valid ones, report the rest.
+
+    Returns ``(valid_claim_dicts, rejection_reasons)``. A rejected claim never
+    reaches the ledger (it is not a valid ``ExtractedClaim``), and cannot veto
+    its well-formed siblings.
+    """
+
+    valid: list[dict[str, Any]] = []
+    rejected: list[str] = []
+    for index, raw in enumerate(raw_claims):
+        try:
+            valid.append(ExtractedClaim.model_validate(raw).model_dump())
+        except ValidationError as error:
+            first = error.errors()[0]
+            rejected.append(f"claim {index}: {first.get('loc')}: {first.get('msg')}")
+    return valid, rejected
+
+
 def semantic_extract(
     *,
     source_id: str,
@@ -299,31 +366,29 @@ def semantic_extract(
             response_format={"type": "json_object"},
         )
         content = response.choices[0].message.content or "{}"
-        payload = json.loads(content)
-        import logging
-
-        # Some providers return the claims array directly, or wrap stringified
-        # claim objects; normalise both before schema validation.
-        if isinstance(payload, list):
-            payload = {"claims": payload}
-        if isinstance(payload.get("claims"), list):
-            payload["claims"] = [
-                json.loads(item) if isinstance(item, str) else item
-                for item in payload["claims"]
-            ]
-        # Claims with no metric are not ledger-claimable; drop them loudly
-        # rather than rejecting the whole run.
-        dropped = [
-            c for c in payload.get("claims", [])
-            if isinstance(c, dict)
-            and not any(isinstance(m, dict) and m.get("value") is not None for m in c.get("metrics") or [])
-        ]
-        if dropped:
-            logging.getLogger(__name__).warning(
-                "dropped %d claims with no metrics (not ledger-claimable)", len(dropped)
+        payload = _load_claims_payload(content)
+        # Validate claim-by-claim, not all-or-nothing: one malformed claim (bad
+        # topic, too-short statement, placeholder anchor) must not discard a whole
+        # document's worth of good ones. Invalid claims are dropped with a
+        # per-claim reason; the integrity gate downstream is unchanged.
+        good, rejected = _validate_claims_individually(payload.get("claims", []))
+        logger = logging.getLogger(__name__)
+        if rejected:
+            logger.warning(
+                "dropped %d individually-invalid claims for %s (kept %d)",
+                len(rejected), source_id, len(good),
             )
-        payload["claims"] = [c for c in payload.get("claims", []) if c.get("metrics")]
-        parsed = ExtractedClaims.model_validate(payload)
+        # A claim is only ledger-claimable when at least one metric carries a
+        # real value (not null/absent). Preserve the original semantic exactly:
+        # a null-valued metric is 'unknown', not a value, and must not be admitted.
+        without_metrics = [c for c in good if not _has_valued_metric(c)]
+        if without_metrics:
+            logger.warning(
+                "dropped %d claims with no metric value (not ledger-claimable)",
+                len(without_metrics),
+            )
+        good = [c for c in good if _has_valued_metric(c)]
+        parsed = ExtractedClaims(claims=[ExtractedClaim.model_validate(c) for c in good])
         usage = getattr(response, "usage", None)
         raw_cost = getattr(usage, "cost", None)
         cost_value: float | None = None

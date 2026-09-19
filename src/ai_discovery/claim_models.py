@@ -79,13 +79,19 @@ MeasurementMode = Literal[
     "unknown",
 ]
 SourceClass = Literal[
+    # Acquisition/registry vocabulary (config/sources.yaml `class`)
+    "official",
+    "market_telemetry",
+    "visibility_research",   # independent visibility/SEO/citation research (Ahrefs, Semrush, Sistrix, Peec, Profound)
+    "editorial_discovery",   # trade/editorial discovery (Search Engine Land, SE Journal, SE Roundtable)
+    "open_research",         # open academic/dataset research (arXiv, OpenAlex, Crossref, Common Crawl)
+    "open_discovery",        # discovery-only aggregators (GDELT, Google News RSS); never canonical
+    # Ledger vocabulary (legacy/spec-defined)
     "vendor_research",
     "vendor_blog",
     "press_release",
     "news",
     "industry_report",
-    "official",
-    "market_telemetry",
     "other",
 ]
 
