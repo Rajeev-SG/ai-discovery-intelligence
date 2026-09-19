@@ -3,9 +3,9 @@ name: claim-ledger-ci
 on:
   push:
     branches: ["**"]
-    paths: ["src/**", "scripts/**", "proof/**", "db/**", "tests/**", "deploy/**", ".github/workflows/claim-ledger-ci.yml"]
+    paths: ["src/**", "scripts/**", "proof/**", "db/**", "tests/**", "deploy/**", "pov/**", "config/**", ".github/workflows/claim-ledger-ci.yml"]
   pull_request:
-    paths: ["src/**", "scripts/**", "proof/**", "db/**", "tests/**", "deploy/**"]
+    paths: ["src/**", "scripts/**", "proof/**", "db/**", "tests/**", "deploy/**", "pov/**", "config/**"]
   workflow_dispatch:
 
 permissions:
@@ -72,6 +72,48 @@ jobs:
           assets = {a.key.to_user_string() for a in defs.assets}
           assert "claims" in assets and "feed_items" in assets
           print("dagster defs OK:", sorted(assets))
+          PY
+
+      - name: Living POV is deterministic and gated (issue #7)
+        run: |
+          uv run python - <<'PY'
+          import sys
+          sys.path.insert(0, "src")
+          import datetime as dt
+          from ai_discovery.pov import (
+              PovProposition, PovState, apply_event, evaluate_event, load_policy,
+          )
+
+          policy = load_policy()
+          state = PovState(propositions=[PovProposition(
+              id="ret", section="R", base_text="b",
+              topics=["crawler_index_policy", "audience_usage"])])
+          class E:
+              def __init__(self, id): self.id=id; self.title="generic"; self.effective_from=None
+              published_at=dt.datetime(2026,9,18,tzinfo=dt.UTC); observed_at=published_at
+          claim = {"claim_id":"c1","topic":"crawler_index_policy","confidence":"medium",
+                   "relationship":"new","status":"current","surfaces":["chatgpt"],
+                   "value":[{"value_number":100.0,"value_text":"100"}],
+                   "statement":"validated claim statement"}
+          d = apply_event(state=state, event=E("e1"), claim=claim, policy=policy)
+          assert d.adopt and d.proposition_id == "ret"
+          assert len(state.changelog) == 1
+          # Idempotent replay: the same event must not adopt again.
+          d_replay = apply_event(state=state, event=E("e1"), claim=claim, policy=policy)
+          assert not d_replay.adopt and len(state.changelog) == 1
+          # A repeat of the incumbent value is not a material change.
+          repeat = dict(claim, claim_id="c2", value=[{"value_number":100.0}])
+          assert not evaluate_event(event=E("e2"), claim=repeat, state=state, policy=policy).adopt
+          # A topic the proposition does not own yields no change.
+          other = dict(claim, claim_id="c3", topic="commerce_ads")
+          assert not evaluate_event(event=E("e3"), claim=other, state=state, policy=policy).adopt
+          # Rejecting counterexample: a tiny relative change on an owned topic is
+          # NOT material, while a large one is — the gate discriminates.
+          from ai_discovery.pov import _magnitude
+          tiny, _ = _magnitude(claim={"value":[{"value_number":24.1}]}, prior_value=24.0, policy=policy)
+          large, _ = _magnitude(claim={"value":[{"value_number":96.0}]}, prior_value=24.0, policy=policy)
+          assert tiny == 0.0 and large > policy.min_relative_change
+          print("POV gate OK: adopt + idempotent replay + repeat + unowned topic + tiny-delta reject")
           PY
 
       - name: Build the evidence-API image (issue #9)

@@ -1,0 +1,69 @@
+# Living-POV editorial policy (issue #7). Deterministic, model-free.
+#
+# A change event may *propose* a revision to a POV proposition; adoption is gated
+# by these rules, not by a model's judgement. The POV changes only when a
+# qualifying event clears the bar for that proposition.
+version: 1
+
+pov:
+  # Minimum event significance (config/significance.yaml axes, 0-5 scale)
+  # for an event to propose a change at all.
+  min_significance: 3.5
+  # Minimum claim confidence label (high > medium_high > medium > low) for an
+  # event's grounding claim to be admissible.
+  min_confidence: medium
+  # An event only revises the proposition whose topics it addresses, and only
+  # when it is *material* for that proposition: a topic a proposition does not
+  # own never touches it.
+  require_topic_match: true
+  # Magnitude applied when the grounding claim carries a stated number (a
+  # quantified change is more material than a qualitative one).
+  magnitude_with_value: 0.8
+  magnitude_without_value: 0.4
+  # A changed value must move at least this relative amount to count as a change;
+  # below it the two readings are noise and nothing is adopted. Magnitude is
+  # `magnitude_change_floor` at the threshold and rises toward 1.0 as the change
+  # grows. This is the gate's real discrimination power, stated so it is not
+  # oversold: for a first-seen value (no incumbent) adoption still requires a
+  # medium-confidence, non-qualitative claim on an owned topic, and any later
+  # reading below this threshold is rejected.
+  min_relative_change: 0.10
+  magnitude_change_floor: 0.4
+
+  # Per-topic significance profile (config/significance.yaml axes, each 0-1).
+  # These are stated editorial weights, not model output. `magnitude` is set from
+  # the value bump above. Unlisted topics fall back to a flat 0.5 profile, which
+  # cannot clear the gate: an unknown topic does not move the POV.
+  significance_topics:
+    crawler_index_policy:
+      {reach: 0.70, commercial_intent: 0.70, magnitude: 0.60, breadth: 0.60, persistence: 0.70, actionability: 0.90}
+    retrieval_index:
+      {reach: 0.75, commercial_intent: 0.60, magnitude: 0.60, breadth: 0.65, persistence: 0.70, actionability: 0.85}
+    citations_sources:
+      {reach: 0.80, commercial_intent: 0.70, magnitude: 0.60, breadth: 0.65, persistence: 0.60, actionability: 0.75}
+    audience_usage:
+      {reach: 0.90, commercial_intent: 0.70, magnitude: 0.60, breadth: 0.60, persistence: 0.60, actionability: 0.60}
+    referrals_conversion:
+      {reach: 0.75, commercial_intent: 0.80, magnitude: 0.60, breadth: 0.60, persistence: 0.60, actionability: 0.80}
+    commerce_ads:
+      {reach: 0.75, commercial_intent: 0.85, magnitude: 0.60, breadth: 0.60, persistence: 0.60, actionability: 0.80}
+    measurement:
+      {reach: 0.80, commercial_intent: 0.65, magnitude: 0.60, breadth: 0.60, persistence: 0.60, actionability: 0.70}
+    optimisation_implication:
+      {reach: 0.40, commercial_intent: 0.35, magnitude: 0.40, breadth: 0.40, persistence: 0.40, actionability: 0.35}
+
+# The POV as product data: stable proposition ids with owner topics. The current
+# text lives in docs/EXECUTIVE_POV.md (rendered from pov/state.yaml + changelog).
+propositions:
+  - id: pov-retrieval-systems
+    section: How retrieval/search/citation systems differ
+    topics: [retrieval_index, citations_sources, crawler_index_policy]
+  - id: pov-channel-prioritisation
+    section: Channel/surface prioritisation by geography/category
+    topics: [audience_usage, referrals_conversion]
+  - id: pov-commerce-ads
+    section: "Commercial surfaces: shopping, transaction and ads"
+    topics: [commerce_ads]
+  - id: pov-measurement
+    section: Measurement principles and known blind spots
+    topics: [measurement]
