@@ -1,0 +1,88 @@
+{
+  "checks_total": 8,
+  "checks_passed": 8,
+  "checks_failed": 0,
+  "verified_count": 8,
+  "warning_count": 0,
+  "negative_controls": [
+    "plausible-but-unsupported figure (9.9M)",
+    "correction sharing a syndication key"
+  ],
+  "checks": [
+    {
+      "name": "fabricated_claim_rejected",
+      "status": "verified",
+      "admitted": 0,
+      "criterion": "admitted must be 0",
+      "result": "pass"
+    },
+    {
+      "name": "fabricated_selector_rejected",
+      "status": "verified",
+      "admitted": 0,
+      "criterion": "admitted must be 0",
+      "result": "pass"
+    },
+    {
+      "name": "unknown_round_trips_as_unknown",
+      "status": "verified",
+      "value_text": null,
+      "rendered_as_known": 0,
+      "criterion": "rendered_as_known must be 0",
+      "result": "pass"
+    },
+    {
+      "name": "correction_retained",
+      "status": "verified",
+      "correction_dropped": 0,
+      "timeline": [
+        "original",
+        "correction"
+      ],
+      "criterion": "correction_dropped must be 0",
+      "result": "pass"
+    },
+    {
+      "name": "contradictions_preserved",
+      "status": "verified",
+      "both_claims_preserved": 1,
+      "falsely_resolved": 0,
+      "state": "methodologically_incomparable",
+      "criterion": "both_claims_preserved must be 1 and falsely_resolved 0",
+      "result": "pass"
+    },
+    {
+      "name": "old_study_not_a_new_change",
+      "status": "verified",
+      "old_study_misclassified": 0,
+      "included": [
+        "new"
+      ],
+      "criterion": "old_study_misclassified must be 0",
+      "result": "pass"
+    },
+    {
+      "name": "brief_inclusion_matches_expected",
+      "status": "verified",
+      "mismatch": 0,
+      "included": [
+        "genuinely new event"
+      ],
+      "expected": [
+        "genuinely new event"
+      ],
+      "criterion": "mismatch must be 0",
+      "result": "pass"
+    },
+    {
+      "name": "confidence_not_model_asserted",
+      "status": "verified",
+      "model_says": "high",
+      "derived": "low",
+      "elevated_by_model": 0,
+      "criterion": "elevated_by_model must be 0",
+      "result": "pass"
+    }
+  ],
+  "content_hash": "c8390d9f31afdc9d"
+}

@@ -1,0 +1,11 @@
+{
+  "reference": "2026-09-17T00:00:00+00:00",
+  "target_items": 3,
+  "max_items": 5,
+  "candidates": [
+    {"change": "old study ingested this week", "significance": 5.0, "published_at": "2024-01-01T00:00:00+00:00", "confidence": "medium"},
+    {"change": "genuinely new event", "significance": 4.2, "published_at": "2026-09-15T00:00:00+00:00", "confidence": "medium"},
+    {"change": "weak new event", "significance": 3.0, "published_at": "2026-09-15T00:00:00+00:00", "confidence": "medium"}
+  ],
+  "expected_included": ["genuinely new event"]
+}
