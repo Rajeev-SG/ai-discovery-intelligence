@@ -1,14 +1,29 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { parse } from "yaml";
+import generated from "./generated-registry.json";
 import type { Registry, RegistrySurface } from "@/lib/surfaces";
 
 export type { Registry, RegistrySurface } from "@/lib/surfaces";
 
-const REGISTRY_PATH = path.join(process.cwd(), "..", "config", "surfaces.yaml");
+/** The canonical registry in the monorepo (present in local dev and CI). */
+const MONOREPO_REGISTRY_PATH = path.join(process.cwd(), "..", "config", "surfaces.yaml");
 
+/**
+ * Resolve the registry file. Precedence:
+ * 1. `REGISTRY_PATH` (explicit override);
+ * 2. the monorepo `config/surfaces.yaml` when present;
+ * 3. the vendored `generated-registry.json`, so a `web/`-root deploy (Vercel) that
+ *    cannot see `../config` still serves the canonical surface set.
+ */
 export function resolveRegistryPath(): string {
-  return process.env.REGISTRY_PATH ?? REGISTRY_PATH;
+  if (process.env.REGISTRY_PATH) return process.env.REGISTRY_PATH;
+  return existsSync(MONOREPO_REGISTRY_PATH) ? MONOREPO_REGISTRY_PATH : "";
+}
+
+/** True when the monorepo YAML is the active source; false for the vendored copy. */
+export function usingVendoredRegistry(): boolean {
+  return resolveRegistryPath() === "";
 }
 
 /**
@@ -17,7 +32,11 @@ export function resolveRegistryPath(): string {
  * helpers from `@/lib/surfaces` instead.
  */
 export function loadRegistry(filePath: string = resolveRegistryPath()): Registry {
-  const raw = parse(readFileSync(filePath, "utf8")) as {
+  const raw = (
+    filePath
+      ? parse(readFileSync(filePath, "utf8"))
+      : (generated as { version?: number; last_reviewed?: string; surfaces?: RegistrySurface[] })
+  ) as {
     version?: number;
     last_reviewed?: string;
     surfaces?: RegistrySurface[];

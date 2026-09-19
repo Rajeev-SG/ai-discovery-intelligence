@@ -46,6 +46,12 @@ jobs:
           python -m pip install --quiet "PyYAML>=6,<7"
           python scripts/validate_scaffold.py
 
+      - name: Vendored registry is current
+        working-directory: .
+        run: |
+          python scripts/build_web_registry.py
+          git diff --exit-code web/lib/generated-registry.json
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
