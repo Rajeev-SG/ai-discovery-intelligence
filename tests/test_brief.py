@@ -109,10 +109,48 @@ def test_generator_watch_item():
     assert result[0].is_watch_item
 
 
-def test_generator_caps_at_target():
-    bg = BriefGenerator(target_items=2)
-    candidates = [item(change=f"c{i}", significance=3.5 + i) for i in range(5)]
-    assert len(bg.generate(candidates)) == 2
+def test_target_is_soft_and_max_is_hard():
+    """Issue #28B: target_items is a soft target; max_items is the hard ceiling."""
+
+    candidates = [item(change=f"c{i}", significance=3.5 + i) for i in range(6)]
+    # target below the material available -> emit more than the target, up to max.
+    bg = BriefGenerator(target_items=3, max_items=5)
+    out = bg.generate(candidates)
+    assert len(out) == 5, "should use the hard maximum when more material qualifies"
+    assert out[0].significance == max(c.significance for c in candidates)
+
+    # The hard ceiling is never exceeded even when everything qualifies.
+    bg2 = BriefGenerator(target_items=2, max_items=3)
+    assert len(bg2.generate([item(change=f"c{i}") for i in range(9)])) == 3
+
+    # Fewer qualifying items than the target is fine (soft, not a floor).
+    bg3 = BriefGenerator(target_items=3, max_items=5)
+    assert len(bg3.generate([item(change="only", significance=4.0)])) == 1
+
+
+def test_watch_item_cannot_displace_corroborated_material():
+    """A watch item never takes a slot corroborated material wanted."""
+
+    bg = BriefGenerator(target_items=3, max_items=3)
+    corroborated = [item(change=f"c{i}", significance=4.0 + i) for i in range(3)]
+    watch = item(change="uncorroborated", significance=4.9, is_watch_item=True)
+    out = bg.generate([*corroborated, watch])
+    assert len(out) == 3
+    assert not any(x.is_watch_item for x in out), "watch item displaced corroborated material"
+
+
+def test_single_watch_item_fills_a_free_slot():
+    """When corroborated material leaves room, exactly one watch item may appear."""
+
+    bg = BriefGenerator(target_items=3, max_items=4)
+    corrob = [item(change="c1", significance=4.0)]
+    watches = [
+        item(change="w1", significance=4.6, is_watch_item=True),
+        item(change="w2", significance=4.7, is_watch_item=True),
+    ]
+    out = bg.generate([*corrob, *watches])
+    assert sum(1 for x in out if x.is_watch_item) == 1
+    assert out[0].change == "c1"  # corroborated material still leads
 
 
 def test_generator_caps_at_max():

@@ -201,25 +201,46 @@ class BriefGenerator:
     }
 
     def generate(self, candidates: list[BriefItem]) -> list[BriefItem]:
-        """Filter + sort + cap. High-noise/low-significance items are excluded."""
+        """Filter + rank + cap with soft-target / hard-max and watch-item semantics.
+
+        * ``max_items`` is the hard ceiling; nothing may exceed it.
+        * ``target_items`` is a soft target, not a cap: the brief aims for it, but
+          emits more (up to ``max_items``) when more material clears the bar, so a
+          configured hard maximum is reachable instead of being dead config.
+        * at most one watch item is admitted;
+        * a watch item never displaces corroborated material — corroborated items
+          are selected first, and a watch item only fills a slot that is still free
+          below ``max_items``.
+        """
+
         min_rank = self._confidence_rank[self.min_confidence]
-        included: list[BriefItem] = []
-        for c in sorted(candidates, key=lambda x: -x.significance):
-            rank = self._confidence_rank[c.confidence]
-            if c.is_watch_item:
-                # Cap at most 1 watch item per brief so uncorroborated items
-                # cannot displace corroborated material in the same week.
-                if c.significance >= self.watch_item_min_significance and not any(
-                    i.is_watch_item for i in included
-                ):
-                    included.append(c)
-                    if len(included) >= self.target_items:
-                        break
-                continue
-            if rank < min_rank:
-                continue
-            if c.significance >= self.normal_min_significance:
-                included.append(c)
-            if len(included) >= self.target_items:
-                break
-        return included[: self.max_items]
+
+        corroborated = sorted(
+            (
+                c
+                for c in candidates
+                if not c.is_watch_item
+                and self._confidence_rank[c.confidence] >= min_rank
+                and c.significance >= self.normal_min_significance
+            ),
+            key=lambda x: -x.significance,
+        )
+        # Corroborated material fills toward the soft target and may continue to
+        # the hard maximum; the ceiling is the only cap.
+        included = corroborated[: self.max_items]
+
+        # A watch item is uncorroborated by definition: it may only use a slot no
+        # corroborated item wanted, and only one may appear in a brief.
+        if len(included) < self.max_items:
+            watch = next(
+                (
+                    c
+                    for c in sorted(candidates, key=lambda x: -x.significance)
+                    if c.is_watch_item and c.significance >= self.watch_item_min_significance
+                ),
+                None,
+            )
+            if watch is not None:
+                included.append(watch)
+
+        return included
