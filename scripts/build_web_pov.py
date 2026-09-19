@@ -21,19 +21,19 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "src"))
 
-SYSTEM_PROPS = {
-    "pov-retrieval-systems": "retrieval",
-    "pov-channel-prioritisation": "channel",
-    "pov-commerce-ads": "commerce",
-    "pov-measurement": "measurement",
-}
-
-
 def _iso(value):
     return value.isoformat().replace("+00:00", "Z") if value is not None else None
 
 
 def build_payload(state) -> dict:
+    """Project the canonical POV state into the client-safe artifact.
+
+    Structural guarantee: the artifact covers exactly the propositions in
+    state.yaml, in the same order, with no dropped or invented ids. This is
+    asserted here rather than in the web tests so the generator fails loudly if
+    the projection ever diverges from the canonical state.
+    """
+
     propositions = []
     for prop in state.propositions:
         propositions.append(
@@ -48,6 +48,14 @@ def build_payload(state) -> dict:
                 "supporting": [_bullet(b) for b in prop.supporting],
                 "contradicting": [_bullet(b) for b in prop.contradicting],
             }
+        )
+
+    source_ids = [prop.id for prop in state.propositions]
+    artifact_ids = [prop["id"] for prop in propositions]
+    if artifact_ids != source_ids:
+        raise SystemExit(
+            f"POV artifact does not cover state.yaml propositions: "
+            f"{artifact_ids!r} != {source_ids!r}"
         )
 
     changelog = []

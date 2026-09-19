@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { PovChangelog } from "@/components/pov-changelog";
 import { PovProposition } from "@/components/pov-proposition";
-import { hasChanges, loadPov } from "@/lib/pov";
+import { hasChanges } from "@/lib/pov";
+import { loadPov } from "@/lib/pov.server";
 
 export const metadata: Metadata = {
   title: "Living POV — AI Discovery Intelligence",

@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
 import {
   CONFIDENCE_LABELS,
@@ -7,9 +10,9 @@ import {
   hasChanges,
   isContested,
   isUnresolved,
-  loadPov,
   projectPov,
 } from "../lib/pov";
+import { loadPov } from "../lib/pov.server";
 
 // A minimal valid proposition builder so each test states only what it asserts.
 function prop(overrides: Record<string, unknown> = {}) {
@@ -27,44 +30,61 @@ function prop(overrides: Record<string, unknown> = {}) {
   };
 }
 
+/**
+ * Canonical proposition ids straight from pov/state.yaml. The artifact tests are
+ * structural: every id in the artifact must exist in state.yaml and vice versa,
+ * instead of hard-coding four ids and a claim hash that drift silently.
+ */
+function canonicalIds(): string[] {
+  const raw = parse(readFileSync(path.join(process.cwd(), "..", "pov", "state.yaml"), "utf8"));
+  return (raw.propositions as { id: string }[]).map((p) => p.id);
+}
+
 describe("canonical POV artifact", () => {
   const view = loadPov();
 
-  it("projects all four canonical propositions", () => {
-    expect(view.propositions.map((p) => p.id)).toEqual([
-      "pov-retrieval-systems",
-      "pov-channel-prioritisation",
-      "pov-commerce-ads",
-      "pov-measurement",
-    ]);
+  it("covers exactly the propositions in pov/state.yaml", () => {
+    const ids = view.propositions.map((p) => p.id);
+    expect(ids).toEqual(canonicalIds());
+    expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("renders pov-retrieval-systems as medium with one supporting item and its real change", () => {
-    const retrieval = view.propositions.find((p) => p.id === "pov-retrieval-systems");
-    if (!retrieval) throw new Error("missing retrieval proposition");
-    expect(retrieval.confidence).toBe("medium");
-    expect(retrieval.supporting).toHaveLength(1);
-    expect(retrieval.contradicting).toHaveLength(0);
-    expect(retrieval.supporting[0].claim_id).toBe("0b187a5b6f942c1d2a3fcb12285238e5");
-    expect(retrieval.last_reviewed).not.toBeNull();
-
-    const change = view.changelog.find((c) => c.proposition_id === "pov-retrieval-systems");
-    if (!change) throw new Error("missing retrieval changelog entry");
-    expect(change.changed_at.startsWith("2026-09-19")).toBe(true);
-    expect(change.evidence_ids).toContain("0b187a5b6f942c1d2a3fcb12285238e5");
-    expect(change.significance).toBeGreaterThanOrEqual(3.5);
-    expect(change.confidence).toBe("medium");
+  it("renders every proposition's canonical confidence verbatim", () => {
+    const labels = new Set(Object.keys(CONFIDENCE_LABELS));
+    for (const proposition of view.propositions) {
+      expect(labels.has(proposition.confidence)).toBe(true);
+      // isUnresolved/isContested are pure projections of the artifact fields.
+      expect(isUnresolved(proposition)).toBe(proposition.confidence === "unresolved");
+      expect(isContested(proposition)).toBe(proposition.contested);
+    }
   });
 
-  it("renders at least one proposition as unresolved", () => {
+  it("renders a proposition with evidence and its matching changelog entry", () => {
+    const withEvidence = view.propositions.filter((p) => p.supporting.length > 0);
+    expect(withEvidence.length).toBeGreaterThan(0);
+    for (const proposition of withEvidence) {
+      expect(proposition.confidence).not.toBe("unresolved");
+      expect(proposition.last_reviewed).not.toBeNull();
+      for (const bullet of proposition.supporting) {
+        expect(bullet.claim_id.length).toBeGreaterThan(0);
+        // A change that adopted this evidence is recorded in the changelog.
+        const change = view.changelog.find(
+          (c) => c.proposition_id === proposition.id && c.evidence_ids.includes(bullet.claim_id),
+        );
+        expect(change, `no changelog entry grounds ${proposition.id} claim ${bullet.claim_id}`).toBeTruthy();
+      }
+    }
+  });
+
+  it("renders at least one proposition as unresolved with no evidence", () => {
     const unresolved = view.propositions.filter(isUnresolved);
-    expect(unresolved.map((p) => p.id)).toContain("pov-channel-prioritisation");
-    const channel = view.propositions.find((p) => p.id === "pov-channel-prioritisation");
-    if (!channel) throw new Error("missing channel proposition");
-    expect(channel.confidence).toBe("unresolved");
-    expect(channel.supporting).toHaveLength(0);
-    expect(channel.contradicting).toHaveLength(0);
-    expect(channel.last_reviewed).toBeNull();
+    expect(unresolved.length).toBeGreaterThan(0);
+    for (const proposition of unresolved) {
+      expect(proposition.supporting).toHaveLength(0);
+      expect(proposition.contradicting).toHaveLength(0);
+      expect(proposition.contested).toBe(false);
+      expect(proposition.last_reviewed).toBeNull();
+    }
   });
 });
 
@@ -103,11 +123,12 @@ describe("projection states", () => {
     expect(formatDate(p.last_reviewed)).toBe("not yet reviewed");
   });
 
-  it("contested proposition is capped and flagged when contradicting evidence exists", () => {
+  it("contested proposition is flagged verbatim from the artifact field", () => {
     const view = projectPov({
       propositions: [
         prop({
           confidence: "low",
+          contested: true,
           supporting: [
             { slot: "measurement", polarity: "supporting", text: "Supports.", claim_id: "s1", event_id: "e1", confidence: "high" },
           ],
@@ -123,7 +144,9 @@ describe("projection states", () => {
     expect(p.confidence).toBe("low");
   });
 
-  it("contested flag is inferred from contradicting evidence even if unset", () => {
+  it("does not invent contested state: artifact flag is authoritative", () => {
+    // Contradicting evidence present but the canonical model says not contested.
+    // The projection must render the flag as-is, not re-derive from the list.
     const view = projectPov({
       propositions: [
         prop({
@@ -134,7 +157,8 @@ describe("projection states", () => {
         }),
       ],
     });
-    expect(view.propositions[0].contested).toBe(true);
+    expect(view.propositions[0].contested).toBe(false);
+    expect(isContested(view.propositions[0])).toBe(false);
   });
 
   it("changed proposition produces an ordered changelog with before and after", () => {

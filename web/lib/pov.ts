@@ -1,19 +1,16 @@
-import { existsSync, readFileSync } from "node:fs";
-import path from "node:path";
-import generated from "./generated-pov.json";
-
 /**
- * Client-safe shape of the POV product artifact.
+ * Client-safe POV projection: types, helpers and normalisation. Contains no
+ * Node built-ins, so client components can import it freely.
  *
- * The committed artifact (`web/lib/generated-pov.json`) is produced by
- * `scripts/build_web_pov.py`, which projects `pov/state.yaml` through the
- * canonical, tested domain model (`ai_discovery.pov`). Derived fields —
- * `confidence` and `contested` — are therefore already computed by that model,
- * so the web app never re-implements the deterministic POV gate in TypeScript.
- * `pov/state.yaml` stays canonical; CI enforces the artifact is current.
+ * Canonical state lives in `pov/state.yaml`; the committed product artifact
+ * (`web/lib/generated-pov.json`) is produced by `scripts/build_web_pov.py`,
+ * which projects that state through the canonical, tested domain model
+ * (`ai_discovery.pov`). Derived fields — `confidence`, `contested` and the
+ * unresolved state — are computed by that model and rendered here **verbatim**.
+ * This module never re-derives them: doing so would fork the single source of
+ * truth and let the UI disagree with the generator and changelog.
  *
- * The Next app deploys from `web/` alone (Vercel), where `../pov` is absent, so
- * the committed JSON is the product read contract.
+ * The fs/env loader (`loadPov`) lives in `web/lib/pov.server.ts`.
  */
 
 export type ConfidenceLabel =
@@ -41,7 +38,9 @@ export interface PovProposition {
   section: string;
   base_text: string;
   topics: string[];
+  /** Canonical confidence from the POV gate; rendered verbatim. */
   confidence: ConfidenceLabel;
+  /** Canonical contested flag from the POV domain model; rendered verbatim. */
   contested: boolean;
   last_reviewed: string | null;
   supporting: PovEvidence[];
@@ -77,14 +76,20 @@ export const CONFIDENCE_LABELS: Record<ConfidenceLabel, string> = {
   unresolved: "Unresolved",
 };
 
-/** True when a proposition has no supporting evidence (confidence unresolved). */
+/**
+ * True when the canonical gate reports the proposition as unresolved. Rendered
+ * verbatim from the artifact's `confidence`; no evidence-count re-derivation.
+ */
 export function isUnresolved(proposition: PovProposition): boolean {
-  return proposition.confidence === "unresolved" && proposition.supporting.length === 0;
+  return proposition.confidence === "unresolved";
 }
 
-/** True when any proposition carries contradicting evidence. */
+/**
+ * True when the canonical model flags the proposition as contested. Rendered
+ * verbatim from the artifact's `contested` flag.
+ */
 export function isContested(proposition: PovProposition): boolean {
-  return proposition.contested || proposition.contradicting.length > 0;
+  return proposition.contested;
 }
 
 /**
@@ -134,18 +139,17 @@ function asEvidence(raw: unknown): PovEvidence {
 
 function asProposition(raw: unknown): PovProposition {
   const value = (raw ?? {}) as Partial<PovProposition>;
-  const supporting = (value.supporting ?? []).map(asEvidence);
-  const contradicting = (value.contradicting ?? []).map(asEvidence);
   return {
     id: value.id ?? "",
     section: value.section ?? "",
     base_text: value.base_text ?? "",
     topics: value.topics ?? [],
     confidence: (value.confidence ?? "unresolved") as ConfidenceLabel,
-    contested: Boolean(value.contested) || contradicting.length > 0,
+    // Verbatim from the artifact — the canonical model decides contested state.
+    contested: Boolean(value.contested),
     last_reviewed: value.last_reviewed ?? null,
-    supporting,
-    contradicting,
+    supporting: (value.supporting ?? []).map(asEvidence),
+    contradicting: (value.contradicting ?? []).map(asEvidence),
   };
 }
 
@@ -185,27 +189,3 @@ export function projectPov(raw: unknown): PovView {
     changelog,
   };
 }
-
-/** The canonical committed artifact path, relative to the `web/` project root. */
-const ARTIFACT_PATH = path.join(process.cwd(), "lib", "generated-pov.json");
-
-/**
- * Load the POV product view. Server-only (reads the filesystem when an override
- * is used). Precedence:
- *  1. `POV_PATH` (explicit override, must point at a generated JSON artifact);
- *  2. the committed `web/lib/generated-pov.json` imported at build time.
- *
- * The artifact is the product contract and is kept current by CI, so local dev
- * and the deployed `web/`-root build read the same data. We deliberately do not
- * read `pov/state.yaml` here: re-deriving confidence in TypeScript would fork
- * the deterministic gate, and the artifact is the tested project of it.
- */
-export function loadPov(): PovView {
-  const override = process.env.POV_PATH;
-  if (override && existsSync(override)) {
-    return projectPov(JSON.parse(readFileSync(override, "utf8")));
-  }
-  return projectPov(generated);
-}
-
-export { ARTIFACT_PATH };
