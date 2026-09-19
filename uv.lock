@@ -16,6 +16,7 @@ dependencies = [
     { name = "feedparser" },
     { name = "httpx" },
     { name = "lxml" },
+    { name = "psycopg", extra = ["binary"] },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "python-dateutil" },
@@ -32,11 +33,6 @@ dev = [
     { name = "ruff" },
 ]
 
-[package.dev-dependencies]
-dev = [
-    { name = "psycopg", extra = ["binary"] },
-]
-
 [package.metadata]
 requires-dist = [
     { name = "dagster", specifier = ">=1.9,<2" },
@@ -44,6 +40,7 @@ requires-dist = [
     { name = "feedparser", specifier = ">=6.0,<7" },
     { name = "httpx", specifier = ">=0.27,<1" },
     { name = "lxml", specifier = ">=5,<7" },
+    { name = "psycopg", extras = ["binary"], specifier = ">=3.2,<4" },
     { name = "pydantic", specifier = ">=2.9,<3" },
     { name = "pydantic-settings", specifier = ">=2.5,<3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8,<10" },
@@ -58,7 +55,7 @@ requires-dist = [
 provides-extras = ["dev"]
 
 [package.metadata.requires-dev]
-dev = [{ name = "psycopg", extras = ["binary"], specifier = ">=3.2,<4" }]
+dev = []
 
 [[package]]
 name = "aiohappyeyeballs"
