@@ -56,10 +56,24 @@ def event_from_claim(claim: ClaimRecord) -> ChangeEvent | None:
         statement if len(statement) <= _MAX_TITLE else statement[: _MAX_TITLE - 1].rstrip() + "…"
     )
 
-    # 12 hex chars (the change_event PK width) derived from the full claim id by
-    # hashing, not by slicing: a hash keeps the whole claim id in the input, so
-    # two distinct claims cannot collide through a shared prefix.
-    event_id = hashlib.sha256(f"change:{claim.claim_id}".encode()).hexdigest()[:12]
+    # The event id folds in the claim content (not just its stable id): a corrected
+    # claim that keeps the same claim_id but changes statement/metrics yields a
+    # DISTINCT event, so the superseding change is never silently dropped by the
+    # append-only, idempotent-by-id persist path. Same claim + same content is the
+    # same event (idempotent across re-runs).
+    content_fingerprint = hashlib.sha256(
+        "\x1f".join(
+            [
+                claim.statement,
+                claim.topic,
+                ",".join(sorted(claim.surfaces)),
+                ",".join(f"{m.label}={m.value.value}" for m in claim.metrics),
+            ]
+        ).encode()
+    ).hexdigest()
+    event_id = hashlib.sha256(
+        f"change:{claim.claim_id}:{content_fingerprint}".encode()
+    ).hexdigest()[:12]
     return ChangeEvent(
         id=event_id,
         event_type=event_type,
@@ -72,7 +86,7 @@ def event_from_claim(claim: ClaimRecord) -> ChangeEvent | None:
         published_at=published_at,
         effective_from=published_at,
         source_hash=claim.evidence.capture_hash,
-        dedupe_key=f"claim-{claim.claim_id}",
+        dedupe_key=f"claim-{claim.claim_id}-{content_fingerprint[:12]}",
         metadata={
             "publisher": claim.evidence.publisher,
             "topic": claim.topic,

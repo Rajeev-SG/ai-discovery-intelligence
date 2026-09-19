@@ -113,7 +113,10 @@ def test_claim_status_check(db):
 # --- 0002: unknown value_text may be NULL (issue #25) ----------------------- #
 
 MIGRATION_0002 = (
-    Path(__file__).resolve().parents[1] / "db" / "ledger" / "0002_claim_metric_value_text_nullable.sql"
+    Path(__file__).resolve().parents[1]
+    / "db"
+    / "ledger"
+    / "0002_claim_metric_value_text_nullable.sql"
 )
 
 
@@ -163,7 +166,9 @@ def test_0002_relaxes_value_text_not_null_and_backfills_legacy_none():
             cur.execute(f"SET search_path TO {schema}")
 
         ddl = MIGRATION.read_text()
-        metric_ddl = ddl[ddl.index("CREATE TABLE claim_metric") : ddl.index("CREATE TABLE claim_locator")]
+        metric_ddl = ddl[
+            ddl.index("CREATE TABLE claim_metric") : ddl.index("CREATE TABLE claim_locator")
+        ]
         # The inline FK targets ``claim``; this shape test needs only the column
         # shape, and the FK itself is covered by the 0001 fidelity test above.
         metric_ddl = re.sub(r"REFERENCES claim\(claim_id\)[^,]*", "", metric_ddl)
@@ -173,7 +178,7 @@ def test_0002_relaxes_value_text_not_null_and_backfills_legacy_none():
             cur.execute("ALTER TABLE claim_metric ALTER COLUMN value_text SET NOT NULL")
             cur.execute(
                 "INSERT INTO claim_metric"
-                " (claim_id, metric_id, label, definition, value_text, value_number, unit, \"window\", scope)"
+                ' (claim_id, metric_id, label, definition, value_text, value_number, unit, "window", scope)'
                 " VALUES ('c1','m1','label','def','None',NULL,'u','w','s')"
             )
 
@@ -182,7 +187,7 @@ def test_0002_relaxes_value_text_not_null_and_backfills_legacy_none():
             cur.execute("SET search_path TO " + schema)
             cur.execute(
                 "INSERT INTO claim_metric"
-                " (claim_id, metric_id, label, definition, value_text, value_number, unit, \"window\", scope)"
+                ' (claim_id, metric_id, label, definition, value_text, value_number, unit, "window", scope)'
                 " VALUES ('c1','m2','label','def',NULL,NULL,'u','w','s')"
             )
 
@@ -195,7 +200,7 @@ def test_0002_relaxes_value_text_not_null_and_backfills_legacy_none():
             cur.execute("SET search_path TO " + schema)
             cur.execute(
                 "INSERT INTO claim_metric"
-                " (claim_id, metric_id, label, definition, value_text, value_number, unit, \"window\", scope)"
+                ' (claim_id, metric_id, label, definition, value_text, value_number, unit, "window", scope)'
                 " VALUES ('c1','m3','label','def',NULL,NULL,'u','w','s')"
             )
             cur.execute("SELECT value_text FROM claim_metric WHERE metric_id='m1'")
@@ -253,3 +258,109 @@ def test_0004_adds_event_and_brief_tables_idempotently():
     }
     assert {"change_event", "brief_snapshot"} <= tables
     conn.close()
+
+
+# --- 0005/0006: honest provenance flag + forged-row correction (issue #9) ---- #
+
+MIGRATION_0005 = (
+    Path(__file__).resolve().parents[1] / "db" / "ledger" / "0005_verified_against_capture.sql"
+)
+MIGRATION_0006 = (
+    Path(__file__).resolve().parents[1] / "db" / "ledger" / "0006_correct_forged_human_review.sql"
+)
+
+
+def test_0005_relaxes_llm_review_check_on_postgres():
+    """0005 adds verified_against_capture and admits an llm_proposal verified row.
+
+    This is PostgreSQL DDL (ADD COLUMN IF NOT EXISTS, DROP/ADD CONSTRAINT), so it
+    needs a real Postgres (CI service / compose db). Absent one it skips rather
+    than pretending a string match is verification.
+    """
+
+    assert MIGRATION_0005.exists()
+    conn = _postgres()
+    with conn:
+        cur = conn.cursor()
+        # Isolated schema so the shared CI database is untouched.
+        cur.execute("DROP SCHEMA IF EXISTS mig0005 CASCADE")
+        cur.execute("CREATE SCHEMA mig0005")
+        cur.execute("SET search_path TO mig0005")
+        # Minimal pre-0005 claim table carrying the original constraint.
+        cur.execute(
+            """
+            CREATE TABLE claim (
+                claim_id text PRIMARY KEY,
+                extraction_method varchar(30) NOT NULL,
+                human_reviewed boolean NOT NULL DEFAULT false,
+                CONSTRAINT ck_claim_llm_reviewed CHECK (
+                    extraction_method <> 'llm_proposal' OR human_reviewed)
+            )
+            """
+        )
+        # Before 0005 an unreviewed llm_proposal is rejected.
+        with pytest.raises(psycopg.errors.CheckViolation):
+            cur.execute("INSERT INTO claim VALUES ('c1','llm_proposal',false)")
+
+        cur.execute(MIGRATION_0005.read_text())
+        cur.execute(MIGRATION_0005.read_text())  # idempotent re-run
+
+        cols = {
+            r[0]
+            for r in cur.execute(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema='mig0005' AND table_name='claim'"
+            ).fetchall()
+        }
+        assert "verified_against_capture" in cols
+        # After 0005 a capture-verified llm_proposal is admitted; an unflagged one is not.
+        cur.execute("INSERT INTO claim VALUES ('c2','llm_proposal',false,true)")
+        with pytest.raises(psycopg.errors.CheckViolation):
+            cur.execute("INSERT INTO claim VALUES ('c3','llm_proposal',false,false)")
+        cur.execute("DROP SCHEMA mig0005 CASCADE")
+
+
+def test_0006_corrects_only_forged_semantic_rows_on_postgres():
+    """0006 clears human_reviewed only on the pre-fix automated-lane rows."""
+
+    assert MIGRATION_0006.exists()
+    conn = _postgres()
+    with conn:
+        cur = conn.cursor()
+        cur.execute("DROP SCHEMA IF EXISTS mig0006 CASCADE")
+        cur.execute("CREATE SCHEMA mig0006")
+        cur.execute("SET search_path TO mig0006")
+        cur.execute(
+            """
+            CREATE TABLE claim (
+                claim_id text PRIMARY KEY,
+                extraction_method varchar(30) NOT NULL,
+                extraction_tool varchar(80) NOT NULL,
+                human_reviewed boolean NOT NULL DEFAULT false,
+                verified_against_capture boolean NOT NULL DEFAULT false
+            )
+            """
+        )
+        cur.executemany(
+            "INSERT INTO claim VALUES (%s,%s,%s,%s,%s)",
+            [
+                # Forged: the pre-fix automated lane wrote this.
+                ("forged", "llm_proposal", "ai_discovery.semantic", True, False),
+                # A genuine human review of a different tool must be untouched.
+                ("human", "llm_proposal", "ai_discovery.review", True, False),
+                # A deterministic parser row is untouched.
+                ("det", "deterministic_parser", "ai_discovery.claims", False, False),
+            ],
+        )
+        cur.execute(MIGRATION_0006.read_text())
+        cur.execute(MIGRATION_0006.read_text())  # idempotent re-run
+        rows = {
+            r[0]: (r[1], r[2])
+            for r in cur.execute(
+                "SELECT claim_id, human_reviewed, verified_against_capture FROM claim"
+            ).fetchall()
+        }
+        assert rows["forged"] == (False, True), "forged row must be corrected"
+        assert rows["human"] == (True, False), "genuine human review untouched"
+        assert rows["det"] == (False, False), "deterministic row untouched"
+        cur.execute("DROP SCHEMA mig0006 CASCADE")

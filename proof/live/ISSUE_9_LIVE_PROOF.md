@@ -30,24 +30,29 @@ blocking the unattended run):
 
 1. **Tailscale SSH on the tailnet IP.** Hetzner runs Tailscale SSH, which
    intercepts `:22` on `100.109.237.19` and demands interactive browser auth, so
-   the restricted key could never authenticate for an unattended systemd tunnel
-   or `rrsync`. The kit now connects over Hetzner's public IP `89.167.5.185`
-   (plain sshd, key auth). The restricted `authorized_keys` entries are now
+   a restricted key could never authenticate for an unattended systemd tunnel or
+   `rrsync`. The fix keeps traffic on the tailnet (never the public internet): a
+   dedicated **non-root** `adi-worker` account on Hetzner is reached over a
+   tailnet-only sshd listener on port `2222` (a real sshd, not Tailscale SSH, so
+   per-key restrictions apply and root is refused). The restricted keys carry
    `from="100.112.158.79,140.238.91.73"` (tailnet + Oracle egress) with
-   `permitopen="127.0.0.1:55432"` / `rrsync`, so the DB port stays
-   loopback-only and never public.
-2. **rrsync target path.** `rrsync` roots at `/var/lib/ai-discovery`, so the
-   replication target is `snapshots/` (relative), not the absolute path.
+   `permitopen="127.0.0.1:55432"` / `rrsync`; Oracle no longer holds a root key on
+   Hetzner. The DB port stays loopback-only and never public.
+2. **rrsync target path.** `rrsync` is chrooted at
+   `/var/lib/ai-discovery/snapshots`, so the replication target is `.`, not the
+   absolute path.
 
 ## 2. Real production refresh, end to end
 
-Run: `run-2026-09-19T151109Z.log` (systemd `adi-run.service`), `RUN_SUCCESS`.
+Run: `run-2026-09-19T163919Z.log` (systemd `adi-run.service`), `RUN_SUCCESS`.
+This is the run after the honest-provenance fix and the non-root tailnet tunnel,
+so the persisted claim records `human_reviewed=false, verified_against_capture=true`.
 
 ```
 $ cat /var/lib/ai-discovery/status/latest.json
-{"started_at": "2026-09-19T15:11:09Z", "finished_at": "2026-09-19T15:16:43Z",
+{"started_at": "2026-09-19T16:39:19Z", "finished_at": "2026-09-19T16:44:49Z",
  "ok": 1, "run_exit": 0, "replicated": 1, "api_evidence_items": 12,
- "log": "/var/lib/ai-discovery/runs/run-2026-09-19T151109Z.log"}
+ "log": "/var/lib/ai-discovery/runs/run-2026-09-19T163919Z.log"}
 ```
 
 Durable Hetzner ledger after the run:
@@ -64,7 +69,7 @@ change_event      1
 `/health` from the live API:
 
 ```json
-{"status":"degraded","evidence_items":12,"sources":51,"sources_not_ok":39,"discovered_candidates":18}
+{"status":"degraded","evidence_items":12,"sources":51,"sources_not_ok":39,"discovered_candidates":19}
 ```
 
 `/surface-evidence` (chatgpt surface is `evidenced`, not empty state):
@@ -87,7 +92,7 @@ the registry still shows explicit no-evidence.
 `/events`:
 
 ```json
-{"count":1,"items":[{"id":"0b187a5b6f94","event_type":"crawler_policy",
+{"count":1,"items":[{"id":"9f7e8c586b05","event_type":"crawler_policy",
  "title":"It can take approximately 24 hours for OpenAI's systems to adjust for search results after a site's robots.txt update.",
  "surfaces":["chatgpt"],"claims":["0b187a5b6f942c1d2a3fcb12285238e5"],
  "evidence_urls":["https://developers.openai.com/api/docs/bots"],
@@ -135,7 +140,13 @@ keys. Neither the evidence DB nor the corpus DB is publicly reachable
    asserts that every declared locator was deterministically checked against the
    capture bytes — the honest property it establishes — and never asserts
    `human_reviewed`, which would falsely claim a person read the model output.
-   Both flags are persisted and surfaced in the API.
+   Both flags are persisted and surfaced in the API. Migration
+   `db/ledger/0005_verified_against_capture.sql` adds the column and relaxes the
+   CHECK; `db/ledger/0006_correct_forged_human_review.sql` corrects any row the
+   pre-fix lane wrote with the forged flag. On the live Hetzner ledger the single
+   claim row now reads `human_reviewed=false, verified_against_capture=true`,
+   confirmed after applying 0006 (`UPDATE 0` — the clean re-run had already
+   written it honestly).
 2. No production code derived change events from claims (PR #41 removed the
    only generator), so `/events` was permanently empty. Added
    `change_derivation.py` (deterministic, model-free topic→event mapping) and

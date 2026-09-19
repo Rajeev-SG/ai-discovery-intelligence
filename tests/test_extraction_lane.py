@@ -206,3 +206,94 @@ def test_no_change_topic_yields_no_event(ledger_db, monkeypatch):
 
     with Session(ledger_db) as s2:
         assert load_events(s2) == []
+
+
+def test_event_id_is_content_addressed_not_prefix_sliced():
+    """A corrected claim (same id, new content) must yield a DISTINCT event id."""
+    from ai_discovery.change_derivation import event_from_claim
+
+    base = _result().claims[0]
+
+    def _record(claim):
+        from ai_discovery.claim_extract import claim_from_extracted
+        from ai_discovery.claims import Capture
+
+        text = CAPTURE_TEXT
+        cap = Capture(raw=b"", text=text, fetched_at=dt.datetime(2026, 9, 16, tzinfo=dt.UTC))
+        src = {
+            "source_id": "similarweb-most-visited-websites",
+            "publisher": "Similarweb",
+            "url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+            "canonical_url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+            "source_class": "vendor_research",
+            "http_status": 200,
+        }
+        return claim_from_extracted(claim, source=src, capture=cap, verified_against_capture=True)
+
+    rec_a = _record(base)
+    # Same claim id (topic/statement/source) but a changed statement would change
+    # the claim id, so instead vary a metric value that does not feed claim_id.
+    corrected = base.model_copy(deep=True)
+    corrected.metrics[0].value = 52.9
+    corrected.metrics[0].value_quote = "around 52.7% one month ago"  # quote still valid
+    rec_b = _record(corrected)
+
+    assert rec_a.claim_id == rec_b.claim_id, "claim id must be stable for this test"
+    ev_a = event_from_claim(rec_a)
+    ev_b = event_from_claim(rec_b)
+    assert ev_a.id != ev_b.id, "a corrected claim must produce a distinct event id"
+    # Idempotent: the same content derives the same id every time.
+    assert event_from_claim(rec_a).id == ev_a.id
+
+
+def test_persist_events_is_idempotent_and_appends_distinct(ledger_db):
+    from sqlalchemy.orm import Session
+
+    from ai_discovery.change_derivation import event_from_claim
+    from ai_discovery.claim_extract import claim_from_extracted
+    from ai_discovery.claims import Capture
+    from ai_discovery.observations import load_events, persist_events
+
+    cap = Capture(raw=b"", text=CAPTURE_TEXT, fetched_at=dt.datetime(2026, 9, 16, tzinfo=dt.UTC))
+    src = {
+        "source_id": "similarweb-most-visited-websites",
+        "publisher": "Similarweb",
+        "url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+        "canonical_url": "https://www.similarweb.com/blog/research/market-research/most-visited-websites/",
+        "source_class": "vendor_research",
+        "http_status": 200,
+    }
+    rec = claim_from_extracted(
+        _result().claims[0], source=src, capture=cap, verified_against_capture=True
+    )
+    ev = event_from_claim(rec)
+
+    with Session(ledger_db) as s:
+        assert persist_events(s, [ev]) == 1
+        assert persist_events(s, [ev]) == 0, "same event id must be a no-op"
+        assert len(load_events(s)) == 1
+
+
+def test_provenance_validator_accepts_all_three_honest_combinations():
+    """The three admissible flag combinations, and the one that must be rejected."""
+    from pydantic import ValidationError
+
+    from ai_discovery.claim_models import ExtractionProvenance
+
+    # deterministic parser: no review flag needed.
+    ok = ExtractionProvenance(method="deterministic_parser", tool="t", version="v")
+    assert ok.human_reviewed is False and ok.verified_against_capture is False
+
+    # human reviewed, unattended-verified, and both: all admissible.
+    for kwargs in (
+        {"human_reviewed": True, "verified_against_capture": False},
+        {"human_reviewed": False, "verified_against_capture": True},
+        {"human_reviewed": True, "verified_against_capture": True},
+    ):
+        prov = ExtractionProvenance(method="llm_proposal", tool="t", version="v", **kwargs)
+        assert prov.human_reviewed == kwargs["human_reviewed"]
+        assert prov.verified_against_capture == kwargs["verified_against_capture"]
+
+    # Neither flag: an unreviewed, unverified llm_proposal is never evidence.
+    with pytest.raises(ValidationError):
+        ExtractionProvenance(method="llm_proposal", tool="t", version="v")
