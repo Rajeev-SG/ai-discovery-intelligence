@@ -1,0 +1,880 @@
+{
+  "version": 1,
+  "lastReviewed": "2026-09-15",
+  "surfaces": [
+    {
+      "id": "chatgpt",
+      "vendor": "OpenAI",
+      "name": "ChatGPT",
+      "family": "ChatGPT",
+      "type": "conversational_assistant",
+      "tier": "core_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "web",
+        "mobile",
+        "desktop"
+      ],
+      "discovery_modes": [
+        "web_search",
+        "answers",
+        "shopping",
+        "deep_research"
+      ],
+      "retrieval_status": "partially_documented",
+      "official_urls": [
+        "https://chatgpt.com/",
+        "https://help.openai.com/en/collections/3742473-chatgpt",
+        "https://platform.openai.com/docs/bots"
+      ]
+    },
+    {
+      "id": "google-gemini",
+      "vendor": "Google",
+      "name": "Gemini",
+      "family": "Gemini",
+      "type": "conversational_assistant",
+      "tier": "core_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "web",
+        "mobile",
+        "android_ecosystem"
+      ],
+      "discovery_modes": [
+        "web_grounding",
+        "answers",
+        "deep_research",
+        "shopping"
+      ],
+      "retrieval_status": "partially_documented",
+      "official_urls": [
+        "https://gemini.google.com/",
+        "https://support.google.com/gemini/"
+      ]
+    },
+    {
+      "id": "google-ai-mode",
+      "vendor": "Google",
+      "name": "Google Search AI Mode",
+      "family": "Google Search",
+      "type": "ai_native_search",
+      "tier": "core_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "google_search_web",
+        "google_search_mobile"
+      ],
+      "discovery_modes": [
+        "search",
+        "query_fanout",
+        "shopping",
+        "local"
+      ],
+      "retrieval_status": "documented_in_part",
+      "official_urls": [
+        "https://support.google.com/websearch/answer/16011537"
+      ]
+    },
+    {
+      "id": "google-ai-overviews",
+      "vendor": "Google",
+      "name": "Google AI Overviews",
+      "family": "Google Search",
+      "type": "search_augmentation",
+      "tier": "core_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "google_search_web",
+        "google_search_mobile"
+      ],
+      "discovery_modes": [
+        "search_answers",
+        "citations"
+      ],
+      "retrieval_status": "documented_in_part",
+      "official_urls": [
+        "https://developers.google.com/search/docs/appearance/ai-features"
+      ]
+    },
+    {
+      "id": "microsoft-copilot",
+      "vendor": "Microsoft",
+      "name": "Microsoft Copilot",
+      "family": "Copilot",
+      "type": "conversational_assistant",
+      "tier": "core_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "web",
+        "windows",
+        "edge",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "web_search",
+        "answers",
+        "shopping"
+      ],
+      "retrieval_status": "partially_documented",
+      "official_urls": [
+        "https://copilot.microsoft.com/",
+        "https://support.microsoft.com/copilot"
+      ]
+    },
+    {
+      "id": "bing-copilot-search",
+      "vendor": "Microsoft",
+      "name": "Bing Copilot Search",
+      "family": "Bing",
+      "type": "ai_native_search",
+      "tier": "core_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "bing_web",
+        "edge"
+      ],
+      "discovery_modes": [
+        "search",
+        "citations",
+        "shopping"
+      ],
+      "retrieval_status": "documented_in_part",
+      "official_urls": [
+        "https://www.bing.com/copilotsearch"
+      ]
+    },
+    {
+      "id": "claude",
+      "vendor": "Anthropic",
+      "name": "Claude",
+      "family": "Claude",
+      "type": "conversational_assistant",
+      "tier": "core_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "web",
+        "mobile",
+        "desktop"
+      ],
+      "discovery_modes": [
+        "web_search",
+        "answers",
+        "research"
+      ],
+      "retrieval_status": "partially_documented",
+      "official_urls": [
+        "https://claude.ai/",
+        "https://support.anthropic.com/"
+      ]
+    },
+    {
+      "id": "perplexity",
+      "vendor": "Perplexity",
+      "name": "Perplexity",
+      "family": "Perplexity",
+      "type": "ai_native_search",
+      "tier": "core_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "web",
+        "mobile",
+        "browser"
+      ],
+      "discovery_modes": [
+        "search",
+        "citations",
+        "shopping",
+        "research"
+      ],
+      "retrieval_status": "partially_documented",
+      "official_urls": [
+        "https://www.perplexity.ai/",
+        "https://docs.perplexity.ai/"
+      ]
+    },
+    {
+      "id": "deepseek-chat",
+      "vendor": "DeepSeek",
+      "name": "DeepSeek Chat",
+      "family": "DeepSeek",
+      "type": "conversational_assistant",
+      "tier": "core_global",
+      "regions": [
+        "global",
+        "china"
+      ],
+      "distribution": [
+        "web",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "web_search",
+        "answers"
+      ],
+      "retrieval_status": "under_documented",
+      "official_urls": [
+        "https://chat.deepseek.com/",
+        "https://api-docs.deepseek.com/"
+      ]
+    },
+    {
+      "id": "grok",
+      "vendor": "xAI",
+      "name": "Grok",
+      "family": "Grok",
+      "type": "conversational_assistant",
+      "tier": "core_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "grok_web",
+        "x",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "web_search",
+        "social_search",
+        "answers"
+      ],
+      "retrieval_status": "partially_documented",
+      "official_urls": [
+        "https://grok.com/",
+        "https://docs.x.ai/"
+      ]
+    },
+    {
+      "id": "meta-ai",
+      "vendor": "Meta",
+      "name": "Meta AI",
+      "family": "Meta AI",
+      "type": "embedded_ecosystem_assistant",
+      "tier": "core_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "meta_ai_web",
+        "whatsapp",
+        "instagram",
+        "facebook",
+        "messenger"
+      ],
+      "discovery_modes": [
+        "web_search",
+        "answers",
+        "recommendations"
+      ],
+      "retrieval_status": "under_documented",
+      "official_urls": [
+        "https://www.meta.ai/",
+        "https://ai.meta.com/"
+      ]
+    },
+    {
+      "id": "mistral-le-chat",
+      "vendor": "Mistral AI",
+      "name": "Le Chat",
+      "family": "Le Chat",
+      "type": "conversational_assistant",
+      "tier": "secondary_global",
+      "regions": [
+        "global",
+        "europe"
+      ],
+      "distribution": [
+        "web",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "web_search",
+        "answers"
+      ],
+      "retrieval_status": "partially_documented",
+      "official_urls": [
+        "https://chat.mistral.ai/",
+        "https://help.mistral.ai/"
+      ]
+    },
+    {
+      "id": "you-com",
+      "vendor": "You.com",
+      "name": "You.com",
+      "family": "You.com",
+      "type": "ai_native_search",
+      "tier": "secondary_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "web",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "search",
+        "answers",
+        "research"
+      ],
+      "retrieval_status": "under_documented",
+      "official_urls": [
+        "https://you.com/"
+      ]
+    },
+    {
+      "id": "duckduckgo-duck-ai",
+      "vendor": "DuckDuckGo",
+      "name": "Duck.ai",
+      "family": "DuckDuckGo",
+      "type": "ai_native_search",
+      "tier": "secondary_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "web",
+        "browser",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "answers",
+        "web_search"
+      ],
+      "retrieval_status": "partially_documented",
+      "official_urls": [
+        "https://duck.ai/",
+        "https://duckduckgo.com/duckduckgo-help-pages/duckai/"
+      ]
+    },
+    {
+      "id": "brave-answer-with-ai",
+      "vendor": "Brave",
+      "name": "Brave Search Answer with AI",
+      "family": "Brave Search",
+      "type": "search_augmentation",
+      "tier": "secondary_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "web",
+        "brave_browser"
+      ],
+      "discovery_modes": [
+        "search",
+        "answers",
+        "citations"
+      ],
+      "retrieval_status": "partially_documented",
+      "official_urls": [
+        "https://search.brave.com/help/ai"
+      ]
+    },
+    {
+      "id": "brave-leo",
+      "vendor": "Brave",
+      "name": "Brave Leo",
+      "family": "Brave",
+      "type": "browser_native_ai",
+      "tier": "watch_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "brave_browser"
+      ],
+      "discovery_modes": [
+        "answers",
+        "web_search"
+      ],
+      "retrieval_status": "under_documented",
+      "official_urls": [
+        "https://brave.com/leo/"
+      ]
+    },
+    {
+      "id": "genspark",
+      "vendor": "MainFunc",
+      "name": "Genspark",
+      "family": "Genspark",
+      "type": "ai_native_search",
+      "tier": "secondary_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "web",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "search",
+        "answers",
+        "research",
+        "shopping"
+      ],
+      "retrieval_status": "under_documented",
+      "official_urls": [
+        "https://www.genspark.ai/"
+      ]
+    },
+    {
+      "id": "doubao",
+      "vendor": "ByteDance",
+      "name": "Doubao / \u8c46\u5305",
+      "family": "Doubao",
+      "type": "conversational_assistant",
+      "tier": "core_china",
+      "regions": [
+        "china"
+      ],
+      "distribution": [
+        "web",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "web_search",
+        "answers",
+        "recommendations"
+      ],
+      "retrieval_status": "under_documented",
+      "official_urls": [
+        "https://www.doubao.com/"
+      ]
+    },
+    {
+      "id": "qwen-consumer",
+      "vendor": "Alibaba",
+      "name": "Qwen / \u5343\u95ee",
+      "family": "Qwen",
+      "type": "conversational_assistant",
+      "tier": "core_china",
+      "regions": [
+        "china",
+        "global"
+      ],
+      "distribution": [
+        "web",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "web_search",
+        "answers"
+      ],
+      "retrieval_status": "under_documented",
+      "official_urls": [
+        "https://www.qianwen.com/",
+        "https://qwen.ai/"
+      ]
+    },
+    {
+      "id": "quark-ai",
+      "vendor": "Alibaba",
+      "name": "Quark AI / \u5938\u514b",
+      "family": "Quark",
+      "type": "ai_native_search",
+      "tier": "core_china",
+      "regions": [
+        "china"
+      ],
+      "distribution": [
+        "mobile",
+        "web"
+      ],
+      "discovery_modes": [
+        "search",
+        "answers",
+        "research"
+      ],
+      "retrieval_status": "under_documented",
+      "official_urls": [
+        "https://quark.cn/"
+      ]
+    },
+    {
+      "id": "tencent-yuanbao",
+      "vendor": "Tencent",
+      "name": "Yuanbao / \u5143\u5b9d",
+      "family": "Yuanbao",
+      "type": "conversational_assistant",
+      "tier": "core_china",
+      "regions": [
+        "china"
+      ],
+      "distribution": [
+        "web",
+        "mobile",
+        "tencent_ecosystem"
+      ],
+      "discovery_modes": [
+        "web_search",
+        "answers",
+        "recommendations"
+      ],
+      "retrieval_status": "under_documented",
+      "official_urls": [
+        "https://yuanbao.tencent.com/"
+      ]
+    },
+    {
+      "id": "kimi",
+      "vendor": "Moonshot AI",
+      "name": "Kimi",
+      "family": "Kimi",
+      "type": "conversational_assistant",
+      "tier": "core_china",
+      "regions": [
+        "china",
+        "global"
+      ],
+      "distribution": [
+        "web",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "web_search",
+        "answers",
+        "research"
+      ],
+      "retrieval_status": "under_documented",
+      "official_urls": [
+        "https://www.kimi.com/"
+      ]
+    },
+    {
+      "id": "baidu-ai-search",
+      "vendor": "Baidu",
+      "name": "Baidu AI Search",
+      "family": "Baidu Search",
+      "type": "ai_native_search",
+      "tier": "core_china",
+      "regions": [
+        "china"
+      ],
+      "distribution": [
+        "baidu_search_web",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "search",
+        "answers",
+        "citations",
+        "local"
+      ],
+      "retrieval_status": "partially_documented",
+      "official_urls": [
+        "https://www.baidu.com/"
+      ]
+    },
+    {
+      "id": "nano-ai-search",
+      "vendor": 360,
+      "name": "Nano AI Search / \u7eb3\u7c73AI\u641c\u7d22",
+      "family": "360 Search",
+      "type": "ai_native_search",
+      "tier": "core_china",
+      "regions": [
+        "china"
+      ],
+      "distribution": [
+        "web",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "search",
+        "answers"
+      ],
+      "retrieval_status": "under_documented",
+      "official_urls": [
+        "https://www.n.cn/"
+      ]
+    },
+    {
+      "id": "zhipu-qingyan",
+      "vendor": "Zhipu AI",
+      "name": "Qingyan / \u667a\u8c31\u6e05\u8a00",
+      "family": "Z.ai",
+      "type": "conversational_assistant",
+      "tier": "core_china",
+      "regions": [
+        "china"
+      ],
+      "distribution": [
+        "web",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "web_search",
+        "answers"
+      ],
+      "retrieval_status": "under_documented",
+      "official_urls": [
+        "https://chatglm.cn/",
+        "https://z.ai/"
+      ]
+    },
+    {
+      "id": "naver-ai",
+      "vendor": "NAVER",
+      "name": "NAVER AI Tab / AI Briefing",
+      "family": "NAVER Search",
+      "type": "search_augmentation",
+      "tier": "core_regional",
+      "regions": [
+        "south_korea"
+      ],
+      "distribution": [
+        "naver_search_web",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "search",
+        "answers",
+        "shopping",
+        "local"
+      ],
+      "retrieval_status": "partially_documented",
+      "official_urls": [
+        "https://search.naver.com/"
+      ]
+    },
+    {
+      "id": "yandex-ai-search",
+      "vendor": "Yandex",
+      "name": "Yandex Search with Alice AI",
+      "family": "Yandex Search",
+      "type": "search_augmentation",
+      "tier": "core_regional",
+      "regions": [
+        "russia",
+        "cis"
+      ],
+      "distribution": [
+        "yandex_search_web",
+        "browser",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "search",
+        "answers",
+        "shopping",
+        "local"
+      ],
+      "retrieval_status": "partially_documented",
+      "official_urls": [
+        "https://ya.ru/"
+      ]
+    },
+    {
+      "id": "gigachat",
+      "vendor": "Sber",
+      "name": "GigaChat",
+      "family": "GigaChat",
+      "type": "conversational_assistant",
+      "tier": "core_regional",
+      "regions": [
+        "russia",
+        "cis"
+      ],
+      "distribution": [
+        "web",
+        "mobile",
+        "sber_ecosystem"
+      ],
+      "discovery_modes": [
+        "web_search",
+        "answers"
+      ],
+      "retrieval_status": "under_documented",
+      "official_urls": [
+        "https://giga.chat/"
+      ]
+    },
+    {
+      "id": "baidu-wenxin-assistant",
+      "vendor": "Baidu",
+      "name": "Baidu Wenxin Assistant / \u6587\u5fc3\u52a9\u624b",
+      "family": "Baidu Wenxin",
+      "type": "conversational_assistant",
+      "tier": "core_china",
+      "regions": [
+        "china"
+      ],
+      "distribution": [
+        "web",
+        "baidu_app",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "web_search",
+        "deep_search",
+        "answers",
+        "agents"
+      ],
+      "retrieval_status": "partially_documented",
+      "official_urls": [
+        "https://chat.baidu.com/",
+        "https://www.baidu.com/"
+      ]
+    },
+    {
+      "id": "kakao-kanana",
+      "vendor": "Kakao",
+      "name": "Kanana in KakaoTalk / Kanana Search",
+      "family": "Kanana",
+      "type": "embedded_ecosystem_assistant",
+      "tier": "core_regional",
+      "regions": [
+        "south_korea"
+      ],
+      "distribution": [
+        "kakaotalk"
+      ],
+      "discovery_modes": [
+        "search",
+        "answers",
+        "recommendations",
+        "agentic_actions"
+      ],
+      "retrieval_status": "under_documented",
+      "official_urls": [
+        "https://www.kakaocorp.com/"
+      ]
+    },
+    {
+      "id": "felo",
+      "vendor": "Felo",
+      "name": "Felo Search",
+      "family": "Felo",
+      "type": "ai_native_search",
+      "tier": "watch_regional",
+      "regions": [
+        "japan",
+        "global"
+      ],
+      "distribution": [
+        "web",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "search",
+        "citations",
+        "cross_language_search",
+        "research"
+      ],
+      "retrieval_status": "under_documented",
+      "official_urls": [
+        "https://felo.ai/"
+      ]
+    },
+    {
+      "id": "manus",
+      "vendor": "Manus",
+      "name": "Manus",
+      "family": "Manus",
+      "type": "general_consumer_agent",
+      "tier": "watch_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "web",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "web_research",
+        "browser_actions",
+        "recommendations"
+      ],
+      "retrieval_status": "under_documented",
+      "official_urls": [
+        "https://manus.im/"
+      ]
+    },
+    {
+      "id": "poe",
+      "vendor": "Quora",
+      "name": "Poe",
+      "family": "Poe",
+      "type": "multi_model_assistant",
+      "tier": "watch_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "web",
+        "mobile"
+      ],
+      "discovery_modes": [
+        "bot_dependent"
+      ],
+      "retrieval_status": "heterogeneous",
+      "official_urls": [
+        "https://poe.com/"
+      ]
+    },
+    {
+      "id": "apple-intelligence-siri",
+      "vendor": "Apple",
+      "name": "Siri / Apple Intelligence with ChatGPT",
+      "family": "Apple Intelligence",
+      "type": "embedded_ecosystem_assistant",
+      "tier": "watch_global",
+      "regions": [
+        "global"
+      ],
+      "distribution": [
+        "iphone",
+        "ipad",
+        "mac"
+      ],
+      "discovery_modes": [
+        "assistant",
+        "external_model_handoff"
+      ],
+      "retrieval_status": "partially_documented",
+      "official_urls": [
+        "https://www.apple.com/apple-intelligence/"
+      ]
+    },
+    {
+      "id": "amazon-rufus",
+      "vendor": "Amazon",
+      "name": "Rufus",
+      "family": "Amazon",
+      "type": "commerce_native_ai",
+      "tier": "watch_commerce",
+      "regions": [
+        "multi_market"
+      ],
+      "distribution": [
+        "amazon_app",
+        "amazon_web"
+      ],
+      "discovery_modes": [
+        "product_search",
+        "recommendations",
+        "shopping"
+      ],
+      "retrieval_status": "partially_documented",
+      "official_urls": [
+        "https://www.aboutamazon.com/news/retail/amazon-rufus"
+      ]
+    }
+  ]
+}
