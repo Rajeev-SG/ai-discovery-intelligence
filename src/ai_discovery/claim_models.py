@@ -460,14 +460,26 @@ class ExtractionProvenance(BaseModel):
     tool: str
     version: str
     rule_id: str | None = None
+    # A human read the model output against the source. This is the honest,
+    # load-bearing claim of human curation; an unattended lane must NOT set it.
     human_reviewed: bool = False
+    # Every known field's locator was deterministically checked against the
+    # capture bytes by the extraction lane (``check_against_capture``), so the
+    # record is source-anchored even though no human read it. This is what the
+    # unattended lane may legitimately assert; it is never a substitute for
+    # ``human_reviewed`` and is recorded distinctly so the plane can tell the two
+    # apart.
+    verified_against_capture: bool = False
 
     @model_validator(mode="after")
     def _llm_is_not_evidence(self) -> ExtractionProvenance:
-        if self.method == "llm_proposal" and not self.human_reviewed:
+        if self.method == "llm_proposal" and not (
+            self.human_reviewed or self.verified_against_capture
+        ):
             raise ValueError(
-                "LLM extraction is never evidence: an llm_proposal claim needs "
-                "human_reviewed=True against the source capture before it can enter the ledger"
+                "LLM extraction is never evidence: an llm_proposal claim must be "
+                "either human_reviewed or deterministically verified against the "
+                "source capture before it can enter the ledger"
             )
         return self
 

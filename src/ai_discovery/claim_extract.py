@@ -150,6 +150,7 @@ def claim_from_extracted(
     source: dict[str, Any],
     capture: Capture,
     human_reviewed: bool = False,
+    verified_against_capture: bool = False,
 ) -> ClaimRecord:
     """Shape one extracted claim into a validated, quote-verified ClaimRecord."""
     statement = claim.statement.strip()
@@ -202,6 +203,7 @@ def claim_from_extracted(
         version=EXTRACTION_VERSION,
         rule_id=None,
         human_reviewed=human_reviewed,
+        verified_against_capture=verified_against_capture,
     )
 
     anchors = [Locator(kind=claim.capture_anchor_kind, quote=claim.capture_anchor)]
@@ -235,12 +237,15 @@ def claims_from_extraction(
     source: dict[str, Any],
     capture: Capture,
     human_reviewed: bool = False,
+    verified_against_capture: bool = False,
 ) -> list[ClaimRecord]:
     """Validate every extracted claim; return only the records that fully verify.
 
-    ``human_reviewed=True`` marks the extraction as reviewed against the source
-    capture; without it, the record is an ``llm_proposal`` that the ledger's
-    provenance validator keeps out of evidence status.
+    ``human_reviewed=True`` marks the extraction as read by a human against the
+    source capture. ``verified_against_capture=True`` marks the narrower, honest
+    property the unattended lane actually establishes: every declared locator was
+    checked against the capture bytes. Either lets the ``llm_proposal`` record
+    enter the ledger, and the plane can tell the two apart.
     """
     records: list[ClaimRecord] = []
     failures: list[str] = []
@@ -248,7 +253,11 @@ def claims_from_extraction(
         try:
             records.append(
                 claim_from_extracted(
-                    extracted, source=source, capture=capture, human_reviewed=human_reviewed
+                    extracted,
+                    source=source,
+                    capture=capture,
+                    human_reviewed=human_reviewed,
+                    verified_against_capture=verified_against_capture,
                 )
             )
         except (ValidationError, ClaimSpecError) as error:

@@ -16,6 +16,7 @@ same claim re-extracted from the same source yields the same event.
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
 
 from .change_events import ChangeEvent, EventType
 from .claim_models import ClaimRecord
@@ -55,8 +56,12 @@ def event_from_claim(claim: ClaimRecord) -> ChangeEvent | None:
         statement if len(statement) <= _MAX_TITLE else statement[: _MAX_TITLE - 1].rstrip() + "…"
     )
 
+    # 12 hex chars (the change_event PK width) derived from the full claim id by
+    # hashing, not by slicing: a hash keeps the whole claim id in the input, so
+    # two distinct claims cannot collide through a shared prefix.
+    event_id = hashlib.sha256(f"change:{claim.claim_id}".encode()).hexdigest()[:12]
     return ChangeEvent(
-        id=claim.claim_id[:12],
+        id=event_id,
         event_type=event_type,
         title=title,
         description=statement,

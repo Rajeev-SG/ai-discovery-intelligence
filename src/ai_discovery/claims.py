@@ -155,6 +155,7 @@ class Claim(Base):
     extraction_version: Mapped[str] = mapped_column(String(40))
     rule_id: Mapped[str | None] = mapped_column(String(80))
     human_reviewed: Mapped[bool] = mapped_column(Boolean, default=False)
+    verified_against_capture: Mapped[bool] = mapped_column(Boolean, default=False)
 
     published_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True))
     published_at_source: Mapped[str | None] = mapped_column(String(30))
@@ -491,6 +492,7 @@ def extract_claim(
         version=extraction_raw.get("version", EXTRACTION_VERSION),
         rule_id=rule_id or extraction_raw.get("rule_id"),
         human_reviewed=bool(extraction_raw.get("human_reviewed", False)),
+        verified_against_capture=bool(extraction_raw.get("verified_against_capture", False)),
     )
 
     methodology_raw = spec.get("methodology") or {}
@@ -723,6 +725,7 @@ def persist_claim(engine: Engine, record: ClaimRecord) -> tuple[str, bool]:
                     extraction_version=record.extraction.version,
                     rule_id=record.extraction.rule_id,
                     human_reviewed=record.extraction.human_reviewed,
+                    verified_against_capture=record.extraction.verified_against_capture,
                     published_at=_midnight(record.dates.published_at.value),
                     published_at_source=(
                         record.dates.published_at.locator.selector
@@ -944,6 +947,7 @@ def load_expanded_claims(
                         "version": claim.extraction_version,
                         "rule_id": claim.rule_id,
                         "human_reviewed": claim.human_reviewed,
+                        "verified_against_capture": claim.verified_against_capture,
                     },
                 }
             )

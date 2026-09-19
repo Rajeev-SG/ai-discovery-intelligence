@@ -123,6 +123,10 @@ def claim_view(row: dict[str, Any]) -> dict[str, Any]:
             "source_class": (row.get("source") or {}).get("source_class"),
         },
         "provenance": provenance_view(row.get("provenance") or []),
+        # How the claim was produced, stated honestly: an unattended lane reports
+        # verified_against_capture (every locator checked against the capture),
+        # never human_reviewed (no person read the model output).
+        "extraction": row.get("extraction") or {},
         # Private captures: hash + availability only.
         "evidence": [
             {

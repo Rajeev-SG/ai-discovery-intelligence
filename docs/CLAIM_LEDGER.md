@@ -37,10 +37,15 @@ study methodology. Claims are the unit the observation plane shows.
    `observed_at` are four separate fields; a validator rejects `modified_at < published_at`
    and a naive `observed_at`. Confirmed distinct on the real pages: e.g. Similarweb
    published 2026-05-14, modified 2026-06-11, measured ~Apr 2026, observed 2026-09-16.
-4. **LLM extraction is never evidence.** `ExtractionProvenance` rejects
-   `method="llm_proposal"` unless `human_reviewed=True`, and the DDL carries the same
-   `CHECK`. v1 is deterministic-parser only; if prose inference is added it must come
-   through Instructor + Pydantic structured output and land as a human-reviewed row.
+4. **LLM extraction is never evidence on its own.** `ExtractionProvenance` rejects
+   `method="llm_proposal"` unless the row is either `human_reviewed=True` (a person
+   read the model output against the source) or `verified_against_capture=True`
+   (the unattended lane deterministically checked every declared locator against the
+   capture bytes), and the DDL carries the same `CHECK`. The two flags are recorded
+   separately and surfaced in the API, so a consumer can always tell a human-reviewed
+   row from a machine-verified one; an unattended lane must never set
+   `human_reviewed`. Prose inference enters only through Instructor + Pydantic
+   structured output.
 5. **Claim identity is content-addressed.** `claim_id = sha256(source_id|topic|statement)[:32]`,
    so re-extracting the same assertion from the same source is the same claim. A changed
    assertion gets a new id with `relationship` + `supersedes_claim_id`.

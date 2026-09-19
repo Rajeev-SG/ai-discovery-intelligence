@@ -130,9 +130,12 @@ keys. Neither the evidence DB nor the corpus DB is publicly reachable
 
 1. `claim_pipeline.py` called `claims_from_extraction` with the default
    `human_reviewed=False`, so the ledger provenance guard rejected every
-   `llm_proposal` claim and the lane persisted 0 claims in production. Now
-   passes `human_reviewed=True` after deterministic quote verification (the
-   contract already pinned in `tests/test_integration_cycle.py`).
+   `llm_proposal` claim and the lane persisted 0 claims in production. The fix
+   adds a distinct `verified_against_capture` provenance flag: the unattended lane
+   asserts that every declared locator was deterministically checked against the
+   capture bytes — the honest property it establishes — and never asserts
+   `human_reviewed`, which would falsely claim a person read the model output.
+   Both flags are persisted and surfaced in the API.
 2. No production code derived change events from claims (PR #41 removed the
    only generator), so `/events` was permanently empty. Added
    `change_derivation.py` (deterministic, model-free topic→event mapping) and

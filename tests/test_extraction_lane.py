@@ -3,9 +3,11 @@
 ``extract_pending_claims`` is the unattended production lane (Dagster asset →
 Oracle timer). It must mark each quote-verified claim reviewed, because every
 locator it accepts was deterministically checked against the capture. If it
-leaves ``human_reviewed=False``, the ledger's provenance validator rejects every
+leaves both review flags false, the ledger's provenance validator rejects every
 ``llm_proposal`` claim and the lane silently persists nothing — the exact
-production failure this test pins against (issue #9).
+production failure this test pins against (issue #9). It asserts
+``verified_against_capture``, the honest property an unattended lane establishes,
+and never ``human_reviewed``.
 """
 
 from __future__ import annotations
@@ -153,10 +155,15 @@ def test_automated_lane_persists_a_quote_verified_claim(ledger_db, monkeypatch):
     assert run.captures_failed == 0, run.failures
     assert run.claims_created == 1, (
         "the automated lane must persist the quote-verified claim; 0 means the "
-        "provenance guard rejected an unreviewed llm_proposal"
+        "provenance guard rejected an llm_proposal with no review flag"
     )
     rows = C.load_expanded_claims(ledger_db)
     assert len(rows) == 1
+    # Honest provenance: the lane may assert deterministic capture verification,
+    # never human_reviewed (no person read the model output).
+    prov = rows[0]["extraction"]
+    assert prov["verified_against_capture"] is True
+    assert prov["human_reviewed"] is False
 
     # Claims -> change_events: the validated claim yields one typed, dated event
     # linked back to the claim, so the observation plane's event feed is real.

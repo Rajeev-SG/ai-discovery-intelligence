@@ -1,9 +1,16 @@
 [Unit]
 Description=SSH tunnel: Oracle -> Hetzner evidence Postgres (issue #9)
 # Forwards 127.0.0.1:55432 (Oracle) to 127.0.0.1:55432 (Hetzner host, the
-# loopback-only publish of the Coolify evidence Postgres). The key is
-# restricted on the Hetzner side (from= + permitopen + no-pty), so it can
-# only open this one forward. Postgres is never exposed publicly.
+# loopback-only publish of the Coolify evidence Postgres). The key is held by the
+# non-root adi-worker account on the Hetzner side and restricted there (from= +
+# permitopen + no-pty), so it can only open this one forward. Postgres is never
+# exposed publicly.
+#
+# Reaches Hetzner over the tailnet on port 2222: the default :22 is served by
+# Tailscale SSH, which requires interactive browser auth and cannot be used by an
+# unattended timer. Port 2222 is a real-sshd listener bound to the Tailscale
+# interface only (ssh.socket.d/60-adi-tunnel.conf) that enforces the per-key
+# permitopen restriction and refuses root.
 Wants=network-online.target
 After=network-online.target
 
@@ -12,8 +19,9 @@ Type=simple
 ExecStart=/usr/bin/ssh -N -o ServerAliveInterval=30 -o ServerAliveCountMax=3 \
   -o ExitOnForwardFailure=yes -o BatchMode=yes \
   -i /etc/ai-discovery/db-tunnel-key \
+  -p 2222 \
   -L 127.0.0.1:55432:127.0.0.1:55432 \
-  root@89.167.5.185
+  adi-worker@100.109.237.19
 Restart=always
 RestartSec=10
 

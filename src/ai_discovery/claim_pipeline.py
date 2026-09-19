@@ -121,13 +121,17 @@ def extract_pending_claims(
                 client=client,
                 model=model,
             )
-            # Every quote is deterministically verified against the capture
-            # inside claims_from_extraction (check_against_capture), so the
-            # record is a review of the source bytes, not an unreviewed model
-            # proposal. Without this the ledger's provenance validator rejects
-            # every llm_proposal claim and the automated lane persists nothing.
+            # Every declared locator is deterministically checked against the
+            # capture bytes inside claims_from_extraction
+            # (check_against_capture). That is the honest property this
+            # unattended lane establishes, so it asserts
+            # verified_against_capture=True — never human_reviewed, which would
+            # falsely claim a person read the model output.
             claims = claims_from_extraction(
-                result, source=source, capture=capture, human_reviewed=True
+                result,
+                source=source,
+                capture=capture,
+                verified_against_capture=True,
             )
         except Exception as error:  # noqa: BLE001 — surfaced per capture, never fatal
             run.captures_failed += 1
