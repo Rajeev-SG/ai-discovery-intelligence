@@ -143,6 +143,11 @@ class Claim(Base):
         ForeignKey("claim.claim_id"), nullable=True
     )
     confidence: Mapped[str] = mapped_column(String(20), default="medium")
+    # Derived-confidence audit trail (issue #28A): the exact scorer inputs and the
+    # rationale, so the label can be recomputed and explained without the model.
+    confidence_score: Mapped[float | None] = mapped_column(Float)
+    confidence_inputs: Mapped[dict] = mapped_column(JSON, default=dict)
+    confidence_rationale: Mapped[list] = mapped_column(JSON, default=list)
     extraction_method: Mapped[str] = mapped_column(String(30))
     extraction_tool: Mapped[str] = mapped_column(String(80))
     extraction_version: Mapped[str] = mapped_column(String(40))
@@ -496,14 +501,13 @@ def extract_claim(
         status=spec.get("status", "current"),
         relationship=relationship,
         supersedes_claim_id=spec.get("supersedes_claim_id") or None,
-        confidence=spec.get("confidence", "medium"),
     )
 
     missing = check_against_capture(record, capture)
     if missing:
         joined = "; ".join(missing)
         raise ClaimSpecError(f"declared evidence not found in capture: {joined}")
-    return record
+    return with_derived_confidence(record, spec=spec)
 
 
 def check_against_capture(record: ClaimRecord, capture: Capture) -> list[str]:
@@ -544,6 +548,47 @@ def _value_at_path(record: ClaimRecord, path: str) -> Any:
         else:
             node = getattr(node, part)
     return getattr(node, "value", None)
+
+
+def with_derived_confidence(
+    record: ClaimRecord,
+    *,
+    spec: Mapping[str, Any] | None = None,
+    corroborating_sources: int = 0,
+) -> ClaimRecord:
+    """Return ``record`` with confidence derived from evidence, not assertion.
+
+    Any ``confidence`` in the spec (a spec-author or, after PR #22, an LLM value)
+    is recorded for audit but can never set the label (issue #28A): the label is a
+    pure function of the derived inputs, and those inputs are persisted so the
+    label can be recomputed and explained.
+    """
+
+    from .confidence import assess_confidence
+
+    asserted = None
+    if spec is not None and spec.get("confidence") is not None:
+        asserted = str(spec["confidence"])
+    assessment = assess_confidence(
+        record, corroborating_sources=corroborating_sources, model_asserted=asserted
+    )
+    # Map the 5-level scorer label onto the ledger's 4-level Confidence vocabulary,
+    # downgrading (never upgrading) so the stricter of the two is always kept.
+    ledger_label = {
+        "high": "high",
+        "medium_high": "medium",
+        "medium": "medium",
+        "low": "low",
+        "unresolved": "unknown",
+    }[assessment.label]
+    return record.model_copy(
+        update={
+            "confidence": ledger_label,
+            "confidence_score": assessment.score,
+            "confidence_inputs": assessment.inputs,
+            "confidence_rationale": assessment.rationale,
+        }
+    )
 
 
 RULE_SOURCE_CLASS_DEFAULT = {
@@ -640,6 +685,9 @@ def persist_claim(engine: Engine, record: ClaimRecord) -> tuple[str, bool]:
                     relationship=record.relationship,
                     supersedes_claim_id=record.supersedes_claim_id,
                     confidence=record.confidence,
+                    confidence_score=record.confidence_score,
+                    confidence_inputs=record.confidence_inputs,
+                    confidence_rationale=record.confidence_rationale,
                     extraction_method=record.extraction.method,
                     extraction_tool=record.extraction.tool,
                     extraction_version=record.extraction.version,
@@ -759,6 +807,12 @@ def load_expanded_claims(engine: Engine) -> list[dict[str, Any]]:
                     "relationship": claim.relationship,
                     "supersedes_claim_id": claim.supersedes_claim_id,
                     "confidence": claim.confidence,
+                    "confidence_detail": {
+                        "score": claim.confidence_score,
+                        "inputs": claim.confidence_inputs or {},
+                        "rationale": claim.confidence_rationale or [],
+                        "derived": True,
+                    },
                     "source": {
                         "source_id": claim.source_id,
                         "publisher": study.publisher,

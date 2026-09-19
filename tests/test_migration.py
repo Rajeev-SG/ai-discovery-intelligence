@@ -207,3 +207,26 @@ def test_0002_relaxes_value_text_not_null_and_backfills_legacy_none():
                 cur.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
         finally:
             conn.close()
+
+
+# --- 0003: derived-confidence inputs on claim (issue #28A) ------------------ #
+
+MIGRATION_0003 = (
+    Path(__file__).resolve().parents[1] / "db" / "ledger" / "0003_claim_confidence_inputs.sql"
+)
+
+
+def test_0003_adds_confidence_columns_idempotently():
+    """The 0003 migration is additive and safe to re-run on a schema that has them."""
+
+    assert MIGRATION_0003.exists()
+    sql = MIGRATION_0003.read_text()
+    for column in ("confidence_score", "confidence_inputs", "confidence_rationale"):
+        assert column in sql
+        assert "IF NOT EXISTS" in sql
+
+    conn = sqlite3.connect(":memory:")
+    conn.executescript(_strip_pg_dialect(MIGRATION.read_text()))
+    cols = {r[1] for r in conn.execute("PRAGMA table_info(claim)").fetchall()}
+    assert {"confidence_inputs", "confidence_rationale", "confidence_score"} <= cols
+    conn.close()
