@@ -19,3 +19,6 @@ private-snapshots/
 var/
 *.pyc
 web/test-results/
+
+# Local image/verification scratch
+*.dockerignore.local
