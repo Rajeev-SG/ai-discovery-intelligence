@@ -1,6 +1,7 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
+import { EvidenceDetail } from "@/components/evidence-detail";
 import type { SurfaceRow } from "@/lib/surfaces";
 
 interface DetailDrawerProps {
@@ -106,33 +107,7 @@ export function DetailDrawer({ row, open, onOpenChange, label }: DetailDrawerPro
                   )}
                 </Section>
 
-                <Section title="Evidence">
-                  <p className="detail-lead">
-                    <strong>{row.evidenceLabel}.</strong> {row.evidenceNote}
-                  </p>
-                  <dl className="evidence-grid">
-                    <div>
-                      <dt>Claims</dt>
-                      <dd className="placeholder">Awaiting ingestion (issue 03)</dd>
-                    </div>
-                    <div>
-                      <dt>Methodology</dt>
-                      <dd className="placeholder">Awaiting ingestion (issue 02)</dd>
-                    </div>
-                    <div>
-                      <dt>Conflicting evidence</dt>
-                      <dd className="placeholder">Awaiting ingestion (issue 04)</dd>
-                    </div>
-                    <div>
-                      <dt>Confidence</dt>
-                      <dd className="placeholder">{row.confidenceLabel}</dd>
-                    </div>
-                    <div>
-                      <dt>Last verified</dt>
-                      <dd className="placeholder">Not yet verified — registry reviewed {row.lastReviewed}</dd>
-                    </div>
-                  </dl>
-                </Section>
+                <EvidenceDetail surfaceId={row.id} />
               </div>
             </>
           ) : null}

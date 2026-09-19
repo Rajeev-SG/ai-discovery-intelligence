@@ -26,8 +26,8 @@ export interface Registry {
 
 /**
  * A surface row as rendered by the observation plane. Registry facts are kept
- * verbatim; evidence fields are deliberately explicit placeholders because
- * ingestion and the claim ledger are issues 02/03, not 01.
+ * verbatim; evidence fields carry whatever the read-only evidence API holds for
+ * the surface, or an explicit no-evidence state when it holds nothing.
  */
 export interface SurfaceRow {
   id: string;
@@ -51,11 +51,13 @@ export interface SurfaceRow {
   retrievalUnknown: boolean;
   retrievalUnknownNotes: string[];
   officialUrls: string[];
-  evidenceStatus: "not_yet_ingested" | "evidenced" | "no_evidence";
+  evidenceStatus: "evidenced" | "no_evidence";
   evidenceLabel: string;
   evidenceNote: string;
   confidenceLabel: string;
   freshnessLabel: string;
+  /** Number of validated claims backing this surface (0 = explicit no-evidence). */
+  evidenceClaimCount: number;
   lastReviewed: string;
   /** Pre-built lowercase haystack covering every searchable field. */
   searchHaystack: string;
@@ -161,9 +163,6 @@ export function retrievalUnknowns(status: string): string[] {
   }
 }
 
-const NOT_YET_INGESTED =
-  "No evidence ingested yet. Source acquisition (issue 02) and the claim ledger (issue 03) own live provenance; this plane does not invent it.";
-
 /** Registry statuses that mean retrieval architecture is genuinely unknown. */
 export const RETRIEVAL_UNKNOWN_STATUSES = new Set(["under_documented", "heterogeneous"]);
 
@@ -199,8 +198,9 @@ export function buildHaystack(surface: RegistrySurface, lastReviewed: string): s
 
 /**
  * Projects registry entries into observation-plane rows. Registry facts are
- * kept verbatim; evidence fields are explicit placeholders because ingestion
- * and the claim ledger are issues 02/03, not 01.
+ * kept verbatim; evidence fields carry only lightweight summary state — the
+ * full claim/provenance payload is loaded lazily by the drill-down so the
+ * client prop for the collapsed table stays bounded.
  */
 export function toSurfaceRows(registry: Registry): SurfaceRow[] {
   const lastReviewed = registry.lastReviewed;
@@ -225,11 +225,12 @@ export function toSurfaceRows(registry: Registry): SurfaceRow[] {
     retrievalUnknown: RETRIEVAL_UNKNOWN_STATUSES.has(surface.retrieval_status),
     retrievalUnknownNotes: retrievalUnknowns(surface.retrieval_status),
     officialUrls: surface.official_urls ?? [],
-    evidenceStatus: "not_yet_ingested",
-    evidenceLabel: "Not yet ingested",
-    evidenceNote: NOT_YET_INGESTED,
-    confidenceLabel: "Not yet assessed",
-    freshnessLabel: "Registry reviewed " + lastReviewed,
+    evidenceStatus: "no_evidence",
+    evidenceLabel: "No evidence",
+    evidenceNote: "No validated claim is linked to this surface yet.",
+    confidenceLabel: "Unknown — no validated claim",
+    freshnessLabel: "No capture yet",
+    evidenceClaimCount: 0,
     lastReviewed,
     searchHaystack: buildHaystack(surface, lastReviewed),
   }));

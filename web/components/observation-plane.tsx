@@ -515,7 +515,7 @@ export function ObservationPlane({ rows, registryVersion, lastReviewed }: Observ
                             ))}
                           </ul>
                           <h3>Evidence</h3>
-                          <p className="placeholder">
+                          <p className="muted">
                             {row.original.evidenceLabel} — {row.original.evidenceNote}
                           </p>
                         </div>
@@ -593,7 +593,11 @@ export function ObservationPlane({ rows, registryVersion, lastReviewed }: Observ
                 </div>
                 <div>
                   <dt>Evidence</dt>
-                  <dd className="placeholder-badge">{row.original.evidenceLabel}</dd>
+                  <dd className="muted">
+                    {row.original.evidenceClaimCount > 0
+                      ? `${row.original.evidenceLabel} — see detail panel`
+                      : row.original.evidenceLabel}
+                  </dd>
                 </div>
               </dl>
               <button type="button" className="link-button" onClick={() => openDrawer(row.id)} data-testid={`card-open-${row.id}`}>

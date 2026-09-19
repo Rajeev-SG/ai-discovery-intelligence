@@ -16,6 +16,11 @@ jobs:
   observation-plane:
     name: observation-plane (typecheck, unit, build, e2e)
     runs-on: ubuntu-latest
+    # Recorded-fixture mode: the evidence drill-down e2e runs structurally
+    # against recorded data instead of silently skipping when no live API is
+    # configured. Set EVIDENCE_API_URL to point the same suite at the real API.
+    env:
+      EVIDENCE_FIXTURE: "1"
     defaults:
       run:
         working-directory: web

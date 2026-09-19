@@ -47,11 +47,12 @@ describe("canonical registry", () => {
     }
   });
 
-  it("never invents evidence for issue 01", () => {
+  it("defaults every surface to an explicit no-evidence state, inventing nothing", () => {
     for (const row of rows) {
-      expect(row.evidenceStatus).toBe("not_yet_ingested");
-      expect(row.confidenceLabel).toBe("Not yet assessed");
-      expect(row.evidenceNote).toMatch(/ingested/i);
+      expect(row.evidenceStatus).toBe("no_evidence");
+      expect(row.evidenceClaimCount).toBe(0);
+      expect(row.confidenceLabel).toMatch(/Unknown/);
+      expect(row.evidenceNote).toMatch(/no validated claim/i);
       // No fabricated figures: the registry surface row carries no metrics.
       for (const field of [row.evidenceLabel, row.confidenceLabel, row.freshnessLabel]) {
         expect(field).not.toMatch(/[%≈]/);
