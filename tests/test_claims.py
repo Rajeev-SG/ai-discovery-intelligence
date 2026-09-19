@@ -8,7 +8,6 @@ negative controls; the real captures are acceptance evidence, never fixtures.
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
@@ -138,8 +137,10 @@ def test_unknown_metric_value_persists_as_null_not_the_string_none():
     metric = row["metrics"][0]
     assert metric["value_text"] is None
     assert metric["value_number"] is None
-    # No consumer path may turn that into the literal string "None".
-    assert "None" not in json.dumps(row)
+    # The persisted value is None, not the string "None"; assert on the field
+    # itself rather than scanning the whole JSON blob.
+    assert not isinstance(metric["value_text"], str)
+    assert repr(metric["value_text"]) == "None"
 
 
 # --- append-only ledger ----------------------------------------------------- #

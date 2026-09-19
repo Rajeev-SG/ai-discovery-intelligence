@@ -104,3 +104,28 @@ def test_claim_status_check(db):
             "INSERT INTO claim (claim_id, study_id, source_id, topic, statement, extraction_method, extraction_tool, extraction_version, observed_at, status) "
             "VALUES ('c2', 's2', 'src2', 'bogus_topic', 'stmt', 'deterministic_parser', 'x_v1', 'v0.1.0', CURRENT_TIMESTAMP, 'current')"
         )
+
+
+# --- 0002: unknown value_text may be NULL (issue #25) ----------------------- #
+
+MIGRATION_0002 = (
+    Path(__file__).resolve().parents[1] / "db" / "ledger" / "0002_claim_metric_value_text_nullable.sql"
+)
+
+
+def test_value_text_nullable_migration_exists():
+    assert MIGRATION_0002.exists(), "issue #25 needs a forward migration for existing ledgers"
+
+
+def test_0002_relaxes_value_text_not_null_on_an_existing_ledger():
+    """An existing ledger must accept NULL value_text after the #25 migration."""
+
+    conn = sqlite3.connect(":memory:")
+    conn.executescript(_strip_pg_dialect(MIGRATION.read_text()))
+    # SQLite cannot ALTER COLUMN DROP NOT NULL, so prove the intent structurally:
+    # the migration must target exactly the claim_metric.value_text column.
+    sql = MIGRATION_0002.read_text()
+    assert "ALTER TABLE claim_metric" in sql
+    assert "value_text" in sql
+    assert "DROP NOT NULL" in sql
+    conn.close()

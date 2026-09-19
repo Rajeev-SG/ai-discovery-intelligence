@@ -81,8 +81,7 @@ CREATE TABLE claim_metric (
     label       varchar(160) NOT NULL,
     comparator  varchar(20) NOT NULL DEFAULT 'exact',
     definition  text NOT NULL,
-    -- NULL means "unknown", which is a first-class state (issue #25).
-    value_text  text,
+    value_text  text NOT NULL,
     value_number double precision,
     unit        varchar(40) NOT NULL,
     window      text NOT NULL,
