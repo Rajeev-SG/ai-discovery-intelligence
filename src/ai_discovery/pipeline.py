@@ -1,11 +1,14 @@
-"""Dagster definitions: source assets, schedules and lineage.
+"""Dagster definitions: capture → extraction assets, schedules and lineage.
 
-Dagster owns scheduling, retries and run history — no custom scheduler or run
-dashboard exists in this repo. Assets call the domain modules in ingest.py /
-discovery.py.
+Dagster owns scheduling, retries and run history. Assets call the domain
+modules directly: the capture lane (crawler.py) renders and snapshots new
+evidence; the extraction lane (semantic.py + claim_extract.py) turns changed
+cleaned snapshots into quote-verified ledger claims.
 """
 
 from __future__ import annotations
+
+import datetime as dt
 
 from dagster import (
     Definitions,
@@ -14,9 +17,10 @@ from dagster import (
     define_asset_job,
 )
 
+from .claim_pipeline import extract_pending_claims
 from .db import session_scope
 from .ingest import run_discovery_lane, run_registry_lane, upsert_sources
-from .models import Source, SourceCheck
+from .models import EvidenceItem, Source, SourceCheck
 from .registry import load_sources_config
 
 
@@ -32,7 +36,7 @@ def source_registry(context) -> dict:
 @asset(
     group_name="acquisition",
     deps=[source_registry],
-    description="Acquires configured free sources via Scrapy + Trafilatura.",
+    description="Crawl4AI/HTTP capture of configured free sources into hash-addressed snapshots.",
 )
 def feed_items(context) -> dict:
     config = load_sources_config()
@@ -42,6 +46,18 @@ def feed_items(context) -> dict:
             {"sources_attempted": result.sources_attempted, "items_new": result.items_new}
         )
         return result.as_dict()
+
+
+@asset(
+    group_name="claims",
+    deps=[feed_items],
+    description="Instructor + OpenRouter extraction: changed snapshots → quote-verified ledger claims.",
+)
+def claims(context) -> dict:
+    with session_scope() as session:
+        run = extract_pending_claims(session)
+    context.add_asset_metadata({"claims_created": run.claims_created})
+    return run.as_dict()
 
 
 @asset(
@@ -63,7 +79,6 @@ def discovered_urls(context) -> dict:
     description="Source health + staleness, surfaced rather than silently dropped.",
 )
 def source_health(context) -> dict:
-    config = load_sources_config()
     from sqlalchemy import select
 
     with session_scope() as session:
@@ -85,7 +100,6 @@ def source_health(context) -> dict:
         checks = session.scalar(select(SourceCheck).limit(1))
         payload = {
             "registered_sources": len(sources),
-            "configured": len(config.enabled_sources()),
             "degraded": degraded,
             "has_check_history": checks is not None,
         }
@@ -99,11 +113,7 @@ def source_health(context) -> dict:
     description="Coverage gaps: registry entries with no fresh evidence yet.",
 )
 def coverage_gaps(context) -> dict:
-    import datetime as dt
-
     from sqlalchemy import func, select
-
-    from .models import EvidenceItem
 
     with session_scope() as session:
         counts = dict(
@@ -128,13 +138,31 @@ def coverage_gaps(context) -> dict:
     return payload
 
 
+# --- Schedules (docs/PIPELINES.md) ----------------------------------------- #
+
 acquisition_job = define_asset_job("acquisition_job", selection="*")
-daily_schedule = ScheduleDefinition(
-    name="daily_acquisition", job=acquisition_job, cron_schedule="0 6 * * *"
+discovery_job = define_asset_job("discovery_job", selection=["source_registry", "discovered_urls", "source_health", "coverage_gaps"])
+audit_job = define_asset_job("coverage_audit_job", selection=["source_registry", "source_health", "coverage_gaps"])
+
+daily_high_value = ScheduleDefinition(
+    name="daily_high_value_sources", job=acquisition_job, cron_schedule="0 6 * * *"
+)
+weekly_discovery = ScheduleDefinition(
+    name="weekly_discovery_lane", job=discovery_job, cron_schedule="0 7 * * 1"
+)
+weekly_coverage_audit = ScheduleDefinition(
+    name="weekly_coverage_audit", job=audit_job, cron_schedule="0 8 * * 1"
 )
 
 defs = Definitions(
-    assets=[source_registry, feed_items, discovered_urls, source_health, coverage_gaps],
-    jobs=[acquisition_job],
-    schedules=[daily_schedule],
+    assets=[
+        source_registry,
+        feed_items,
+        claims,
+        discovered_urls,
+        source_health,
+        coverage_gaps,
+    ],
+    jobs=[acquisition_job, discovery_job, audit_job],
+    schedules=[daily_high_value, weekly_discovery, weekly_coverage_audit],
 )

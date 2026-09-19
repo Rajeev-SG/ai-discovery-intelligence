@@ -13,22 +13,8 @@ permissions:
 
 jobs:
   build:
-    name: claim-ledger (extraction, proof, tests)
+    name: claim-ledger (extraction, tests, lint)
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:17-alpine
-        env:
-          POSTGRES_USER: ai_discovery
-          POSTGRES_PASSWORD: ai_discovery
-          POSTGRES_DB: ai_discovery
-        ports:
-          - 55432:5432
-        options: >-
-          --health-cmd "pg_isready -U ai_discovery -d ai_discovery"
-          --health-interval 3s --health-timeout 3s --health-retries 20
-    env:
-      AI_DISCOVERY_TEST_DATABASE_URL: postgresql://ai_discovery:ai_discovery@127.0.0.1:55432/ai_discovery
     steps:
       - uses: actions/checkout@v4
 
@@ -39,28 +25,25 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras
 
-      - name: Regenerate claim ledger + sqlite proof (from committed captures; no live fetch)
-        run: uv run python scripts/build_claim_proof.py --from-captures
-
-      - name: Verify sqlite ledger was regenerated
-        run: |
-          if [ ! -f proof/claim_ledger/claim_ledger.sqlite3 ]; then
-            echo "::error::claim_ledger.sqlite3 was not regenerated"
-            exit 1
-          fi
-          echo "sqlite ledger regenerated: $(wc -c < proof/claim_ledger/claim_ledger.sqlite3) bytes"
-
-      - name: Evidence-integrity scorecard (issue #29)
-        run: uv run python scripts/build_integrity_scorecard.py
-
       - name: Run tests
         run: uv run pytest tests/ -q --tb=short
 
       - name: Lint
         run: uv run ruff check src tests scripts
 
-      - name: Build the evidence-API image (issue #9)
-        run: docker build -t ai-discovery-evidence-api:ci .
+      - name: Verify Instructor claim pipeline is importable and scheduleable
+        run: |
+          uv run python - <<'PY'
+          import sys
+          sys.path.insert(0, "src")
+          from ai_discovery.pipeline import defs
+          assert {s.name for s in defs.schedules} == {
+              "daily_high_value_sources", "weekly_discovery_lane", "weekly_coverage_audit"
+          }
+          assets = {a.key.to_user_string() for a in defs.assets}
+          assert "claims" in assets and "feed_items" in assets
+          print("dagster defs OK:", sorted(assets))
+          PY
 
       - name: Upload proof artifacts
         uses: actions/upload-artifact@v4

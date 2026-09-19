@@ -1,7 +1,8 @@
 """Discovery-lane domain logic.
 
-Candidates come from the Scrapy discovery spider (spiders.py); this module only
-maps hits into the canonical candidate table and deduplicates by canonical URL.
+Candidates come from the direct discovery lane (crawler.run_discovery_jobs via
+provider parsing in spiders_parse.py); this module only maps hits into the
+canonical candidate table and deduplicates by canonical URL.
 Candidates stay non-canonical until a human/validation step promotes them.
 """
 
