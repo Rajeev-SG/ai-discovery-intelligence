@@ -302,3 +302,135 @@ def canonical_reconciliation() -> Reconciliation:
     denominators, geographies and time windows), not a material conflict.
     """
     return compare_claims(CANONICAL_SEMRUSH, CANONICAL_AHREFS)
+
+
+# ---------------------------------------------------------------------------
+# Real reconciliation over the persisted ledger (issue #23)
+# ---------------------------------------------------------------------------
+
+
+def study_claim_from_view(row: dict) -> StudyClaim | None:
+    """Build a ``StudyClaim`` from an expanded-ledger view, or ``None`` if it lacks context.
+
+    Only claims that name a surface and a subject can be compared at all: an
+    absent context is not a match, so we refuse to invent one.
+    """
+
+    surfaces = row.get("surfaces") or []
+    if not surfaces:
+        return None
+    metrics = [m for m in (row.get("metrics") or []) if m.get("value_number") is not None]
+    if not metrics:
+        return None
+    metric = metrics[0]  # see study_claims_from_view: expanded per metric
+    source = row.get("source") or {}
+    dates = row.get("dates") or {}
+    period_start = _iso_date(dates.get("published_at"))
+    return StudyClaim(
+        id=row["claim_id"],
+        evidence_ids=(row["claim_id"],),
+        surface=surfaces[0],
+        subject=_subject_of(row, source),
+        statement=row.get("statement") or "",
+        metric=metric.get("label"),
+        denominator=(row.get("methodology") or {}).get("denominator"),
+        geography=(row.get("methodology") or {}).get("geography"),
+        mode=(row.get("methodology") or {}).get("measurement_mode"),
+        sampling_frame=(row.get("methodology") or {}).get("unit_of_analysis"),
+        period_start=period_start,
+        period_end=period_start,
+        value=metric.get("value_number"),
+        unit=metric.get("unit"),
+        provisional=row.get("status") in {"contested", "watch"},
+    )
+
+
+def study_claims_from_view(row: dict) -> list[StudyClaim]:
+    """One ``StudyClaim`` per metric of a ledger row (multi-metric, no collapse).
+
+    Each metric is its own comparable quantity, so a claim carrying several metrics
+    yields several study claims rather than collapsing to the first.
+    """
+
+    base = study_claim_from_view(row)
+    if base is None:
+        return []
+    metrics = [m for m in (row.get("metrics") or []) if m.get("value_number") is not None]
+    out: list[StudyClaim] = []
+    for metric in metrics:
+        out.append(
+            base.model_copy(
+                update={
+                    "id": f"{row['claim_id']}:{metric.get('metric_id')}",
+                    "metric": metric.get("label"),
+                    "value": metric.get("value_number"),
+                    "unit": metric.get("unit"),
+                }
+            )
+        )
+    return out
+
+
+def _iso_date(value: str | None):
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(str(value)[:10])
+    except ValueError:
+        return None
+
+
+def _subject_of(row: dict, source: dict) -> str:
+    """The entity two claims must share to be comparable at all."""
+
+    import re
+
+    for surface in row.get("surfaces") or []:
+        if surface:
+            return surface
+    url = source.get("canonical_url") or source.get("url") or ""
+    host = re.sub(r"^https?://", "", str(url)).split("/")[0]
+    return host or row["claim_id"]
+
+
+def reconcile_persisted(rows: list[dict]) -> list[Reconciliation]:
+    """Compare persisted claims that share a surface, subject and metric.
+
+    Grouping is ``(surface, subject, metric, unit)``: two claims only conflict
+    when they measure the *same* quantity, so a value on a different metric or
+    unit is not compared. Values are compared unit-aware (see :func:`_same_value`),
+    so 0.5 percent and 0.5 are not treated as the same reading. Each comparison is
+    grounded in stored, validated claims and preserves both sides.
+    """
+
+    claims = [sc for row in rows for sc in study_claims_from_view(row)]
+    # Group by (surface, subject): two claims only conflict when they are about the
+    # same entity on the same surface. Metric/denominator differences are exactly
+    # what the comparison interprets, so they are compared, not used to group.
+    groups: dict[tuple, list[StudyClaim]] = {}
+    for claim in claims:
+        key = (claim.surface, _norm(claim.subject))
+        groups.setdefault(key, []).append(claim)
+
+    out: list[Reconciliation] = []
+    for members in groups.values():
+        for i, first in enumerate(members):
+            for second in members[i + 1 :]:
+                if _same_value(first, second):
+                    continue
+                out.append(compare_claims(first, second))
+    return out
+
+
+def _same_value(first: StudyClaim, second: StudyClaim) -> bool:
+    """Unit-aware value equality: unlike units are never "the same reading".
+
+    A relative tolerance absorbs float noise but is far smaller than any real
+    disagreement, so a genuine difference still surfaces.
+    """
+
+    if first.unit != second.unit:
+        return False
+    if first.value is None or second.value is None:
+        return False
+    return abs(first.value - second.value) <= 1e-9 * max(1.0, abs(first.value))

@@ -182,15 +182,70 @@ def test_canonical_case_semrush_vs_ahrefs():
     assert "geography" in result.differences
 
 
-def test_canonical_case_via_api():
-    """The API exposes the canonical reconciliation."""
+def test_canonical_case_via_api(tmp_path):
+    """The API reconciles the canonical pair from a ledger, not a hardcoded case.
+
+    ``/reconciliation`` compares persisted claims: given the two canonical studies
+    as ledger rows, it returns the same methodologically-incomparable finding.
+    With an empty ledger it returns no items rather than a fixed answer.
+    """
     from fastapi.testclient import TestClient
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
 
-    from ai_discovery.api import app
+    from ai_discovery import api
+    from ai_discovery.models import Base
+    from ai_discovery.reconciliation import CANONICAL_AHREFS, CANONICAL_SEMRUSH
 
-    client = TestClient(app)
-    resp = client.get("/reconciliation/canonical")
-    assert resp.status_code == 200
-    body = resp.json()
-    assert body["state"] == "methodologically_incomparable"
-    assert body["topic"] == "reddit-chatgpt-citation-share"
+    engine = create_engine(f"sqlite+pysqlite:///{tmp_path / 'recon.db'}")
+    Base.metadata.create_all(engine)
+    from ai_discovery.claims import init_ledger
+
+    init_ledger(engine)
+    session = sessionmaker(bind=engine, expire_on_commit=False)()
+    api.app.dependency_overrides[api.get_db] = lambda: session
+    try:
+        client = TestClient(api.app)
+        body = client.get("/reconciliation").json()
+        assert body["count"] == 0  # no hardcoded case
+        assert body["items"] == []
+
+        rows = [
+            _view_from(CANONICAL_SEMRUSH),
+            _view_from(CANONICAL_AHREFS),
+        ]
+        from ai_discovery.reconciliation import reconcile_persisted
+
+        results = reconcile_persisted(rows)
+        assert len(results) == 1
+        assert results[0].state == "methodologically_incomparable"
+    finally:
+        api.app.dependency_overrides.clear()
+        session.close()
+
+
+def _view_from(claim):
+    """An expanded-ledger-shaped row for a canonical StudyClaim."""
+
+    return {
+        "claim_id": claim.id,
+        "statement": claim.statement,
+        "surfaces": [claim.surface],
+        "status": "contested" if claim.provisional else "current",
+        "source": {"canonical_url": f"https://example.test/{claim.id}"},
+        "dates": {"published_at": f"{claim.period_start.isoformat() if claim.period_start else '2026-01-01'}T00:00:00+00:00"},
+        "methodology": {
+            "denominator": claim.denominator,
+            "geography": claim.geography,
+            "measurement_mode": claim.mode,
+            "unit_of_analysis": claim.sampling_frame,
+        },
+        "metrics": [
+            {
+                "metric_id": "m1",
+                "label": claim.metric,
+                "value_number": claim.value,
+                "unit": claim.unit,
+            }
+        ],
+    }

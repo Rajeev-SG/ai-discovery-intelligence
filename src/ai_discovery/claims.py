@@ -76,7 +76,9 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    func,
     select,
+    text,
 )
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import (
@@ -245,12 +247,40 @@ class ClaimEvidence(Base):
     claim: Mapped[Claim] = sa_relationship(back_populates="captures")
 
 
+class ChangeEventRow(Base):
+    """Persisted change event (issue #23). Append-only; payload is the event JSON."""
+
+    __tablename__ = "change_event"
+
+    id: Mapped[str] = mapped_column(String(12), primary_key=True)
+    event_type: Mapped[str] = mapped_column(String(40), index=True)
+    title: Mapped[str] = mapped_column(Text)
+    surfaces: Mapped[list[str]] = mapped_column(JSON, default=list)
+    dedupe_key: Mapped[str | None] = mapped_column(String(200), index=True)
+    payload: Mapped[str] = mapped_column(Text)
+    observed_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), index=True)
+    published_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True))
+    effective_from: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class BriefSnapshotRow(Base):
+    """One generated weekly brief, persisted so the product reads real output."""
+
+    __tablename__ = "brief_snapshot"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    generated_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+    payload: Mapped[str] = mapped_column(Text)
+
+
 LEDGER_TABLES = (
     Study.__table__,
     Claim.__table__,
     ClaimMetric.__table__,
     ClaimLocator.__table__,
     ClaimEvidence.__table__,
+    ChangeEventRow.__table__,
+    BriefSnapshotRow.__table__,
 )
 
 
@@ -760,15 +790,43 @@ def _midnight(value: dt.date | None) -> dt.datetime | None:
     return None if value is None else dt.datetime(value.year, value.month, value.day, tzinfo=dt.UTC)
 
 
-def load_expanded_claims(engine: Engine) -> list[dict[str, Any]]:
-    """The expanded observation/evidence view: claim + methodology + provenance."""
+def load_expanded_claims(
+    engine: Engine,
+    *,
+    topic: str | None = None,
+    surface: str | None = None,
+    limit: int | None = None,
+    offset: int = 0,
+) -> list[dict[str, Any]]:
+    """The expanded observation/evidence view: claim + methodology + provenance.
+
+    Filtering, ordering and pagination run in SQL at the claim level so a request
+    touches only the rows it returns (rather than expanding the whole ledger and
+    slicing in Python). Ordering is newest-first by ``observed_at`` then
+    ``claim_id``, a stable total order for pagination.
+    """
 
     session_factory = sessionmaker(bind=engine, future=True)
     out: list[dict[str, Any]] = []
     with session_factory() as session:
-        for claim in session.execute(
-            select(Claim).order_by(Claim.created_at, Claim.claim_id)
-        ).scalars():
+        stmt = select(Claim)
+        if topic:
+            stmt = stmt.where(Claim.topic == topic)
+        if surface:
+            if session.bind.dialect.name == "sqlite":
+                stmt = stmt.where(func.json_extract(Claim.surfaces, "$").like(f'%"{surface}"%'))
+            else:
+                stmt = stmt.where(
+                    text("claim.surfaces::jsonb @> :surface_json").bindparams(
+                        surface_json=json.dumps([surface])
+                    )
+                )
+        stmt = stmt.order_by(Claim.observed_at.desc(), Claim.claim_id)
+        if offset:
+            stmt = stmt.offset(offset)
+        if limit is not None:
+            stmt = stmt.limit(limit)
+        for claim in session.execute(stmt).scalars():
             study = session.get(Study, claim.study_id)
             metrics = (
                 session.execute(

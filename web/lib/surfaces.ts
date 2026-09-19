@@ -51,7 +51,7 @@ export interface SurfaceRow {
   retrievalUnknown: boolean;
   retrievalUnknownNotes: string[];
   officialUrls: string[];
-  evidenceStatus: "not_yet_ingested";
+  evidenceStatus: "not_yet_ingested" | "evidenced" | "no_evidence";
   evidenceLabel: string;
   evidenceNote: string;
   confidenceLabel: string;

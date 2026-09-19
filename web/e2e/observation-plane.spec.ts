@@ -123,7 +123,8 @@ test("search, filter, sort and expanded DeepSeek detail", async ({ page }) => {
   await expect(page.getByTestId("detail-deepseek-chat")).toBeVisible();
   await expect(page.getByTestId("detail-deepseek-chat")).toContainText("Upstream retrieval index/provider");
   await expect(page.getByTestId("detail-deepseek-chat")).toContainText("chat.deepseek.com");
-  await expect(page.getByTestId("detail-deepseek-chat")).toContainText("Not yet ingested");
+  // Issue #23: a surface with no validated claim shows an explicit no-evidence state.
+  await expect(page.getByTestId("detail-deepseek-chat")).toContainText("No evidence");
   await page.screenshot({ path: `${SHOTS}/desktop-expanded-deepseek.png` });
 });
 
