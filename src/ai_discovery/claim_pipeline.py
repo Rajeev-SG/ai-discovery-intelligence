@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from .change_derivation import derive_and_persist
 from .claim_extract import claims_from_extraction
 from .claims import Capture, create_ledger_engine, persist_claim
 from .models import EvidenceItem
@@ -30,6 +31,7 @@ class ExtractionRun:
     captures_failed: int = 0
     claims_created: int = 0
     claims_skipped: int = 0
+    events_created: int = 0
     failures: list[dict] = field(default_factory=list)
     tokens_in: int = 0
     tokens_out: int = 0
@@ -42,6 +44,7 @@ class ExtractionRun:
             "captures_extracted": self.captures_extracted,
             "captures_failed": self.captures_failed,
             "claims_created": self.claims_created,
+            "events_created": self.events_created,
             "failures": self.failures,
             "semantic_tokens_in": self.tokens_in,
             "semantic_tokens_out": self.tokens_out,
@@ -69,9 +72,7 @@ def extract_pending_claims(
 
     evidence = list(
         session.scalars(
-            select(EvidenceItem)
-            .order_by(EvidenceItem.observed_at.desc())
-            .limit(limit or 20)
+            select(EvidenceItem).order_by(EvidenceItem.observed_at.desc()).limit(limit or 20)
         ).all()
     )
     for item in evidence:
@@ -130,9 +131,7 @@ def extract_pending_claims(
             )
         except Exception as error:  # noqa: BLE001 — surfaced per capture, never fatal
             run.captures_failed += 1
-            run.failures.append(
-                {"capture_hash": item.capture_hash[:12], "error": str(error)[:300]}
-            )
+            run.failures.append({"capture_hash": item.capture_hash[:12], "error": str(error)[:300]})
             continue
         run.captures_extracted += 1
         run.tokens_in += result.tokens_in or 0
@@ -146,4 +145,8 @@ def extract_pending_claims(
             if created:
                 run.claims_created += 1
         ledger_engine.dispose()
+        # Claims → change_events: derive a typed, dated event per validated claim
+        # on the same ledger session (idempotent by claim id), so the observation
+        # plane and the brief see real changes, not an empty event feed.
+        run.events_created += derive_and_persist(session, claims)
     return run

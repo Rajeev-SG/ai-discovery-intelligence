@@ -25,9 +25,7 @@ from ai_discovery.semantic import (
 )
 
 QUOTE = "ChatGPT's web traffic share fell from 76.4% one year ago to around 52.7% one month ago."
-CAPTURE_TEXT = (
-    "Similarweb research. " + QUOTE + " The panel covers opt-in devices worldwide."
-)
+CAPTURE_TEXT = "Similarweb research. " + QUOTE + " The panel covers opt-in devices worldwide."
 
 
 def _result() -> SemanticExtractionResult:
@@ -106,10 +104,7 @@ def _seed_evidence(engine, capture_hash: str) -> None:
     from ai_discovery.snapshot_store import store_extracted_text
 
     store_extracted_text(capture_hash, CAPTURE_TEXT)
-    url = (
-        "https://www.similarweb.com/blog/research/market-research/"
-        "most-visited-websites/"
-    )
+    url = "https://www.similarweb.com/blog/research/market-research/most-visited-websites/"
     with Session(engine) as session:
         session.add(
             Source(
@@ -148,9 +143,7 @@ def test_automated_lane_persists_a_quote_verified_claim(ledger_db, monkeypatch):
     _seed_evidence(ledger_db, capture_hash)
 
     # Feed the fake result through the same semantic_extract seam the lane uses.
-    monkeypatch.setattr(
-        claim_pipeline, "semantic_extract", lambda **_kw: _result()
-    )
+    monkeypatch.setattr(claim_pipeline, "semantic_extract", lambda **_kw: _result())
     from ai_discovery.db import session_scope
 
     with session_scope() as session:
@@ -164,3 +157,45 @@ def test_automated_lane_persists_a_quote_verified_claim(ledger_db, monkeypatch):
     )
     rows = C.load_expanded_claims(ledger_db)
     assert len(rows) == 1
+
+    # Claims -> change_events: the validated claim yields one typed, dated event
+    # linked back to the claim, so the observation plane's event feed is real.
+    from sqlalchemy.orm import Session
+
+    from ai_discovery.observations import load_events
+
+    with Session(ledger_db) as s2:
+        events = load_events(s2)
+    assert len(events) == 1, "a validated claim must produce one change event"
+    event = events[0]
+    assert event.event_type.value == "audience_shift"
+    assert event.claims == [rows[0]["claim_id"]]
+    assert event.surfaces == ["chatgpt"]
+    assert run.events_created == 1
+
+
+def test_no_change_topic_yields_no_event(ledger_db, monkeypatch):
+    """An implication is not a change: it must not fabricate an event."""
+    from ai_discovery import claim_pipeline
+
+    capture_hash = "b" * 64
+    _seed_evidence(ledger_db, capture_hash)
+
+    result = _result()
+    # optimisation_implication is an implication, not a market change.
+    result.claims[0].topic = "optimisation_implication"
+    monkeypatch.setattr(claim_pipeline, "semantic_extract", lambda **_kw: result)
+    from ai_discovery.db import session_scope
+
+    with session_scope() as session:
+        run = extract_pending_claims(session, limit=5)
+
+    assert run.claims_created == 1, run.failures
+    assert run.events_created == 0, "an implication must not produce a change event"
+
+    from sqlalchemy.orm import Session
+
+    from ai_discovery.observations import load_events
+
+    with Session(ledger_db) as s2:
+        assert load_events(s2) == []
