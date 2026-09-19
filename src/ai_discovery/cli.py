@@ -6,6 +6,7 @@ import argparse
 import json
 import sys
 
+from .claim_pipeline import extract_pending_claims
 from .db import session_scope
 from .ingest import ingest_all, run_discovery_lane, run_registry_lane, upsert_sources
 from .registry import load_sources_config
@@ -13,7 +14,7 @@ from .registry import load_sources_config
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="ai-discovery-ingest")
-    parser.add_argument("lane", choices=["registry", "discovery", "all"])
+    parser.add_argument("lane", choices=["registry", "discovery", "claims", "all"])
     parser.add_argument("--source", action="append", dest="sources")
     parser.add_argument("--provider", action="append", dest="providers")
     parser.add_argument("--limit", type=int, default=None)
@@ -36,6 +37,8 @@ def main(argv: list[str] | None = None) -> int:
                     max_per_query=args.max_per_query,
                 )
             )
+        elif args.lane == "claims":
+            payload["claims"] = extract_pending_claims(session).as_dict()
         elif args.lane == "registry":
             payload["registry"] = run_registry_lane(
                 session, config, source_ids=args.sources, limit=args.limit

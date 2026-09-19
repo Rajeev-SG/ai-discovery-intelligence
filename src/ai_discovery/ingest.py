@@ -1,18 +1,18 @@
 """Lane orchestration: registry acquisition + discovery.
 
-Transport is Scrapy (crawler.py); this module sequences the lanes, persists
-results and returns a run summary. Dagster owns scheduling and run history.
+Transport is the direct crawler (crawler.py: robots gate + HTTP + Crawl4AI
+render fallback); this module sequences the lanes, persists results and
+returns a run summary. Dagster owns scheduling and run history.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from urllib.parse import urlsplit
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from .crawler import build_query_jobs, build_source_jobs, run_spiders
+from .crawler import build_query_jobs, build_source_jobs, run_discovery_jobs, run_registry_lane_jobs
 from .discovery import candidate_urls
 from .models import Source
 from .registry import SourcesConfig, resolve_fetch_mode
@@ -75,12 +75,11 @@ def run_registry_lane(
     result = LaneResult(lane="registry", sources_attempted=len(jobs))
     if not jobs:
         return result
-    sinks, _ = run_spiders(acquisition_jobs=jobs)
-    output = sinks[0] if sinks else {}
+    sinks = run_registry_lane_jobs(jobs)
     session.flush()
-    result.items_new = store_articles(session, output.get("items", []))
-    store_statuses(session, output.get("statuses", []))
-    result.statuses = output.get("statuses", [])
+    result.items_new = store_articles(session, sinks.items)
+    store_statuses(session, sinks.statuses)
+    result.statuses = sinks.statuses
     return result
 
 
@@ -95,12 +94,9 @@ def run_discovery_lane(
     result = LaneResult(lane="discovery", sources_attempted=len(jobs))
     if not jobs:
         return result
-    _, sinks = run_spiders(discovery_jobs=[{**q, "max_results": max_per_query} for q in jobs])
-    output = sinks[0] if sinks else {}
-    result.candidates_new = store_candidates(
-        session, output.get("candidates", []), config.registered_hosts()
-    )
-    result.failures = output.get("failures", [])
+    sinks = run_discovery_jobs([{**q, "max_results": max_per_query} for q in jobs])
+    result.candidates_new = store_candidates(session, sinks.candidates, config.registered_hosts())
+    result.failures = sinks.failures
     return result
 
 
@@ -112,31 +108,24 @@ def ingest_all(
     limit: int | None = None,
     max_per_query: int = 10,
 ) -> dict:
-    """Run both lanes in ONE reactor cycle.
-
-    Twisted's reactor cannot be restarted in a process, so the registry and
-    discovery crawls share a single CrawlerProcess (see crawler.run_spiders).
-    """
+    """Run both lanes sequentially and persist their outputs."""
     upsert_sources(session, config)
     session.flush()
     source_jobs = build_source_jobs(config, source_ids=source_ids, limit=limit)
-    query_jobs = build_query_jobs(config)
-    query_jobs = [{**q, "max_results": max_per_query} for q in query_jobs]
-    acq_sinks, disc_sinks = run_spiders(acquisition_jobs=source_jobs, discovery_jobs=query_jobs)
-    acq_output = acq_sinks[0] if acq_sinks else {}
-    disc_output = disc_sinks[0] if disc_sinks else {}
+    query_jobs = [{**q, "max_results": max_per_query} for q in build_query_jobs(config)]
+    acq_sinks = run_registry_lane_jobs(source_jobs)
+    disc_sinks = run_discovery_jobs(query_jobs)
     session.flush()
     registry = LaneResult(lane="registry", sources_attempted=len(source_jobs))
-    registry.items_new = store_articles(session, acq_output.get("items", []))
-    store_statuses(session, acq_output.get("statuses", []))
-    registry.statuses = acq_output.get("statuses", [])
+    registry.items_new = store_articles(session, acq_sinks.items)
+    store_statuses(session, acq_sinks.statuses)
+    registry.statuses = acq_sinks.statuses
     discovery = LaneResult(lane="discovery", sources_attempted=len(query_jobs))
     discovery.candidates_new = store_candidates(
-        session, disc_output.get("candidates", []), config.registered_hosts()
+        session, disc_sinks.candidates, config.registered_hosts()
     )
-    discovery.failures = disc_output.get("failures", [])
+    discovery.failures = disc_sinks.failures
     session.flush()
-    registry.statuses = acq_output.get("statuses", [])
     return {"registry": registry.as_dict(), "discovery": discovery.as_dict()}
 
 
@@ -182,9 +171,10 @@ def run_candidate_lane(
     """Validate discovered candidates by acquiring them and storing non-canonical evidence.
 
     Candidates are promoted to evidence only when the page returns 200, is
-    robots-allowed (Scrapy enforces this and reports `blocked` otherwise) and
-    yields substantive text. They stay marked `is_candidate=True` until a
-    human/validation step marks them canonical.
+    robots-allowed (the shared robots gate enforces this and reports
+    `blocked`/`robots_denied` otherwise) and yields substantive text. They
+    stay marked `is_candidate=True` until a human/validation step marks
+    them canonical.
     """
 
     from .models import DiscoveredCandidate
@@ -195,30 +185,26 @@ def run_candidate_lane(
         return result
     result.sources_attempted = len(candidates)
 
-    jobs = []
-    for cand in candidates:
-        parts = urlsplit(cand.canonical_url)
-        jobs.append(
-            {
-                "id": cand.id,
-                "url": cand.canonical_url,
-                "fetch_url": cand.canonical_url,
-                "fetch_mode": "http",
-                "robots_url": f"{parts.scheme}://{parts.netloc}/robots.txt",
-                "publisher": cand.host,
-                "source_class": cand.source_class_guess or "editorial_discovery",
-                "topics": cand.topics or [],
-                "region": None,
-                "language": None,
-                "limit": 1,
-            }
-        )
-    sinks, _ = run_spiders(acquisition_jobs=jobs)
-    output = sinks[0] if sinks else {}
-    statuses = {s.get("source_id"): s for s in output.get("statuses", [])}
+    jobs = [
+        {
+            "id": cand.id,
+            "url": cand.canonical_url,
+            "fetch_url": cand.canonical_url,
+            "fetch_mode": "http",
+            "publisher": cand.host,
+            "source_class": cand.source_class_guess or "editorial_discovery",
+            "topics": cand.topics or [],
+            "region": None,
+            "language": None,
+            "limit": 1,
+        }
+        for cand in candidates
+    ]
+    sinks = run_registry_lane_jobs(jobs)
+    statuses = {s.get("source_id"): s for s in sinks.statuses}
 
     created = 0
-    for item in output.get("items", []):
+    for item in sinks.items:
         cand = session.get(DiscoveredCandidate, item["source_id"])
         if cand is None:
             continue

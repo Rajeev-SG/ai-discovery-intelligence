@@ -1,0 +1,2 @@
+User-agent: ai-discovery-intelligence
+Disallow: /

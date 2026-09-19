@@ -73,10 +73,14 @@ See [`docs/REPOSITORY_SETUP.md`](docs/REPOSITORY_SETUP.md). The scaffold include
 uv sync --all-extras
 uv run pytest tests/ -q
 
-# Claim ledger + proof
-uv run python scripts/build_claim_specs_expanded.py
-uv run python scripts/build_claim_proof.py
-cat proof/claim_ledger/PROOF.md
+# Automated claim cycle (Dagster assets; requires OPENROUTER_API_KEY for the claims asset)
+uv run python -m ai_discovery registry          # capture configured sources → snapshots
+uv run python -m ai_discovery claims            # Instructor extraction → quote-verified ledger claims
+
+# Browser provisioning for the Crawl4AI render fallback (optional but recommended):
+# HTTP-first fetching works without a browser; JS-render fallback needs one, and
+# render failures are surfaced per source rather than fatal.
+uv run playwright install --with-deps chromium
 
 # Frontend (observation plane)
 cd web
@@ -89,7 +93,7 @@ npm start
 
 | Workflow | Scope |
 |---|---|
-| `claim-ledger-ci` | Regenerates the sqlite proof ledger, runs tests and lint |
+| `claim-ledger-ci` | Evidence-integrity scorecard, tests (incl. the Instructor claim-cycle e2e), lint, Dagster defs smoke, API image build |
 | `web-ci` | Typecheck, unit tests, build, e2e for the observation plane |
 
 ## Architecture change (2026-09-17)
