@@ -1,0 +1,95 @@
+{
+  "source": "pov/state.yaml",
+  "version": 1,
+  "canonical_ids": [
+    "pov-retrieval-systems",
+    "pov-channel-prioritisation",
+    "pov-commerce-ads",
+    "pov-measurement"
+  ],
+  "propositions": [
+    {
+      "id": "pov-retrieval-systems",
+      "section": "How retrieval/search/citation systems differ",
+      "base_text": "Each surface reaches the live web through a different retrieval and citation stack, so the same brand asset is discovered unevenly. Treat retrieval/index and crawler/index documentation as first-class evidence: it changes what \"being found\" means on that surface.",
+      "topics": [
+        "retrieval_index",
+        "citations_sources",
+        "crawler_index_policy"
+      ],
+      "confidence": "medium",
+      "contested": false,
+      "last_reviewed": "2026-09-19T18:33:41.589716Z",
+      "supporting": [
+        {
+          "slot": "crawler_index_policy",
+          "polarity": "supporting",
+          "text": "It can take approximately 24 hours for OpenAI's systems to adjust for search results after a site's robots.txt update.",
+          "claim_id": "0b187a5b6f942c1d2a3fcb12285238e5",
+          "event_id": "9f7e8c586b05",
+          "confidence": "medium",
+          "value_number": null,
+          "value_text": "24",
+          "effective_at": "2026-09-19T16:44:43.507845Z",
+          "added_at": "2026-09-19T18:33:41.589716Z"
+        }
+      ],
+      "contradicting": []
+    },
+    {
+      "id": "pov-channel-prioritisation",
+      "section": "Channel/surface prioritisation by geography/category",
+      "base_text": "Prioritise by measured audience and referral behaviour, not by press volume. A surface matters when it moves a category's discovery, and that varies by geography; a regional surface can be commercially material before it is globally large.",
+      "topics": [
+        "audience_usage",
+        "referrals_conversion"
+      ],
+      "confidence": "unresolved",
+      "contested": false,
+      "last_reviewed": null,
+      "supporting": [],
+      "contradicting": []
+    },
+    {
+      "id": "pov-commerce-ads",
+      "section": "Commercial surfaces: shopping, transaction and ads",
+      "base_text": "Where AI surfaces carry shopping, transaction or ad placements, discovery is also a commercial pipeline. Optimise the product and feed data those surfaces consume, and measure the commerce path, not just the citation.",
+      "topics": [
+        "commerce_ads"
+      ],
+      "confidence": "unresolved",
+      "contested": false,
+      "last_reviewed": null,
+      "supporting": [],
+      "contradicting": []
+    },
+    {
+      "id": "pov-measurement",
+      "section": "Measurement principles and known blind spots",
+      "base_text": "Measure discovery with evidence-derived confidence and explicit unknowns; a vendor's self-reported share is a study with a denominator and a window, not a fact. Known blind spots (unnamed samples, unpublished denominators, different geographies) are recorded, not smoothed over.",
+      "topics": [
+        "measurement"
+      ],
+      "confidence": "unresolved",
+      "contested": false,
+      "last_reviewed": null,
+      "supporting": [],
+      "contradicting": []
+    }
+  ],
+  "changelog": [
+    {
+      "proposition_id": "pov-retrieval-systems",
+      "changed_at": "2026-09-19T18:33:41.589716Z",
+      "reason": "material crawler_index_policy change: significance 3.63 >= 3.50, confidence medium (first-seen quantified claim)",
+      "event_id": "9f7e8c586b05",
+      "evidence_ids": [
+        "0b187a5b6f942c1d2a3fcb12285238e5"
+      ],
+      "old_statement": "Each surface reaches the live web through a different retrieval and citation stack, so the same brand asset is discovered unevenly. Treat retrieval/index and crawler/index documentation as first-class evidence: it changes what \"being found\" means on that surface.",
+      "new_statement": "Each surface reaches the live web through a different retrieval and citation stack, so the same brand asset is discovered unevenly. Treat retrieval/index and crawler/index documentation as first-class evidence: it changes what \"being found\" means on that surface.\n- It can take approximately 24 hours for OpenAI's systems to adjust for search results after a site's robots.txt update. (evidence 0b187a5b6f942c1d2a3fcb12285238e5; 2026-09-19; medium)",
+      "significance": 3.63,
+      "confidence": "medium"
+    }
+  ]
+}
