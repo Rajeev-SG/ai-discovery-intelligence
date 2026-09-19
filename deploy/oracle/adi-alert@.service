@@ -1,0 +1,8 @@
+[Unit]
+Description=Record a failed ai-discovery-intelligence run (%i)
+
+[Service]
+Type=oneshot
+# Appends a persistent, greppable marker so a failed scheduled run is visible
+# even if nobody is watching the journal.
+ExecStart=/bin/sh -c 'echo "$(date -u +%%Y-%%m-%%dT%%H:%%M:%%SZ) RUN_FAILED unit=%i action=rerun" >> /var/lib/ai-discovery/status/failures.log'

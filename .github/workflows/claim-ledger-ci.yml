@@ -3,9 +3,9 @@ name: claim-ledger-ci
 on:
   push:
     branches: ["**"]
-    paths: ["src/**", "scripts/**", "proof/**", "db/**", "tests/**", ".github/workflows/claim-ledger-ci.yml"]
+    paths: ["src/**", "scripts/**", "proof/**", "db/**", "tests/**", "deploy/**", ".github/workflows/claim-ledger-ci.yml"]
   pull_request:
-    paths: ["src/**", "scripts/**", "proof/**", "db/**", "tests/**"]
+    paths: ["src/**", "scripts/**", "proof/**", "db/**", "tests/**", "deploy/**"]
   workflow_dispatch:
 
 permissions:

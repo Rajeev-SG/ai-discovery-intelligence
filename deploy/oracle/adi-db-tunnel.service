@@ -1,0 +1,21 @@
+[Unit]
+Description=SSH tunnel: Oracle -> Hetzner evidence Postgres (issue #9)
+# Forwards 127.0.0.1:55432 (Oracle) to 127.0.0.1:55432 (Hetzner host, the
+# loopback-only publish of the Coolify evidence Postgres). The key is
+# restricted on the Hetzner side (from= + permitopen + no-pty), so it can
+# only open this one forward. Postgres is never exposed publicly.
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ssh -N -o ServerAliveInterval=30 -o ServerAliveCountMax=3 \
+  -o ExitOnForwardFailure=yes -o BatchMode=yes \
+  -i /etc/ai-discovery/db-tunnel-key \
+  -L 127.0.0.1:55432:127.0.0.1:55432 \
+  root@100.109.237.19
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

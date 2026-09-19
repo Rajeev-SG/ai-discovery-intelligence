@@ -1,0 +1,31 @@
+# Acquisition worker image (issue #9): Dagster + Crawl4AI + Instructor/OpenRouter.
+# Runs the full acquisition_job against the remote evidence Postgres over the
+# SSH tunnel; the evidence API image (repo-root Dockerfile) deliberately stays
+# browser-free and acquisition-free.
+FROM python:3.13-slim
+
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    UV_PROJECT_ENVIRONMENT=/usr/local \
+    PYTHONPATH=/app/src
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl git \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY --from=ghcr.io/astral-sh/uv:0.9.7 /uv /usr/local/bin/uv
+
+WORKDIR /app
+
+# Dependencies first: the acquisition extra (Crawl4AI) plus its Chromium
+# browser runtime, so a run never discovers a missing browser mid-flight.
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-install-project --no-dev --all-extras \
+ && uv run playwright install --with-deps chromium
+
+COPY src ./src
+COPY config ./config
+COPY db ./db
+RUN uv sync --frozen --no-dev --all-extras
+
+CMD ["dagster", "job", "execute", "-m", "ai_discovery.pipeline", "-j", "acquisition_job"]
