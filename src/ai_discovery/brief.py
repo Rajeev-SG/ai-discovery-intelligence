@@ -323,3 +323,40 @@ def _apply_window(
             continue
         out.append(item)
     return out
+
+
+def weekly_window(
+    reference: dt.datetime | None = None,
+    *,
+    days: int = 7,
+) -> tuple[dt.datetime, dt.datetime]:
+    """The ``[start, end]`` event-time window for a weekly brief.
+
+    ``reference`` is the run time (default: now, UTC). The window is the trailing
+    ``days`` up to ``reference``. Callers pass this to ``generate`` so the brief
+    reasons over when changes *happened*, not when we crawled the pages.
+    """
+
+    end = reference or dt.datetime.now(dt.UTC)
+    if end.tzinfo is None:
+        end = end.replace(tzinfo=dt.UTC)
+    return end - dt.timedelta(days=days), end
+
+
+def build_weekly_brief(
+    candidates: list[BriefItem],
+    *,
+    generator: BriefGenerator | None = None,
+    reference: dt.datetime | None = None,
+    days: int = 7,
+) -> list[BriefItem]:
+    """Build the weekly brief over an explicit event-time window.
+
+    This is the product entry point: it always applies the window, so a study
+    published long ago but first ingested this week cannot appear as this week's
+    change. Use it instead of calling ``generate`` directly for weekly output.
+    """
+
+    bg = generator or BriefGenerator()
+    start, end = weekly_window(reference, days=days)
+    return bg.generate(candidates, window_start=start, window_end=end)

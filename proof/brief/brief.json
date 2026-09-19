@@ -1,8 +1,10 @@
 {
-  "generated_at": "2026-09-16T19:47:10.870658+00:00",
+  "generated_at": "2026-09-19T05:27:53.667987+00:00",
   "total_candidates": 5,
   "included": 1,
   "excluded": 4,
+  "excluded_windowed_out": 3,
+  "excluded_below_threshold": 1,
   "scorer_audit": {
     "similarweb-most-visited-websites": {
       "confidence_raw": 0.605,
@@ -54,7 +56,10 @@
       "surfaces": [
         "chatgpt"
       ],
-      "is_watch_item": false
+      "is_watch_item": false,
+      "effective_from": null,
+      "published_at": "2026-09-19T05:27:53.664502Z",
+      "observed_at": "2026-09-19T05:27:53.665477Z"
     }
   ],
   "excluded_items": [
@@ -69,12 +74,12 @@
       "confidence": "medium"
     },
     {
-      "change": "Yandex reports that more than 49 million people use its AI answers in Search eac",
+      "change": "NAVER's AI Tab surpassed 4 million cumulative users in ~2 months of beta, produc",
       "significance": 2.97,
       "confidence": "low"
     },
     {
-      "change": "NAVER's AI Tab surpassed 4 million cumulative users in ~2 months of beta, produc",
+      "change": "Yandex reports that more than 49 million people use its AI answers in Search eac",
       "significance": 2.97,
       "confidence": "low"
     }

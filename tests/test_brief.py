@@ -256,3 +256,25 @@ def test_no_window_keeps_previous_behaviour():
     bg = BriefGenerator(target_items=3, max_items=5)
     out = bg.generate([item(change="x", significance=4.0)])
     assert len(out) == 1
+
+
+def test_build_weekly_brief_is_the_product_entry_point():
+    """The real weekly path applies the window; a caller cannot forget it."""
+
+    from ai_discovery.brief import build_weekly_brief, weekly_window
+
+    ref = dt.datetime(2026, 9, 17, tzinfo=dt.UTC)
+    old = item(
+        change="old study ingested this week",
+        significance=5.0,
+        published_at=dt.datetime(2024, 1, 1, tzinfo=dt.UTC),
+    )
+    new = item(
+        change="this week's change",
+        significance=4.0,
+        published_at=dt.datetime(2026, 9, 15, tzinfo=dt.UTC),
+    )
+    out = build_weekly_brief([old, new], reference=ref)
+    assert [x.change for x in out] == ["this week's change"]
+    start, end = weekly_window(ref)
+    assert (end - start).days == 7

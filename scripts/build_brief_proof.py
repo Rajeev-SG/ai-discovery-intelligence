@@ -11,11 +11,15 @@ from ai_discovery.brief import (
     BriefItem,
     ConfidenceScorer,
     SignificanceScorer,
+    build_weekly_brief,
+    weekly_window,
 )
 
 
 def make_candidate(
     *,
+    effective_from=None,
+    published_at=None,
     change: str,
     why: str,
     action: str,
@@ -68,6 +72,9 @@ def make_candidate(
         evidence_ids=evidence_ids,
         surfaces=surfaces,
         is_watch_item=is_watch_item,
+        effective_from=effective_from,
+        published_at=published_at,
+        observed_at=dt.datetime.now(dt.UTC),
     )
     return item, {
         "confidence_raw": conf_raw,
@@ -266,8 +273,10 @@ for spec in claim_specs["claims"]:
     )
     sample_score = 0.6 if sample_known else 0.3
     corroboration = 0.6 if sid == "similarweb-most-visited-websites" else 0.3
+    pub = (spec.get("dates") or {}).get("published_at")
     item, scores = make_candidate(
         change=statement,
+        published_at=dt.datetime.fromisoformat(pub) if pub else None,
         why=f"{spec['source']['publisher']} ({source_class}) published this {topic} finding with documented methodology.",
         action="Include in monitoring. Adjust client strategy if corroborated by an independent source.",
         surfaces=surfaces,
@@ -292,6 +301,7 @@ for spec in claim_specs["claims"]:
 # The Reddit conflict is an issue-#4 deliverable, not yet in the claim ledger.
 # Included here as a watch item with the conflict penalty to demonstrate policy.
 reddit_item, reddit_scores = make_candidate(
+    published_at=dt.datetime.now(dt.UTC),
     change="Reddit's ChatGPT citation share fell from 3.8% to 0.5% (Promptwatch/Semrush Aug 2026); Ahrefs Sep-2026 ranked Reddit as ChatGPT's largest cited domain at 16.8% mention share (US, different denominator).",
     why="Publisher/UGC visibility in ChatGPT is contested. Brands should not panic-exit Reddit; the drop is provisional.",
     action="Monitor only. Treat Reddit as contested until corroborated.",
@@ -332,15 +342,43 @@ print(
     f"Example significance score for (0.8, 0.6, 0.7, 0.5, 0.9, 0.7) = {ss.score(reach=0.8, commercial_intent=0.6, magnitude=0.7, breadth=0.5, persistence=0.9, actionability=0.7)}"
 )
 
+def _excluded_split(candidates, included, reference):
+    """Why each candidate is absent: windowed out (event time) or below threshold.
+
+    Reported separately because "left out because it is not this week's change" is
+    a different editorial fact from "left out because it is weak".
+    """
+
+    start, end = weekly_window(reference)
+    windowed = [
+        c
+        for c in candidates
+        if c.effective_at is None or not (start <= _aware(c.effective_at) <= end)
+    ]
+    below = [c for c in candidates if c not in included and c not in windowed]
+    return windowed, below
+
+
+def _aware(value):
+    return value if value.tzinfo else value.replace(tzinfo=dt.UTC)
+
+
 bg = BriefGenerator()
-included = bg.generate(candidates)
-excluded = [c for c in candidates if c not in included]
+# Weekly output: apply the explicit event-time window so a newly-ingested old
+# study cannot appear as this week's change (issue #27). The reference is the
+# build time; candidates carry published_at/effective_from from their source.
+reference = dt.datetime.now(dt.UTC)
+included = build_weekly_brief(candidates, generator=bg, reference=reference)
+windowed_out, below_threshold = _excluded_split(candidates, included, reference)
+excluded = [*windowed_out, *below_threshold]
 
 result = {
     "generated_at": dt.datetime.now(dt.UTC).isoformat(),
     "total_candidates": len(candidates),
     "included": len(included),
     "excluded": len(excluded),
+    "excluded_windowed_out": len(windowed_out),
+    "excluded_below_threshold": len(below_threshold),
     "scorer_audit": all_scores,
     "items": [i.model_dump(mode="json") for i in included],
     "excluded_items": [
