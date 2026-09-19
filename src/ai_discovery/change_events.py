@@ -84,11 +84,35 @@ class EventStore:
             key=lambda e: e.published_at or e.observed_at,
         )
 
+    #: Event types that must never be removed as "duplicates of" anything else.
+    PROTECTED_EVENT_TYPES = frozenset({EventType.correction_retraction})
+
+    @classmethod
+    def _is_protected(cls, event: ChangeEvent) -> bool:
+        """A correction/retraction, or anything that supersedes another event.
+
+        Dropping one of these as a syndicated duplicate would hide a correction —
+        the exact thing an evidence ledger must never do.
+        """
+
+        return event.event_type in cls.PROTECTED_EVENT_TYPES or bool(event.supersedes)
+
     def dedupe(self) -> list[ChangeEvent]:
-        """Remove events with the same dedupe_key (keep the earliest)."""
+        """Remove syndicated duplicates, keeping the earliest of each key.
+
+        A ``correction_retraction`` event, or any event carrying ``supersedes``,
+        is never dropped: it survives even when it shares a ``dedupe_key`` with the
+        event it corrects, so the timeline always shows both the original and its
+        correction. It also does not claim the key, so it cannot suppress a genuine
+        later duplicate of the original.
+        """
+
         seen: set[str] = set()
         result: list[ChangeEvent] = []
         for event in sorted(self._events.values(), key=lambda e: e.published_at or e.observed_at):
+            if self._is_protected(event):
+                result.append(event)
+                continue
             key = event.dedupe_key
             if key and key in seen:
                 continue
@@ -96,6 +120,33 @@ class EventStore:
                 seen.add(key)
             result.append(event)
         return result
+
+    @staticmethod
+    def in_window(
+        events: list[ChangeEvent],
+        *,
+        window_start: dt.datetime,
+        window_end: dt.datetime,
+    ) -> list[ChangeEvent]:
+        """Events whose *effective* time falls in ``[window_start, window_end]``.
+
+        Effective time is ``effective_from`` when the publisher states one (when
+        the change took hold), else ``published_at`` (when it was announced). It is
+        deliberately **not** ``observed_at``: when we first ingested a page is our
+        observation time, not the market's, so a study published last year and
+        crawled this week must not look like this week's change.
+        """
+
+        out: list[ChangeEvent] = []
+        for event in events:
+            effective = event.effective_from or event.published_at
+            if effective is None:
+                continue  # no claim about when it happened -> not a dated change
+            if effective.tzinfo is None:
+                effective = effective.replace(tzinfo=dt.UTC)
+            if window_start <= effective <= window_end:
+                out.append(event)
+        return out
 
     def timeline(self, surface_id: str | None = None) -> list[ChangeEvent]:
         """Chronological timeline (optionally per-surface), deduplicated."""
