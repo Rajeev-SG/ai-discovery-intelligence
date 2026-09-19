@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import logging
 from typing import Any
 
 from sqlalchemy import select
@@ -18,6 +19,8 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from .change_events import ChangeEvent
+
+logger = logging.getLogger(__name__)
 
 
 def _iso(value: dt.datetime | None) -> str | None:
@@ -45,6 +48,32 @@ def _freshness(observed: dt.datetime | None) -> dict[str, Any]:
     else:
         state = "stale"
     return {"state": state, "age_days": age, "observed_at": _iso(observed)}
+
+
+#: Provenance decision (issue #23, F3): a locator's ``quote`` is a bounded
+#: evidence *excerpt* — the exact phrase a claim rests on — and is publishable,
+#: matching the evidence feed's existing excerpt contract. It is capped so it can
+#: never stand in for the capture, and ``selector`` is a locator string (a JSON-LD
+#: key or CSS selector), never page text. Raw capture content and filesystem paths
+#: are never returned.
+PROVENANCE_QUOTE_MAX = 300
+
+#: Keys this module is allowed to publish from a ledger provenance row. An
+#: allow-list, not a deny-list: a future ledger column cannot leak by default.
+_PROVENANCE_FIELDS = ("field_path", "locator_kind", "quote", "selector")
+
+
+def provenance_view(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Project locator rows through an explicit allow-list with a bounded quote."""
+
+    out: list[dict[str, Any]] = []
+    for row in rows:
+        entry = {key: row.get(key) for key in _PROVENANCE_FIELDS}
+        quote = entry.get("quote")
+        if isinstance(quote, str) and len(quote) > PROVENANCE_QUOTE_MAX:
+            entry["quote"] = quote[:PROVENANCE_QUOTE_MAX] + "…"
+        out.append(entry)
+    return out
 
 
 def claim_view(row: dict[str, Any]) -> dict[str, Any]:
@@ -93,15 +122,7 @@ def claim_view(row: dict[str, Any]) -> dict[str, Any]:
             "url": (row.get("source") or {}).get("url"),
             "source_class": (row.get("source") or {}).get("source_class"),
         },
-        "provenance": [
-            {
-                "field_path": p.get("field_path"),
-                "locator_kind": p.get("locator_kind"),
-                "quote": p.get("quote"),
-                "selector": p.get("selector"),
-            }
-            for p in (row.get("provenance") or [])
-        ],
+        "provenance": provenance_view(row.get("provenance") or []),
         # Private captures: hash + availability only.
         "evidence": [
             {
@@ -186,7 +207,14 @@ def load_events(db: Session) -> list[ChangeEvent]:
         rows = db.scalars(
             select(ChangeEventRow).order_by(ChangeEventRow.observed_at.desc())
         ).all()
-    except OperationalError:  # pragma: no cover - table absent in a ledger-only database
+    except OperationalError:
+        # An existing ledger predating migration 0004 has no change_event table.
+        # Warn rather than silently returning nothing, so an operator sees why the
+        # product is empty instead of reading it as "no events happened".
+        logger.warning(
+            "change_event table is missing; /events returns empty. "
+            "Apply db/ledger/0004_change_event_and_brief.sql to this ledger."
+        )
         return []
     return [ChangeEvent(**json.loads(r.payload)) for r in rows]
 
@@ -200,7 +228,11 @@ def load_brief(db: Session) -> dict[str, Any] | None:
         row = db.scalars(
             select(BriefSnapshotRow).order_by(BriefSnapshotRow.generated_at.desc()).limit(1)
         ).first()
-    except OperationalError:  # pragma: no cover - table absent in a ledger-only database
+    except OperationalError:
+        logger.warning(
+            "brief_snapshot table is missing; /brief returns empty. "
+            "Apply db/ledger/0004_change_event_and_brief.sql to this ledger."
+        )
         return None
     if row is None:
         return None

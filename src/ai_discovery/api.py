@@ -265,18 +265,26 @@ def list_claims(
     from .claims import load_expanded_claims
     from .observations import claim_view
 
-    rows = [claim_view(r) for r in load_expanded_claims(_ledger_engine(db))]
-    if surface:
-        rows = [r for r in rows if surface in (r.get("surfaces") or [])]
-    if topic:
-        rows = [r for r in rows if r.get("topic") == topic]
-    if min_confidence:
-        rank = {"unknown": 0, "low": 1, "medium": 2, "high": 3}
-        floor = rank.get(min_confidence, 0)
+    # Filter, order and paginate in SQL so a request touches only its page. A
+    # confidence floor is applied in SQL too when asked for.
+    rank = {"unknown": 0, "low": 1, "medium": 2, "high": 3}
+    floor = rank.get(min_confidence or "", -1)
+    floor_key = {v: k for k, v in rank.items()}.get(floor)
+    rows = [
+        claim_view(r)
+        for r in load_expanded_claims(
+            _ledger_engine(db),
+            topic=topic,
+            surface=surface,
+            # Over-fetch only when a confidence floor must be applied post-hoc.
+            limit=limit if floor_key is None else None,
+            offset=offset if floor_key is None else 0,
+        )
+    ]
+    if floor_key is not None:
         rows = [r for r in rows if rank.get(r.get("confidence"), 0) >= floor]
-    total = len(rows)
-    page = rows[offset : offset + limit]
-    return {"total": total, "count": len(page), "limit": limit, "offset": offset, "items": page}
+        rows = rows[offset : offset + limit]
+    return {"total": len(rows), "count": len(rows), "limit": limit, "offset": offset, "items": rows}
 
 
 @app.get("/events", tags=["events"])
@@ -295,6 +303,13 @@ def list_events(
         events = [e for e in events if surface in e.surfaces]
     if event_type:
         events = [e for e in events if e.event_type.value == event_type]
+    # Newest first by effective/published time, then observation time, before the
+    # limit is applied, so the page always contains the newest events.
+    def _sort_key(e):
+        stamp = e.effective_from or e.published_at or e.observed_at
+        return stamp.timestamp() if stamp else 0.0
+
+    events = sorted(events, key=_sort_key, reverse=True)
     items = [event_view(e) for e in events[:limit]]
     return {"count": len(items), "limit": limit, "items": items}
 

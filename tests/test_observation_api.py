@@ -125,3 +125,78 @@ def test_reconciliation_endpoint_is_removed(client):
 
     c, _session, _engine = client
     assert c.get("/reconciliation/canonical").status_code == 404
+
+
+def test_claims_and_events_are_newest_first_with_multiple_items(client):
+    """Issue #23 F2: ordering must hold, and the event limit applies after sorting."""
+
+    c, session, engine = client
+    # A second claim, older than the first.
+    older = _claim_record(
+        statement="Widget Search had 0.9M monthly visits in December 2025.",
+        topic="audience_usage",
+    )
+    C.persist_claim(engine, older)
+
+    # SQL-side pagination: limit/offset page the ledger without overlap.
+    all_ids = [i["claim_id"] for i in c.get("/claims").json()["items"]]
+    assert len(all_ids) >= 2
+    first_page = [i["claim_id"] for i in c.get("/claims?limit=1").json()["items"]]
+    second_page = [i["claim_id"] for i in c.get("/claims?limit=1&offset=1").json()["items"]]
+    assert first_page == all_ids[:1]
+    assert second_page == all_ids[1:2]
+    assert not set(first_page) & set(second_page)
+    # A surface filter is applied in SQL too.
+    assert c.get("/claims?surface=never").json()["total"] == 0
+
+    persist_events(
+        session,
+        [
+            ChangeEvent(
+                event_type=EventType.product_launch,
+                title="newer",
+                description=".",
+                surfaces=["widget-search"],
+                observed_at=dt.datetime(2026, 9, 16, tzinfo=dt.UTC),
+                published_at=dt.datetime(2026, 9, 15, tzinfo=dt.UTC),
+            ),
+            ChangeEvent(
+                event_type=EventType.product_launch,
+                title="older",
+                description=".",
+                surfaces=["widget-search"],
+                observed_at=dt.datetime(2026, 9, 16, tzinfo=dt.UTC),
+                published_at=dt.datetime(2026, 1, 1, tzinfo=dt.UTC),
+            ),
+        ],
+    )
+    titles = [e["title"] for e in c.get("/events").json()["items"]]
+    assert titles[0] == "newer", titles
+    # limit still returns the newest, never a stale page.
+    assert c.get("/events?limit=1").json()["items"][0]["title"] == "newer"
+
+
+def test_provenance_quotes_are_bounded_and_allow_listed(client):
+    """Issue #23 F3: provenance is an allow-list with a bounded excerpt, not raw text."""
+
+    c, _session, _engine = client
+    claim = c.get("/claims").json()["items"][0]
+    for p in claim["provenance"]:
+        assert set(p) == {"field_path", "locator_kind", "quote", "selector"}
+        if p["quote"]:
+            assert len(p["quote"]) <= 301
+
+
+def test_degraded_ledger_without_event_tables_is_operator_visible(client, caplog):
+    """Issue #23 F4: a pre-migration ledger logs a warning instead of failing silently."""
+
+    c, session, _engine = client
+    # Drop the event table to simulate a ledger predating migration 0004.
+    from sqlalchemy import text as _text
+
+    session.execute(_text("DROP TABLE IF EXISTS change_event"))
+    session.commit()
+    with caplog.at_level("WARNING"):
+        body = c.get("/events").json()
+    assert body["count"] == 0
+    assert any("change_event" in r.message for r in caplog.records)

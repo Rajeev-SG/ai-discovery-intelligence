@@ -230,3 +230,26 @@ def test_0003_adds_confidence_columns_idempotently():
     cols = {r[1] for r in conn.execute("PRAGMA table_info(claim)").fetchall()}
     assert {"confidence_inputs", "confidence_rationale", "confidence_score"} <= cols
     conn.close()
+
+
+# --- 0004: change_event + brief_snapshot (issue #23) ------------------------ #
+
+MIGRATION_0004 = (
+    Path(__file__).resolve().parents[1] / "db" / "ledger" / "0004_change_event_and_brief.sql"
+)
+
+
+def test_0004_adds_event_and_brief_tables_idempotently():
+    """The read-path tables must exist for existing ledgers, and be re-runnable."""
+
+    assert MIGRATION_0004.exists()
+    sql = MIGRATION_0004.read_text()
+    assert "IF NOT EXISTS" in sql
+
+    conn = sqlite3.connect(":memory:")
+    conn.executescript(_strip_pg_dialect(MIGRATION_0004.read_text()))
+    tables = {
+        r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+    }
+    assert {"change_event", "brief_snapshot"} <= tables
+    conn.close()

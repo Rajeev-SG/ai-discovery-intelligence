@@ -322,7 +322,7 @@ def study_claim_from_view(row: dict) -> StudyClaim | None:
     metrics = [m for m in (row.get("metrics") or []) if m.get("value_number") is not None]
     if not metrics:
         return None
-    metric = metrics[0]
+    metric = metrics[0]  # see study_claims_from_view: expanded per metric
     source = row.get("source") or {}
     dates = row.get("dates") or {}
     period_start = _iso_date(dates.get("published_at"))
@@ -343,6 +343,32 @@ def study_claim_from_view(row: dict) -> StudyClaim | None:
         unit=metric.get("unit"),
         provisional=row.get("status") in {"contested", "watch"},
     )
+
+
+def study_claims_from_view(row: dict) -> list[StudyClaim]:
+    """One ``StudyClaim`` per metric of a ledger row (multi-metric, no collapse).
+
+    Each metric is its own comparable quantity, so a claim carrying several metrics
+    yields several study claims rather than collapsing to the first.
+    """
+
+    base = study_claim_from_view(row)
+    if base is None:
+        return []
+    metrics = [m for m in (row.get("metrics") or []) if m.get("value_number") is not None]
+    out: list[StudyClaim] = []
+    for metric in metrics:
+        out.append(
+            base.model_copy(
+                update={
+                    "id": f"{row['claim_id']}:{metric.get('metric_id')}",
+                    "metric": metric.get("label"),
+                    "value": metric.get("value_number"),
+                    "unit": metric.get("unit"),
+                }
+            )
+        )
+    return out
 
 
 def _iso_date(value: str | None):
@@ -368,20 +394,43 @@ def _subject_of(row: dict, source: dict) -> str:
 
 
 def reconcile_persisted(rows: list[dict]) -> list[Reconciliation]:
-    """Compare persisted claims that share a surface and subject but disagree.
+    """Compare persisted claims that share a surface, subject and metric.
 
-    This is real reconciliation over the ledger: each comparison is grounded in
-    stored, validated claims, and an interpreted conflict still preserves both
-    sides rather than overwriting one.
+    Grouping is ``(surface, subject, metric, unit)``: two claims only conflict
+    when they measure the *same* quantity, so a value on a different metric or
+    unit is not compared. Values are compared unit-aware (see :func:`_same_value`),
+    so 0.5 percent and 0.5 are not treated as the same reading. Each comparison is
+    grounded in stored, validated claims and preserves both sides.
     """
 
-    claims = [sc for sc in (study_claim_from_view(r) for r in rows) if sc is not None]
+    claims = [sc for row in rows for sc in study_claims_from_view(row)]
+    # Group by (surface, subject): two claims only conflict when they are about the
+    # same entity on the same surface. Metric/denominator differences are exactly
+    # what the comparison interprets, so they are compared, not used to group.
+    groups: dict[tuple, list[StudyClaim]] = {}
+    for claim in claims:
+        key = (claim.surface, _norm(claim.subject))
+        groups.setdefault(key, []).append(claim)
+
     out: list[Reconciliation] = []
-    for i, first in enumerate(claims):
-        for second in claims[i + 1 :]:
-            if (first.surface, first.subject) != (second.surface, second.subject):
-                continue
-            if first.value == second.value:
-                continue
-            out.append(compare_claims(first, second))
+    for members in groups.values():
+        for i, first in enumerate(members):
+            for second in members[i + 1 :]:
+                if _same_value(first, second):
+                    continue
+                out.append(compare_claims(first, second))
     return out
+
+
+def _same_value(first: StudyClaim, second: StudyClaim) -> bool:
+    """Unit-aware value equality: unlike units are never "the same reading".
+
+    A relative tolerance absorbs float noise but is far smaller than any real
+    disagreement, so a genuine difference still surfaces.
+    """
+
+    if first.unit != second.unit:
+        return False
+    if first.value is None or second.value is None:
+        return False
+    return abs(first.value - second.value) <= 1e-9 * max(1.0, abs(first.value))
