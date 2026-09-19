@@ -46,3 +46,34 @@ Each item contains:
 6. Current uncertainties/contested areas.
 
 Keep the client-safe POV stable. Technical evidence stays in the observation plane.
+
+## Living POV (generated)
+
+<!-- pov:generated:start -->
+### How retrieval/search/citation systems differ
+
+**pov-retrieval-systems** · confidence: medium · last reviewed: 2026-09-19
+
+Each surface reaches the live web through a different retrieval and citation stack, so the same brand asset is discovered unevenly. Treat retrieval/index and crawler/index documentation as first-class evidence: it changes what "being found" means on that surface.
+- It can take approximately 24 hours for OpenAI's systems to adjust for search results after a site's robots.txt update. (evidence 0b187a5b6f942c1d2a3fcb12285238e5; 2026-09-19; medium)
+
+Evidence: 0b187a5b6f942c1d2a3fcb12285238e5
+
+### Channel/surface prioritisation by geography/category
+
+**pov-channel-prioritisation** · confidence: unresolved
+
+Prioritise by measured audience and referral behaviour, not by press volume. A surface matters when it moves a category's discovery, and that varies by geography; a regional surface can be commercially material before it is globally large.
+
+### Commercial surfaces: shopping, transaction and ads
+
+**pov-commerce-ads** · confidence: unresolved
+
+Where AI surfaces carry shopping, transaction or ad placements, discovery is also a commercial pipeline. Optimise the product and feed data those surfaces consume, and measure the commerce path, not just the citation.
+
+### Measurement principles and known blind spots
+
+**pov-measurement** · confidence: unresolved
+
+Measure discovery with evidence-derived confidence and explicit unknowns; a vendor's self-reported share is a study with a denominator and a window, not a fact. Known blind spots (unnamed samples, unpublished denominators, different geographies) are recorded, not smoothed over.
+<!-- pov:generated:end -->

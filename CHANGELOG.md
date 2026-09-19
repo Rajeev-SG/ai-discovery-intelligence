@@ -2,6 +2,20 @@
 
 This file records repository/product changes. The generated intelligence changelog will live separately in the canonical data store and `pov/CHANGELOG.md` once implemented.
 
+## 2026-09-19 (issue #7)
+
+- Living POV shipped as product data: `pov/state.yaml` (stable proposition ids,
+  owner topics, evidence bullets, append-only changelog), `config/pov_policy.yaml`
+  (deterministic editorial gate), and `scripts/build_pov.py` (regenerates
+  `docs/EXECUTIVE_POV.md` and `pov/CHANGELOG.md` from the ledger).
+- Proven on the live ledger: one real evidence change (a `crawler_index_policy`
+  claim) updated exactly one proposition with a before/after changelog entry, and
+  the generator is idempotent on re-run. A current event outside a proposition's
+  topics, an implication, and a low-confidence claim each correctly produce no POV
+  change. Evidence in `proof/live/ISSUE_7_LIVING_POV_PROOF.md`.
+- CI: a deterministic POV-gate smoke check runs on every push; `pov/**` and
+  `config/**` are now CI trigger paths.
+
 ## 2026-09-19
 
 - Issue #9 live operational proof: the PR #42 Oracle acquisition worker kit is
