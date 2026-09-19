@@ -13,3 +13,8 @@ line-length = 100
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
+
+[dependency-groups]
+dev = [
+    "psycopg[binary]>=3.2,<4",
+]

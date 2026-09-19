@@ -1,9 +1,13 @@
 """Migration-fidelity test: apply the real DDL and exercise its constraints."""
 
+import os
+import re
 import sqlite3
 from pathlib import Path
 
 import pytest
+
+psycopg = pytest.importorskip("psycopg")
 
 MIGRATION = Path(__file__).resolve().parents[1] / "db" / "ledger" / "0001_claim_ledger.sql"
 
@@ -117,15 +121,89 @@ def test_value_text_nullable_migration_exists():
     assert MIGRATION_0002.exists(), "issue #25 needs a forward migration for existing ledgers"
 
 
-def test_0002_relaxes_value_text_not_null_on_an_existing_ledger():
-    """An existing ledger must accept NULL value_text after the #25 migration."""
+PG_URL = os.environ.get("AI_DISCOVERY_TEST_DATABASE_URL")
 
-    conn = sqlite3.connect(":memory:")
-    conn.executescript(_strip_pg_dialect(MIGRATION.read_text()))
-    # SQLite cannot ALTER COLUMN DROP NOT NULL, so prove the intent structurally:
-    # the migration must target exactly the claim_metric.value_text column.
-    sql = MIGRATION_0002.read_text()
-    assert "ALTER TABLE claim_metric" in sql
-    assert "value_text" in sql
-    assert "DROP NOT NULL" in sql
-    conn.close()
+
+def _postgres():
+    """A psycopg connection to the test database, or skip when unavailable.
+
+    The 0002 migration is PostgreSQL DDL (``ALTER COLUMN ... DROP NOT NULL``), so
+    proving it needs a real Postgres. CI provides one as a service; locally the
+    compose ``db`` service on 127.0.0.1:55432 works. Absent both, the test skips
+    rather than pretending a string match is verification.
+    """
+
+    url = PG_URL or "postgresql://ai_discovery:ai_discovery@127.0.0.1:55432/ai_discovery"
+    try:
+        return psycopg.connect(url, autocommit=True)
+    except psycopg.OperationalError as exc:  # pragma: no cover - no local Postgres
+        pytest.skip(f"no Postgres available: {exc}")
+
+
+def _apply_pg_ddl(conn, sql: str, schema: str = "public") -> None:
+    with conn.cursor() as cur:
+        cur.execute(f"SET search_path TO {schema}")
+        cur.execute(sql)
+
+
+def test_0002_relaxes_value_text_not_null_and_backfills_legacy_none():
+    """Run the real 0002 against Postgres: NULL insert succeeds, ``'None'`` -> NULL.
+
+    Builds claim_metric from the real ``0001`` DDL, restores the pre-fix
+    ``NOT NULL`` and a legacy ``'None'`` row, then applies 0002 and asserts both
+    the constraint is gone and the sentinel is backfilled. Skipped without Postgres.
+    """
+
+    conn = _postgres()
+    schema = "adi_mig_test"
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
+            cur.execute(f"CREATE SCHEMA {schema}")
+            cur.execute(f"SET search_path TO {schema}")
+
+        ddl = MIGRATION.read_text()
+        metric_ddl = ddl[ddl.index("CREATE TABLE claim_metric") : ddl.index("CREATE TABLE claim_locator")]
+        # The inline FK targets ``claim``; this shape test needs only the column
+        # shape, and the FK itself is covered by the 0001 fidelity test above.
+        metric_ddl = re.sub(r"REFERENCES claim\(claim_id\)[^,]*", "", metric_ddl)
+        with conn.cursor() as cur:
+            cur.execute("SET search_path TO " + schema)
+            cur.execute(metric_ddl)
+            cur.execute("ALTER TABLE claim_metric ALTER COLUMN value_text SET NOT NULL")
+            cur.execute(
+                "INSERT INTO claim_metric"
+                " (claim_id, metric_id, label, definition, value_text, value_number, unit, \"window\", scope)"
+                " VALUES ('c1','m1','label','def','None',NULL,'u','w','s')"
+            )
+
+        # A NULL insert must fail under the pre-fix constraint.
+        with pytest.raises(psycopg.errors.NotNullViolation), conn.cursor() as cur:
+            cur.execute("SET search_path TO " + schema)
+            cur.execute(
+                "INSERT INTO claim_metric"
+                " (claim_id, metric_id, label, definition, value_text, value_number, unit, \"window\", scope)"
+                " VALUES ('c1','m2','label','def',NULL,NULL,'u','w','s')"
+            )
+
+        # Apply the real migration.
+        with conn.cursor() as cur:
+            cur.execute("SET search_path TO " + schema)
+            cur.execute(MIGRATION_0002.read_text())
+
+        with conn.cursor() as cur:
+            cur.execute("SET search_path TO " + schema)
+            cur.execute(
+                "INSERT INTO claim_metric"
+                " (claim_id, metric_id, label, definition, value_text, value_number, unit, \"window\", scope)"
+                " VALUES ('c1','m3','label','def',NULL,NULL,'u','w','s')"
+            )
+            cur.execute("SELECT value_text FROM claim_metric WHERE metric_id='m1'")
+            assert cur.fetchone()[0] is None, "legacy 'None' row must be backfilled to NULL"
+    finally:
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SET search_path TO public")
+                cur.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
+        finally:
+            conn.close()

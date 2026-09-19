@@ -1,16 +1,24 @@
--- Migration: allow an unknown claim_metric.value_text to persist as NULL (issue #25)
+-- Migration: unknown claim_metric.value_text persists as NULL (issue #25)
 --
--- Additive. Depends on db/ledger/0001_claim_ledger.sql.
+-- 0001 already declares value_text nullable, so a freshly created ledger is
+-- correct on its own. This file exists for ledgers that were created by an
+-- earlier 0001 that declared `value_text text NOT NULL` (and for any environment
+-- still carrying the sentinel string the old writer produced):
 --
--- 0001 declared `value_text text NOT NULL`, so a ledger created before this fix
--- rejects the NULL that "unknown is a first-class state" requires: persist now
--- writes NULL for an unknown value (matching value_number) instead of the
--- literal string "None". Existing rows are untouched; only the constraint is
--- relaxed. Safe to re-run.
+--   * DROP NOT NULL  - forward-only, a no-op if the column is already nullable;
+--   * UPDATE ...     - one-time backfill of the literal "None" the pre-fix
+--                      writer stored for an unknown value, to a real NULL.
+--
+-- Safe to re-run on either the old or the new shape.
 
 BEGIN;
 
 ALTER TABLE claim_metric
     ALTER COLUMN value_text DROP NOT NULL;
+
+UPDATE claim_metric
+   SET value_text = NULL
+ WHERE value_text = 'None'
+   AND value_number IS NULL;
 
 COMMIT;
