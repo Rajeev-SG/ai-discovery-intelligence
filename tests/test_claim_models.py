@@ -35,8 +35,9 @@ def test_unknown_must_not_carry_a_locator():
 
 
 def test_locator_requires_a_pointer():
+    # Every constructed locator is re-verifiable: a quote or a selector (issue #24).
     assert Locator(kind="verbatim_quote", quote="q").checkable
-    assert not Locator(kind="page_stamp", selector="2026.06.26").checkable
+    assert Locator(kind="page_stamp", selector="2026.06.26").checkable
     with pytest.raises(ValidationError):
         Locator(kind="verbatim_quote")
 
@@ -44,6 +45,32 @@ def test_locator_requires_a_pointer():
 def test_locator_quote_matching_normalises_typography_and_whitespace():
     loc = Locator(kind="verbatim_quote", quote="can\u2019t rule out  a problem")
     assert loc.present_in("Promptwatch says it can't rule out a problem in its data.")
+
+
+def test_selector_locator_must_resolve_not_assume_true():
+    """Issue #24: a selector is re-verified, never assumed true."""
+
+    loc = Locator(kind="jsonld_field", selector="datePublished")
+    # Present in the raw markup (JSON-LD), absent from the parsed text.
+    assert loc.present_in("nothing here", '<script>{"datePublished":"2026-05-14"}</script>')
+    # A selector that names nothing in either haystack must fail.
+    assert not loc.present_in("nothing here", "<html><body>hi</body></html>")
+    assert not Locator(kind="section", selector="div#never-exists").present_in("hi", "<div>hi</div>")
+
+
+def test_selector_value_is_bound_to_its_key():
+    """A short value alone must not match an unrelated substring (issue #24)."""
+
+    loc = Locator(kind="jsonld_field", selector="datePublished=2026-05-14")
+    assert loc.present_in("", '"datePublished":"2026-05-14T01:54:23+00:00"')
+    # The value appears, but under a different key: not the same anchor.
+    assert not loc.present_in("", '"dateModified":"2026-05-14T01:54:23+00:00"')
+
+
+def test_selector_with_multiple_anchors_requires_all():
+    loc = Locator(kind="jsonld_field", selector="datePublished=A / dateModified=B")
+    assert loc.present_in("", '"datePublished":"A","dateModified":"B"')
+    assert not loc.present_in("", '"datePublished":"A"')
 
 
 def test_dates_are_four_distinct_fields():

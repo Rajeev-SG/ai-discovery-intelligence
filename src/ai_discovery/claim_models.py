@@ -123,6 +123,63 @@ def claim_id_for(source_id: str, topic: str, statement: str) -> str:
     return hashlib.sha256(payload).hexdigest()[:32]
 
 
+_SELECTOR_SPLIT = re.compile(r"\s+/\s+|;|\n")
+_PAREN = re.compile(r"\([^)]*\)")
+
+
+def _selector_needles(selector: str) -> list[tuple[str | None, str]]:
+    """Split a selector into ``(required_name, required_value)`` needles.
+
+    A selector may name several anchors (``datePublished=A / dateModified=B``),
+    each possibly annotated in parentheses (``inLanguage=en-US (article JSON-LD)``),
+    or a bare stamp (``2026.06.26``). A ``key=value`` anchor requires both the key
+    name and the value, which binds the value to the attribute it came from rather
+    than letting a short value match an unrelated substring. Returns ``[]`` when
+    nothing usable remains, which the caller treats as unresolvable.
+    """
+
+    needles: list[tuple[str | None, str]] = []
+    for segment in _SELECTOR_SPLIT.split(selector):
+        segment = _PAREN.sub("", segment).strip()
+        if not segment:
+            continue
+        if "=" in segment:
+            name, _, value = segment.partition("=")
+            name = name.strip().split()[-1] if name.strip() else ""
+            value = value.strip().strip("\"'").strip()
+            if value:
+                needles.append((name or None, value))
+        else:
+            value = segment.strip("\"'").strip()
+            if len(value) >= 2:
+                needles.append((None, value))
+    return needles
+
+
+def resolve_selector(selector: str, haystacks: list[str]) -> bool:
+    """True when every anchor in ``selector`` resolves in one of ``haystacks``."""
+
+    needles = _selector_needles(selector)
+    if not needles:
+        return False
+    normalised = [normalize_text(h).lower() for h in haystacks if h]
+    if not normalised:
+        return False
+    for name, value in needles:
+        value_l = normalize_text(value).lower()
+        found = False
+        for text in normalised:
+            if value_l not in text:
+                continue
+            if name and normalize_text(name).lower() not in text:
+                continue
+            found = True
+            break
+        if not found:
+            return False
+    return True
+
+
 class Locator(BaseModel):
     """An exact pointer into a capture: a verbatim quote, or a structured selector."""
 
@@ -141,14 +198,35 @@ class Locator(BaseModel):
 
     @property
     def checkable(self) -> bool:
-        """Quote locators can be re-verified against a fresh capture."""
+        """Every locator is re-verifiable: a verbatim quote, or a structured selector.
 
-        return bool(self.quote)
+        A locator with neither pointer cannot be built (see ``_needs_pointer``), so
+        this is always true for a constructed locator; it exists so callers can
+        assert the invariant and so a future "watch-only" kind can opt out.
+        """
 
-    def present_in(self, capture_text: str) -> bool:
-        if not self.quote:
-            return True  # structured selectors are re-checked by the selector's owner
-        return normalize_text(self.quote) in normalize_text(capture_text)
+        return bool(self.quote or self.selector)
+
+    def present_in(self, capture_text: str, raw_text: str | None = None) -> bool:
+        """Re-verify this locator against the capture it claims to point at.
+
+        A verbatim quote is matched (typography- and whitespace-normalised) against
+        the parsed text. A structured selector (``jsonld_field``/``table_row``/
+        ``section``/``page_stamp``) is resolved against the **raw** capture — the
+        JSON-LD, attributes and stamps it names live in markup that parsing strips —
+        falling back to the parsed text when no raw capture is supplied.
+
+        There is no "assume true" path: a selector that does not resolve fails, so a
+        fabricated number attached to a non-existent selector is rejected exactly
+        like a fabricated quote.
+        """
+
+        if self.quote:
+            return normalize_text(self.quote) in normalize_text(capture_text)
+        if not self.selector:
+            return False
+        haystacks = [s for s in (raw_text, capture_text) if s]
+        return resolve_selector(self.selector, haystacks)
 
 
 class Provenanced[T](BaseModel):
