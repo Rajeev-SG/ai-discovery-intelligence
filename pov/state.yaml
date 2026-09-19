@@ -10,16 +10,20 @@ propositions:
   - retrieval_index
   - citations_sources
   - crawler_index_policy
-  bullets:
+  supporting:
   - slot: crawler_index_policy
+    polarity: supporting
     text: It can take approximately 24 hours for OpenAI's systems to adjust for search
       results after a site's robots.txt update.
     claim_id: 0b187a5b6f942c1d2a3fcb12285238e5
     event_id: 9f7e8c586b05
     confidence: medium
+    value_number: null
+    value_text: '24'
     effective_at: '2026-09-19T16:44:43.507845Z'
-    added_at: '2026-09-19T17:45:20.242520Z'
-  last_reviewed: '2026-09-19T17:45:20.242520Z'
+    added_at: '2026-09-19T18:18:12.869211Z'
+  contradicting: []
+  last_reviewed: '2026-09-19T18:18:12.869211Z'
 - id: pov-channel-prioritisation
   section: Channel/surface prioritisation by geography/category
   base_text: Prioritise by measured audience and referral behaviour, not by press
@@ -29,7 +33,8 @@ propositions:
   topics:
   - audience_usage
   - referrals_conversion
-  bullets: []
+  supporting: []
+  contradicting: []
   last_reviewed: null
 - id: pov-commerce-ads
   section: 'Commercial surfaces: shopping, transaction and ads'
@@ -38,7 +43,8 @@ propositions:
     consume, and measure the commerce path, not just the citation.
   topics:
   - commerce_ads
-  bullets: []
+  supporting: []
+  contradicting: []
   last_reviewed: null
 - id: pov-measurement
   section: Measurement principles and known blind spots
@@ -48,13 +54,14 @@ propositions:
     geographies) are recorded, not smoothed over.
   topics:
   - measurement
-  bullets: []
+  supporting: []
+  contradicting: []
   last_reviewed: null
 changelog:
 - proposition_id: pov-retrieval-systems
-  changed_at: '2026-09-19T17:45:20.242520Z'
-  reason: 'material crawler_index_policy change: significance 3.67 >= 3.50, confidence
-    medium'
+  changed_at: '2026-09-19T18:18:12.869211Z'
+  reason: 'material crawler_index_policy change: significance 3.63 >= 3.50, confidence
+    medium (first-seen quantified claim)'
   event_id: 9f7e8c586b05
   evidence_ids:
   - 0b187a5b6f942c1d2a3fcb12285238e5
@@ -70,5 +77,12 @@ changelog:
     - It can take approximately 24 hours for OpenAI''s systems to adjust for search
     results after a site''s robots.txt update. (evidence 0b187a5b6f942c1d2a3fcb12285238e5;
     2026-09-19; medium)'
-  significance: 3.67
+  significance: 3.63
   confidence: medium
+processed_events:
+  9f7e8c586b05:
+    event_id: 9f7e8c586b05
+    claim_id: 0b187a5b6f942c1d2a3fcb12285238e5
+    proposition_id: pov-retrieval-systems
+    slot: crawler_index_policy
+    adopted_at: '2026-09-19T18:18:12.869211Z'

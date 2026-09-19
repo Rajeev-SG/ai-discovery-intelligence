@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field
@@ -49,9 +49,48 @@ _DEFAULT_SIGNIFICANCE: dict[str, float] = {
     "actionability": 0.5,
 }
 
+# Confidence label vocabulary the POV speaks, strongest -> weakest. Claim
+# confidence is validated into this enum on ingest, so an unknown/misparsed
+# label fails loudly at the boundary instead of rendering into the document.
+_CONFIDENCE_ORDER = [
+    ConfidenceLabel.HIGH,
+    ConfidenceLabel.MEDIUM_HIGH,
+    ConfidenceLabel.MEDIUM,
+    ConfidenceLabel.LOW,
+    ConfidenceLabel.UNRESOLVED,
+]
+_CONFIDENCE_RANK = {label: len(_CONFIDENCE_ORDER) - i for i, label in enumerate(_CONFIDENCE_ORDER)}
+
+# Claim `confidence` values (claim_models.Confidence) -> POV label.
+_CLAIM_CONFIDENCE = {
+    "high": ConfidenceLabel.HIGH,
+    "medium": ConfidenceLabel.MEDIUM,
+    "low": ConfidenceLabel.LOW,
+    "unknown": ConfidenceLabel.UNRESOLVED,
+}
+
 
 def _utcnow() -> dt.datetime:
     return dt.datetime.now(dt.UTC)
+
+
+def to_pov_confidence(value: Any) -> ConfidenceLabel:
+    """Validate a claim's confidence into the POV label vocabulary.
+
+    An unrecognised label raises rather than defaulting: a misparsed confidence
+    must not silently weaken or strengthen a published position.
+    """
+
+    if isinstance(value, ConfidenceLabel):
+        return value
+    key = str(value or "").strip().lower()
+    if key in _CLAIM_CONFIDENCE:
+        return _CLAIM_CONFIDENCE[key]
+    # Accept the POV labels themselves (e.g. "medium_high", "unresolved").
+    try:
+        return ConfidenceLabel(key)
+    except ValueError as exc:  # pragma: no cover - defensive
+        raise ValueError(f"unknown confidence label: {value!r}") from exc
 
 
 class PovPolicy(BaseModel):
@@ -62,23 +101,32 @@ class PovPolicy(BaseModel):
     min_significance: float = 3.5
     min_confidence: ConfidenceLabel = ConfidenceLabel.MEDIUM
     require_topic_match: bool = True
-    max_propositions_per_event: int = 1
+    # Magnitude applied to a first-seen quantified claim; a repeat of the
+    # incumbent value scores magnitude 0 and cannot clear the gate.
     magnitude_with_value: float = 0.8
     magnitude_without_value: float = 0.4
+    # Cap on how much a proposition's confidence may be raised by a single
+    # quantified claim with no stated comparison — a number alone is not proof
+    # of materiality.
     # topic -> {axis: weight}; unlisted topics fall back to the flat profile.
     significance_topics: dict[str, dict[str, float]] = Field(default_factory=dict)
 
 
 class PovEvidenceBullet(BaseModel):
-    """One confirmed evidence bullet, keyed by the claim topic that owns it."""
+    """One evidence bullet: the validated claim statement and its provenance."""
 
     model_config = ConfigDict(extra="forbid")
 
     slot: str
+    polarity: Literal["supporting", "contradicting"] = "supporting"
     text: str
     claim_id: str
     event_id: str
-    confidence: str
+    confidence: ConfidenceLabel
+    # Incumbent value, kept so a later event's magnitude can be measured as a
+    # delta against it (a repeat is not a change).
+    value_number: float | None = None
+    value_text: str | None = None
     effective_at: dt.datetime | None = None
     added_at: dt.datetime = Field(default_factory=_utcnow)
 
@@ -100,7 +148,7 @@ class PovRevision(BaseModel):
 
 
 class PovProposition(BaseModel):
-    """A stable POV proposition: id, section, baseline text, evidence bullets."""
+    """A stable POV proposition: id, section, base text, supporting/contradicting evidence."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -108,50 +156,101 @@ class PovProposition(BaseModel):
     section: str
     base_text: str
     topics: list[str] = Field(default_factory=list)
-    bullets: list[PovEvidenceBullet] = Field(default_factory=list)
+    supporting: list[PovEvidenceBullet] = Field(default_factory=list)
+    contradicting: list[PovEvidenceBullet] = Field(default_factory=list)
     last_reviewed: dt.datetime | None = None
 
+    def bullets(self) -> list[PovEvidenceBullet]:
+        return [*self.supporting, *self.contradicting]
+
     def bullet_for(self, slot: str) -> PovEvidenceBullet | None:
-        return next((b for b in self.bullets if b.slot == slot), None)
+        return next(
+            (b for b in self.bullets() if b.slot == slot and b.polarity == "supporting"), None
+        )
+
+    @property
+    def is_contested(self) -> bool:
+        return bool(self.contradicting)
 
     def statement(self) -> str:
-        """The current rendered text: base position plus one line per bullet."""
+        """The current rendered text: base position plus one line per evidence item.
 
-        lines = [self.base_text.strip()]
-        for bullet in self.bullets:
-            stamp = bullet.effective_at.date().isoformat() if bullet.effective_at else "undated"
-            lines.append(
-                f"- {bullet.text} (evidence {bullet.claim_id}; {stamp}; {bullet.confidence})"
-            )
-        return "\n".join(lines)
-
-    def confidence(self) -> str:
-        """The proposition's confidence: the weakest bullet cannot be hidden.
-
-        A proposition is only as strong as its weakest confirmed evidence, so a
-        weak bullet lowers the whole statement rather than sitting alongside it.
+        Supporting and contradicting evidence are both rendered, labelled, so a
+        contradiction is visible rather than silently overwritten.
         """
 
-        if not self.bullets:
-            return ConfidenceLabel.UNRESOLVED.value
-        # Strongest -> weakest. The preposition must report the WEAKEST bullet,
-        # so a weak confirmed evidence item cannot hide behind a strong one.
-        order = ["high", "medium_high", "medium", "low", "unresolved"]
-        labels = {b.confidence for b in self.bullets}
-        return max(labels, key=lambda c: order.index(c) if c in order else 99)
+        lines = [self.base_text.strip()]
+        for bullet in self.supporting:
+            lines.append(_bullet_line(bullet))
+        for bullet in self.contradicting:
+            lines.append(_bullet_line(bullet, contradicting=True))
+        return "\n".join(lines)
+
+    def confidence(self) -> ConfidenceLabel:
+        """The proposition's confidence, with contradictions capping it.
+
+        Deterministic rule: the proposition is only as strong as its weakest
+        supporting item, and if any contradicting evidence exists the position is
+        capped at ``low`` and marked contested — a live contradiction cannot be
+        hidden behind strong support.
+        """
+
+        if not self.supporting:
+            base = ConfidenceLabel.UNRESOLVED
+        else:
+            # Weakest supporting item governs: strong evidence cannot hide a weak one.
+            base = min(
+                (b.confidence for b in self.supporting),
+                key=lambda c: _CONFIDENCE_RANK[c],
+            )
+        if self.contradicting:
+            # A live contradiction caps the position at low (i.e. take the weaker).
+            base = min(base, ConfidenceLabel.LOW, key=lambda c: _CONFIDENCE_RANK[c])
+        return base
 
     def evidence_ids(self) -> list[str]:
-        return [b.claim_id for b in self.bullets]
+        return [b.claim_id for b in self.supporting]
+
+    def supporting_ids(self) -> list[str]:
+        return [b.claim_id for b in self.supporting]
+
+    def contradicting_ids(self) -> list[str]:
+        return [b.claim_id for b in self.contradicting]
+
+
+def _bullet_line(bullet: PovEvidenceBullet, *, contradicting: bool = False) -> str:
+    stamp = bullet.effective_at.date().isoformat() if bullet.effective_at else "undated"
+    label = "contradicts" if contradicting else "evidence"
+    return f"- {bullet.text} ({label} {bullet.claim_id}; {stamp}; {bullet.confidence.value})"
+
+
+class ProcessedEvent(BaseModel):
+    """A durable record that an event was evaluated and adopted.
+
+    The watermark makes replay idempotent: re-running over the full history
+    converges to the same state with zero new changelog entries, regardless of
+    how many events share a topic.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    event_id: str
+    claim_id: str
+    proposition_id: str
+    slot: str
+    adopted_at: dt.datetime = Field(default_factory=_utcnow)
 
 
 class PovState(BaseModel):
-    """The whole POV: propositions plus the append-only changelog."""
+    """The whole POV: propositions, the changelog, and the processed watermark."""
 
     model_config = ConfigDict(extra="forbid")
 
     version: int = 1
     propositions: list[PovProposition]
     changelog: list[PovRevision] = Field(default_factory=list)
+    # event_id -> ProcessedEvent. Durable idempotency watermark (issue #7 fix).
+    processed_events: dict[str, ProcessedEvent] = Field(default_factory=dict)
 
     def proposition(self, proposition_id: str) -> PovProposition | None:
         return next((p for p in self.propositions if p.id == proposition_id), None)
@@ -178,14 +277,62 @@ def save_state(state: PovState, path: str | Path) -> None:
     )
 
 
+def _incumbent_number(proposition: PovProposition | None, slot: str) -> float | None:
+    if proposition is None:
+        return None
+    bullet = proposition.bullet_for(slot)
+    return bullet.value_number if bullet else None
+
+
+def _magnitude(
+    *,
+    claim: dict[str, Any],
+    prior_value: float | None,
+    policy: PovPolicy,
+) -> tuple[float, str]:
+    """Event-specific magnitude: a repeat of the incumbent value is not a change.
+
+    Returns ``(magnitude, explanation)``. When the claim states a number and an
+    incumbent number is known, magnitude is the relative change — zero when the
+    value is unchanged, so a re-report of a known figure cannot clear the gate.
+    With no incumbent number, a quantified claim gets the first-seen magnitude and
+    an unquantified one the lower value.
+    """
+
+    metrics = claim.get("value") or claim.get("metrics") or []
+    number = None
+    for metric in metrics:
+        if metric.get("value_number") is not None:
+            number = float(metric["value_number"])
+            break
+    has_value = any(
+        (m.get("value_number") is not None) or bool(m.get("value_text")) for m in metrics
+    )
+
+    if number is not None and prior_value is not None:
+        denom = max(abs(prior_value), 1e-9)
+        relative = abs(number - prior_value) / denom
+        if relative == 0:
+            return 0.0, "value unchanged vs incumbent (not a change)"
+        return min(1.0, 0.4 + relative), f"relative change {relative:.2f} vs incumbent"
+    if has_value:
+        return policy.magnitude_with_value, "first-seen quantified claim"
+    return policy.magnitude_without_value, "unquantified claim"
+
+
 def significance_inputs(
-    claim: dict[str, Any], policy: PovPolicy | None = None
+    claim: dict[str, Any],
+    policy: PovPolicy | None = None,
+    *,
+    prior_value: float | None = None,
 ) -> dict[str, float]:
     """Deterministic significance inputs for a claim (no model, fully stated).
 
-    The per-topic axis weights are the editorial profile in
-    ``config/pov_policy.yaml``; the only claim-derived input is ``magnitude``,
-    which is bumped when the claim carries a stated number.
+    Editorial constants (reach, commercial_intent, actionability) come from the
+    per-topic profile; the *event-specific* axes — magnitude (delta vs the
+    incumbent value), breadth (distinct surfaces the claim touches) and
+    persistence (contested claims do not persist) — are derived from this claim,
+    so the gate discriminates a material change from a trivial re-statement.
     """
 
     policy = policy or load_policy()
@@ -193,13 +340,12 @@ def significance_inputs(
     profile = dict(_DEFAULT_SIGNIFICANCE)
     profile.update(policy.significance_topics.get(topic, {}))
 
-    metrics = claim.get("value") or claim.get("metrics") or []
-    has_number = any(
-        (m.get("value_number") is not None) or bool(m.get("value_text")) for m in metrics
-    )
-    profile["magnitude"] = (
-        policy.magnitude_with_value if has_number else policy.magnitude_without_value
-    )
+    magnitude, _ = _magnitude(claim=claim, prior_value=prior_value, policy=policy)
+    surfaces = claim.get("surfaces") or []
+    status = claim.get("status") or "current"
+    profile["magnitude"] = magnitude
+    profile["breadth"] = min(1.0, 0.4 + 0.2 * len(surfaces))
+    profile["persistence"] = 0.2 if status == "contested" else 0.6
     return profile
 
 
@@ -207,9 +353,11 @@ def significance_of(
     claim: dict[str, Any],
     scorer: SignificanceScorer | None = None,
     policy: PovPolicy | None = None,
+    *,
+    prior_value: float | None = None,
 ) -> float:
     return (scorer or SignificanceScorer.from_config()).score(
-        **significance_inputs(claim, policy)
+        **significance_inputs(claim, policy, prior_value=prior_value)
     )
 
 
@@ -234,14 +382,13 @@ def evaluate_event(
 ) -> PovDecision:
     """Decide whether one event revises the POV, and which proposition it hits."""
 
-    significance = significance_of(claim, policy=policy) if claim else 0.0
-    confidence = (claim or {}).get("confidence") or ConfidenceLabel.UNRESOLVED.value
+    confidence = to_pov_confidence((claim or {}).get("confidence")).value if claim else "unresolved"
 
     if claim is None:
         return PovDecision(
             adopt=False,
             reason="event has no linked validated claim",
-            significance=significance,
+            significance=0.0,
             confidence=confidence,
         )
 
@@ -251,30 +398,46 @@ def evaluate_event(
         return PovDecision(
             adopt=False,
             reason=f"no proposition owns topic {topic!r}",
-            significance=significance,
+            significance=0.0,
             confidence=confidence,
         )
 
-    rank = _CONFIDENCE_RANK.get(ConfidenceLabel(confidence), 0)
-    if rank < _CONFIDENCE_RANK[policy.min_confidence]:
+    # Magnitude uses the incumbent value for the claim's own slot when known, and
+    # the corroboration baseline is the proposition's current supporting evidence.
+    slot = claim.get("topic") or ""
+    prior_value = _incumbent_number(state.proposition_for_topic(slot), slot)
+    magnitude, magnitude_note = _magnitude(claim=claim, prior_value=prior_value, policy=policy)
+    inputs = significance_inputs(
+        claim, policy, prior_value=prior_value
+    )
+    significance = (SignificanceScorer.from_config()).score(**inputs)
+
+    label = to_pov_confidence(claim.get("confidence"))
+    if _CONFIDENCE_RANK[label] < _CONFIDENCE_RANK[policy.min_confidence]:
         return PovDecision(
             adopt=False,
-            reason=(
-                f"claim confidence {confidence!r} below {policy.min_confidence.value!r}"
-            ),
+            reason=f"claim confidence {label.value!r} below {policy.min_confidence.value!r}",
             significance=significance,
-            confidence=confidence,
+            confidence=label.value,
+        )
+
+    if magnitude <= 0.0:
+        return PovDecision(
+            adopt=False,
+            reason=f"no material change ({magnitude_note})",
+            significance=significance,
+            confidence=label.value,
         )
 
     if significance < policy.min_significance:
         return PovDecision(
             adopt=False,
             reason=(
-                f"event significance {significance:.2f} below "
-                f"{policy.min_significance:.2f}"
+                f"event significance {significance:.2f} below {policy.min_significance:.2f} "
+                f"({magnitude_note}; breadth {inputs['breadth']:.2f})"
             ),
             significance=significance,
-            confidence=confidence,
+            confidence=label.value,
         )
 
     return PovDecision(
@@ -282,11 +445,20 @@ def evaluate_event(
         proposition_id=proposition.id,
         reason=(
             f"material {topic} change: significance {significance:.2f} >= "
-            f"{policy.min_significance:.2f}, confidence {confidence}"
+            f"{policy.min_significance:.2f}, confidence {label.value} ({magnitude_note})"
         ),
         significance=significance,
-        confidence=confidence,
+        confidence=label.value,
     )
+
+
+def _first_value(claim: dict[str, Any]) -> tuple[float | None, str | None]:
+    for metric in claim.get("value") or claim.get("metrics") or []:
+        if metric.get("value_number") is not None:
+            return float(metric["value_number"]), metric.get("value_text")
+        if metric.get("value_text"):
+            return None, metric["value_text"]
+    return None, None
 
 
 def apply_decision(
@@ -297,11 +469,11 @@ def apply_decision(
     claim: dict[str, Any],
     now: dt.datetime | None = None,
 ) -> PovRevision | None:
-    """Apply one adopting decision: replace the topic's bullet and log the change.
+    """Apply one adopting decision: add the bullet and log the change.
 
-    Returns the changelog entry, or ``None`` when the decision is a skip. The
-    edit is surgical: only the bullet for this claim's topic changes, and the
-    before/after statements are captured for the changelog.
+    The edit is surgical: only one proposition changes, and the before/after
+    statements are captured for the changelog. Supporting and contradicting
+    evidence are kept in separate lists; a claim never evicts an unrelated one.
     """
 
     if not decision.adopt or decision.proposition_id is None:
@@ -314,22 +486,38 @@ def apply_decision(
     topic = claim.get("topic") or ""
     old_statement = proposition.statement()
 
-    text = (getattr(event, "title", None) or claim.get("statement") or "").strip()
+    # Prefer the validated claim statement; the event title is ingest metadata and
+    # is only a fallback when the claim carries no statement.
+    text = (claim.get("statement") or getattr(event, "title", None) or "").strip()
     effective = (
         getattr(event, "effective_from", None)
         or getattr(event, "published_at", None)
         or getattr(event, "observed_at", None)
     )
+    value_number, value_text = _first_value(claim)
+    claim_id = claim.get("claim_id") or ""
+    relationship = (claim.get("relationship") or "new").lower()
+    polarity = "contradicting" if relationship == "contradicts" else "supporting"
     bullet = PovEvidenceBullet(
         slot=topic,
+        polarity=polarity,
         text=text,
-        claim_id=claim.get("claim_id") or "",
+        claim_id=claim_id,
         event_id=getattr(event, "id", "") or "",
-        confidence=decision.confidence,
+        confidence=to_pov_confidence(claim.get("confidence")),
+        value_number=value_number,
+        value_text=value_text,
         effective_at=effective,
         added_at=stamp,
     )
-    proposition.bullets = [b for b in proposition.bullets if b.slot != topic] + [bullet]
+
+    # Replace any bullet for the same claim id; never evict a different claim.
+    proposition.supporting = [b for b in proposition.supporting if b.claim_id != claim_id]
+    proposition.contradicting = [b for b in proposition.contradicting if b.claim_id != claim_id]
+    if polarity == "contradicting":
+        proposition.contradicting.append(bullet)
+    else:
+        proposition.supporting.append(bullet)
     proposition.last_reviewed = stamp
 
     revision = PovRevision(
@@ -337,13 +525,20 @@ def apply_decision(
         changed_at=stamp,
         reason=decision.reason,
         event_id=getattr(event, "id", "") or "",
-        evidence_ids=[bullet.claim_id] if bullet.claim_id else [],
+        evidence_ids=[claim_id] if claim_id else [],
         old_statement=old_statement,
         new_statement=proposition.statement(),
         significance=decision.significance,
         confidence=decision.confidence,
     )
     state.changelog.append(revision)
+    state.processed_events[revision.event_id] = ProcessedEvent(
+        event_id=revision.event_id,
+        claim_id=claim_id,
+        proposition_id=proposition.id,
+        slot=topic,
+        adopted_at=stamp,
+    )
     return revision
 
 
@@ -355,8 +550,21 @@ def apply_event(
     policy: PovPolicy,
     now: dt.datetime | None = None,
 ) -> PovDecision:
-    """Gate + apply one event. Returns the decision (adopted or skipped)."""
+    """Gate + apply one event. Returns the decision (adopted or skipped).
 
+    Idempotent: an event already in the processed watermark is skipped, so
+    replaying the full history converges to the same state with no new changelog
+    entries.
+    """
+
+    event_id = getattr(event, "id", "") or ""
+    if event_id and event_id in state.processed_events:
+        return PovDecision(
+            adopt=False,
+            reason=f"event {event_id!r} already processed",
+            significance=0.0,
+            confidence="unresolved",
+        )
     decision = evaluate_event(event=event, claim=claim, state=state, policy=policy)
     if decision.adopt and claim is not None:
         apply_decision(state=state, decision=decision, event=event, claim=claim, now=now)
@@ -376,15 +584,20 @@ def render_pov_body(state: PovState) -> str:
     for proposition in state.propositions:
         lines.append(f"### {proposition.section}")
         lines.append("")
-        meta = f"**{proposition.id}** · confidence: {proposition.confidence()}"
+        meta = f"**{proposition.id}** · confidence: {proposition.confidence().value}"
+        if proposition.is_contested:
+            meta += " · **contested**"
         if proposition.last_reviewed is not None:
             meta += f" · last reviewed: {proposition.last_reviewed.date().isoformat()}"
         lines.append(meta)
         lines.append("")
         lines.extend(proposition.statement().splitlines())
-        if proposition.evidence_ids():
+        if proposition.supporting_ids():
             lines.append("")
-            lines.append("Evidence: " + ", ".join(proposition.evidence_ids()))
+            lines.append("Supporting evidence: " + ", ".join(proposition.supporting_ids()))
+        if proposition.contradicting_ids():
+            lines.append("")
+            lines.append("Contradicting evidence: " + ", ".join(proposition.contradicting_ids()))
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
 

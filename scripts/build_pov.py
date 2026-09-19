@@ -94,15 +94,9 @@ def main() -> int:
     for event in events:
         claim_id = event.claims[0] if event.claims else None
         claim = claims.get(claim_id) if claim_id else None
-        # Idempotent: if the proposition already carries this claim, skip.
-        existing = (
-            state.proposition_for_topic(claim.get("topic"))
-            if claim is not None
-            else None
-        )
-        if existing is not None and claim_id in existing.evidence_ids():
-            skipped += 1
-            continue
+        # Idempotent via the durable processed-event watermark: replaying the full
+        # history converges to the same state with no new changelog entries,
+        # however many events share a topic.
         decision = apply_event(state=state, event=event, claim=claim, policy=policy)
         if decision.adopt:
             adopted += 1
@@ -133,7 +127,11 @@ def main() -> int:
         f"{adopted} adopted, {skipped} skipped, {len(state.changelog)} changelog entries"
     )
     for proposition in state.propositions:
-        print(f"  {proposition.id}: {proposition.confidence()} ({len(proposition.bullets)} bullets)")
+        print(
+            f"  {proposition.id}: {proposition.confidence().value} "
+            f"({len(proposition.supporting)} supporting, "
+            f"{len(proposition.contradicting)} contradicting)"
+        )
     _ = ConfidenceLabel
     return 0
 

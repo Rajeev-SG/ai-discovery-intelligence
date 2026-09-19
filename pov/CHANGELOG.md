@@ -2,10 +2,10 @@
 
 ## 2026-09-19 — pov-retrieval-systems
 
-- **Reason:** material crawler_index_policy change: significance 3.67 >= 3.50, confidence medium
+- **Reason:** material crawler_index_policy change: significance 3.63 >= 3.50, confidence medium (first-seen quantified claim)
 - **Event:** `9f7e8c586b05`
 - **Evidence:** `0b187a5b6f942c1d2a3fcb12285238e5`
-- **Significance:** 3.67 · **Confidence:** medium
+- **Significance:** 3.63 · **Confidence:** medium
 
 **Before**
 

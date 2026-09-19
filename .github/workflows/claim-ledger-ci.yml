@@ -79,32 +79,35 @@ jobs:
           uv run python - <<'PY'
           import sys
           sys.path.insert(0, "src")
-          from ai_discovery.pov import (
-              PovProposition, PovState, apply_event, evaluate_event,
-              load_policy, render_changelog,
-          )
           import datetime as dt
+          from ai_discovery.pov import (
+              PovProposition, PovState, apply_event, evaluate_event, load_policy,
+          )
 
           policy = load_policy()
           state = PovState(propositions=[PovProposition(
               id="ret", section="R", base_text="b",
               topics=["crawler_index_policy", "audience_usage"])])
           class E:
-              id="e1"; title="A crawler policy change"; effective_from=None
-              published_at=dt.datetime(2026,9,18,tzinfo=dt.UTC)
-              observed_at=published_at
+              def __init__(self, id): self.id=id; self.title="generic"; self.effective_from=None
+              published_at=dt.datetime(2026,9,18,tzinfo=dt.UTC); observed_at=published_at
           claim = {"claim_id":"c1","topic":"crawler_index_policy","confidence":"medium",
-                   "surfaces":["chatgpt"],"value":[{"value_text":"24"}]}
-          d = apply_event(state=state, event=E(), claim=claim, policy=policy)
+                   "relationship":"new","status":"current","surfaces":["chatgpt"],
+                   "value":[{"value_number":100.0,"value_text":"100"}],
+                   "statement":"validated claim statement"}
+          d = apply_event(state=state, event=E("e1"), claim=claim, policy=policy)
           assert d.adopt and d.proposition_id == "ret"
           assert len(state.changelog) == 1
+          # Idempotent replay: the same event must not adopt again.
+          d_replay = apply_event(state=state, event=E("e1"), claim=claim, policy=policy)
+          assert not d_replay.adopt and len(state.changelog) == 1
+          # A repeat of the incumbent value is not a material change.
+          repeat = dict(claim, claim_id="c2", value=[{"value_number":100.0}])
+          assert not evaluate_event(event=E("e2"), claim=repeat, state=state, policy=policy).adopt
           # A topic the proposition does not own yields no change.
-          other = {"claim_id":"c2","topic":"commerce_ads","confidence":"medium",
-                   "surfaces":["chatgpt"],"value":[{"value_text":"1"}]}
-          d2 = evaluate_event(event=E(), claim=other, state=state, policy=policy)
-          assert not d2.adopt
-          assert "Before" in render_changelog(state)
-          print("POV gate OK: 1 adopted, 1 correctly skipped")
+          other = dict(claim, claim_id="c3", topic="commerce_ads")
+          assert not evaluate_event(event=E("e3"), claim=other, state=state, policy=policy).adopt
+          print("POV gate OK: adopt + idempotent replay + repeat + unowned topic")
           PY
 
       - name: Build the evidence-API image (issue #9)

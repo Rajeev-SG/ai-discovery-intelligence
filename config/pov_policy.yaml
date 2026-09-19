@@ -16,9 +16,6 @@ pov:
   # when it is *material* for that proposition: a topic a proposition does not
   # own never touches it.
   require_topic_match: true
-  # Weak/duplicate/stale events never change the POV: at most this many
-  # propositions may change from one event (surgical edits).
-  max_propositions_per_event: 1
   # Magnitude applied when the grounding claim carries a stated number (a
   # quantified change is more material than a qualitative one).
   magnitude_with_value: 0.8
