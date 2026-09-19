@@ -16,9 +16,12 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
 
 from .normalise import normalise_markdown
+
+if TYPE_CHECKING:
+    from crawl4ai import CrawlerRunConfig
 
 INSTALL_HINT = (
     "The Crawl4AI render lane needs the 'acquisition' extra and its browser runtime: "
