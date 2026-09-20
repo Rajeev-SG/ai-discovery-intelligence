@@ -97,10 +97,25 @@ def main() -> int:
         "## 4. Invariants demonstrated",
         "",
         "- A dimension with no supporting claim is `unknown` with a note, not blank.",
-        "- A market-share/audience claim lights **no** mechanics dimension.",
+        "- A market-share/audience claim lights **no** mechanics dimension. A "
+        + "citation-*share* claim lights no dimension either: a dimension needs an "
+        + "inherent topic or a content-gated signal (review F1).",
         "- The vendor-documented vs independently-researched vs directly-observed "
         + "distinction is carried per evidence record (`evidence_class`).",
+        "- Each evidence record carries its original surface value and canonical id "
+        + "(auditable alias attachment, F4) and a methodology-completeness flag so a "
+        + "null field is never read as 'verified absent' (F5).",
         "- No private snapshot path or capture text appears in any payload.",
+        "",
+        "## 5. Conflicting / partial dimensions",
+        "",
+        "The current production ledger holds **no** conflicting or superseded "
+        + "claims (every claim is `relationship='new'`, `status='current'`), so "
+        + "`conflicting`/`partially_known` are 0 across the corpus. That state is "
+        + "reachable and is proven end-to-end by "
+        "`tests/test_mechanics.py::test_multi_source_ledger_projects_conflict_and_supersession` "
+        "over a realistic multi-source ledger, rather than being forced onto a "
+        "share-only corpus.",
     ]
     (OUT / "ISSUE_56_PROOF.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"wrote proof to {OUT}")

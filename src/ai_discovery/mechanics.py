@@ -18,9 +18,9 @@ assertion must name a real ledger claim. This module never reads the registry's
 ``retrieval_status`` as evidence, never reads model knowledge, and never invents
 a mechanic to fill a cell: the projection takes *already-validated claims* as its
 only evidence input, and any dimension with no supporting claim becomes
-``unknown``. It also never manufactures assertions from registry metadata: claims
-are linked to a dimension by an explicit, auditable mapping (``DIMENSION_TOPICS``)
-and a topic with no mapping contributes nothing.
+``unknown``. It also never manufactures assertions from registry metadata: a claim lights a
+dimension only through an explicit, auditable mapping (``DIMENSION_TOPICS``) or a
+content-gated signal (``CLAIM_SIGNALS``); a share-only claim lights nothing.
 """
 
 from __future__ import annotations
@@ -143,27 +143,121 @@ MECHANICS_STATES: tuple[str, ...] = ("known", "partially_known", "conflicting", 
 # from this map contributes no mechanics evidence for any dimension. The mapping
 # is many-to-many: one topic may inform more than one dimension.
 DIMENSION_TOPICS: dict[str, tuple[str, ...]] = {
+    # Only topics that *inherently* assert a mechanic appear here. A coarse
+    # topic that merely *might* relate (citations, commerce, optimisation) is
+    # deliberately absent: it lights a dimension only through the explicit,
+    # content-gated CLAIM_SIGNALS below, never by topic alone.
     "search_trigger": ("retrieval_index",),
     "retrieval_provider": ("retrieval_index",),
     "query_rewrite": ("retrieval_index",),
     "crawling_indexing_controls": ("crawler_index_policy",),
-    "freshness_recrawl": ("crawler_index_policy", "retrieval_index"),
-    "candidate_selection_reranking": ("retrieval_index",),
-    "citation_presentation": ("citations_sources",),
-    "shopping_product_feed": ("commerce_ads",),
-    "local_retrieval": ("retrieval_index",),
-    # A coarse ``citations_sources`` claim is about citation *share*, not about
-    # whether a surface sources from social/community pages. At topic granularity
-    # that mapping would assert something the topic cannot evidence, so it is
-    # deliberately absent: with no social-specific topic the dimension stays an
-    # honest ``unknown`` rather than a derived guess.
+    "freshness_recrawl": ("crawler_index_policy",),
+    "candidate_selection_reranking": (),
+    "citation_presentation": (),
+    "shopping_product_feed": (),
+    "local_retrieval": (),
     "social_community_retrieval": (),
-    "mode_region_differences": ("retrieval_index",),
-    "answer_type": ("retrieval_index",),
+    "mode_region_differences": (),
+    "answer_type": (),
+    "marketer_controllable_inputs": (),
+}
+
+#: Content-gated signals: a (topic, regex) pair that must ALL match a claim's
+#: own statement or metric text before the topic may light the dimension. This is
+#: the "claim-level gating" issue #56 review F1 asked for: a market-share claim
+#: about citations must not light ``citation_presentation``; only a claim whose
+#: text actually asserts a presentation/feed/eligibility mechanic may.
+#:
+#: Deterministic and auditable by design — every gate is a stated pattern, and a
+#: new gate is a reviewed edit here, never a model judgement at request time.
+CLAIM_SIGNALS: dict[str, tuple[tuple[str, str], ...]] = {
+    "candidate_selection_reranking": (
+        (
+            "retrieval_index",
+            r"\b(rank|rerank|re-rank|select|selection|prioriti[sz]|order(?:ing)?)\b",
+        ),
+        (
+            "citations_sources",
+            r"\b(rank|rerank|re-rank|select|selection|prioriti[sz]|order(?:ing)?)\b",
+        ),
+    ),
+    "citation_presentation": (
+        (
+            "citations_sources",
+            (
+                r"\b(inline|footer|footnote|card|link(?:s|ed|ing)?|embed(?:s|ded|ding)?|attribut(?:e|ed|ion)|"
+                r"cite(?:s|d)? per|citations? per|sources? per|display(?:ed|s)?|present(?:ed|ation)|reference(?:s|d)?)\b"
+            ),
+        ),
+    ),
+    "shopping_product_feed": (
+        (
+            "commerce_ads",
+            (
+                r"\b(product|products|feed|feeds|catalog(?:ue)?|shopping|merchant|carousel|sponsored|"
+                r"product listing|store|retailer|price|availability|checkout)\b"
+            ),
+        ),
+    ),
+    # Social/local need *sourcing* language, not merely a domain mention: a
+    # "Reddit citation share" number is a share claim, not a stated mechanic.
+    "local_retrieval": (
+        (
+            "retrieval_index",
+            (
+                r"\b(?:source[sd]? (?:from|via)|retriev\w* (?:from|via)|draws? (?:on|from)|uses?)\b"
+                r"[^.]{0,40}\b(?:local|maps?|places?|near me|geo(?:graphic)?)\b"
+            ),
+        ),
+        (
+            "citations_sources",
+            (
+                r"\b(?:source[sd]? (?:from|via)|retriev\w* (?:from|via)|draws? (?:on|from)|uses?)\b"
+                r"[^.]{0,40}\b(?:local|maps?|places?|near me|geo(?:graphic)?)\b"
+            ),
+        ),
+    ),
+    "social_community_retrieval": (
+        (
+            "citations_sources",
+            (
+                r"\b(?:source[sd]? (?:from|via)|retriev\w* (?:from|via)|draws? (?:on|from)|uses?|"
+                r"grounded (?:in|on)|pulls? from)\b[^.]{0,40}"
+                r"\b(?:reddit|forum|forums|community|communities|quora|stack ?exchange|user-generated)\b"
+            ),
+        ),
+        (
+            "retrieval_index",
+            (
+                r"\b(?:source[sd]? (?:from|via)|retriev\w* (?:from|via)|draws? (?:on|from)|uses?|"
+                r"grounded (?:in|on))\b[^.]{0,40}\b(?:reddit|forum|community|communities|quora|social)\b"
+            ),
+        ),
+    ),
+    "answer_type": (
+        ("retrieval_index", r"\b(grounded|retriev|generat(?:e|ed|ive)|direct answer|synthes|compose(?:d|s)?)\b"),
+        ("citations_sources", r"\b(grounded|retriev|direct answer|synthes|compose(?:d|s)?)\b"),
+    ),
     "marketer_controllable_inputs": (
-        "optimisation_implication",
-        "crawler_index_policy",
-        "commerce_ads",
+        (
+            "crawler_index_policy",
+            (
+                r"\b(robots\.txt|sitemap|llms\.txt|user-agent|user agent|noindex|allow(?:ed)?|disallow|"
+                r"crawl(?:ing)? (?:delay|budget)|markup|structured data|schema)\b"
+            ),
+        ),
+        (
+            "commerce_ads",
+            (
+                r"\b(feed|product listing|merchant|markup|structured data|schema|catalog(?:ue)?)\b"
+            ),
+        ),
+        (
+            "optimisation_implication",
+            (
+                r"\b(robots\.txt|sitemap|llms\.txt|markup|structured data|schema|feed|eligib)\b"
+            ),
+        ),
     ),
 }
 
@@ -241,6 +335,14 @@ class MechanicsEvidence(BaseModel):
     regions: tuple[str, ...] = ()
     relates_to_claim_id: str | None = None
     relationship: str = "new"
+    #: The surface value as the claim stored it, plus the canonical registry id
+    #: it resolved to — so surface attribution from an alias stays auditable
+    #: end-to-end (issue #56 review F4).
+    claimed_surface_value: str | None = None
+    canonical_surface_id: str | None = None
+    #: Which methodology fields were asserted by the claim vs defaulted. A null
+    #: methodology field is NOT "verified absent" — it is unstated (review F5).
+    methodology_completeness: str = "unknown"
 
     @model_validator(mode="after")
     def _class_matches_source(self) -> MechanicsEvidence:
@@ -363,7 +465,23 @@ def _iso_date(value: Any) -> dt.date | None:
         return None
 
 
-def _evidence_from_claim(row: dict[str, Any]) -> MechanicsEvidence | None:
+def _methodology_completeness(methodology: dict[str, Any]) -> str:
+    """How much methodology the claim actually states (never read null as absent)."""
+
+    stated = sum(
+        1
+        for f in ("measurement_mode", "metric_family", "denominator", "sample_size",
+                  "unit_of_analysis", "time_window", "geography")
+        if methodology.get(f)
+    )
+    if stated == 0:
+        return "not_stated"
+    if stated <= 2:
+        return "sparse"
+    return "detailed"
+
+
+def _evidence_from_claim(row: dict[str, Any], canonical_scope: str | None = None) -> MechanicsEvidence | None:
     """Build a MechanicsEvidence from one expanded-claim read row.
 
     Returns ``None`` when the row lacks the minimum a claim needs to be evidence
@@ -393,6 +511,7 @@ def _evidence_from_claim(row: dict[str, Any]) -> MechanicsEvidence | None:
     if geo:
         regions = (str(geo),)
 
+    raw_surfaces = list(row.get("surfaces") or [])
     return MechanicsEvidence(
         claim_id=row["claim_id"],
         source_id=source.get("source_id"),
@@ -410,7 +529,63 @@ def _evidence_from_claim(row: dict[str, Any]) -> MechanicsEvidence | None:
         regions=regions,
         relationship=row.get("relationship") or "new",
         relates_to_claim_id=row.get("supersedes_claim_id"),
+        claimed_surface_value=raw_surfaces[0] if raw_surfaces else None,
+        canonical_surface_id=canonical_scope,
+        methodology_completeness=_methodology_completeness(methodology),
     )
+
+
+import re as _re  # local alias: keeps the module's public surface clean
+
+_SIGNAL_CACHE: dict[tuple[str, str], _re.Pattern[str]] = {}
+
+
+def _signal_regex(topic: str, pattern: str) -> _re.Pattern[str]:
+    key = (topic, pattern)
+    cached = _SIGNAL_CACHE.get(key)
+    if cached is None:
+        cached = _re.compile(pattern, _re.IGNORECASE)
+        _SIGNAL_CACHE[key] = cached
+    return cached
+
+
+def _claim_text(row: dict[str, Any]) -> str:
+    """The claim's own searchable text: statement plus every metric value/label."""
+
+    parts = [row.get("statement") or ""]
+    for m in row.get("metrics") or []:
+        parts.append(str(m.get("label") or ""))
+        parts.append(str(m.get("value_text") or ""))
+        parts.append(str(m.get("unit") or ""))
+        parts.append(str(m.get("definition") or ""))
+    return " ".join(parts)
+
+
+def _claim_lights_dimension(row: dict[str, Any], dimension: str) -> bool:
+    """True only when a claim genuinely asserts this mechanics dimension.
+
+    Two independent gates, both deterministic:
+
+    1. **Inherent topic** (``DIMENSION_TOPICS``): the topic *is* the mechanic
+       (e.g. a ``retrieval_index`` claim is about retrieval).
+    2. **Content-gated signal** (``CLAIM_SIGNALS``): a coarse topic (citations,
+       commerce, optimisation) may light the dimension only when the claim's own
+       text matches the stated pattern for that (topic, dimension) pair.
+
+    A market-share/citation-share claim therefore never lights
+    ``citation_presentation`` unless its text actually asserts a presentation
+    mechanic (links, inline, per-response counts, ...). This is the claim-level
+    gating that keeps a coarse topic from masquerading as a mechanic.
+    """
+
+    topic = row.get("topic")
+    if topic in DIMENSION_TOPICS.get(dimension, ()):
+        return True
+    text = _claim_text(row)
+    for sig_topic, pattern in CLAIM_SIGNALS.get(dimension, ()):
+        if topic == sig_topic and _signal_regex(sig_topic, pattern).search(text):
+            return True
+    return False
 
 
 def _claims_for(
@@ -418,13 +593,10 @@ def _claims_for(
     surface_id: str,
     dimension: str,
 ) -> list[dict[str, Any]]:
-    """Real claims that (a) name this surface and (b) whose topic maps to this dimension."""
+    """Real claims that (a) name this surface and (b) genuinely assert this dimension."""
 
     from .registry import resolve_surface_id
 
-    topics = set(DIMENSION_TOPICS.get(dimension, ()))
-    if not topics:
-        return []
     out: list[dict[str, Any]] = []
     for row in claims:
         # Resolve the claim's surface value to a canonical id (read-time only;
@@ -433,13 +605,15 @@ def _claims_for(
         row_surfaces = {resolve_surface_id(s) for s in (row.get("surfaces") or [])}
         if surface_id not in row_surfaces:
             continue
-        if row.get("topic") in topics:
+        if _claim_lights_dimension(row, dimension):
             out.append(row)
     return out
 
 
 def _assertion_from_claims(
     rows: list[dict[str, Any]],
+    *,
+    surface_id: str,
 ) -> MechanicsAssertion | None:
     """One evidenced assertion from one or more claims sharing a dimension.
 
@@ -451,7 +625,7 @@ def _assertion_from_claims(
 
     evidences: list[MechanicsEvidence] = []
     for row in rows:
-        ev = _evidence_from_claim(row)
+        ev = _evidence_from_claim(row, canonical_scope=surface_id)
         if ev is not None:
             evidences.append(ev)
     if not evidences:
@@ -511,7 +685,7 @@ def project_surface(surface_id: str, claims: list[dict[str, Any]]) -> SurfaceMec
                 )
             states.append(DimensionState(dimension=dimension, state="unknown", note=note))
             continue
-        assertion = _assertion_from_claims(rows)
+        assertion = _assertion_from_claims(rows, surface_id=surface_id)
         if assertion is None:
             states.append(
                 DimensionState(
@@ -581,6 +755,9 @@ def dimension_view(state: DimensionState) -> dict[str, Any]:
                         "regions": list(e.regions),
                         "relates_to_claim_id": e.relates_to_claim_id,
                         "relationship": e.relationship,
+                        "claimed_surface_value": e.claimed_surface_value,
+                        "canonical_surface_id": e.canonical_surface_id,
+                        "methodology_completeness": e.methodology_completeness,
                     }
                     for e in a.evidence
                 ],
@@ -624,3 +801,69 @@ def mechanics_view(mechanics: SurfaceMechanics) -> dict[str, Any]:
         "evidenced_dimension_count": mechanics.evidenced_dimension_count(),
         "dimension_count": len(MECHANICS_DIMENSIONS),
     }
+
+
+# --------------------------------------------------------------------------- #
+# Projection cache (issue #56 review F3)
+# --------------------------------------------------------------------------- #
+#
+# The bulk endpoint projects the whole ledger on each request. The projection is
+# a pure function of (registry ids, ledger claims); it is cached in-process and
+# invalidated by a *ledger token* — the newest claim's ``observed_at`` plus the
+# claim count — so a write (a new claim) changes the token and the next request
+# recomputes. No staleness beyond one ledger write, no unbounded per-request work.
+# A short TTL is a belt-and-braces bound in case a token is unavailable.
+
+import threading as _threading
+
+_CACHE_LOCK = _threading.Lock()
+_CACHE: dict[str, Any] = {"token": None, "projection": None, "built_at": 0.0}
+_CACHE_TTL_SECONDS = 300.0
+
+
+def ledger_token(claims: list[dict[str, Any]]) -> str:
+    """A cheap change token: claim count + newest observed_at."""
+
+    newest = ""
+    for row in claims:
+        observed = (row.get("dates") or {}).get("observed_at") or ""
+        newest = max(newest, observed)
+    return f"{len(claims)}|{newest}"
+
+
+def cached_project_all(
+    surface_ids: list[str],
+    claims: list[dict[str, Any]],
+    *,
+    now: float | None = None,
+) -> dict[str, SurfaceMechanics]:
+    """``project_all`` with an in-process cache keyed by the ledger token.
+
+    The cache is invalidated when the ledger token changes (a new claim) or the
+    TTL expires — so a write never serves a stale projection and a read never
+    re-projects an unchanged ledger.
+    """
+
+    import time
+
+    token = f"{len(surface_ids)}|{ledger_token(claims)}"
+    clock = now if now is not None else time.monotonic()
+    with _CACHE_LOCK:
+        fresh = (
+            _CACHE["token"] == token
+            and _CACHE["projection"] is not None
+            and (clock - float(_CACHE["built_at"])) < _CACHE_TTL_SECONDS
+        )
+        if fresh:
+            return _CACHE["projection"]
+    projection = project_all(surface_ids, claims)
+    with _CACHE_LOCK:
+        _CACHE.update(token=token, projection=projection, built_at=clock)
+    return projection
+
+
+def clear_projection_cache() -> None:
+    """Drop the cache (tests; and an operator escape hatch)."""
+
+    with _CACHE_LOCK:
+        _CACHE.update(token=None, projection=None, built_at=0.0)

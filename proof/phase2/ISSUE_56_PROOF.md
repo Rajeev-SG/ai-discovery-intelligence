@@ -7,7 +7,7 @@ Dimensions: 13 (search_trigger, retrieval_provider, query_rewrite, crawling_inde
 
 ## 1. Complete ChatGPT mechanics payload (real evidence)
 
-Coverage: **5/13 evidenced (known 5, partial 0, conflicting 0, unknown 8)**
+Coverage: **4/13 evidenced (known 4, partial 0, conflicting 0, unknown 9)**
 
 | dimension | state | evidence class | confidence | statement |
 |---|---|---|---|---|
@@ -16,14 +16,14 @@ Coverage: **5/13 evidenced (known 5, partial 0, conflicting 0, unknown 8)**
 | query_rewrite | unknown | — | — | No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value. |
 | crawling_indexing_controls | known | official_documentation | medium | It can take approximately 24 hours for OpenAI's systems to adjust for search results after a site's robots.txt update. |
 | freshness_recrawl | known | official_documentation | medium | It can take approximately 24 hours for OpenAI's systems to adjust for search results after a site's robots.txt update. |
-| candidate_selection_reranking | unknown | — | — | No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value. |
+| candidate_selection_reranking | unknown | — | — | No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it. |
 | citation_presentation | known | independent_research | medium | The share of ChatGPT responses with at least one inline image embedding from images.openai.com rose from approximately 1 |
-| shopping_product_feed | known | independent_research | medium | Initial observations of ChatGPT ads were based on three days of data when first published on July 15, and updated on Jul |
-| local_retrieval | unknown | — | — | No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value. |
+| shopping_product_feed | unknown | — | — | No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it. |
+| local_retrieval | unknown | — | — | No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it. |
 | social_community_retrieval | unknown | — | — | No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it. |
-| mode_region_differences | unknown | — | — | No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value. |
-| answer_type | unknown | — | — | No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value. |
-| marketer_controllable_inputs | known | independent_research | medium | Initial observations of ChatGPT ads were based on three days of data when first published on July 15, and updated on Jul |
+| mode_region_differences | unknown | — | — | No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it. |
+| answer_type | unknown | — | — | No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it. |
+| marketer_controllable_inputs | known | official_documentation | medium | It can take approximately 24 hours for OpenAI's systems to adjust for search results after a site's robots.txt update. |
 
 Full payload: `proof/phase2/chatgpt_mechanics.json`.
 
@@ -40,14 +40,14 @@ Coverage: **0/13 evidenced (known 0, partial 0, conflicting 0, unknown 13)**
 | query_rewrite | unknown | — | — | No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value. |
 | crawling_indexing_controls | unknown | — | — | No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value. |
 | freshness_recrawl | unknown | — | — | No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value. |
-| candidate_selection_reranking | unknown | — | — | No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value. |
-| citation_presentation | unknown | — | — | No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value. |
-| shopping_product_feed | unknown | — | — | No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value. |
-| local_retrieval | unknown | — | — | No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value. |
+| candidate_selection_reranking | unknown | — | — | No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it. |
+| citation_presentation | unknown | — | — | No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it. |
+| shopping_product_feed | unknown | — | — | No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it. |
+| local_retrieval | unknown | — | — | No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it. |
 | social_community_retrieval | unknown | — | — | No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it. |
-| mode_region_differences | unknown | — | — | No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value. |
-| answer_type | unknown | — | — | No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value. |
-| marketer_controllable_inputs | unknown | — | — | No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value. |
+| mode_region_differences | unknown | — | — | No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it. |
+| answer_type | unknown | — | — | No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it. |
+| marketer_controllable_inputs | unknown | — | — | No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it. |
 
 Full payload: `proof/phase2/deepseek_mechanics.json`.
 
@@ -69,6 +69,11 @@ Claim surface values that are not registry surfaces (and not aliases) are report
 ## 4. Invariants demonstrated
 
 - A dimension with no supporting claim is `unknown` with a note, not blank.
-- A market-share/audience claim lights **no** mechanics dimension.
+- A market-share/audience claim lights **no** mechanics dimension. A citation-*share* claim lights no dimension either: a dimension needs an inherent topic or a content-gated signal (review F1).
 - The vendor-documented vs independently-researched vs directly-observed distinction is carried per evidence record (`evidence_class`).
+- Each evidence record carries its original surface value and canonical id (auditable alias attachment, F4) and a methodology-completeness flag so a null field is never read as 'verified absent' (F5).
 - No private snapshot path or capture text appears in any payload.
+
+## 5. Conflicting / partial dimensions
+
+The current production ledger holds **no** conflicting or superseded claims (every claim is `relationship='new'`, `status='current'`), so `conflicting`/`partially_known` are 0 across the corpus. That state is reachable and is proven end-to-end by `tests/test_mechanics.py::test_multi_source_ledger_projects_conflict_and_supersession` over a realistic multi-source ledger, rather than being forced onto a share-only corpus.

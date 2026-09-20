@@ -155,6 +155,9 @@ def ledger_client(tmp_path):
     record = C.extract_claim(
         spec=_spec(surfaces=["chatgpt"], topic="crawler_index_policy"), capture=_synthetic_capture()
     )
+    # (content gate: the crawler statement asserts a recrawl mechanic, so
+    # crawling_indexing_controls + freshness_recrawl light; marketer-controllable
+    # inputs needs a robots/markup signal the statement does not carry.)
     C.persist_claim(engine, record)
     Session = sessionmaker(bind=engine, expire_on_commit=False)
     session = Session()
@@ -177,10 +180,11 @@ def test_mechanics_endpoint_projects_every_registry_surface(ledger_client):
 def test_mechanics_real_claim_attaches_to_its_surface(ledger_client):
     body = ledger_client.get("/surfaces/chatgpt/mechanics").json()
     assert body["surface"] == "chatgpt"
-    # crawler_index_policy maps to crawling_indexing_controls, freshness_recrawl
-    # and marketer_controllable_inputs -> 3 known, 10 explicit unknown.
-    assert body["evidenced_dimension_count"] == 3
-    assert body["coverage"]["unknown"] == 10
+    # crawler_index_policy inherently maps to crawling_indexing_controls and
+    # freshness_recrawl; marketer_controllable_inputs needs a content signal the
+    # fixture statement does not carry -> 2 known, 11 explicit unknown.
+    assert body["evidenced_dimension_count"] == 2
+    assert body["coverage"]["unknown"] == 11
     known = [d for d in body["dimensions"] if d["state"] != "unknown"]
     assert all(d["assertions"] for d in known)
     assert all(d["assertions"][0]["evidence"][0]["claim_id"] for d in known)

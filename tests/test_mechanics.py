@@ -297,9 +297,103 @@ def test_unmapped_diagnostic_is_alias_aware():
     assert unmapped["reddit"] == ["c2"]
 
 
-def test_dimension_with_no_topic_mapping_is_always_unknown():
-    # social_community_retrieval has no topic mapping: a coarse citation-share
-    # claim must not light it. It stays an honest unknown.
+def test_share_only_citation_claim_lights_no_mechanics_dimension():
+    # F1: a citation-SHARE claim asserts no presentation mechanic, so it must
+    # light nothing. A market-share/citation-share number is not "how it works".
+    m = M.project_surface(
+        "chatgpt",
+        [_claim(topic="citations_sources", statement="Reddit held a 3.8% share of ChatGPT citations.")],
+    )
+    assert m.evidenced_dimension_count() == 0
+    assert m.state_of("citation_presentation") == "unknown"
+
+
+def test_citation_presentation_claim_requires_content_signal():
+    # A claim whose text actually asserts a presentation mechanic does light it.
+    m = M.project_surface(
+        "chatgpt",
+        [_claim(
+            topic="citations_sources",
+            statement="The average number of sources cited per ChatGPT response is shown inline as links.",
+        )],
+    )
+    assert m.state_of("citation_presentation") == "known"
+
+
+def test_social_and_local_stay_unknown_without_a_matching_signal():
     m = M.project_surface("chatgpt", [_claim(topic="citations_sources")])
     assert m.state_of("social_community_retrieval") == "unknown"
-    assert m.state_of("citation_presentation") == "known"
+    assert m.state_of("local_retrieval") == "unknown"
+
+
+# --------------------------------------------------------------------------- #
+# F2: an end-to-end multi-source ledger through the projection
+# --------------------------------------------------------------------------- #
+
+
+def test_multi_source_ledger_projects_conflict_and_supersession():
+    """A realistic multi-source ledger: conflict + supersession are reachable.
+
+    The production ledger currently holds no conflicting claims (all
+    ``relationship='new'``), so this drives the *projection* over a realistic
+    multi-source set end-to-end: two sources disagree on the same dimension, and
+    one explicitly supersedes a prior reading.
+    """
+
+    a = _claim(claim_id="a", source_class="official", publisher="Vendor", statement="X is documented.")
+    b = _claim(claim_id="b", source_class="market_telemetry", publisher="Tracker", statement="X is contested.")
+    c = _claim(
+        claim_id="c",
+        source_class="official",
+        publisher="Vendor",
+        statement="X supersedes b.",
+        relationship="supersedes",
+        supersedes="b",
+    )
+    m = M.project_surface("chatgpt", [a, b, c])
+    d = m.dimension("crawling_indexing_controls")
+    assert d.state == "conflicting"
+    assert set(d.evidence_ids) == {"a", "b", "c"}
+    superseded = [e for e in d.assertions[0].evidence if e.relates_to_claim_id]
+    assert superseded and superseded[0].relates_to_claim_id == "b"
+
+
+def test_evidence_carries_alias_attribution_and_methodology_completeness():
+    # F4: original surface value + canonical id travel with the evidence.
+    # F5: methodology completeness is stated, so null is never read as absent.
+    m = M.project_surface("deepseek-chat", [_claim(surfaces=("deepseek",))])
+    d = m.dimension("crawling_indexing_controls")
+    ev = d.assertions[0].evidence[0]
+    assert ev.claimed_surface_value == "deepseek"
+    assert ev.canonical_surface_id == "deepseek-chat"
+    assert ev.methodology_completeness in ("not_stated", "sparse", "detailed")
+
+
+# --------------------------------------------------------------------------- #
+# F3: projection cache
+# --------------------------------------------------------------------------- #
+
+
+def test_projection_cache_reuses_until_ledger_changes():
+    M.clear_projection_cache()
+    ids = ["chatgpt"]
+    claims = [_claim()]
+    first = M.cached_project_all(ids, claims, now=0.0)
+    second = M.cached_project_all(ids, claims, now=1.0)
+    assert first is second  # same token + fresh TTL -> cached object reused
+
+    # A new claim changes the ledger token -> recompute (never a stale projection).
+    changed = claims + [_claim(claim_id="c2")]
+    third = M.cached_project_all(ids, changed, now=2.0)
+    assert third is not first
+    M.clear_projection_cache()
+
+
+def test_projection_cache_expires_after_ttl():
+    M.clear_projection_cache()
+    ids = ["chatgpt"]
+    claims = [_claim()]
+    first = M.cached_project_all(ids, claims, now=0.0)
+    late = M.cached_project_all(ids, claims, now=M._CACHE_TTL_SECONDS + 1)
+    assert late is not first
+    M.clear_projection_cache()

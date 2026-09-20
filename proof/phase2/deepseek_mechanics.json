@@ -46,7 +46,7 @@
       "label": "Candidate selection / reranking",
       "definition": "How retrieved candidates are filtered, ranked or reranked before an answer is composed.",
       "state": "unknown",
-      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "note": "No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it.",
       "assertions": []
     },
     {
@@ -54,7 +54,7 @@
       "label": "Citation / source presentation",
       "definition": "Whether sources are shown, and in what form (inline links, cards, footnotes, absent).",
       "state": "unknown",
-      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "note": "No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it.",
       "assertions": []
     },
     {
@@ -62,7 +62,7 @@
       "label": "Shopping / product feed",
       "definition": "Product, catalogue or feed behaviour in commercial results.",
       "state": "unknown",
-      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "note": "No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it.",
       "assertions": []
     },
     {
@@ -70,7 +70,7 @@
       "label": "Local retrieval",
       "definition": "Use of local/place retrieval or map data.",
       "state": "unknown",
-      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "note": "No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it.",
       "assertions": []
     },
     {
@@ -86,7 +86,7 @@
       "label": "Mode / model / account / region differences",
       "definition": "How behaviour differs across modes, models, account tiers or regions.",
       "state": "unknown",
-      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "note": "No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it.",
       "assertions": []
     },
     {
@@ -94,7 +94,7 @@
       "label": "Direct vs retrieval-backed answer",
       "definition": "Whether a response is a direct model answer or grounded in retrieved sources.",
       "state": "unknown",
-      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "note": "No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it.",
       "assertions": []
     },
     {
@@ -102,7 +102,7 @@
       "label": "Marketer-controllable eligibility inputs",
       "definition": "Signals a marketer can change (markup, feeds, robots policy, content structure) that affect eligibility.",
       "state": "unknown",
-      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "note": "No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it.",
       "assertions": []
     }
   ],

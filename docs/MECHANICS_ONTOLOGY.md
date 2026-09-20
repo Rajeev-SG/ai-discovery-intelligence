@@ -68,12 +68,41 @@ prose. Each assertion links to one or more `MechanicsEvidence` records carrying:
   and controlled observation are separate `evidence_class` values, so a reader can
   tell "the vendor says" from "a study found" from "we observed".
 
-## Topic → dimension mapping
+## Topic → dimension mapping, and the content gate
 
-`DIMENSION_TOPICS` is the single, auditable statement of which dimension each
-coarse ledger topic speaks to. A topic absent from the map contributes nothing.
-The mapping is deliberately conservative — it does not stretch a coarse topic into
-a mechanic it cannot actually evidence.
+A dimension is lit by a claim only through **two independent, deterministic
+gates**, both reviewed in code (never a model judgement at request time):
+
+1. **Inherent topic** (`DIMENSION_TOPICS`) — the topic *is* the mechanic. Only
+   `retrieval_index` and `crawler_index_policy` are inherent here.
+2. **Content-gated signal** (`CLAIM_SIGNALS`) — a coarse topic (citations,
+   commerce, optimisation) may light a dimension only when the claim's own
+   statement/metric text matches a stated pattern. A citation *share* number has
+   no such pattern, so it lights nothing; a claim that says sources are shown
+   `inline`/`per response` lights `citation_presentation`.
+
+This is deliberate: a coarse topic must never masquerade as a mechanic. The
+content gate is the honest answer to "does this claim actually assert how the
+surface works?" — and it drops the ChatGPT evidenced-dimension count from a naive
+6/13 to a truthful **4/13** on the current production ledger.
+
+## Methodology completeness (null is not "absent")
+
+Each evidence record carries `methodology_completeness` (`not_stated` / `sparse` /
+`detailed`). A null methodology field is **unstated**, never "verified absent" —
+consumers must not read null as a negative finding.
+
+## Alias attribution is auditable
+
+Each evidence record carries both `claimed_surface_value` (as the claim stored it)
+and `canonical_surface_id` (what it resolved to), so an aliased attachment is
+traceable end-to-end from the payload.
+
+## Performance
+
+`GET /mechanics` caches the projection in-process, keyed by a ledger token
+(claim count + newest `observed_at`) with a short TTL, so an unchanged ledger is
+never re-projected while a write always invalidates the cache.
 
 ## Surface-id resolution (read-time only)
 
