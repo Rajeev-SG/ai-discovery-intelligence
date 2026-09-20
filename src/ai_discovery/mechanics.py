@@ -26,6 +26,7 @@ content-gated signal (``CLAIM_SIGNALS``); a share-only claim lights nothing.
 from __future__ import annotations
 
 import datetime as dt
+from collections.abc import Callable
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -804,25 +805,38 @@ def mechanics_view(mechanics: SurfaceMechanics) -> dict[str, Any]:
 
 
 # --------------------------------------------------------------------------- #
-# Projection cache (issue #56 review F3)
+# Projection cache (issue #56 review F3/D1/D2)
 # --------------------------------------------------------------------------- #
 #
-# The bulk endpoint projects the whole ledger on each request. The projection is
-# a pure function of (registry ids, ledger claims); it is cached in-process and
-# invalidated by a *ledger token* — the newest claim's ``observed_at`` plus the
-# claim count — so a write (a new claim) changes the token and the next request
-# recomputes. No staleness beyond one ledger write, no unbounded per-request work.
-# A short TTL is a belt-and-braces bound in case a token is unavailable.
+# The endpoints project ledger claims on each request. The projection is a pure
+# function of (surface ids, ledger claims), so it is cached in-process.
+#
+# Invalidation is *bounded*, and stated honestly: the token is the claim count
+# plus the newest ``observed_at``. That changes on the append-only writes this
+# ledger actually performs (a new or superseding claim). It does NOT detect an
+# in-place UPDATE of an existing claim (a data correction) — for that the TTL is
+# the bound. Worst-case staleness after an in-place correction is therefore the
+# TTL, not zero; do not read the cache as "never stale".
+#
+# The cache is keyed by the surface-ids signature *and* the token, so a
+# single-surface request and a bulk request never thrash one another.
 
 import threading as _threading
+import time as _time
 
 _CACHE_LOCK = _threading.Lock()
-_CACHE: dict[str, Any] = {"token": None, "projection": None, "built_at": 0.0}
+#: key -> (token, projection, built_at). Bounded: at most one entry per distinct
+#: surface-ids signature actually requested (bulk = 1, plus one per single surface).
+_CACHE: dict[str, tuple[str, Any, float]] = {}
 _CACHE_TTL_SECONDS = 300.0
 
 
 def ledger_token(claims: list[dict[str, Any]]) -> str:
-    """A cheap change token: claim count + newest observed_at."""
+    """A cheap change token: claim count + newest observed_at.
+
+    Detects append-only writes (new / superseding claims). It does NOT detect an
+    in-place claim edit, which the TTL bounds instead.
+    """
 
     newest = ""
     for row in claims:
@@ -831,39 +845,51 @@ def ledger_token(claims: list[dict[str, Any]]) -> str:
     return f"{len(claims)}|{newest}"
 
 
+def _cached(key: str, token: str, build: Callable[[], Any], *, now: float | None) -> Any:
+    clock = now if now is not None else _time.monotonic()
+    with _CACHE_LOCK:
+        entry = _CACHE.get(key)
+        if entry is not None and entry[0] == token and (clock - entry[2]) < _CACHE_TTL_SECONDS:
+            return entry[1]
+    value = build()
+    with _CACHE_LOCK:
+        _CACHE[key] = (token, value, clock)
+    return value
+
+
 def cached_project_all(
     surface_ids: list[str],
     claims: list[dict[str, Any]],
     *,
     now: float | None = None,
 ) -> dict[str, SurfaceMechanics]:
-    """``project_all`` with an in-process cache keyed by the ledger token.
+    """``project_all`` with an in-process cache keyed by shape + ledger token."""
 
-    The cache is invalidated when the ledger token changes (a new claim) or the
-    TTL expires — so a write never serves a stale projection and a read never
-    re-projects an unchanged ledger.
+    sign = ",".join(surface_ids)
+    token = ledger_token(claims)
+    return _cached(f"all:{sign}", token, lambda: project_all(surface_ids, claims), now=now)
+
+
+def cached_project_surface(
+    surface_id: str,
+    claims: list[dict[str, Any]],
+    *,
+    now: float | None = None,
+) -> SurfaceMechanics:
+    """``project_surface`` for one surface, cached so a repeat request is free.
+
+    A single surface is projected, never all 35; the cache key includes the
+    surface id so single-surface and bulk shapes never collide.
     """
 
-    import time
-
-    token = f"{len(surface_ids)}|{ledger_token(claims)}"
-    clock = now if now is not None else time.monotonic()
-    with _CACHE_LOCK:
-        fresh = (
-            _CACHE["token"] == token
-            and _CACHE["projection"] is not None
-            and (clock - float(_CACHE["built_at"])) < _CACHE_TTL_SECONDS
-        )
-        if fresh:
-            return _CACHE["projection"]
-    projection = project_all(surface_ids, claims)
-    with _CACHE_LOCK:
-        _CACHE.update(token=token, projection=projection, built_at=clock)
-    return projection
+    token = ledger_token(claims)
+    return _cached(
+        f"one:{surface_id}", token, lambda: project_surface(surface_id, claims), now=now
+    )
 
 
 def clear_projection_cache() -> None:
     """Drop the cache (tests; and an operator escape hatch)."""
 
     with _CACHE_LOCK:
-        _CACHE.update(token=None, projection=None, built_at=0.0)
+        _CACHE.clear()

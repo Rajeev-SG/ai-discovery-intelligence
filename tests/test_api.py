@@ -210,3 +210,44 @@ def test_mechanics_never_exposes_private_snapshot_data(ledger_client):
     blob = ledger_client.get("/mechanics").text
     for forbidden in ("snapshot_path", "capture_hash", '"snapshot_available"', "/var/", "/private/"):
         assert forbidden not in blob
+
+
+def test_mechanics_endpoint_reuses_projection_cache(ledger_client, monkeypatch):
+    """D1: two consecutive /mechanics requests compute the projection once."""
+
+    import ai_discovery.mechanics as _m
+
+    calls = {"project": 0}
+    real = _m.project_all
+
+    def spy(*a, **k):
+        calls["project"] += 1
+        return real(*a, **k)
+
+    monkeypatch.setattr(_m, "project_all", spy)
+    _m.clear_projection_cache()
+    first = ledger_client.get("/mechanics")
+    second = ledger_client.get("/mechanics")
+    assert first.status_code == 200 and second.status_code == 200
+    assert calls["project"] == 1  # second request served from cache
+    _m.clear_projection_cache()
+
+
+def test_single_surface_endpoint_does_not_project_all_surfaces(ledger_client, monkeypatch):
+    """D1: /surfaces/{id}/mechanics projects one surface, not the whole registry."""
+
+    import ai_discovery.mechanics as _m
+
+    calls = {"project": 0}
+    real = _m.project_all
+
+    def spy(*a, **k):
+        calls["project"] += 1
+        return real(*a, **k)
+
+    monkeypatch.setattr(_m, "project_all", spy)
+    _m.clear_projection_cache()
+    body = ledger_client.get("/surfaces/chatgpt/mechanics").json()
+    assert body["surface"] == "chatgpt" and len(body["dimensions"]) == 13
+    assert calls["project"] == 0
+    _m.clear_projection_cache()

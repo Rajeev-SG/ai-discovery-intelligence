@@ -426,16 +426,17 @@ def list_mechanics(db: Session = Depends(get_db)) -> dict:  # noqa: B008 - FastA
     from .claims import load_expanded_claims
     from .mechanics import (
         MECHANICS_DIMENSIONS,
+        cached_project_all,
         mechanics_view,
-        project_all,
         unmapped_claim_surfaces,
     )
 
     # Raw expanded ledger rows: the projection needs each claim's methodology and
-    # provenance, not just the product-shaped claim view.
+    # provenance, not just the product-shaped claim view. cached_project_all
+    # avoids re-projecting the whole ledger on every request (review F3/D1).
     registry_ids = _surface_registry_ids()
     claims = load_expanded_claims(_ledger_engine(db))
-    projection = project_all(registry_ids, claims)
+    projection = cached_project_all(registry_ids, claims)
     unmapped = unmapped_claim_surfaces(registry_ids, claims)
     return {
         "dimension_count": len(MECHANICS_DIMENSIONS),
@@ -458,14 +459,17 @@ def get_surface_mechanics(
     """
 
     from .claims import load_expanded_claims
-    from .mechanics import mechanics_view, project_surface
+    from .mechanics import cached_project_surface, mechanics_view
 
-    if surface_id not in _surface_registry_ids():
+    registry_ids = _surface_registry_ids()
+    if surface_id not in registry_ids:
         return {
             "surface": surface_id,
             "state": "unknown_surface",
             "note": "Surface is not in the canonical registry.",
             "dimensions": [],
         }
+    # A single-surface request projects only that surface, and reuses the cache
+    # when the ledger is unchanged (review F3/D1).
     claims = load_expanded_claims(_ledger_engine(db))
-    return mechanics_view(project_surface(surface_id, claims))
+    return mechanics_view(cached_project_surface(surface_id, claims))

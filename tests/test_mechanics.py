@@ -380,9 +380,8 @@ def test_projection_cache_reuses_until_ledger_changes():
     claims = [_claim()]
     first = M.cached_project_all(ids, claims, now=0.0)
     second = M.cached_project_all(ids, claims, now=1.0)
-    assert first is second  # same token + fresh TTL -> cached object reused
+    assert first is second  # same shape + token, fresh TTL -> reused
 
-    # A new claim changes the ledger token -> recompute (never a stale projection).
     changed = claims + [_claim(claim_id="c2")]
     third = M.cached_project_all(ids, changed, now=2.0)
     assert third is not first
@@ -397,3 +396,45 @@ def test_projection_cache_expires_after_ttl():
     late = M.cached_project_all(ids, claims, now=M._CACHE_TTL_SECONDS + 1)
     assert late is not first
     M.clear_projection_cache()
+
+
+def test_cache_is_keyed_per_shape_so_bulk_and_single_do_not_thrash():
+    M.clear_projection_cache()
+    ids = ["chatgpt", "claude"]
+    claims = [_claim()]
+    bulk = M.cached_project_all(ids, claims, now=0.0)
+    single = M.cached_project_surface("chatgpt", claims, now=0.5)
+    # Both cached; the single-surface call must not evict the bulk entry.
+    assert M.cached_project_all(ids, claims, now=1.0) is bulk
+    assert M.cached_project_surface("chatgpt", claims, now=1.5) is single
+    assert single.surface_id == "chatgpt" and len(single.dimensions) == 13
+    M.clear_projection_cache()
+
+
+def test_single_surface_projection_does_not_project_all_surfaces(monkeypatch):
+    # D1: the per-surface path projects one surface; prove project_all is not used.
+    import ai_discovery.mechanics as _m
+
+    calls = {"all": 0}
+    real = _m.project_all
+
+    def spy(*a, **k):
+        calls["all"] += 1
+        return real(*a, **k)
+
+    monkeypatch.setattr(_m, "project_all", spy)
+    _m.clear_projection_cache()
+    _m.cached_project_surface("chatgpt", [_claim()], now=0.0)
+    assert calls["all"] == 0
+    _m.clear_projection_cache()
+
+
+def test_ledger_token_is_honest_about_in_place_edits():
+    # D2: the token detects appends but NOT an in-place edit; the TTL is the bound.
+    a = [_claim()]
+    appended = a + [_claim(claim_id="c2")]
+    assert M.ledger_token(a) != M.ledger_token(appended)
+    # Same count + same observed_at -> identical token (documented limitation).
+    edited = copy.deepcopy(a)
+    edited[0]["statement"] = "a corrected statement"
+    assert M.ledger_token(a) == M.ledger_token(edited)
