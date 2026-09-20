@@ -88,6 +88,9 @@ test("landing shows real changes, brief and current POV from the live API", asyn
   const briefList = brief.getByTestId("brief-list");
   if ((await briefList.count()) > 0) {
     const first = brief.getByTestId("brief-item").first();
+    // The standing "why it matters / agency action" framing is disclosed behind a
+    // per-card expander (the copy repeats across items), so open it before checking.
+    await first.locator("details summary").first().click();
     await expect(first).toContainText("Why it matters");
     await expect(first).toContainText("Agency action");
     await page.screenshot({ path: shot(testInfo, "brief"), fullPage: false });
