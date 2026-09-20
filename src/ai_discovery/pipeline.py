@@ -62,6 +62,45 @@ def claims(context) -> dict:
 
 @asset(
     group_name="claims",
+    deps=[feed_items],
+    description=(
+        "Deterministic mechanics extraction: pull curated mechanics evidence from the "
+        "real captures committed under proof/claim_ledger/captures via "
+        "scripts/build_mechanics_claims.py, then persist the quote-verified claims and "
+        "their change events. No model is involved - every value is a verbatim quote "
+        "re-verified against the capture bytes."
+    ),
+)
+def mechanics_claims(context) -> dict:
+    import importlib.util
+    from pathlib import Path
+
+    from .change_derivation import derive_and_persist
+
+    repo = Path(__file__).resolve().parents[2]
+    spec_path = repo / "scripts" / "build_mechanics_claims.py"
+    mod = importlib.util.spec_from_file_location("build_mechanics_claims", spec_path)
+    assert mod and mod.loader
+    builder = importlib.util.module_from_spec(mod)
+    mod.loader.exec_module(builder)
+
+    from .claims import persist_claim
+    from .db import get_engine
+
+    records = builder.build_records()
+    engine = get_engine()
+    created = 0
+    for record in records:
+        _, was_created = persist_claim(engine, record)
+        created += int(was_created)
+    with session_scope() as session:
+        events = derive_and_persist(session, records)
+    context.add_asset_metadata({"claims_seen": len(records), "claims_created": created, "events": events})
+    return {"claims_seen": len(records), "claims_created": created, "events_created": events}
+
+
+@asset(
+    group_name="claims",
     deps=[claims],
     description=(
         "Deterministic weekly executive brief (docs/PIPELINES.md step 14) from the "
@@ -177,6 +216,7 @@ defs = Definitions(
         source_registry,
         feed_items,
         claims,
+        mechanics_claims,
         weekly_brief,
         discovered_urls,
         source_health,
