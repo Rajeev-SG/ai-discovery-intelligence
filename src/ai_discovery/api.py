@@ -500,12 +500,17 @@ def get_comparison(
 
     registry = load_surfaces_config()
     registry_ids = registry.ids()
-    wanted = [s.strip() for s in surfaces.split(",") if s.strip()]
+    # Dedupe preserving order (issue #60 review): "chatgpt,chatgpt" must not pass
+    # as a 2-surface comparison while actually comparing one.
+    wanted = list(dict.fromkeys(s.strip() for s in surfaces.split(",") if s.strip()))
     unknown = [s for s in wanted if s not in registry_ids]
     if unknown:
         raise HTTPException(status_code=400, detail=f"unknown surface id(s): {unknown}")
     if not (2 <= len(wanted) <= 6):
-        raise HTTPException(status_code=400, detail="compare between 2 and 6 surfaces")
+        raise HTTPException(
+            status_code=400,
+            detail="compare between 2 and 6 distinct surfaces",
+        )
     claims = load_expanded_claims(_ledger_engine(db))
     projection = cached_project_all(registry_ids, claims)
     all_surfaces = build_landscape(registry, projection, claims, ids=tuple(wanted))

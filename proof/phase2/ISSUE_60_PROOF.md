@@ -67,7 +67,27 @@ The comparison includes **ChatGPT, Gemini/AI Mode, Claude, Perplexity, DeepSeek*
 and the regional/China surface **Doubao** in the landscape (6 in the default
 comparison set).
 
-## 5. Honest limitations
+## 5. Review-hardening pass (frontier findings)
+
+- **URL-state desync.** The comparison selection is re-derived from `?compare=`
+  when the URL changes underneath the view (back/forward, a pasted link), so a
+  shared selection is honoured rather than overwritten by stale local state. e2e:
+  *a shared `?compare=` URL round-trips and survives back/forward*.
+- **Duplicate surface ids.** `GET /landscape/comparison` dedupes before validating
+  the 2–6 range, so `?surfaces=chatgpt,chatgpt` returns 400 (one distinct surface),
+  not a two-surface claim. Test:
+  `test_comparison_endpoint_rejects_duplicate_surface_ids`.
+- **Dead comparison endpoint / divergent validation.** Unknown ids in a shared URL
+  are now surfaced explicitly (`compare-dropped`) rather than silently filtered, so
+  the client and the validated `/landscape/comparison` endpoint do not diverge
+  silently; e2e covers it.
+- **Reach name-matching heuristic.** Reach association is now token-based with the
+  vendor name excluded, so a joint "Google AI users" claim is attributed to
+  *neither* Gemini nor AI Mode, and a joint claim naming neither surface yields no
+  figure. Tests: `test_reach_is_none_when_a_joint_claim_names_neither_surface`,
+  `test_vendor_ambiguous_joint_claim_is_not_attributed`.
+
+## 6. Honest limitations
 
 - The landscape is a **curated** view; the registry status is still coarse and is
   labelled as registry metadata, never as mechanics evidence.

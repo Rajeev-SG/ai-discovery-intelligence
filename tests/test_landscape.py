@@ -136,3 +136,46 @@ def test_comparison_cell_carries_evidence_link():
 def test_comparison_dims_are_canonical():
     assert set(L.COMPARISON_DIMENSIONS) <= set(M.MECHANICS_DIMENSIONS)
     assert set(L.LANDSCAPE_IDS)  # non-empty curated set
+
+
+def test_reach_is_none_when_a_joint_claim_names_neither_surface():
+    """Review: a joint claim whose metric names neither surface yields no figure."""
+
+    registry = _registry()
+    joint = _claim(
+        claim_id="joint",
+        surfaces=("doubao", "deepseek-chat"),
+        topic="audience_usage",
+        statement="Both assistants gained users.",
+        value_number=5.0,
+        label="combined assistant users",
+    )
+    rows = {r.id: r for r in L.build_landscape(registry, _projection(registry, [joint]), [joint])}
+    assert rows["doubao"].reach_metric is None
+    assert rows["deepseek-chat"].reach_metric is None
+
+
+def test_vendor_ambiguous_joint_claim_is_not_attributed():
+    """Review: a joint Google claim labelled 'Google AI users' must not be
+    attributed to either Gemini or AI Mode (the vendor token is ambiguous)."""
+
+    def g(sid, name):
+        return SurfaceConfig(
+            id=sid, vendor="Google", name=name, family=name,
+            type="conversational_assistant", tier="core_global",
+            regions=["global"], distribution=["web"], discovery_modes=["search"],
+            retrieval_status="partially_documented", official_urls=[f"https://{sid}.example/"],
+        )
+
+    registry = SurfacesConfig(surfaces=[g("google-gemini", "Gemini"), g("google-ai-mode", "Google Search AI Mode")])
+    joint = _claim(
+        claim_id="google-joint",
+        surfaces=("google-gemini", "google-ai-mode"),
+        topic="audience_usage",
+        statement="Google AI users grew.",
+        value_number=100.0,
+        label="Google AI users",
+    )
+    rows = {r.id: r for r in L.build_landscape(registry, _projection(registry, [joint]), [joint])}
+    assert rows["google-gemini"].reach_metric is None
+    assert rows["google-ai-mode"].reach_metric is None

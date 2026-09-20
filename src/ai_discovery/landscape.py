@@ -21,6 +21,7 @@ reach figure where one is evidenced, never as the organising layer.
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict
@@ -99,7 +100,7 @@ def _format_number(value: Any) -> str | None:
 
 
 def _reach(
-    claims: list[dict[str, Any]], surface_name: str
+    claims: list[dict[str, Any]], surface_name: str, vendor: str | None = None
 ) -> tuple[str | None, str | None, str | None]:
     """The single best evidenced reach/usage figure for a surface, if any.
 
@@ -113,7 +114,22 @@ def _reach(
     rank = {"unknown": 0, "low": 1, "medium": 2, "high": 3}
     best: tuple[str | None, str | None, str | None] = (None, None, None)
     best_key = (-1, -1)
-    name_lower = surface_name.lower()
+    # Distinctive tokens from the surface name (e.g. "Doubao / 豆包" -> {"doubao"}),
+    # so a joint claim is attributed only when its metric actually names THIS
+    # surface. Substring matching is deliberately conservative: a metric that does
+    # not name the surface yields no figure at all rather than a misattribution
+    # (issue #60 review: prefer dropping a figure over guessing its owner).
+    name = surface_name.lower()
+    vendor_tokens = {t for t in re.split(r"[^a-z0-9]+", (vendor or "").lower()) if t}
+    # Distinctive tokens exclude the vendor name: "Google" alone is ambiguous
+    # across Gemini and AI Mode, so a joint "Google AI users" claim must not be
+    # attributed to either — only a token specific to the surface (e.g. "gemini",
+    # "doubao") qualifies.
+    name_tokens = [
+        t
+        for t in re.split(r"[^a-z0-9]+", name)
+        if len(t) >= 3 and t not in vendor_tokens
+    ]
     for row in claims:
         if row.get("topic") != "audience_usage":
             continue
@@ -135,10 +151,8 @@ def _reach(
             unit = m.get("unit") or ""
             text = f"{label}: {value}{(' ' + unit) if unit else ''}"
             # Prefer a metric named for this surface; then by confidence.
-            names_surface = (
-                name_lower in str(label).lower()
-                or name_lower in str(m.get("scope") or "").lower()
-            )
+            haystack = f"{label} {m.get('scope') or ''}".lower()
+            names_surface = any(tok in haystack for tok in name_tokens)
             if multi and not names_surface:
                 continue
             key = (1 if names_surface else 0, rank.get(row.get("confidence"), 0))
@@ -234,7 +248,7 @@ def build_landscape(
             continue
         mechanics = projection.get(sid)
         coverage = mechanics.coverage() if mechanics else {"known": 0, "partially_known": 0, "conflicting": 0, "unknown": len(MECHANICS_DIMENSIONS)}
-        reach, reach_claim, reach_conf = _reach(by_surface.get(sid, []), config.name)
+        reach, reach_claim, reach_conf = _reach(by_surface.get(sid, []), config.name, config.vendor)
         out.append(
             LandscapeSurface(
                 id=config.id,

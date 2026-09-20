@@ -344,3 +344,29 @@ def test_alias_surface_filter_on_postgres_uses_the_jsonb_branch():
             conn.execution_options(isolation_level="AUTOCOMMIT")
             conn.execute(text(f'DROP DATABASE IF EXISTS "{dbname}"'))
         admin.dispose()
+
+
+def test_comparison_endpoint_rejects_duplicate_surface_ids(client, monkeypatch):
+    """Review: ?surfaces=chatgpt,chatgpt must not pass as a 2-surface comparison.
+
+    The endpoint dedupes before validating the 2-6 range, so a duplicate collapses
+    to one surface and fails the minimum (400), never reporting two.
+    """
+
+    c, _session, _engine = client
+    # A registry stub so the endpoint has canonical ids without a ledger.
+    from ai_discovery import api as A
+    from ai_discovery.registry import SurfaceConfig, SurfacesConfig
+
+    def _s(sid):
+        return SurfaceConfig(id=sid, vendor="V", name=sid, family=sid, type="conversational_assistant",
+                             tier="core_global", regions=["global"], distribution=["web"],
+                             discovery_modes=["search"], retrieval_status="partially_documented",
+                             official_urls=[f"https://{sid}.example/"])
+    monkeypatch.setattr(A, "_surface_registry_ids", lambda: ["chatgpt", "claude"])
+    monkeypatch.setattr("ai_discovery.registry.load_surfaces_config",
+                        lambda *a, **k: SurfacesConfig(surfaces=[_s("chatgpt"), _s("claude")]))
+
+    assert c.get("/landscape/comparison?surfaces=chatgpt,chatgpt").status_code == 400
+    assert c.get("/landscape/comparison?surfaces=chatgpt,claude").status_code == 200
+    assert c.get("/landscape/comparison?surfaces=chatgpt,nope").status_code == 400

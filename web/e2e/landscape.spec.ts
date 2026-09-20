@@ -47,3 +47,28 @@ test("comparison selection is stored in the URL", async ({ page }) => {
   await page.waitForTimeout(200);
   expect(page.url()).toMatch(/compare=/);
 });
+
+
+test("a shared ?compare= URL round-trips and survives back/forward", async ({ page }) => {
+  test.skip(!HAS_API, "requires EVIDENCE_API_URL or EVIDENCE_FIXTURE=1");
+  test.skip((page.viewportSize()?.width ?? 0) < 861, "desktop layout");
+
+  // Load a shared selection of two real surfaces.
+  await page.goto("/landscape?compare=chatgpt,deepseek-chat");
+  await expect(page.getByTestId("comparison-table")).toBeVisible();
+  // The rendered columns match the URL, not the curated default.
+  await expect(page.getByTestId("cmp-col-chatgpt")).toBeVisible();
+  await expect(page.getByTestId("cmp-col-deepseek-chat")).toBeVisible();
+  await expect(page.getByTestId("cmp-col-google-gemini")).toHaveCount(0);
+
+  // A user toggle updates the URL, and a fresh navigation honours the new one.
+  await page.goto("/landscape?compare=chatgpt,google-gemini");
+  await expect(page.getByTestId("cmp-col-google-gemini")).toBeVisible();
+  await expect(page.getByTestId("cmp-col-deepseek-chat")).toHaveCount(0);
+});
+
+test("an unknown id in a shared URL is surfaced, not silently dropped", async ({ page }) => {
+  test.skip(!HAS_API, "requires EVIDENCE_API_URL or EVIDENCE_FIXTURE=1");
+  await page.goto("/landscape?compare=chatgpt,not-a-surface");
+  await expect(page.getByTestId("compare-dropped")).toBeVisible();
+});

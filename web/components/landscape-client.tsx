@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { LandscapeGrid } from "@/components/landscape-grid";
 import { LandscapeComparison } from "@/components/landscape-comparison";
@@ -24,35 +24,56 @@ export function LandscapeClient({ projection }: { projection: LandscapeProjectio
   const pathname = usePathname();
 
   const availableIds = projection.surfaces.map((s) => s.id);
-  // Initial selection: the URL, else the curated default filtered to real ids.
-  const initial = useMemo(() => {
-    const fromUrl = parseComparisonIds(searchParams.get("compare"));
-    const base = fromUrl.length >= COMPARISON_MIN ? fromUrl : [...DEFAULT_COMPARISON_IDS];
-    return base.filter((id) => availableIds.includes(id)).slice(0, COMPARISON_MAX);
-    
+
+  // The URL is the source of truth for EXTERNAL navigation (a pasted shared link,
+  // back/forward). An ABSENT ?compare= means "use the curated default"; a PRESENT
+  // one is honoured verbatim (even below the compare minimum, where the UI just
+  // asks for one more) so a short shared selection is never silently reset.
+  const resolveFromUrl = useCallback((): Set<string> => {
+    const raw = searchParams.get("compare");
+    if (raw === null) {
+      return new Set([...DEFAULT_COMPARISON_IDS].filter((id) => availableIds.includes(id)));
+    }
+    return new Set(parseComparisonIds(raw).filter((id) => availableIds.includes(id)));
   }, [searchParams, availableIds]);
 
-  const [selected, setSelected] = useState<Set<string>>(new Set(initial));
+  const urlCompare = searchParams.get("compare");
+  const [selected, setSelected] = useState<Set<string>>(() => resolveFromUrl());
 
-  // Persist the comparison selection to the URL (shareable), like the plane.
+  // Re-derive only when the raw URL param changes underneath us AND differs from
+  // the state we would already serialize — so a shared link / back-forward updates
+  // the view, while a user toggle (which writes the same param) does not clobber
+  // local state (issue #60 review).
   useEffect(() => {
-    const ids = availableIds.filter((id) => selected.has(id));
-    const params = new URLSearchParams(searchParams.toString());
-    if (ids.length >= COMPARISON_MIN) params.set("compare", ids.join(","));
-    else params.delete("compare");
-    const qs = params.toString();
-    const next = qs ? `${pathname}?${qs}` : pathname;
-    window.history.replaceState(null, "", next);
-  }, [selected, availableIds, pathname, searchParams]);
+    const fromUrl = resolveFromUrl();
+    setSelected((prev) => {
+      const same =
+        prev.size === fromUrl.size && [...prev].every((id) => fromUrl.has(id));
+      return same ? prev : fromUrl;
+    });
+    // Keyed on the raw URL param; resolveFromUrl is stable per param.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlCompare]);
 
   const toggle = (id: string) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else if (next.size < COMPARISON_MAX) next.add(id);
-      return next;
-    });
+    const next = new Set(selected);
+    if (next.has(id)) next.delete(id);
+    else if (next.size < COMPARISON_MAX) next.add(id);
+    setSelected(next);
+    // A user-initiated change writes the URL so the view stays shareable. The
+    // param is always written (even below the minimum) so it round-trips exactly.
+    const ids = availableIds.filter((x) => next.has(x));
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("compare", ids.join(","));
+    window.history.replaceState(null, "", `${pathname}?${params.toString()}`);
   };
+
+  // Ids present in a shared URL that are not in this curated landscape are dropped
+  // (never fetched). Surface that explicitly rather than silently narrowing the
+  // comparison (issue #60 review: client and /landscape/comparison must not
+  // diverge silently; the endpoint is the validated API path).
+  const requestedIds = parseComparisonIds(searchParams.get("compare"));
+  const droppedIds = requestedIds.filter((id) => !availableIds.includes(id));
 
   const orderedSelected = availableIds.filter((id) => selected.has(id));
   const selectedSurfaces = projection.surfaces.filter((s) => selected.has(s.id));
@@ -92,6 +113,13 @@ export function LandscapeClient({ projection }: { projection: LandscapeProjectio
               ? ` (maximum ${COMPARISON_MAX}).`
               : "."}{" "}
           The selection is stored in the URL, so the comparison is shareable.
+          {droppedIds.length ? (
+            <span className="cmp-dropped" data-testid="compare-dropped">
+              {" "}
+              Ignored {droppedIds.length} id{droppedIds.length === 1 ? "" : "s"} not in
+              this landscape ({droppedIds.join(", ")}).
+            </span>
+          ) : null}
         </p>
         {orderedSelected.length >= COMPARISON_MIN ? (
           <LandscapeComparison projection={scoped} surfaces={projection.surfaces} />
