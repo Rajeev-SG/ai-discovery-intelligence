@@ -44,9 +44,9 @@ export function ReconciliationList({ relationships }: { relationships: ResolvedR
             </div>
             <p className="recon-group-note">{CATEGORY_NOTE[category]}</p>
             <div className="recon-rel-list">
-              {items.map((relationship) => (
+              {items.map((relationship, index) => (
                 <ReconciliationRelationship
-                  key={`${relationship.item.claim_ids.join("|")}:${relationship.item.relationship}:${relationship.item.state}`}
+                  key={`${category}:${index}`}
                   relationship={relationship}
                 />
               ))}

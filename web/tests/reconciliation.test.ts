@@ -160,6 +160,51 @@ describe("supersession", () => {
     expect(resolved.sides).toHaveLength(2);
     expect(resolved.sides.every((s) => s.claim !== null)).toBe(true);
   });
+
+  it("marks nothing when a supersedes/updates side has no observation time", () => {
+    const noDates = [semrush, { ...ahrefs, dates: {} }];
+    const resolved = joinRelationship(update, indexClaims(noDates));
+    expect(resolved.sides.some((s) => s.superseded)).toBe(false);
+    expect(resolved.sides).toHaveLength(2);
+  });
+
+  it("never marks a side for possible_transient_change (it asserts no precedence)", () => {
+    const transient: ReconciliationItem = {
+      ...update,
+      state: "possible_transient_change",
+      relationship: "contextualises",
+    };
+    const resolved = joinRelationship(transient, indexClaims([semrush, ahrefs]));
+    expect(resolved.sides.some((s) => s.superseded)).toBe(false);
+    expect(resolved.category).toBe("temporal");
+  });
+});
+
+describe("claims-ledger failure mode", () => {
+  it("flags every side as ledger-unavailable when the claim ledger cannot be read", () => {
+    const joined = joinReconciliation({ count: 1, items: [incomparable] }, null);
+    expect(joined[0].sides).toHaveLength(2);
+    expect(joined[0].sides.every((s) => s.claim === null)).toBe(true);
+    expect(joined[0].sides.every((s) => s.ledgerUnavailable)).toBe(true);
+  });
+
+  it("does not flag ledger-unavailable when the ledger loaded but a claim is absent", () => {
+    const joined = joinReconciliation({ count: 1, items: [incomparable] }, [semrush]);
+    const missing = joined[0].sides[1];
+    expect(missing.claim).toBeNull();
+    expect(missing.ledgerUnavailable).toBe(false);
+  });
+});
+
+describe("key collisions", () => {
+  it("keeps two relationships with identical (claims, relationship, state) distinct", () => {
+    const a = incomparable;
+    const b: ReconciliationItem = { ...incomparable, interpretation: "Second, different interpretation." };
+    const joined = joinReconciliation({ count: 2, items: [a, b] }, [semrush, ahrefs]);
+    expect(joined).toHaveLength(2);
+    // The list keys on category+index, so both survive with their own interpretation.
+    expect(joined[1].item.interpretation).toBe("Second, different interpretation.");
+  });
 });
 
 describe("formatting helpers", () => {

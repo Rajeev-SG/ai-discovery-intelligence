@@ -32,7 +32,9 @@ export default async function ReconciliationPage() {
         {reconciliation && (
           <p className="recon-source" data-testid="recon-total">
             {reconciliation.count} relationship{reconciliation.count === 1 ? "" : "s"} ·{" "}
-            {claims.length} claim{claims.length === 1 ? "" : "s"} resolved
+            {claims
+              ? `${claims.length} claim${claims.length === 1 ? "" : "s"} resolved`
+              : "claim ledger unreachable"}
           </p>
         )}
       </header>

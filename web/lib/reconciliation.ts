@@ -140,6 +140,12 @@ export interface ResolvedSide {
   surface: string | null;
   /** True when this side's evidence is superseded/updated by the other side. */
   superseded: boolean;
+  /**
+   * True when the claims ledger could not be fetched at all. Distinguishes
+   * "the ledger is unreachable" from "this claim is genuinely absent", so the
+   * UI never implies a claim does not exist when it merely could not be read.
+   */
+  ledgerUnavailable: boolean;
 }
 
 export interface ResolvedRelationship {
@@ -155,33 +161,32 @@ function observedAt(claim: ReconClaim | null): string | null {
 }
 
 /**
- * Mark the superseded side(s) for update-style relationships. The newer
- * observation supersedes the older; this is a factual ordering of the persisted
- * timestamps, not a re-derivation of the reconciliation decision. When no
- * timestamp is available the earlier-listed side is treated as the predecessor.
+ * Mark the superseded side(s) for relationships that assert precedence
+ * (`supersedes` / `updates`) and only when both sides carry a persisted
+ * observation time. `possible_transient_change` does not assert that one side
+ * supersedes the other, so it never marks a side. When the timestamps are
+ * missing or equal we mark nothing rather than guessing which side is older —
+ * the reviewer's rule is "unknown which side is newer", rendered as-is.
  */
 function markSuperseded(item: ReconciliationItem, sides: ResolvedSide[]): void {
-  const superseding =
-    item.relationship === "supersedes" ||
-    item.relationship === "updates" ||
-    item.state === "temporal_update";
-  if (!superseding) return;
+  const assertsPrecedence = item.relationship === "supersedes" || item.relationship === "updates";
+  if (!assertsPrecedence || sides.length < 2) return;
   const times = sides.map((s) => observedAt(s.claim));
-  const known = times.filter((t): t is string => t != null);
-  if (known.length >= 2) {
-    const newest = known.reduce((a, b) => (a > b ? a : b));
-    sides.forEach((side, i) => {
-      if (times[i] != null && times[i] !== newest) side.superseded = true;
-    });
-    return;
-  }
-  if (sides.length >= 2) sides[0].superseded = true;
+  if (times.some((t) => t == null)) return;
+  const known = times as string[];
+  const newest = known.reduce((a, b) => (a > b ? a : b));
+  const oldest = known.reduce((a, b) => (a < b ? a : b));
+  if (newest === oldest) return;
+  sides.forEach((side, i) => {
+    if (times[i] !== newest) side.superseded = true;
+  });
 }
 
 /** Resolve one persisted relationship against the claim ledger. */
 export function joinRelationship(
   item: ReconciliationItem,
   byId: Map<string, ReconClaim>,
+  ledgerUnavailable = false,
 ): ResolvedRelationship {
   const sides: ResolvedSide[] = item.claim_ids.map((raw) => {
     const ref = splitClaimRef(raw);
@@ -194,6 +199,7 @@ export function joinRelationship(
       metric,
       surface: claim?.surfaces && claim.surfaces.length > 0 ? claim.surfaces[0] : null,
       superseded: false,
+      ledgerUnavailable,
     };
   });
   markSuperseded(item, sides);
@@ -205,13 +211,19 @@ export function joinRelationship(
   };
 }
 
-/** Join a full reconciliation response against the claim ledger. */
+/**
+ * Join a full reconciliation response against the claim ledger. When the claim
+ * ledger is unreachable (`claims === null`) the relationships are still
+ * rendered — each side is flagged `ledgerUnavailable` so the UI says the ledger
+ * could not be read rather than implying the claim does not exist.
+ */
 export function joinReconciliation(
   response: ReconciliationResponse,
-  claims: readonly ReconClaim[],
+  claims: readonly ReconClaim[] | null,
 ): ResolvedRelationship[] {
-  const byId = indexClaims(claims);
-  return response.items.map((item) => joinRelationship(item, byId));
+  const byId = indexClaims(claims ?? []);
+  const ledgerUnavailable = claims === null;
+  return response.items.map((item) => joinRelationship(item, byId, ledgerUnavailable));
 }
 
 /** Human label for a relationship verb. */
@@ -275,11 +287,17 @@ function normalizeClaims(body: unknown): ReconClaim[] {
   return [];
 }
 
+/** Timeout for the evidence API so a hanging upstream cannot stall the page. */
+export const EVIDENCE_FETCH_TIMEOUT_MS = 5000;
+
 /** Fetch the canonical reconciliation ledger. Returns null on any failure. */
 export async function fetchReconciliation(): Promise<ReconciliationResponse | null> {
   if (!EVIDENCE_API_BASE) return null;
   try {
-    const res = await fetch(`${EVIDENCE_API_BASE}/reconciliation`, { cache: "no-store" });
+    const res = await fetch(`${EVIDENCE_API_BASE}/reconciliation`, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(EVIDENCE_FETCH_TIMEOUT_MS),
+    });
     if (!res.ok) return null;
     const body = (await res.json()) as { count?: number; items?: ReconciliationItem[] };
     return { count: body.count ?? body.items?.length ?? 0, items: body.items ?? [] };
@@ -288,14 +306,21 @@ export async function fetchReconciliation(): Promise<ReconciliationResponse | nu
   }
 }
 
-/** Fetch every claim so `claim_ids` entries can be resolved. Returns [] on failure. */
-export async function fetchClaims(): Promise<ReconClaim[]> {
-  if (!EVIDENCE_API_BASE) return [];
+/**
+ * Fetch every claim so `claim_ids` entries can be resolved. Returns null when
+ * the ledger could not be fetched (unlike an empty ledger, which returns `[]`),
+ * so the caller can distinguish "unreachable" from "no claims".
+ */
+export async function fetchClaims(): Promise<ReconClaim[] | null> {
+  if (!EVIDENCE_API_BASE) return null;
   try {
-    const res = await fetch(`${EVIDENCE_API_BASE}/claims`, { cache: "no-store" });
-    if (!res.ok) return [];
+    const res = await fetch(`${EVIDENCE_API_BASE}/claims`, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(EVIDENCE_FETCH_TIMEOUT_MS),
+    });
+    if (!res.ok) return null;
     return normalizeClaims(await res.json());
   } catch {
-    return [];
+    return null;
   }
 }

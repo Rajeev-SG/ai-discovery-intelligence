@@ -18,10 +18,21 @@ import {
 function SideValue({ side }: { side: ResolvedSide }) {
   const { claim, metric } = side;
   if (!claim) {
+    // Distinguish "the ledger could not be read" from "this claim is absent":
+    // claiming a referenced claim does not exist when the fetch simply failed
+    // would be misleading.
     return (
       <div className="recon-side recon-side-missing">
-        <p className="recon-side-missing-note">
-          Referenced claim <code>{side.ref.claim_id}</code> is not in the claim ledger.
+        <p className="recon-side-missing-note" data-testid="recon-side-ledger-state">
+          {side.ledgerUnavailable ? (
+            <>
+              Claim ledger unreachable — <code>{side.ref.claim_id}</code> could not be resolved.
+            </>
+          ) : (
+            <>
+              Referenced claim <code>{side.ref.claim_id}</code> is not in the claim ledger.
+            </>
+          )}
         </p>
       </div>
     );
