@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { BriefOutcome, BriefItem } from "@/lib/intel";
+import { clampText, type BriefOutcome, type BriefItem } from "@/lib/intel";
 import { formatDate } from "@/lib/evidence";
 import { CONFIDENCE_LABELS, evidenceHref, type ConfidenceLabel } from "@/lib/pov";
 
@@ -21,15 +21,15 @@ function BriefCard({ item }: { item: BriefItem }) {
         <span className="pill brief-significance">significance {item.significance.toFixed(2)}</span>
         {item.is_watch_item ? <span className="pill brief-watch">watch item</span> : null}
       </div>
-      <p className="brief-change">{item.change}</p>
+      <p className="brief-change">{clampText(item.change)}</p>
       <dl className="brief-why">
         <div>
           <dt>Why it matters</dt>
-          <dd>{item.why_it_matters}</dd>
+          <dd>{clampText(item.why_it_matters)}</dd>
         </div>
         <div>
           <dt>Agency action</dt>
-          <dd>{item.agency_action}</dd>
+          <dd>{clampText(item.agency_action)}</dd>
         </div>
       </dl>
       <p className="brief-meta">

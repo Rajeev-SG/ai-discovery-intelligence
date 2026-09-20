@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { EventsOutcome } from "@/lib/intel";
+import { eventTypeLabel, type EventsOutcome } from "@/lib/intel";
 import { formatDate } from "@/lib/evidence";
 import { evidenceHref } from "@/lib/pov";
 
@@ -11,20 +11,7 @@ import { evidenceHref } from "@/lib/pov";
  * surface evidence for the claim behind the event. When the backend is
  * unreachable the section says so rather than showing a misleading empty list.
  */
-const HOW_MANY = 8;
-
-/** Human labels for the persisted event types the feed emits. */
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  audience_shift: "Audience shift",
-  citation_source_shift: "Citation source shift",
-  commerce_ads: "Commerce and ads",
-  crawler_policy: "Crawler policy",
-  referral_measurement: "Referral measurement",
-};
-
-function eventTypeLabel(value: string): string {
-  return EVENT_TYPE_LABELS[value] ?? value.replace(/_/g, " ");
-}
+export const HOW_MANY = 8;
 
 /** Best available date for an event, honest about absence. */
 function eventDate(event: { effective_from?: string | null; published_at?: string | null; observed_at?: string | null }): string {
@@ -58,7 +45,14 @@ export function LandingChanges({ outcome }: { outcome: EventsOutcome }) {
           No material change event is currently recorded.
         </p>
       ) : (
-        <ol className="change-list" data-testid="change-list">
+        <>
+          {outcome.items.length > HOW_MANY ? (
+            <p className="change-truncation" data-testid="changes-truncation">
+              Showing the newest {HOW_MANY} of {outcome.items.length} changes.{" "}
+              <Link href="/surfaces">Explore surfaces for the full evidence set →</Link>
+            </p>
+          ) : null}
+          <ol className="change-list" data-testid="change-list">
           {items.map((event) => (
             <li className="change-item" key={event.id} data-testid={`change-${event.id}`}>
               <div className="change-item-head">
@@ -82,7 +76,8 @@ export function LandingChanges({ outcome }: { outcome: EventsOutcome }) {
               ) : null}
             </li>
           ))}
-        </ol>
+          </ol>
+        </>
       )}
     </section>
   );

@@ -676,6 +676,7 @@ main { flex: 1; }
 
 /* Latest material changes */
 .change-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.change-truncation { margin: 0 0 12px; color: var(--text-muted); font-size: 13px; }
 .change-item {
   padding: 14px 16px;
   border: 1px solid var(--border);
