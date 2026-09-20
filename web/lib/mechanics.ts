@@ -7,7 +7,7 @@
  * mechanics, states or evidence in React. Unknown is a first-class state the
  * backend emits explicitly; the UI must render it as information.
  */
-import { evidenceApiBase } from "./evidence";
+import { evidenceApiBase, fixtureMode } from "./evidence";
 
 export type MechanicsState = "known" | "partially_known" | "conflicting" | "unknown";
 
@@ -28,13 +28,32 @@ export interface MechanicsEvidence {
   effective_from: string | null;
   confidence: string;
   confidence_score: number | null;
+  /** Why the confidence is what it is — copied verbatim from the backend. */
+  confidence_rationale: string[];
+  /** Capture freshness as an explicit state; never a guess. */
+  freshness_state: string;
+  freshness_age_days: number | null;
   measurement_mode: string | null;
   methodology_notes: string | null;
+  methodology_completeness?: string;
   limitations: string[];
   modes: string[];
   regions: string[];
   relates_to_claim_id: string | null;
   relationship: string;
+  /** Persisted reconciliation records naming this claim (backend decision, reused). */
+  reconciliation?: ReconciliationRecord[];
+}
+
+/** One persisted reconciliation record, as the backend emitted it (never re-derived). */
+export interface ReconciliationRecord {
+  claim_ids: string[];
+  state: string;
+  relationship: string;
+  confidence_adjustment: number | null;
+  differences: string[];
+  unknown_dimensions: string[];
+  interpretation: string;
 }
 
 export interface MechanicsAssertion {
@@ -119,6 +138,48 @@ export async function fetchMechanics(): Promise<MechanicsOutcome> {
   } catch (error) {
     console.error("[mechanics] GET /mechanics failed:", error);
     return { status: "error", projection: null };
+  }
+}
+
+/** One surface's mechanics projection outcome (per-surface read path). */
+export interface SurfaceMechanicsOutcome {
+  status: MechanicsStatus | "unknown_surface";
+  surface: SurfaceMechanics | null;
+}
+
+/**
+ * Fetch ONE surface's mechanics projection. Server-only. Used by the evidence &
+ * trust layer so a surface shows its evidenced mechanics without loading the
+ * whole ledger projection. Reports an explicit outcome: an unreachable backend is
+ * never rendered as "unknown mechanics".
+ */
+export async function fetchSurfaceMechanics(surfaceId: string): Promise<SurfaceMechanicsOutcome> {
+  if (fixtureMode()) {
+    const { fixtureMechanics } = await import("./mechanics-fixtures");
+    const surface = fixtureMechanics(surfaceId);
+    return surface ? { status: "ok", surface } : { status: "empty", surface: null };
+  }
+  if (!evidenceApiBase()) {
+    return { status: "unconfigured", surface: null };
+  }
+  try {
+    const res = await fetch(`${evidenceApiBase()}/surfaces/${encodeURIComponent(surfaceId)}/mechanics`, {
+      next: { revalidate: 120 },
+      signal: AbortSignal.timeout(MECHANICS_FETCH_TIMEOUT_MS),
+    });
+    if (!res.ok) {
+      console.error(`[mechanics] GET /surfaces/${surfaceId}/mechanics failed: HTTP ${res.status}`);
+      return { status: "error", surface: null };
+    }
+    const body = (await res.json()) as SurfaceMechanics | { state?: string; dimensions?: [] };
+    if ("state" in body && body.state === "unknown_surface") {
+      return { status: "unknown_surface", surface: null };
+    }
+    const surface = body as SurfaceMechanics;
+    return { status: surface.dimensions?.length ? "ok" : "empty", surface };
+  } catch (error) {
+    console.error(`[mechanics] GET /surfaces/${surfaceId}/mechanics failed:`, error);
+    return { status: "error", surface: null };
   }
 }
 

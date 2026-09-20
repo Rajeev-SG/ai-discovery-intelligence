@@ -2,6 +2,7 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { EvidenceDetail } from "@/components/evidence-detail";
+import { MechanicsTrustPanel } from "@/components/mechanics-trust";
 import type { SurfaceRow } from "@/lib/surfaces";
 
 interface DetailDrawerProps {
@@ -75,6 +76,15 @@ export function DetailDrawer({ row, open, onOpenChange, label }: DetailDrawerPro
 
                 <Section title="Discovery modes">
                   <ChipList values={row.discoveryModeLabels} empty="No discovery mode recorded yet." />
+                </Section>
+
+                <Section title="Evidence & trust">
+                  <p className="detail-lead">
+                    How we know this, how strong the evidence is, and where sources disagree —
+                    grouped by discovery-mechanics dimension. Each finding carries its publisher,
+                    public source, evidence class, dates, confidence and methodology.
+                  </p>
+                  <MechanicsTrustPanel surfaceId={row.id} />
                 </Section>
 
                 <Section title="Retrieval architecture (registry metadata)">

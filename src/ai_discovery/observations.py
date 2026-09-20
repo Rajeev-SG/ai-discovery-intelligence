@@ -157,19 +157,31 @@ def _parse(value: Any) -> dt.datetime | None:
 def surface_evidence(
     claims: list[dict[str, Any]], change_events: list[ChangeEvent]
 ) -> dict[str, dict]:
-    """Per-surface view: claims + latest material change, or an explicit no-evidence state."""
+    """Per-surface view: claims + latest material change, or an explicit no-evidence state.
+
+    A claim stores the surface as the source page wrote it, which may be an alias
+    (``deepseek``) for the canonical registry id (``deepseek-chat``). Grouping by
+    the *canonical* id — the same resolution the mechanics projection uses — keeps
+    the two read paths consistent: otherwise a surface with aliased claims shows
+    "No evidence" here while its mechanics projection shows evidence (issue #58).
+    Resolution is read-time only; stored claims are never rewritten.
+    """
+
+    from .registry import resolve_surface_id
 
     by_surface: dict[str, dict] = {}
     for claim in claims:
         for surface in claim.get("surfaces") or []:
+            canonical = resolve_surface_id(surface)
             entry = by_surface.setdefault(
-                surface, {"surface": surface, "claims": [], "latest_change": None}
+                canonical, {"surface": canonical, "claims": [], "latest_change": None}
             )
             entry["claims"].append(claim)
     for event in sorted(change_events, key=lambda e: e.published_at or e.observed_at, reverse=True):
         for surface in event.surfaces:
+            canonical = resolve_surface_id(surface)
             entry = by_surface.setdefault(
-                surface, {"surface": surface, "claims": [], "latest_change": None}
+                canonical, {"surface": canonical, "claims": [], "latest_change": None}
             )
             if entry["latest_change"] is None:
                 entry["latest_change"] = event_view(event)

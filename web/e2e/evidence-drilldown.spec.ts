@@ -72,9 +72,9 @@ test("no-evidence surface: explicit state, no contradictory chrome", async ({ pa
   test.skip((page.viewportSize()?.width ?? 0) < 861, DESKTOP_ONLY);
 
   await page.goto("/surfaces");
-  await page.getByTestId("search-input").fill("DeepSeek");
-  await page.getByTestId("row-deepseek-chat").scrollIntoViewIfNeeded();
-  await page.getByTestId("cell-deepseek-chat-evidence").click();
+  await page.getByTestId("search-input").fill("Grok");
+  await page.getByTestId("row-grok").scrollIntoViewIfNeeded();
+  await page.getByTestId("cell-grok-evidence").click();
 
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();

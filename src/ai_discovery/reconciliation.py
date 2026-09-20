@@ -434,3 +434,34 @@ def _same_value(first: StudyClaim, second: StudyClaim) -> bool:
     if first.value is None or second.value is None:
         return False
     return abs(first.value - second.value) <= 1e-9 * max(1.0, abs(first.value))
+
+
+def reconciliation_index(rows: list[dict]) -> dict[str, list[dict]]:
+    """Index persisted reconciliation by the claim ids it relates.
+
+    Issue #58: the evidence/trust layer shows conflicts *inline* on a mechanics
+    dimension without reimplementing reconciliation in React. This reuses
+    :func:`reconcile_persisted` unchanged and reshapes its output so the frontend
+    only has to join on ``claim_id`` — the same read-time join it already performs
+    for the reconciliation page. Claim ids are the ``<claim_id>:<metric_id>`` form
+    the comparison uses; the bare claim id is also indexed so a UI holding only a
+    claim id still finds its relationships.
+    """
+
+    index: dict[str, list[dict]] = {}
+    for rec in reconcile_persisted(rows):
+        payload = {
+            "claim_ids": list(rec.claim_ids),
+            "state": rec.state,
+            "relationship": rec.relationship,
+            "confidence_adjustment": rec.confidence_adjustment,
+            "differences": list(rec.differences),
+            "unknown_dimensions": list(rec.unknown_dimensions),
+            "interpretation": rec.interpretation,
+        }
+        for cid in rec.claim_ids:
+            index.setdefault(cid, []).append(payload)
+            bare = cid.split(":", 1)[0]
+            if bare != cid:
+                index.setdefault(bare, []).append(payload)
+    return index

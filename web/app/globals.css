@@ -782,3 +782,64 @@ main { flex: 1; }
   border: 1px solid rgba(217, 164, 65, 0.35);
   vertical-align: middle;
 }
+
+/* ---------------------------------------------------------------------- */
+/* Evidence & trust layer (issue #58).                                    */
+/* Renders the backend mechanics projection with simple evidence classes. */
+/* ---------------------------------------------------------------------- */
+.trust { display: flex; flex-direction: column; gap: 16px; }
+.trust-summary { margin: 0; color: var(--text-muted); font-size: 13px; }
+.trust-dimensions { display: flex; flex-direction: column; gap: 14px; }
+.trust-dimension {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--surface);
+}
+.trust-dimension.state-conflicting { border-color: rgba(217, 100, 65, 0.5); }
+.trust-dimension.state-partially_known { border-color: rgba(217, 164, 65, 0.4); }
+.trust-dimension-head { display: flex; align-items: center; gap: 8px; }
+.trust-dimension-head h3 { margin: 0; font-size: 14px; }
+.trust-definition { margin: 4px 0 8px; color: var(--text-muted); font-size: 12px; }
+.trust-assertion { margin-top: 8px; }
+.trust-statement { margin: 0 0 8px; font-size: 13px; line-height: 1.5; }
+.trust-conflict-note { margin: 0 0 8px; font-size: 12px; color: #e0a97a; }
+.trust-evidence-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.trust-evidence {
+  border-left: 3px solid var(--border);
+  padding: 8px 10px;
+  background: var(--bg);
+  border-radius: 0 6px 6px 0;
+}
+.trust-evidence.tone-official { border-left-color: #4f9d69; }
+.trust-evidence.tone-observed { border-left-color: #c07bd1; }
+.trust-evidence.tone-independent { border-left-color: #4f83c4; }
+.trust-evidence-head { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.chip-class.tone-official { background: #16281d; color: #7bd39a; }
+.chip-class.tone-observed { background: #29182e; color: #d9a3e6; }
+.chip-class.tone-independent { background: #16212e; color: #8fbde8; }
+.chip-conflict { background: #2e1a16; color: #e6a08f; }
+.chip-freshness { background: var(--surface); color: var(--text-muted); }
+.trust-evidence-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 12px; margin: 0 0 6px; font-size: 12px; }
+.trust-evidence-grid dt { color: var(--text-muted); font-size: 11px; }
+.trust-evidence-grid dd { margin: 0 0 4px; overflow-wrap: anywhere; }
+.trust-why, .trust-methodology, .trust-limitations, .trust-scope { margin: 4px 0 0; font-size: 12px; line-height: 1.5; }
+.trust-conflicts { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.trust-conflict {
+  border: 1px solid rgba(217, 100, 65, 0.4);
+  border-radius: 6px;
+  padding: 8px;
+  background: #1d1310;
+}
+.trust-conflict-text { margin: 6px 0; font-size: 12px; }
+.trust-conflict-link { font-size: 12px; }
+.trust-technical { margin-top: 8px; }
+.trust-technical summary { font-size: 12px; cursor: pointer; color: var(--text-muted); }
+.trust-technical-line { font-size: 11px; color: var(--text-muted); overflow-wrap: anywhere; }
+.trust-unknown-list { font-size: 12px; }
+.trust-unknown-list summary { cursor: pointer; color: var(--text-muted); }
+.trust-unknown-list ul { margin: 8px 0 0; padding-left: 18px; }
+
+@media (max-width: 640px) {
+  .trust-evidence-grid { grid-template-columns: 1fr; }
+}

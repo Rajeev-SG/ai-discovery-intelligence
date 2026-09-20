@@ -297,3 +297,28 @@ def test_provenance_validator_accepts_all_three_honest_combinations():
     # Neither flag: an unreviewed, unverified llm_proposal is never evidence.
     with pytest.raises(ValidationError):
         ExtractionProvenance(method="llm_proposal", tool="t", version="v")
+
+
+def test_llm_lane_persists_explainable_confidence(ledger_db, monkeypatch):
+    """Issue #58 / rule 11: a persisted ``llm_proposal`` claim must carry the
+    evidence-derived confidence *inputs and rationale*, not just a hardcoded label,
+    so the marketer trust layer can explain why the confidence is what it is."""
+
+    from ai_discovery import claim_pipeline
+    from ai_discovery.db import session_scope
+
+    capture_hash = "b" * 64
+    _seed_evidence(ledger_db, capture_hash)
+    monkeypatch.setattr(claim_pipeline, "semantic_extract", lambda **_kw: _result())
+
+    with session_scope() as session:
+        run = extract_pending_claims(session, limit=5)
+    assert run.claims_created == 1, run.failures
+
+    rows = C.load_expanded_claims(ledger_db)
+    assert len(rows) == 1
+    row = rows[0]
+    assert row["confidence"] in ("high", "medium", "low", "unknown")
+    assert row["confidence_detail"]["inputs"], "confidence inputs must be persisted"
+    assert row["confidence_detail"]["rationale"], "confidence rationale must be persisted"
+    assert row["confidence_detail"]["derived"] is True

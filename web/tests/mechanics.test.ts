@@ -4,6 +4,7 @@ import {
   dimensionEvidenceClass,
   evidenceClassLabel,
   evidencedDimensions,
+  type MechanicsEvidence,
   type SurfaceMechanics,
 } from "../lib/mechanics";
 import { RETRIEVAL_UNKNOWNS_SOURCE, retrievalUnknowns } from "../lib/surfaces";
@@ -77,6 +78,9 @@ describe("mechanics contract helpers", () => {
             effective_from: null,
             confidence: "high",
             confidence_score: null,
+            confidence_rationale: [],
+            freshness_state: "unknown",
+            freshness_age_days: null,
             measurement_mode: null,
             methodology_notes: null,
             limitations: [],
@@ -94,5 +98,76 @@ describe("mechanics contract helpers", () => {
   it("treats registry retrieval-unknowns as registry metadata, not evidence", () => {
     expect(RETRIEVAL_UNKNOWNS_SOURCE).toBe("registry_metadata");
     expect(retrievalUnknowns("under_documented").length).toBeGreaterThan(0);
+  });
+});
+
+describe("evidence & trust helpers (issue #58)", () => {
+  const ev = (over: Partial<MechanicsEvidence> = {}): MechanicsEvidence => ({
+    claim_id: "c1",
+    source_id: null,
+    publisher: "OpenAI",
+    url: "https://platform.openai.com/docs/bots",
+    source_class: "official",
+    evidence_class: "official_documentation",
+    published_at: "2026-09-01",
+    observed_at: "2026-09-19T00:00:00Z",
+    effective_from: null,
+    confidence: "high",
+    confidence_score: 0.9,
+    confidence_rationale: ["source_authority: 1.00 (official)"],
+    freshness_state: "fresh",
+    freshness_age_days: 1,
+    measurement_mode: "official_documentation",
+    methodology_notes: "Vendor docs",
+    limitations: [],
+    modes: [],
+    regions: [],
+    relates_to_claim_id: null,
+    relationship: "new",
+    reconciliation: [],
+    ...over,
+  });
+
+  it("keeps the three classes distinct and labelled", () => {
+    expect(evidenceClassLabel("official_documentation")).toBe("Vendor-documented");
+    expect(evidenceClassLabel("independent_research")).toBe("Independently researched");
+    expect(evidenceClassLabel("controlled_observation")).toBe("Directly observed");
+  });
+
+  it("reports no-evidence for a surface whose dimensions are all unknown", () => {
+    const s = surface({ dimensions: [] });
+    expect(s.evidenced_dimension_count).toBe(0);
+    expect(evidencedDimensions(s)).toEqual([]);
+  });
+
+  it("carries inline reconciliation records verbatim from the backend", () => {
+    const withConflict = ev({
+      reconciliation: [
+        {
+          claim_ids: ["c1", "c2"],
+          state: "material_conflict",
+          relationship: "contradicts",
+          confidence_adjustment: -0.2,
+          differences: ["value"],
+          unknown_dimensions: [],
+          interpretation: "The two readings disagree.",
+        },
+      ],
+    });
+    expect(withConflict.reconciliation?.[0].state).toBe("material_conflict");
+    expect(withConflict.reconciliation?.[0].relationship).toBe("contradicts");
+  });
+
+  it("distinguishes official documentation from controlled observation", () => {
+    const observed = ev({ source_class: "controlled_observation", evidence_class: "controlled_observation" });
+    expect(evidenceClassLabel(observed.evidence_class)).not.toBe(
+      evidenceClassLabel(ev().evidence_class),
+    );
+  });
+
+  it("represents unknown freshness explicitly rather than guessing", () => {
+    const unknownFresh = ev({ freshness_state: "unknown", freshness_age_days: null });
+    expect(unknownFresh.freshness_state).toBe("unknown");
+    expect(unknownFresh.freshness_age_days).toBeNull();
   });
 });

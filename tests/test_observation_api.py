@@ -200,3 +200,89 @@ def test_degraded_ledger_without_event_tables_is_operator_visible(client, caplog
         body = c.get("/events").json()
     assert body["count"] == 0
     assert any("change_event" in r.message for r in caplog.records)
+
+
+def test_surface_evidence_resolves_aliases_like_the_mechanics_path(client):
+    """Issue #58: a surface whose claims are stored under an alias must resolve to
+    the canonical registry id in the evidence read path too, so it renders its
+    evidence instead of a false "No evidence" (the gap #58 fixes)."""
+
+    c, _session, engine = client
+    # A real, validated claim stored under the alias "deepseek" (not the registry
+    # id "deepseek-chat"). Distinct content so it is not deduped against the
+    # fixture's widget-search claim.
+    C.persist_claim(
+        engine,
+        _claim_record(
+            surfaces=["deepseek"],
+            statement="DeepSeek had 9.9M monthly visits in February 2026.",
+        ),
+    )
+
+    aliased = c.get("/surfaces/deepseek-chat/evidence").json()
+    assert aliased["evidence_state"] == "evidenced"
+    assert aliased["claims"]
+
+    # The same claim is found by the per-surface claims filter.
+    assert c.get("/claims?surface=deepseek-chat").json()["total"] == 1
+
+    # The bulk projection is keyed by the canonical id, not the raw alias.
+    bulk = c.get("/surface-evidence").json()["surfaces"]
+    assert "deepseek-chat" in bulk
+    assert "deepseek" not in bulk
+
+
+def test_mechanics_endpoint_inlines_reconciliation_for_conflicting_claims(client, monkeypatch):
+    """Issue #58: the mechanics endpoint joins the backend reconciliation index onto
+    each evidence entry, so a conflict renders inline without React re-deriving it."""
+
+    c, _session, _engine = client
+    # Two real-shaped ledger rows that disagree on the same surface/subject/metric.
+    # Monkeypatch the ledger read so the test exercises the API wiring, not
+    # extraction (the alias path already has its own end-to-end test).
+    def _row(visits, claim_id):
+        return {
+            "claim_id": claim_id,
+            "topic": "retrieval_index",
+            "statement": f"ChatGPT retrieved ~{visits} results per query.",
+            "surfaces": ["chatgpt"],
+            "status": "current",
+            "relationship": "new",
+            "confidence": "medium",
+            "confidence_detail": {"score": 0.5, "inputs": {}, "rationale": [], "derived": True},
+            "source": {
+                "source_id": "s",
+                "publisher": "P",
+                "url": "https://example.test/x",
+                "source_class": "official",
+            },
+            "dates": {"published_at": "2026-01-02", "observed_at": "2026-09-16T00:00:00+00:00"},
+            "methodology": {"measurement_mode": "vendor_estimate"},
+            "metrics": [
+                {
+                    "metric_id": "count",
+                    "label": "Results per query",
+                    "value_number": visits,
+                    "unit": "results",
+                }
+            ],
+            "provenance": [],
+            "evidence": [],
+            "extraction": {},
+        }
+
+    rows = [_row(2.4, "cr1"), _row(0.6, "cr2")]
+    monkeypatch.setattr("ai_discovery.claims.load_expanded_claims", lambda *a, **k: rows)
+
+    body = c.get("/mechanics").json()
+    surface = body["surfaces"].get("chatgpt")
+    assert surface is not None
+    recon_seen = [
+        rec
+        for dim in surface["dimensions"]
+        for a in dim["assertions"]
+        for e in a["evidence"]
+        for rec in e["reconciliation"]
+    ]
+    assert recon_seen, "expected an inline reconciliation record for differing claims"
+    assert all(rec["state"] and rec["relationship"] for rec in recon_seen)

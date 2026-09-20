@@ -327,6 +327,14 @@ class MechanicsEvidence(BaseModel):
     effective_from: dt.date | None = None
     confidence: str
     confidence_score: float | None = None
+    #: Why the confidence is what it is, copied verbatim from the evidence-derived
+    #: confidence rationale (issue #58: "a one-line why this confidence"). A
+    #: marketer can read the reason without learning the confidence model.
+    confidence_rationale: tuple[str, ...] = ()
+    #: Freshness of the capture the claim rests on, as an explicit state. Never a
+    #: guess: an absent timestamp is ``unknown``.
+    freshness_state: str = "unknown"
+    freshness_age_days: int | None = None
     measurement_mode: str | None = None
     methodology_notes: str | None = None
     limitations: tuple[str, ...] = ()
@@ -466,6 +474,29 @@ def _iso_date(value: Any) -> dt.date | None:
         return None
 
 
+def _freshness_of(observed: dt.datetime | None) -> dict[str, Any]:
+    """Capture freshness as an explicit state, mirroring the observations read model.
+
+    Kept here (not imported) so the mechanics contract has one owner for its own
+    payload shape; the thresholds match ``observations._freshness`` exactly.
+    """
+
+    if observed is None:
+        return {"state": "unknown", "age_days": None}
+    if observed.tzinfo is None:
+        observed = observed.replace(tzinfo=dt.UTC)
+    age = (dt.datetime.now(dt.UTC) - observed).days
+    if age <= 7:
+        state = "fresh"
+    elif age <= 45:
+        state = "recent"
+    elif age <= 180:
+        state = "aging"
+    else:
+        state = "stale"
+    return {"state": state, "age_days": age}
+
+
 def _methodology_completeness(methodology: dict[str, Any]) -> str:
     """How much methodology the claim actually states (never read null as absent)."""
 
@@ -512,8 +543,13 @@ def _evidence_from_claim(row: dict[str, Any], canonical_scope: str | None = None
     if geo:
         regions = (str(geo),)
 
+    rationale = tuple((row.get("confidence_detail") or {}).get("rationale") or ())
+    fresh = _freshness_of(parsed_observed)
     raw_surfaces = list(row.get("surfaces") or [])
     return MechanicsEvidence(
+        confidence_rationale=rationale,
+        freshness_state=fresh["state"],
+        freshness_age_days=fresh["age_days"],
         claim_id=row["claim_id"],
         source_id=source.get("source_id"),
         publisher=source.get("publisher"),
@@ -721,8 +757,17 @@ def project_all(
 # --------------------------------------------------------------------------- #
 
 
-def dimension_view(state: DimensionState) -> dict[str, Any]:
-    """The marketer-safe view of one mechanics dimension."""
+def dimension_view(
+    state: DimensionState, reconciliation: dict[str, list[dict]] | None = None
+) -> dict[str, Any]:
+    """The marketer-safe view of one mechanics dimension.
+
+    ``reconciliation`` is the read-only index from
+    :func:`ai_discovery.reconciliation.reconciliation_index`. When present, each
+    evidence entry carries the persisted reconciliation records that name its
+    claim, so a conflict renders *inline* without reimplementing reconciliation in
+    React (issue #58). The backend decision is shown verbatim; the UI only joins.
+    """
 
     meta = DIMENSION_META.get(state.dimension, {})
     return {
@@ -749,6 +794,9 @@ def dimension_view(state: DimensionState) -> dict[str, Any]:
                         "effective_from": e.effective_from.isoformat() if e.effective_from else None,
                         "confidence": e.confidence,
                         "confidence_score": e.confidence_score,
+                        "confidence_rationale": list(e.confidence_rationale),
+                        "freshness_state": e.freshness_state,
+                        "freshness_age_days": e.freshness_age_days,
                         "measurement_mode": e.measurement_mode,
                         "methodology_notes": e.methodology_notes,
                         "limitations": list(e.limitations),
@@ -759,6 +807,7 @@ def dimension_view(state: DimensionState) -> dict[str, Any]:
                         "claimed_surface_value": e.claimed_surface_value,
                         "canonical_surface_id": e.canonical_surface_id,
                         "methodology_completeness": e.methodology_completeness,
+                        "reconciliation": (reconciliation or {}).get(e.claim_id, []),
                     }
                     for e in a.evidence
                 ],
@@ -792,12 +841,14 @@ def unmapped_claim_surfaces(
     return {sid: sorted(ids) for sid, ids in sorted(seen.items())}
 
 
-def mechanics_view(mechanics: SurfaceMechanics) -> dict[str, Any]:
+def mechanics_view(
+    mechanics: SurfaceMechanics, reconciliation: dict[str, list[dict]] | None = None
+) -> dict[str, Any]:
     """The marketer-safe payload for one surface's mechanics projection."""
 
     return {
         "surface": mechanics.surface_id,
-        "dimensions": [dimension_view(d) for d in mechanics.dimensions],
+        "dimensions": [dimension_view(d, reconciliation) for d in mechanics.dimensions],
         "coverage": mechanics.coverage(),
         "evidenced_dimension_count": mechanics.evidenced_dimension_count(),
         "dimension_count": len(MECHANICS_DIMENSIONS),

@@ -413,6 +413,15 @@ def _surface_registry_ids() -> list[str]:
         return []
 
 
+def _canonical_surfaces(row: dict, registry_ids: list[str]) -> set[str]:
+    """The canonical registry ids a claim names (alias-resolved, drift ignored)."""
+
+    from .registry import resolve_surface_id
+
+    known = set(registry_ids)
+    return {resolve_surface_id(s) for s in (row.get("surfaces") or []) if resolve_surface_id(s) in known}
+
+
 @app.get("/mechanics", tags=["mechanics"])
 def list_mechanics(db: Session = Depends(get_db)) -> dict:  # noqa: B008 - FastAPI DI
     """Marketer-safe mechanics projection for every registry surface.
@@ -430,6 +439,7 @@ def list_mechanics(db: Session = Depends(get_db)) -> dict:  # noqa: B008 - FastA
         mechanics_view,
         unmapped_claim_surfaces,
     )
+    from .reconciliation import reconciliation_index
 
     # Raw expanded ledger rows: the projection needs each claim's methodology and
     # provenance, not just the product-shaped claim view. cached_project_all
@@ -438,10 +448,13 @@ def list_mechanics(db: Session = Depends(get_db)) -> dict:  # noqa: B008 - FastA
     claims = load_expanded_claims(_ledger_engine(db))
     projection = cached_project_all(registry_ids, claims)
     unmapped = unmapped_claim_surfaces(registry_ids, claims)
+    # Inline conflict context (issue #58): reuse the one reconciliation service so
+    # the UI never re-implements it. Read-only index keyed by claim id.
+    recon = reconciliation_index(claims)
     return {
         "dimension_count": len(MECHANICS_DIMENSIONS),
         "count": len(projection),
-        "surfaces": {sid: mechanics_view(m) for sid, m in projection.items()},
+        "surfaces": {sid: mechanics_view(m, recon) for sid, m in projection.items()},
         # Diagnostic only: claim surface ids absent from the registry (drift).
         "unmapped_claim_surfaces": unmapped,
     }
@@ -460,6 +473,7 @@ def get_surface_mechanics(
 
     from .claims import load_expanded_claims
     from .mechanics import cached_project_surface, mechanics_view
+    from .reconciliation import reconciliation_index
 
     registry_ids = _surface_registry_ids()
     if surface_id not in registry_ids:
@@ -472,4 +486,7 @@ def get_surface_mechanics(
     # A single-surface request projects only that surface, and reuses the cache
     # when the ledger is unchanged (review F3/D1).
     claims = load_expanded_claims(_ledger_engine(db))
-    return mechanics_view(cached_project_surface(surface_id, claims))
+    # Only reconcile the claims on this surface: reconciliation is pairwise within
+    # a (surface, subject) group, so a same-surface subset yields identical records.
+    scoped = [c for c in claims if surface_id in _canonical_surfaces(c, registry_ids)]
+    return mechanics_view(cached_project_surface(surface_id, claims), reconciliation_index(scoped))

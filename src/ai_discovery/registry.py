@@ -175,3 +175,20 @@ def resolve_surface_id(value: str) -> str:
     """Map a claim's surface value to a canonical registry id (identity if unknown)."""
 
     return SURFACE_ALIASES.get(value, value)
+
+
+def surface_id_variants(canonical_id: str) -> tuple[str, ...]:
+    """Every stored ``surfaces`` value that resolves to ``canonical_id``.
+
+    The ledger is append-only and stores a surface as the source page wrote it, so
+    a claim may carry an alias (``deepseek``) rather than the registry id
+    (``deepseek-chat``). A read path that filters or groups by surface must match
+    *all* of a surface's spellings, not just the canonical one, or a surface with
+    aliased claims renders as "No evidence" while its mechanics projection shows
+    evidence (the exact drift issue #58 fixes). Resolution stays read-time only:
+    stored claims are never rewritten.
+    """
+
+    variants = [canonical_id]
+    variants.extend(alias for alias, target in SURFACE_ALIASES.items() if target == canonical_id)
+    return tuple(dict.fromkeys(variants))

@@ -2,6 +2,27 @@
 
 This file records repository/product changes. The generated intelligence changelog will live separately in the canonical data store and `pov/CHANGELOG.md` once implemented.
 
+## 2026-09-20 (issue #58)
+
+- **Surface-alias read-path fix.** `/surface-evidence` and
+  `/surfaces/{id}/evidence` (and the `?surface=` claim filter) resolve a claim's
+  surface value to the canonical registry id at read time — the same resolution
+  the mechanics projection uses — so a surface whose claims were stored under an
+  alias (`deepseek`, `naver-ai-tab`, `kanana-in-kakaotalk`) shows its real
+  evidence instead of a false "No evidence". Stored claims are never rewritten.
+- **Marketer-facing evidence & trust layer.** Every evidenced mechanic now
+  carries `confidence_rationale` (a one-line "why this confidence"), freshness,
+  publisher, public URL, evidence class, dates and methodology; the mechanics
+  endpoints join the single reconciliation service onto each evidence entry so
+  conflicts render inline. New UI (`web/components/mechanics-trust.tsx`) renders
+  the three simple evidence classes with the technical record behind progressive
+  disclosure, wired into the surface detail drawer under "Evidence & trust".
+- **Explainable confidence for the LLM lane.** The `llm_proposal` extraction lane
+  no longer hardcodes `medium`; it derives confidence from evidence like the
+  deterministic lane (repo rule 11 / issue #28A), so every persisted claim can
+  explain its label.
+- Proven on the real production ledger; see `proof/phase2/ISSUE_58_PROOF.md`.
+
 ## 2026-09-19 (issue #7)
 
 - Living POV shipped as product data: `pov/state.yaml` (stable proposition ids,

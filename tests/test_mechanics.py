@@ -9,6 +9,7 @@ no supporting claim is an explicit unknown. Tests cover all four states plus the
 from __future__ import annotations
 
 import copy
+import datetime as dt
 
 import pytest
 from pydantic import ValidationError
@@ -438,3 +439,73 @@ def test_ledger_token_is_honest_about_in_place_edits():
     edited = copy.deepcopy(a)
     edited[0]["statement"] = "a corrected statement"
     assert M.ledger_token(a) == M.ledger_token(edited)
+
+
+# --------------------------------------------------------------------------- #
+# Issue #58: the trust layer's evidence contract — why-confidence, freshness,
+# and inline reconciliation (reused verbatim, never re-derived)
+# --------------------------------------------------------------------------- #
+
+
+def test_evidence_carries_confidence_rationale_and_freshness():
+    """Issue #58: each evidence entry states why its confidence is what it is and
+    how fresh the capture is, so a marketer can judge trust in one interaction."""
+
+    row = _claim(
+        observed_at=dt.datetime.now(dt.UTC).isoformat(),
+    )
+    row["confidence_detail"] = {
+        "score": 0.82,
+        "inputs": {"source_authority": 1.0},
+        "rationale": ["source_authority: 1.00 (official)", "recency: captured 2d after publication"],
+        "derived": True,
+    }
+    m = M.project_surface("chatgpt", [row])
+    ev = m.dimension("crawling_indexing_controls").assertions[0].evidence[0]
+    assert ev.confidence_rationale and "source_authority" in ev.confidence_rationale[0]
+    assert ev.freshness_state == "fresh"
+    assert ev.freshness_age_days == 0
+
+
+def test_freshness_is_unknown_without_a_timestamp():
+    """An absent observation time is an explicit unknown, never a guess."""
+
+    row = _claim(observed_at=None)
+    ev = M.project_surface("chatgpt", [row]).dimension("crawling_indexing_controls").assertions[0].evidence[0]
+    assert ev.freshness_state == "unknown"
+    assert ev.freshness_age_days is None
+
+
+def test_dimension_view_inlines_reconciliation_verbatim():
+    """Issue #58: conflicts render inline by joining the backend reconciliation
+    index onto each evidence entry; nothing is re-derived in the presentation."""
+
+    row = _claim(claim_id="c1")
+    recon = {
+        "c1": [
+            {
+                "claim_ids": ["c1", "c2"],
+                "state": "material_conflict",
+                "relationship": "contradicts",
+                "confidence_adjustment": -0.2,
+                "differences": ["value"],
+                "unknown_dimensions": [],
+                "interpretation": "The two readings disagree on the same quantity.",
+            }
+        ]
+    }
+    view = M.dimension_view(
+        M.project_surface("chatgpt", [row]).dimension("crawling_indexing_controls"), recon
+    )
+    entry = view["assertions"][0]["evidence"][0]
+    assert entry["reconciliation"][0]["state"] == "material_conflict"
+    assert entry["reconciliation"][0]["relationship"] == "contradicts"
+
+
+def test_dimension_view_has_empty_reconciliation_when_none_supplied():
+    row = _claim(claim_id="c1")
+    view = M.dimension_view(
+        M.project_surface("chatgpt", [row]).dimension("crawling_indexing_controls"), None
+    )
+    assert view["assertions"][0]["evidence"][0]["reconciliation"] == []
+
