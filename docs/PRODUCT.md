@@ -57,3 +57,15 @@ topic. Every implication carries its supporting claim ids, applicable
 surfaces/modes/regions, confidence, actionability (distinct from confidence),
 significance, and any contradicting evidence. Unknown is a valid output: a surface
 with no actionable evidenced mechanic returns an explicit monitor-only state.
+
+## Marketer-first landscape (issue #60)
+
+The first front-door answer — "what AI discovery surfaces exist, and how do they
+differ?" — is a curated landscape over the registry
+(`src/ai_discovery/landscape.py`), not the 35-surface analyst matrix. Each surface
+shows name/vendor, type, priority/geography, one evidenced reach figure,
+discovery modes, mechanics coverage and a one-line relevance; a comparison matrix
+renders the canonical mechanics dimensions side by side. Registry facts are
+labelled as registry metadata; every reach figure and comparison cell is
+evidence-backed or an explicit unknown. The exhaustive registry remains at
+`/surfaces`.

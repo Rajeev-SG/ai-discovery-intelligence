@@ -460,6 +460,66 @@ def list_mechanics(db: Session = Depends(get_db)) -> dict:  # noqa: B008 - FastA
     }
 
 
+@app.get("/landscape", tags=["landscape"])
+def get_landscape(db: Session = Depends(get_db)) -> dict:  # noqa: B008 - FastAPI DI
+    """Marketer-first AI discovery landscape + mechanics comparison (issue #60).
+
+    Registry facts (name, vendor, type, geography, discovery modes) are copied
+    verbatim and labelled as registry metadata, never as mechanics evidence.
+    Reach/usage, mechanics coverage and comparison cells come from validated
+    claims only; a comparison cell with no evidence stays an explicit ``unknown``.
+    Market share is one contextual figure, not the organising layer.
+    """
+
+    from .claims import load_expanded_claims
+    from .landscape import build_comparison, build_landscape, landscape_view
+    from .mechanics import cached_project_all
+    from .registry import load_surfaces_config
+
+    registry = load_surfaces_config()
+    registry_ids = registry.ids()
+    claims = load_expanded_claims(_ledger_engine(db))
+    projection = cached_project_all(registry_ids, claims)
+    surfaces = build_landscape(registry, projection, claims)
+    comparison_ids = [s.id for s in surfaces]
+    comparison = build_comparison(comparison_ids, projection)
+    return landscape_view(surfaces, comparison, comparison_surface_ids=comparison_ids)
+
+
+@app.get("/landscape/comparison", tags=["landscape"])
+def get_comparison(
+    surfaces: str = Query(..., description="Comma-separated surface ids to compare (2-6)."),
+    db: Session = Depends(get_db),  # noqa: B008 - FastAPI DI
+) -> dict:
+    """Mechanics comparison for 2-6 surfaces across the canonical dimensions."""
+
+    from .claims import load_expanded_claims
+    from .landscape import build_comparison, build_landscape, landscape_view
+    from .mechanics import MECHANICS_DIMENSIONS, cached_project_all
+    from .registry import load_surfaces_config
+
+    registry = load_surfaces_config()
+    registry_ids = registry.ids()
+    # Dedupe preserving order (issue #60 review): "chatgpt,chatgpt" must not pass
+    # as a 2-surface comparison while actually comparing one.
+    wanted = list(dict.fromkeys(s.strip() for s in surfaces.split(",") if s.strip()))
+    unknown = [s for s in wanted if s not in registry_ids]
+    if unknown:
+        raise HTTPException(status_code=400, detail=f"unknown surface id(s): {unknown}")
+    if not (2 <= len(wanted) <= 6):
+        raise HTTPException(
+            status_code=400,
+            detail="compare between 2 and 6 distinct surfaces",
+        )
+    claims = load_expanded_claims(_ledger_engine(db))
+    projection = cached_project_all(registry_ids, claims)
+    all_surfaces = build_landscape(registry, projection, claims, ids=tuple(wanted))
+    comparison = build_comparison(wanted, projection)
+    view = landscape_view(all_surfaces, comparison, comparison_surface_ids=wanted)
+    view["dimension_count"] = len(MECHANICS_DIMENSIONS)
+    return view
+
+
 @app.get("/implications", tags=["implications"])
 def list_implications(db: Session = Depends(get_db)) -> dict:  # noqa: B008 - FastAPI DI
     """Evidence-backed marketing implications for every registry surface.

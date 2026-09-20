@@ -2,6 +2,17 @@
 
 This file records repository/product changes. The generated intelligence changelog will live separately in the canonical data store and `pov/CHANGELOG.md` once implemented.
 
+## 2026-09-20 (issue #60)
+
+- **Marketer-first landscape + mechanics comparison.**
+  `src/ai_discovery/landscape.py` projects a curated major-surface landscape
+  (name/vendor/type/priority/geography, one evidenced reach figure, discovery
+  modes, mechanics coverage, one-line relevance) and a per-dimension comparison
+  across the canonical mechanics onto the #56 projection. `/landscape` and
+  `/landscape/comparison`; new `/landscape` UI page (grid + comparison matrix,
+  comparison selection stored in the URL). Registry facts are labelled as registry
+  metadata; unknown cells stay explicit. Proof: `proof/phase2/ISSUE_60_PROOF.md`.
+
 ## 2026-09-20 (issue #59)
 
 - **Evidence-backed marketing implications.** `src/ai_discovery/implications.py`

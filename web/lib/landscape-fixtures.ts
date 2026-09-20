@@ -1,0 +1,141 @@
+/**
+ * Recorded-fixture mode (EVIDENCE_FIXTURE=1) for the landscape + comparison
+ * (issue #60). Static, recorded data only — never used in production. Mirrors the
+ * real `/landscape` payload so the view can be tested structurally in CI,
+ * including evidenced cells, explicit unknowns, and a regional/China surface.
+ */
+import type { LandscapeProjection } from "./landscape";
+
+export function fixtureLandscape(): LandscapeProjection {
+  const ids = ["chatgpt", "google-gemini", "deepseek-chat"];
+  return {
+    surfaces: [
+      {
+        id: "chatgpt",
+        name: "ChatGPT",
+        vendor: "OpenAI",
+        type: "conversational_assistant",
+        type_label: "Conversational assistant",
+        priority: "Core — global",
+        regions: ["global"],
+        discovery_modes: ["web_search", "answers", "shopping"],
+        official_url: "https://chatgpt.com/",
+        reach_metric: "market share: 79.4 percent",
+        reach_claim_id: "fx-reach-1",
+        reach_confidence: "medium",
+        evidenced_dimensions: 7,
+        dimension_count: 13,
+        coverage: { known: 7, partially_known: 0, conflicting: 0, unknown: 6 },
+        relevance: "For ChatGPT, sources are cited, crawler/index controls are documented.",
+      },
+      {
+        id: "google-gemini",
+        name: "Gemini",
+        vendor: "Google",
+        type: "conversational_assistant",
+        type_label: "Conversational assistant",
+        priority: "Core — global",
+        regions: ["global"],
+        discovery_modes: ["web_grounding", "answers"],
+        official_url: "https://gemini.google.com/",
+        reach_metric: "market share: 10.9 percent",
+        reach_claim_id: "fx-reach-2",
+        reach_confidence: "medium",
+        evidenced_dimensions: 0,
+        dimension_count: 13,
+        coverage: { known: 0, partially_known: 0, conflicting: 0, unknown: 13 },
+        relevance: "No evidenced discovery mechanic for Gemini yet.",
+      },
+      {
+        id: "deepseek-chat",
+        name: "DeepSeek Chat",
+        vendor: "DeepSeek",
+        type: "conversational_assistant",
+        type_label: "Conversational assistant",
+        priority: "Core — China",
+        regions: ["global", "china"],
+        discovery_modes: ["web_search", "answers"],
+        official_url: "https://chat.deepseek.com/",
+        reach_metric: "market share: 0.02 percent",
+        reach_claim_id: "fx-reach-3",
+        reach_confidence: "medium",
+        evidenced_dimensions: 0,
+        dimension_count: 13,
+        coverage: { known: 0, partially_known: 0, conflicting: 0, unknown: 13 },
+        relevance: "No evidenced discovery mechanic for DeepSeek Chat yet.",
+      },
+    ],
+    comparison_surface_ids: ids,
+    comparison: [
+      {
+        dimension: "crawling_indexing_controls",
+        label: "Crawling and indexing controls",
+        definition: "Crawler user-agents and site-side controls.",
+        cells: {
+          chatgpt: {
+            dimension: "crawling_indexing_controls",
+            state: "known",
+            statement: "OpenAI documents OAI-SearchBot and its robots.txt controls.",
+            claim_id: "fx-crawler-1",
+            evidence_class: "official_documentation",
+            confidence: "medium",
+            unknown: false,
+          },
+          "google-gemini": {
+            dimension: "crawling_indexing_controls",
+            state: "unknown",
+            statement: null,
+            claim_id: null,
+            evidence_class: null,
+            confidence: null,
+            unknown: true,
+          },
+          "deepseek-chat": {
+            dimension: "crawling_indexing_controls",
+            state: "unknown",
+            statement: null,
+            claim_id: null,
+            evidence_class: null,
+            confidence: null,
+            unknown: true,
+          },
+        },
+      },
+      {
+        dimension: "citation_presentation",
+        label: "Citation / source presentation",
+        definition: "Whether sources are shown and in what form.",
+        cells: {
+          chatgpt: {
+            dimension: "citation_presentation",
+            state: "known",
+            statement: "A share of responses carries inline links.",
+            claim_id: "fx-inline-2",
+            evidence_class: "independent_research",
+            confidence: "low",
+            unknown: false,
+          },
+          "google-gemini": {
+            dimension: "citation_presentation",
+            state: "unknown",
+            statement: null,
+            claim_id: null,
+            evidence_class: null,
+            confidence: null,
+            unknown: true,
+          },
+          "deepseek-chat": {
+            dimension: "citation_presentation",
+            state: "unknown",
+            statement: null,
+            claim_id: null,
+            evidence_class: null,
+            confidence: null,
+            unknown: true,
+          },
+        },
+      },
+    ],
+    dimension_count: 13,
+  };
+}
