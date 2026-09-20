@@ -86,6 +86,10 @@ SourceClass = Literal[
     "editorial_discovery",   # trade/editorial discovery (Search Engine Land, SE Journal, SE Roundtable)
     "open_research",         # open academic/dataset research (arXiv, OpenAlex, Crossref, Common Crawl)
     "open_discovery",        # discovery-only aggregators (GDELT, Google News RSS); never canonical
+    # Controlled consumer-surface observation (issue #10): first-party observation
+    # of a surface’s own behaviour. Distinct from vendor docs and from third-party
+    # research; never a substitute for either.
+    "controlled_observation",
     # Ledger vocabulary (legacy/spec-defined)
     "vendor_research",
     "vendor_blog",

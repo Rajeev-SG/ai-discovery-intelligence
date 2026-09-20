@@ -1,0 +1,417 @@
+{
+  "surface": "chatgpt",
+  "dimensions": [
+    {
+      "dimension": "search_trigger",
+      "label": "Search / retrieval trigger",
+      "definition": "When and why the surface decides to retrieve from the live web rather than answer from model weights.",
+      "state": "unknown",
+      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "assertions": []
+    },
+    {
+      "dimension": "retrieval_provider",
+      "label": "Retrieval provider / index",
+      "definition": "Which index or upstream search provider backs retrieval.",
+      "state": "unknown",
+      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "assertions": []
+    },
+    {
+      "dimension": "query_rewrite",
+      "label": "Query rewrite / fan-out",
+      "definition": "Whether and how the user query is rewritten, decomposed or fanned out into multiple sub-queries.",
+      "state": "unknown",
+      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "assertions": []
+    },
+    {
+      "dimension": "crawling_indexing_controls",
+      "label": "Crawling and indexing controls",
+      "definition": "Crawler user-agents, robots directives and site-side controls that govern what is fetched and indexed.",
+      "state": "known",
+      "note": "",
+      "assertions": [
+        {
+          "statement": "It can take approximately 24 hours for OpenAI's systems to adjust for search results after a site's robots.txt update.",
+          "state": "known",
+          "conflict_note": null,
+          "evidence": [
+            {
+              "claim_id": "0b187a5b6f942c1d2a3fcb12285238e5",
+              "source_id": "openai-platform-bots",
+              "publisher": "OpenAI",
+              "url": "https://developers.openai.com/api/docs/bots",
+              "source_class": "official",
+              "evidence_class": "official_documentation",
+              "published_at": null,
+              "observed_at": "2026-09-19T16:44:43.507845+00:00",
+              "effective_from": null,
+              "confidence": "medium",
+              "confidence_score": null,
+              "measurement_mode": "official_documentation",
+              "methodology_notes": null,
+              "limitations": [],
+              "modes": [],
+              "regions": [],
+              "relates_to_claim_id": null,
+              "relationship": "new"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "dimension": "freshness_recrawl",
+      "label": "Freshness / recrawl",
+      "definition": "How quickly changed content is refetched and reflected.",
+      "state": "known",
+      "note": "",
+      "assertions": [
+        {
+          "statement": "It can take approximately 24 hours for OpenAI's systems to adjust for search results after a site's robots.txt update.",
+          "state": "known",
+          "conflict_note": null,
+          "evidence": [
+            {
+              "claim_id": "0b187a5b6f942c1d2a3fcb12285238e5",
+              "source_id": "openai-platform-bots",
+              "publisher": "OpenAI",
+              "url": "https://developers.openai.com/api/docs/bots",
+              "source_class": "official",
+              "evidence_class": "official_documentation",
+              "published_at": null,
+              "observed_at": "2026-09-19T16:44:43.507845+00:00",
+              "effective_from": null,
+              "confidence": "medium",
+              "confidence_score": null,
+              "measurement_mode": "official_documentation",
+              "methodology_notes": null,
+              "limitations": [],
+              "modes": [],
+              "regions": [],
+              "relates_to_claim_id": null,
+              "relationship": "new"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "dimension": "candidate_selection_reranking",
+      "label": "Candidate selection / reranking",
+      "definition": "How retrieved candidates are filtered, ranked or reranked before an answer is composed.",
+      "state": "unknown",
+      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "assertions": []
+    },
+    {
+      "dimension": "citation_presentation",
+      "label": "Citation / source presentation",
+      "definition": "Whether sources are shown, and in what form (inline links, cards, footnotes, absent).",
+      "state": "known",
+      "note": "",
+      "assertions": [
+        {
+          "statement": "The share of ChatGPT responses with at least one inline image embedding from images.openai.com rose from approximately 15% to 35% between May 7-11, 2026.",
+          "state": "known",
+          "conflict_note": null,
+          "evidence": [
+            {
+              "claim_id": "71357b0db1ad3cdf5909675daf57e58f",
+              "source_id": "sistrix-blog",
+              "publisher": "SISTRIX",
+              "url": "https://www.sistrix.com/feed/",
+              "source_class": "visibility_research",
+              "evidence_class": "independent_research",
+              "published_at": "2026-06-01",
+              "observed_at": "2026-09-19T20:59:12.827914+00:00",
+              "effective_from": null,
+              "confidence": "medium",
+              "confidence_score": null,
+              "measurement_mode": "unknown",
+              "methodology_notes": null,
+              "limitations": [],
+              "modes": [],
+              "regions": [],
+              "relates_to_claim_id": null,
+              "relationship": "new"
+            },
+            {
+              "claim_id": "32d51457523d2d7440ccde65e1e2152e",
+              "source_id": "sistrix-blog",
+              "publisher": "SISTRIX",
+              "url": "https://www.sistrix.com/feed/",
+              "source_class": "visibility_research",
+              "evidence_class": "independent_research",
+              "published_at": "2026-06-01",
+              "observed_at": "2026-09-19T20:59:12.769995+00:00",
+              "effective_from": null,
+              "confidence": "medium",
+              "confidence_score": null,
+              "measurement_mode": "unknown",
+              "methodology_notes": null,
+              "limitations": [],
+              "modes": [],
+              "regions": [],
+              "relates_to_claim_id": null,
+              "relationship": "new"
+            },
+            {
+              "claim_id": "220eaa9c190726b6dc92a3b32541c3d9",
+              "source_id": "sistrix-blog",
+              "publisher": "SISTRIX",
+              "url": "https://www.sistrix.com/feed/",
+              "source_class": "visibility_research",
+              "evidence_class": "independent_research",
+              "published_at": "2026-06-01",
+              "observed_at": "2026-09-19T20:59:12.710717+00:00",
+              "effective_from": null,
+              "confidence": "medium",
+              "confidence_score": null,
+              "measurement_mode": "unknown",
+              "methodology_notes": null,
+              "limitations": [],
+              "modes": [],
+              "regions": [],
+              "relates_to_claim_id": null,
+              "relationship": "new"
+            },
+            {
+              "claim_id": "68a73e6b3b03273fdc7a09813db794ee",
+              "source_id": "sistrix-blog",
+              "publisher": "SISTRIX",
+              "url": "https://www.sistrix.com/feed/",
+              "source_class": "visibility_research",
+              "evidence_class": "independent_research",
+              "published_at": "2026-06-01",
+              "observed_at": "2026-09-19T20:59:12.670557+00:00",
+              "effective_from": null,
+              "confidence": "medium",
+              "confidence_score": null,
+              "measurement_mode": "unknown",
+              "methodology_notes": null,
+              "limitations": [],
+              "modes": [],
+              "regions": [],
+              "relates_to_claim_id": null,
+              "relationship": "new"
+            },
+            {
+              "claim_id": "8c55d69c5c80d98aa8ee81c4c104e9a1",
+              "source_id": "ahrefs-most-cited-domains",
+              "publisher": "Ahrefs",
+              "url": "https://ahrefs.com/blog/most-cited-domains-in-chatgpt/",
+              "source_class": "visibility_research",
+              "evidence_class": "independent_research",
+              "published_at": null,
+              "observed_at": "2026-09-19T20:57:00.851705+00:00",
+              "effective_from": null,
+              "confidence": "medium",
+              "confidence_score": null,
+              "measurement_mode": "unknown",
+              "methodology_notes": null,
+              "limitations": [],
+              "modes": [],
+              "regions": [],
+              "relates_to_claim_id": null,
+              "relationship": "new"
+            },
+            {
+              "claim_id": "f1d16124c71b30f31a5bdda135a8e81c",
+              "source_id": "semrush-reddit-citations",
+              "publisher": "Semrush",
+              "url": "https://www.semrush.com/blog/reddits-citations-in-chatgpt-fall/",
+              "source_class": "visibility_research",
+              "evidence_class": "independent_research",
+              "published_at": null,
+              "observed_at": "2026-09-19T20:56:47.748309+00:00",
+              "effective_from": null,
+              "confidence": "medium",
+              "confidence_score": null,
+              "measurement_mode": "vendor_estimate",
+              "methodology_notes": null,
+              "limitations": [],
+              "modes": [],
+              "regions": [],
+              "relates_to_claim_id": null,
+              "relationship": "new"
+            },
+            {
+              "claim_id": "0ead256d1bba9ae60d462ff2f31bef40",
+              "source_id": "semrush-reddit-citations",
+              "publisher": "Semrush",
+              "url": "https://www.semrush.com/blog/reddits-citations-in-chatgpt-fall/",
+              "source_class": "visibility_research",
+              "evidence_class": "independent_research",
+              "published_at": null,
+              "observed_at": "2026-09-19T20:56:47.746576+00:00",
+              "effective_from": null,
+              "confidence": "medium",
+              "confidence_score": null,
+              "measurement_mode": "vendor_estimate",
+              "methodology_notes": null,
+              "limitations": [],
+              "modes": [],
+              "regions": [],
+              "relates_to_claim_id": null,
+              "relationship": "new"
+            },
+            {
+              "claim_id": "961ca583882fea4668528ad8d02e6d3f",
+              "source_id": "semrush-reddit-citations",
+              "publisher": "Semrush",
+              "url": "https://www.semrush.com/blog/reddits-citations-in-chatgpt-fall/",
+              "source_class": "visibility_research",
+              "evidence_class": "independent_research",
+              "published_at": null,
+              "observed_at": "2026-09-19T20:56:47.744869+00:00",
+              "effective_from": null,
+              "confidence": "medium",
+              "confidence_score": null,
+              "measurement_mode": "vendor_estimate",
+              "methodology_notes": null,
+              "limitations": [],
+              "modes": [],
+              "regions": [],
+              "relates_to_claim_id": null,
+              "relationship": "new"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "dimension": "shopping_product_feed",
+      "label": "Shopping / product feed",
+      "definition": "Product, catalogue or feed behaviour in commercial results.",
+      "state": "known",
+      "note": "",
+      "assertions": [
+        {
+          "statement": "Initial observations of ChatGPT ads were based on three days of data when first published on July 15, and updated on July 28, 2026.",
+          "state": "known",
+          "conflict_note": null,
+          "evidence": [
+            {
+              "claim_id": "62a1277a5ac77fc351dc3626e6e7586e",
+              "source_id": "seer-ai-research",
+              "publisher": "Seer Interactive",
+              "url": "https://www.seerinteractive.com/insights",
+              "source_class": "visibility_research",
+              "evidence_class": "independent_research",
+              "published_at": "2026-07-15",
+              "observed_at": "2026-09-19T21:35:22.592704+00:00",
+              "effective_from": null,
+              "confidence": "medium",
+              "confidence_score": null,
+              "measurement_mode": "unknown",
+              "methodology_notes": null,
+              "limitations": [],
+              "modes": [],
+              "regions": [],
+              "relates_to_claim_id": null,
+              "relationship": "new"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "dimension": "local_retrieval",
+      "label": "Local retrieval",
+      "definition": "Use of local/place retrieval or map data.",
+      "state": "unknown",
+      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "assertions": []
+    },
+    {
+      "dimension": "social_community_retrieval",
+      "label": "Social / community retrieval",
+      "definition": "Use of social, forum or community sources (e.g. Reddit).",
+      "state": "unknown",
+      "note": "No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it.",
+      "assertions": []
+    },
+    {
+      "dimension": "mode_region_differences",
+      "label": "Mode / model / account / region differences",
+      "definition": "How behaviour differs across modes, models, account tiers or regions.",
+      "state": "unknown",
+      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "assertions": []
+    },
+    {
+      "dimension": "answer_type",
+      "label": "Direct vs retrieval-backed answer",
+      "definition": "Whether a response is a direct model answer or grounded in retrieved sources.",
+      "state": "unknown",
+      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "assertions": []
+    },
+    {
+      "dimension": "marketer_controllable_inputs",
+      "label": "Marketer-controllable eligibility inputs",
+      "definition": "Signals a marketer can change (markup, feeds, robots policy, content structure) that affect eligibility.",
+      "state": "known",
+      "note": "",
+      "assertions": [
+        {
+          "statement": "Initial observations of ChatGPT ads were based on three days of data when first published on July 15, and updated on July 28, 2026.",
+          "state": "known",
+          "conflict_note": null,
+          "evidence": [
+            {
+              "claim_id": "62a1277a5ac77fc351dc3626e6e7586e",
+              "source_id": "seer-ai-research",
+              "publisher": "Seer Interactive",
+              "url": "https://www.seerinteractive.com/insights",
+              "source_class": "visibility_research",
+              "evidence_class": "independent_research",
+              "published_at": "2026-07-15",
+              "observed_at": "2026-09-19T21:35:22.592704+00:00",
+              "effective_from": null,
+              "confidence": "medium",
+              "confidence_score": null,
+              "measurement_mode": "unknown",
+              "methodology_notes": null,
+              "limitations": [],
+              "modes": [],
+              "regions": [],
+              "relates_to_claim_id": null,
+              "relationship": "new"
+            },
+            {
+              "claim_id": "0b187a5b6f942c1d2a3fcb12285238e5",
+              "source_id": "openai-platform-bots",
+              "publisher": "OpenAI",
+              "url": "https://developers.openai.com/api/docs/bots",
+              "source_class": "official",
+              "evidence_class": "official_documentation",
+              "published_at": null,
+              "observed_at": "2026-09-19T16:44:43.507845+00:00",
+              "effective_from": null,
+              "confidence": "medium",
+              "confidence_score": null,
+              "measurement_mode": "official_documentation",
+              "methodology_notes": null,
+              "limitations": [],
+              "modes": [],
+              "regions": [],
+              "relates_to_claim_id": null,
+              "relationship": "new"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "coverage": {
+    "known": 5,
+    "partially_known": 0,
+    "conflicting": 0,
+    "unknown": 8
+  },
+  "evidenced_dimension_count": 5,
+  "dimension_count": 13
+}

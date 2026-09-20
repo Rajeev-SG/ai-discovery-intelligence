@@ -395,3 +395,77 @@ def get_surface_evidence(
             "latest_change": None,
         }
     return entry
+
+
+# --------------------------------------------------------------------------- #
+# Canonical mechanics projection (Phase 2, issue #56)
+# --------------------------------------------------------------------------- #
+
+
+def _surface_registry_ids() -> list[str]:
+    """Registry surface ids, in canonical order. Never derived from claims."""
+
+    from .registry import load_surfaces_config
+
+    try:
+        return load_surfaces_config().ids()
+    except (FileNotFoundError, OSError, ValueError):
+        return []
+
+
+@app.get("/mechanics", tags=["mechanics"])
+def list_mechanics(db: Session = Depends(get_db)) -> dict:  # noqa: B008 - FastAPI DI
+    """Marketer-safe mechanics projection for every registry surface.
+
+    Real, validated claims only: a dimension with no supporting claim is an
+    explicit ``unknown``. No private snapshot data and no capture text is
+    exposed - each evidenced dimension carries the claim id, source class,
+    evidence class, publisher, public URL, dates, confidence and methodology.
+    """
+
+    from .claims import load_expanded_claims
+    from .mechanics import (
+        MECHANICS_DIMENSIONS,
+        mechanics_view,
+        project_all,
+        unmapped_claim_surfaces,
+    )
+
+    # Raw expanded ledger rows: the projection needs each claim's methodology and
+    # provenance, not just the product-shaped claim view.
+    registry_ids = _surface_registry_ids()
+    claims = load_expanded_claims(_ledger_engine(db))
+    projection = project_all(registry_ids, claims)
+    unmapped = unmapped_claim_surfaces(registry_ids, claims)
+    return {
+        "dimension_count": len(MECHANICS_DIMENSIONS),
+        "count": len(projection),
+        "surfaces": {sid: mechanics_view(m) for sid, m in projection.items()},
+        # Diagnostic only: claim surface ids absent from the registry (drift).
+        "unmapped_claim_surfaces": unmapped,
+    }
+
+
+@app.get("/surfaces/{surface_id}/mechanics", tags=["mechanics"])
+def get_surface_mechanics(
+    surface_id: str,
+    db: Session = Depends(get_db),  # noqa: B008 - FastAPI DI
+) -> dict:
+    """The canonical mechanics projection for one surface.
+
+    An unknown surface (not in the registry) returns an explicit empty state
+    rather than a fabricated projection.
+    """
+
+    from .claims import load_expanded_claims
+    from .mechanics import mechanics_view, project_surface
+
+    if surface_id not in _surface_registry_ids():
+        return {
+            "surface": surface_id,
+            "state": "unknown_surface",
+            "note": "Surface is not in the canonical registry.",
+            "dimensions": [],
+        }
+    claims = load_expanded_claims(_ledger_engine(db))
+    return mechanics_view(project_surface(surface_id, claims))

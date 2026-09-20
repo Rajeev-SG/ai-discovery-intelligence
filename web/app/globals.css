@@ -766,3 +766,19 @@ main { flex: 1; }
   .change-meta { flex: 1 1 100%; }
   .change-row { flex-wrap: wrap; gap: 4px 12px; }
 }
+
+/* Registry-metadata tag (issue #56): marks registry-derived copy as explicitly
+   NOT evidence, so coarse status text is never read as substantive intelligence. */
+.registry-metadata-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #2a2118;
+  color: #d9a441;
+  border: 1px solid rgba(217, 164, 65, 0.35);
+  vertical-align: middle;
+}

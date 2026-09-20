@@ -129,10 +129,18 @@ function label(map: Record<string, string>, value: string): string {
 }
 
 /**
- * Unknowns are derived from the registry's own retrieval_status. This is
- * information, not an empty cell: the plane states exactly what is not yet
- * documented instead of implying anything.
+ * Registry-derived retrieval unknowns.
+ *
+ * IMPORTANT (issue #56): these strings are derived from the registry's own
+ * coarse `retrieval_status` field. They are a *registry scorecard*, NOT
+ * evidenced mechanics — they must never be presented as substantive
+ * intelligence about how a surface actually retrieves. The canonical,
+ * evidence-backed mechanics projection lives in `@/lib/mechanics`
+ * (`/mechanics`); this helper only powers the registry's coarse fallback, which
+ * is always labelled as registry metadata in the UI.
  */
+export const RETRIEVAL_UNKNOWNS_SOURCE = "registry_metadata" as const;
+
 export function retrievalUnknowns(status: string): string[] {
   switch (status) {
     case "under_documented":

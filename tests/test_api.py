@@ -134,3 +134,75 @@ def test_health_counts(client):
     body = client.get("/health").json()
     assert body["evidence_items"] == 1
     assert body["sources"] == 1
+
+
+# --------------------------------------------------------------------------- #
+# Canonical mechanics projection endpoints (issue #56)
+# --------------------------------------------------------------------------- #
+
+
+@pytest.fixture()
+def ledger_client(tmp_path):
+    """A TestClient over a fresh SQLite ledger holding one real validated claim."""
+
+    from test_claims import _spec, _synthetic_capture
+
+    from ai_discovery import claims as C
+
+    engine = create_engine(f"sqlite+pysqlite:///{tmp_path / 'mech.db'}")
+    Base.metadata.create_all(engine)
+    C.init_ledger(engine)
+    record = C.extract_claim(
+        spec=_spec(surfaces=["chatgpt"], topic="crawler_index_policy"), capture=_synthetic_capture()
+    )
+    C.persist_claim(engine, record)
+    Session = sessionmaker(bind=engine, expire_on_commit=False)
+    session = Session()
+    api.app.dependency_overrides[api.get_db] = lambda: session
+    with TestClient(api.app) as test_client:
+        yield test_client
+    api.app.dependency_overrides.clear()
+    session.close()
+
+
+def test_mechanics_endpoint_projects_every_registry_surface(ledger_client):
+    body = ledger_client.get("/mechanics").json()
+    assert body["dimension_count"] == 13
+    assert body["count"] >= 1
+    for surface in body["surfaces"].values():
+        assert len(surface["dimensions"]) == 13
+        assert set(surface["coverage"]) == {"known", "partially_known", "conflicting", "unknown"}
+
+
+def test_mechanics_real_claim_attaches_to_its_surface(ledger_client):
+    body = ledger_client.get("/surfaces/chatgpt/mechanics").json()
+    assert body["surface"] == "chatgpt"
+    # crawler_index_policy maps to crawling_indexing_controls, freshness_recrawl
+    # and marketer_controllable_inputs -> 3 known, 10 explicit unknown.
+    assert body["evidenced_dimension_count"] == 3
+    assert body["coverage"]["unknown"] == 10
+    known = [d for d in body["dimensions"] if d["state"] != "unknown"]
+    assert all(d["assertions"] for d in known)
+    assert all(d["assertions"][0]["evidence"][0]["claim_id"] for d in known)
+
+
+def test_mechanics_surface_endpoint_explicit_unknown_for_bare_surface(ledger_client):
+    # claude is in the registry but has no claims here: all-unknown, explicitly.
+    body = ledger_client.get("/surfaces/claude/mechanics").json()
+    assert body["surface"] == "claude"
+    assert body["coverage"]["unknown"] == 13
+    for dim in body["dimensions"]:
+        assert dim["state"] == "unknown"
+        assert dim["note"]
+
+
+def test_mechanics_surface_endpoint_rejects_non_registry_surface(ledger_client):
+    body = ledger_client.get("/surfaces/not-a-real-surface/mechanics").json()
+    assert body["state"] == "unknown_surface"
+    assert body["dimensions"] == []
+
+
+def test_mechanics_never_exposes_private_snapshot_data(ledger_client):
+    blob = ledger_client.get("/mechanics").text
+    for forbidden in ("snapshot_path", "capture_hash", '"snapshot_available"', "/var/", "/private/"):
+        assert forbidden not in blob

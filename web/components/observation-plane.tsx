@@ -492,7 +492,10 @@ export function ObservationPlane({ rows, registryVersion, lastReviewed }: Observ
                     <div className="tr-detail" data-testid={`detail-${row.id}`}>
                       <div className="detail-inline">
                         <div>
-                          <h3>Retrieval unknowns</h3>
+                          <h3>
+                            Retrieval unknowns{" "}
+                            <span className="registry-metadata-tag">registry metadata — not evidence</span>
+                          </h3>
                           <ul className="unknown-list">
                             {row.original.retrievalUnknownNotes.map((note) => (
                               <li key={note}>{note}</li>
