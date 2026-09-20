@@ -76,6 +76,16 @@ jobs:
           EVIDENCE_API_URL: ${{ vars.EVIDENCE_API_URL }}
         run: npx playwright test
 
+      - name: All-monitor-only implications state (issue #59 impl-004)
+        # Proves the no-action state renders even when nothing is actionable, so an
+        # all-monitor ledger never degrades to a blank "nothing here".
+        env:
+          EVIDENCE_FIXTURE: "all-monitor"
+        run: |
+          # The fixture is chosen at request time, so no rebuild is needed; the
+          # Playwright webServer inherits this env.
+          WEB_PORT=3110 EVIDENCE_FIXTURE=all-monitor npx playwright test e2e/implications.spec.ts -g "all-monitor" --project=desktop-chromium
+
       - name: Upload proof screenshots
         if: always()
         uses: actions/upload-artifact@v4

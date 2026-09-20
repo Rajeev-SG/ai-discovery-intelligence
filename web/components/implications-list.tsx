@@ -86,6 +86,8 @@ function ImplicationCard({ impl, showSurfaces = true }: { impl: Implication; sho
 export function ImplicationsList({ projection }: { projection: ImplicationsProjection }) {
   const cross = projection.cross_surface;
   const actionable = cross.filter((i) => !i.monitor_only);
+  // Monitor surfaces come from the per-surface payload, independent of the
+  // actionable count, so an all-monitor-only ledger still shows them (impl-004).
   const monitorSurfaces = Object.values(projection.surfaces).filter((s) => s.monitor_only);
 
   return (

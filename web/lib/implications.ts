@@ -97,6 +97,10 @@ export const ACTIONABILITY_ORDER: Record<string, number> = { high: 3, medium: 2,
 
 /** Fetch the whole implications projection in one request. Server-only. */
 export async function fetchImplications(): Promise<ImplicationsOutcome> {
+  if (process.env.EVIDENCE_FIXTURE === "all-monitor") {
+    const { fixtureImplicationsAllMonitor } = await import("./implications-fixtures");
+    return { status: "ok", projection: fixtureImplicationsAllMonitor() };
+  }
   if (fixtureMode()) {
     const { fixtureImplications } = await import("./implications-fixtures");
     return { status: "ok", projection: fixtureImplications() };
@@ -127,7 +131,11 @@ export function actionableSurfaces(
   projection: ImplicationsProjection | null,
 ): SurfaceImplications[] {
   if (!projection) return [];
-  return Object.values(projection.surfaces).filter((s) => s.implications.length > 0);
+  // A monitor implication is a structured no-action result, so a surface counts
+  // as actionable only when it has a non-monitor implication.
+  return Object.values(projection.surfaces).filter((s) =>
+    s.implications.some((i) => !i.monitor_only),
+  );
 }
 
 /** Cross-surface implications sorted most-actionable, most-significant first. */

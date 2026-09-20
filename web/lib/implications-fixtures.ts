@@ -59,9 +59,60 @@ export function fixtureImplications(): ImplicationsProjection {
         surface: "grok",
         monitor_only: true,
         note: "No evidenced, marketer-actionable mechanic for this surface yet. Monitor rather than act: unknown is a valid answer.",
-        implications: [],
+        implications: [
+          {
+            family: "monitor",
+            action: "Monitor this surface; do not act on assumption until a mechanic is evidenced.",
+            rationale: "The evidence does not yet support a specific action for this surface.",
+            supporting_claim_ids: [],
+            supporting_dimensions: [],
+            surfaces: ["grok"],
+            modes: [],
+            regions: [],
+            confidence: "unknown",
+            actionability: "low",
+            significance: 0.0,
+            contradicting_claim_ids: [],
+            monitor_only: true,
+            note: "Watching 13 unknown dimension(s).",
+          },
+        ],
       },
     },
     cross_surface: [CRAWL, CITATION],
+  };
+}
+
+
+/** An all-monitor-only projection (issue #59 review impl-004). */
+export function fixtureImplicationsAllMonitor(): ImplicationsProjection {
+  return {
+    count: 0,
+    surfaces: {
+      grok: {
+        surface: "grok",
+        monitor_only: true,
+        note: "No evidenced, marketer-actionable mechanic for this surface yet. Monitor rather than act: unknown is a valid answer.",
+        implications: [
+          {
+            family: "monitor",
+            action: "Monitor this surface; do not act on assumption until a mechanic is evidenced.",
+            rationale: "The evidence does not yet support a specific action for this surface.",
+            supporting_claim_ids: [],
+            supporting_dimensions: [],
+            surfaces: ["grok"],
+            modes: [],
+            regions: [],
+            confidence: "unknown",
+            actionability: "low",
+            significance: 0.0,
+            contradicting_claim_ids: [],
+            monitor_only: true,
+            note: "Watching 13 unknown dimension(s).",
+          },
+        ],
+      },
+    },
+    cross_surface: [],
   };
 }

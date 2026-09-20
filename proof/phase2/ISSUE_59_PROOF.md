@@ -75,7 +75,30 @@ invented advice.
 
 Verification: pytest **300**, ruff clean, vitest **80**, playwright **28** live.
 
-## 5. Honest limitations
+## 5. Review-hardening pass (impl-001 … impl-005)
+
+- **impl-001 (supersedes treated as contradiction).** A `supersedes` relationship
+  now retires the superseded claim from support instead of flagging a
+  contradiction and capping confidence at `low`; scope (modes/regions) is unioned
+  from supporting evidence only. Test:
+  `test_supersedes_is_replacement_not_contradiction`.
+- **impl-002 (merge overstated significance).** A merged cross-surface implication
+  now takes the **weakest** member's significance, matching the min-policy used for
+  confidence and actionability. Live: merged citation-visibility significance fell
+  from 3.61 to 3.36, query-coverage from 3.29 to 3.14. Test:
+  `test_merge_does_not_overstate_significance`.
+- **impl-003 (dead `monitor` family).** The no-action outcome is now a structured
+  `Implication` with `family="monitor"`, so the API returns one shape; the wrapper
+  boolean remains a convenience. Tests assert the monitor shape.
+- **impl-004 (all-monitor ledger degraded to blank).** The page renders whenever
+  any surface exists, so an all-monitor-only ledger shows the monitor list, never
+  the generic empty state. Verified live with `EVIDENCE_FIXTURE=all-monitor`
+  (`impl-monitor-list` present, `impl-empty` absent); e2e added and wired into CI.
+- **impl-005 (weak tests).** Added a real high-confidence/low-actionability fixture
+  proving the axes are independent, and a word-boundary filler scan over the full
+  rendered payload (including notes) rather than the static rule table only.
+
+## 6. Honest limitations
 
 - Rules cover the mechanics dimensions the ledger can evidence today; a dimension
   with no rule (provider selection, answer type) yields no implication rather than

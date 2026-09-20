@@ -18,7 +18,11 @@ test("marketing implications are evidence-linked with confidence and actionabili
   const cards = page.getByTestId("impl-card");
   const empty = page.getByTestId("impl-empty");
   const unavailable = page.getByTestId("impl-unavailable");
-  const count = (await cards.count()) + (await empty.count()) + (await unavailable.count());
+  const monitor = page.getByTestId("impl-monitor-list");
+  // Exactly one of the mutually-exclusive states must be present: actionable
+  // cards, an all-monitor list, an explicit empty state, or an unavailable state.
+  const count =
+    (await cards.count()) + (await empty.count()) + (await unavailable.count()) + (await monitor.count());
   expect(count).toBeGreaterThanOrEqual(1);
 
   if ((await cards.count()) > 0) {
@@ -45,4 +49,17 @@ test("monitor-only surfaces are shown explicitly, not as invented actions", asyn
   if ((await monitor.count()) > 0) {
     await expect(monitor).toContainText(/watch|monitor/i);
   }
+});
+
+
+test("an all-monitor-only ledger shows the monitor state, not a blank empty state", async ({ page }) => {
+  test.skip(process.env.EVIDENCE_FIXTURE !== "all-monitor", "requires EVIDENCE_FIXTURE=all-monitor");
+  test.skip((page.viewportSize()?.width ?? 0) < 861, "desktop layout");
+
+  await page.goto("/implications");
+  // Review impl-004: with zero actionable implications the monitor list must show,
+  // never the generic "nothing here" empty state.
+  await expect(page.getByTestId("impl-monitor-list")).toBeVisible();
+  await expect(page.getByTestId("impl-empty")).toHaveCount(0);
+  await expect(page.getByTestId("impl-monitor-list")).toContainText(/watch|monitor/i);
 });

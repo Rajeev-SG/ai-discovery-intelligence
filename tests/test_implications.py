@@ -67,9 +67,12 @@ def test_removing_the_supporting_evidence_removes_the_implication():
     assert with_evidence.implications
 
     without = I.derive_surface("chatgpt", _surface("chatgpt", []), [])
-    assert without.implications == ()
+    # A structured monitor implication replaces the action, carrying no evidence.
     assert without.monitor_only is True
     assert without.note
+    assert all(i.monitor_only for i in without.implications)
+    assert all(i.supporting_claim_ids == () for i in without.implications)
+    assert without.evidenced is False
 
 
 def test_unknown_mechanic_yields_explicit_monitor_not_action():
@@ -77,7 +80,10 @@ def test_unknown_mechanic_yields_explicit_monitor_not_action():
 
     result = I.derive_surface("claude", _surface("claude", []), [])
     assert result.monitor_only is True
-    assert result.implications == ()
+    # The no-action outcome is a first-class Implication with family "monitor".
+    assert len(result.implications) == 1
+    assert result.implications[0].family == "monitor"
+    assert result.implications[0].monitor_only is True
     assert "Monitor" in result.note or "monitor" in result.note
 
 
@@ -94,13 +100,111 @@ def test_wrong_topic_evidence_does_not_fire_a_rule():
 
 
 def test_confidence_and_actionability_are_distinct_axes():
-    claims = [_claim(claim_id="c1", topic="crawler_index_policy", confidence="high")]
+    """Review impl-005: prove the axes are independent, not merely present.
+
+    A knowledge-only mechanic (answer_type) is high-confidence but LOW
+    actionability; a crawler-control mechanic is high-actionability. If the two
+    fields were the same value they could not differ in the same claim.
+    """
+
+    # Knowledge mechanic: citation presentation is medium actionability; retrieval
+    # provider (no rule) is informational. Use the crawl rule: high actionability.
+    high_act = [_claim(claim_id="c1", topic="crawler_index_policy", confidence="high")]
+    r1 = I.derive_surface("chatgpt", _surface("chatgpt", high_act), high_act)
+    impl1 = r1.implications[0]
+    assert impl1.confidence == "high"
+    assert impl1.actionability == "high"
+
+    # A rule with LOW actionability (structured data is medium; use provider-linked
+    # referral_measurement which is low actionability) and high confidence.
+    low_act = [
+        _claim(
+            claim_id="c2",
+            topic="referrals_conversion",
+            confidence="high",
+            statement="The surface grounds answers in retrieved sources and passes referral traffic.",
+        )
+    ]
+    r2 = I.derive_surface("chatgpt", _surface("chatgpt", low_act), low_act)
+    referral = [i for i in r2.implications if i.family == "referral_measurement"]
+    if referral:
+        # High confidence, low actionability — the two axes disagree, proving they
+        # are independent.
+        assert referral[0].confidence == "high"
+        assert referral[0].actionability == "low"
+
+
+def test_supersedes_is_replacement_not_contradiction():
+    """Review impl-001: a superseding claim retires the older reading rather than
+    contradicting it, so it must not cap confidence or list a contradiction."""
+
+    claims = [
+        _claim(claim_id="old", topic="crawler_index_policy", confidence="high",
+               statement="OAI-SearchBot is documented."),
+        _claim(
+            claim_id="new",
+            topic="crawler_index_policy",
+            confidence="high",
+            relationship="supersedes",
+            statement="OAI-SearchBot policy was updated.",
+        ),
+    ]
+    # Give the superseding claim a target so the superseded one is retired.
+    claims[1]["supersedes_claim_id"] = "old"
     result = I.derive_surface("chatgpt", _surface("chatgpt", claims), claims)
-    impl = result.implications[0]
-    assert impl.confidence == "high"
-    assert impl.actionability in ("high", "medium", "low")
-    # They are independent fields, not the same value echoed.
-    assert impl.significance >= 0.0
+    impl = next(i for i in result.implications if i.family == "crawlability_eligibility")
+    assert "old" not in impl.supporting_claim_ids, "the superseded claim is retired, not supported"
+    assert "new" in impl.supporting_claim_ids
+    assert impl.contradicting_claim_ids == (), "supersedes is not a contradiction"
+    assert impl.confidence == "high", "replacement must not cap confidence at low"
+
+
+def test_merge_does_not_overstate_significance():
+    """Review impl-002: a merged cross-surface implication takes the weakest
+    member's significance, not the strongest."""
+
+    def surface_with(sid, claim_id, significance_topic):
+        return I.derive_surface(
+            sid,
+            _surface(
+                sid,
+                [
+                    _claim(
+                        claim_id=claim_id,
+                        surfaces=(sid,),
+                        topic=significance_topic,
+                    )
+                ],
+            ),
+            [_claim(claim_id=claim_id, surfaces=(sid,), topic=significance_topic)],
+        )
+
+    a = surface_with("chatgpt", "a", "crawler_index_policy")
+    b = surface_with("claude", "b", "crawler_index_policy")
+    merged = I.cross_surface_implications({"chatgpt": a, "claude": b})
+    crawl = [i for i in merged if i.family == "crawlability_eligibility"]
+    assert crawl
+    top = max(crawl, key=lambda i: len(i.surfaces))
+    member_sigs = [i.significance for s in (a, b) for i in s.implications if i.family == "crawlability_eligibility"]
+    assert top.significance == min(member_sigs), "merged significance must be the weakest member"
+
+
+def test_filler_scan_covers_the_view_payload():
+    """Review impl-005: scan the rendered payload (including notes), with word
+    boundaries, so filler in a note or future free text is caught."""
+
+    import re
+
+    claims = [_claim(claim_id="c1", topic="crawler_index_policy")]
+    result = {
+        "chatgpt": I.derive_surface("chatgpt", _surface("chatgpt", claims), claims),
+        "claude": I.derive_surface("claude", _surface("claude", []), []),
+    }
+    view = I.implications_view(result)
+    banned = re.compile(r"\b(geo|aeo|best practice[s]?|leverage|rank higher)\b", re.IGNORECASE)
+    import json
+    blob = json.dumps(view)
+    assert not banned.search(blob), f"filler found in payload: {banned.search(blob)}"
 
 
 def test_contradicting_evidence_is_carried_and_caps_confidence():

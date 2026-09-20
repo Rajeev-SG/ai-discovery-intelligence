@@ -36,7 +36,10 @@ export default async function ImplicationsPage() {
           The implications source is unreachable right now. No implications are shown
           rather than inventing them.
         </p>
-      ) : outcome.projection && outcome.projection.count > 0 ? (
+      ) : outcome.projection && Object.keys(outcome.projection.surfaces).length > 0 ? (
+        // Render whenever any surface exists, independent of the actionable count:
+        // an all-monitor-only ledger must show the explicit monitor state, not a
+        // generic "nothing here" (issue #59 review impl-004).
         <ImplicationsList projection={outcome.projection} />
       ) : (
         <p className="impl-empty" data-testid="impl-empty">

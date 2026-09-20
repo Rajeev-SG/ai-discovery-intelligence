@@ -227,6 +227,20 @@ def surface_implications(
         if dim.state == "unknown":
             continue
         # Gather the evidence on this dimension whose claim carries the rule topic.
+        #
+        # ``supersedes`` is REPLACEMENT, not disagreement (issue #59 review
+        # impl-001): a superseding claim retires the claim it replaces rather than
+        # contradicting it, so the superseded claim is dropped from support and does
+        # NOT cap confidence. Only an explicit ``contradicts`` (or a ``contested``
+        # status) is a live disagreement. Scope (modes/regions) is unioned from
+        # supporting evidence only — a superseded or contradicting claim must not
+        # widen where the implication claims to apply.
+        superseded: set[str] = set()
+        for assertion in dim.assertions:
+            for ev in assertion.evidence:
+                if ev.relationship == "supersedes" and ev.relates_to_claim_id:
+                    superseded.add(ev.relates_to_claim_id)
+
         supporting: list[str] = []
         contradicting: list[str] = []
         modes: set[str] = set()
@@ -236,10 +250,13 @@ def surface_implications(
                 row = by_claim.get(ev.claim_id)
                 if row is None or row.get("topic") != rule.topic:
                     continue
-                if ev.relationship in {"contradicts", "supersedes"} or row.get("status") == "contested":
+                if ev.claim_id in superseded:
+                    # Replaced by a newer reading: not support, not a contradiction.
+                    continue
+                if ev.relationship == "contradicts" or row.get("status") == "contested":
                     contradicting.append(ev.claim_id)
-                else:
-                    supporting.append(ev.claim_id)
+                    continue
+                supporting.append(ev.claim_id)
                 modes.update(ev.modes)
                 regions.update(ev.regions)
         if not supporting:
@@ -291,7 +308,13 @@ class SurfaceImplications(BaseModel):
 
     @property
     def evidenced(self) -> bool:
-        return bool(self.implications)
+        """True when the surface has at least one *actionable* implication.
+
+        A monitor implication is a structured no-action result, so it does not make
+        the surface "evidenced" for the purpose of action.
+        """
+
+        return any(not i.monitor_only for i in self.implications)
 
 
 def derive_surface(
@@ -314,14 +337,39 @@ def derive_surface(
     )
     if implications:
         return SurfaceImplications(surface_id=surface_id, implications=tuple(implications))
+    # No actionable evidenced mechanic. Emit a structured monitor Implication so
+    # the no-action outcome has the same shape as an action (issue #59 review
+    # impl-003): it states why nothing is recommended and names the unknown
+    # dimensions being watched, with no invented evidence.
+    unknown_dims = tuple(
+        d.dimension for d in mechanics.dimensions if d.state == "unknown"
+    )
+    note = (
+        "No evidenced, marketer-actionable mechanic for this surface yet. "
+        "Monitor rather than act: unknown is a valid answer."
+    )
+    monitor = Implication(
+        family="monitor",
+        action="Monitor this surface; do not act on assumption until a mechanic is evidenced.",
+        rationale=(
+            "The evidence does not yet support a specific action for this surface, so "
+            "taking one would be a guess. Watching for validated mechanics is the "
+            "correct next step."
+        ),
+        supporting_claim_ids=(),
+        supporting_dimensions=(),
+        surfaces=(surface_id,),
+        confidence="unknown",
+        actionability="low",
+        significance=0.0,
+        monitor_only=True,
+        note=note + (f" Watching {len(unknown_dims)} unknown dimension(s)." if unknown_dims else ""),
+    )
     return SurfaceImplications(
         surface_id=surface_id,
-        implications=(),
+        implications=(monitor,),
         monitor_only=True,
-        note=(
-            "No evidenced, marketer-actionable mechanic for this surface yet. "
-            "Monitor rather than act: unknown is a valid answer."
-        ),
+        note=note,
     )
 
 
@@ -339,6 +387,10 @@ def cross_surface_implications(
     grouped: dict[tuple[str, tuple[str, ...]], list[Implication]] = {}
     for impl_set in per_surface.values():
         for impl in impl_set.implications:
+            # Monitor results are per-surface no-action states, not actions to
+            # merge: they stay in the per-surface payload only (review impl-003).
+            if impl.monitor_only:
+                continue
             key = (impl.family, impl.supporting_dimensions)
             grouped.setdefault(key, []).append(impl)
 
@@ -353,7 +405,11 @@ def cross_surface_implications(
         modes = tuple(sorted({x for m in members for x in m.modes}))
         regions = tuple(sorted({x for m in members for x in m.regions}))
         confidence = min((m.confidence for m in members), key=_confidence_rank)
-        significance = max(m.significance for m in members)
+        # Do not overstate on merge (issue #59 review impl-002): the merged
+        # significance is the WEAKEST member's, matching the min-policy used for
+        # confidence and actionability. A merged implication claims to apply across
+        # all its surfaces, so it may not inherit the strongest surface's reading.
+        significance = min(m.significance for m in members)
         # Actionability is the least actionable of the merged set (do not overstate).
         order = {"high": 3, "medium": 2, "low": 1}
         actionability = min(members, key=lambda m: order[m.actionability]).actionability
