@@ -31,7 +31,14 @@ def _iso(value: dt.datetime | None) -> str | None:
     return value.isoformat()
 
 
-def _freshness(observed: dt.datetime | None) -> dict[str, Any]:
+#: The one freshness state machine (issue #58 review F5): thresholds and state
+#: names live here and every read path — the claim view and the mechanics
+#: projection — calls this, so two UI surfaces can never disagree about the same
+#: capture's freshness.
+FRESHNESS_THRESHOLDS = {"fresh_days": 7, "recent_days": 45, "aging_days": 180}
+
+
+def freshness_of(observed: dt.datetime | None) -> dict[str, Any]:
     """Freshness of a claim/capture, as an explicit state (never a guess)."""
 
     if observed is None:
@@ -39,11 +46,11 @@ def _freshness(observed: dt.datetime | None) -> dict[str, Any]:
     if observed.tzinfo is None:
         observed = observed.replace(tzinfo=dt.UTC)
     age = (dt.datetime.now(dt.UTC) - observed).days
-    if age <= 7:
+    if age <= FRESHNESS_THRESHOLDS["fresh_days"]:
         state = "fresh"
-    elif age <= 45:
+    elif age <= FRESHNESS_THRESHOLDS["recent_days"]:
         state = "recent"
-    elif age <= 180:
+    elif age <= FRESHNESS_THRESHOLDS["aging_days"]:
         state = "aging"
     else:
         state = "stale"
@@ -82,6 +89,22 @@ def claim_view(row: dict[str, Any]) -> dict[str, Any]:
     metrics = row.get("metrics") or []
     evidence = row.get("evidence") or []
     detail = row.get("confidence_detail") or {}
+    rationale = list(detail.get("rationale") or [])
+    derived_label = None
+    derived_score = None
+    if not rationale:
+        # A claim persisted before the LLM lane recorded its rationale still has to
+        # explain its confidence (issue #58 review F4). Derive the "why" at read
+        # time, reusing the ONE confidence implementation; the persisted label is
+        # never rewritten. The derived label is surfaced separately (review DELTA-1)
+        # so a trust layer can never show a rationale that justifies a label the
+        # claim does not carry: the two are stated as persisted vs derived.
+        from .confidence import explain_persisted_confidence
+
+        assessment = explain_persisted_confidence(row)
+        rationale = list(assessment.rationale)
+        derived_label = assessment.label
+        derived_score = assessment.score
     # The latest evidence row carries the observed_at used for freshness.
     latest_observed = None
     for entry in evidence:
@@ -100,8 +123,13 @@ def claim_view(row: dict[str, Any]) -> dict[str, Any]:
         "confidence_detail": {
             "score": detail.get("score"),
             "inputs": detail.get("inputs") or {},
-            "rationale": detail.get("rationale") or [],
+            "rationale": rationale,
             "derived": True,
+            # Set only when the rationale was synthesised at read time; names the
+            # label/score the rationale actually supports so the UI can show any
+            # discrepancy with the persisted label explicitly (review DELTA-1).
+            "derived_label": derived_label,
+            "derived_score": derived_score,
         },
         "value": [
             {
@@ -139,8 +167,12 @@ def claim_view(row: dict[str, Any]) -> dict[str, Any]:
             for e in evidence
         ],
         "dates": row.get("dates") or {},
-        "freshness": _freshness(observed),
+        "freshness": freshness_of(observed),
     }
+
+
+#: Back-compat alias; prefer ``freshness_of``.
+_freshness = freshness_of
 
 
 def _parse(value: Any) -> dt.datetime | None:
@@ -157,19 +189,31 @@ def _parse(value: Any) -> dt.datetime | None:
 def surface_evidence(
     claims: list[dict[str, Any]], change_events: list[ChangeEvent]
 ) -> dict[str, dict]:
-    """Per-surface view: claims + latest material change, or an explicit no-evidence state."""
+    """Per-surface view: claims + latest material change, or an explicit no-evidence state.
+
+    A claim stores the surface as the source page wrote it, which may be an alias
+    (``deepseek``) for the canonical registry id (``deepseek-chat``). Grouping by
+    the *canonical* id — the same resolution the mechanics projection uses — keeps
+    the two read paths consistent: otherwise a surface with aliased claims shows
+    "No evidence" here while its mechanics projection shows evidence (issue #58).
+    Resolution is read-time only; stored claims are never rewritten.
+    """
+
+    from .registry import resolve_surface_id
 
     by_surface: dict[str, dict] = {}
     for claim in claims:
         for surface in claim.get("surfaces") or []:
+            canonical = resolve_surface_id(surface)
             entry = by_surface.setdefault(
-                surface, {"surface": surface, "claims": [], "latest_change": None}
+                canonical, {"surface": canonical, "claims": [], "latest_change": None}
             )
             entry["claims"].append(claim)
     for event in sorted(change_events, key=lambda e: e.published_at or e.observed_at, reverse=True):
         for surface in event.surfaces:
+            canonical = resolve_surface_id(surface)
             entry = by_surface.setdefault(
-                surface, {"surface": surface, "claims": [], "latest_change": None}
+                canonical, {"surface": canonical, "claims": [], "latest_change": None}
             )
             if entry["latest_change"] is None:
                 entry["latest_change"] = event_view(event)

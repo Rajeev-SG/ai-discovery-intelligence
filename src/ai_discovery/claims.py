@@ -77,6 +77,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     func,
+    or_,
     select,
     text,
 )
@@ -816,12 +817,22 @@ def load_expanded_claims(
         if topic:
             stmt = stmt.where(Claim.topic == topic)
         if surface:
+            # Match every spelling of the surface (canonical id + aliases), so a
+            # claim stored under an alias (e.g. "deepseek" for "deepseek-chat")
+            # is found by the canonical id. Read-time only; claims are never
+            # rewritten (issue #58 fixes the surface-alias read-path gap).
+            from .registry import surface_id_variants
+
+            variants = list(surface_id_variants(surface))
             if session.bind.dialect.name == "sqlite":
-                stmt = stmt.where(func.json_extract(Claim.surfaces, "$").like(f'%"{surface}"%'))
+                clauses = [
+                    func.json_extract(Claim.surfaces, "$").like(f'%"{v}"%') for v in variants
+                ]
+                stmt = stmt.where(or_(*clauses))
             else:
                 stmt = stmt.where(
-                    text("claim.surfaces::jsonb @> CAST(:surface_json AS jsonb)").bindparams(
-                        surface_json=json.dumps([surface])
+                    text("claim.surfaces::jsonb ?| CAST(:surface_variants AS text[])").bindparams(
+                        surface_variants=variants
                     )
                 )
         stmt = stmt.order_by(Claim.observed_at.desc(), Claim.claim_id)

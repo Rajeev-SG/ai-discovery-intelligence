@@ -228,7 +228,15 @@ def claim_from_extracted(
     if missing:
         joined = "; ".join(missing)
         raise ClaimSpecError(f"model quote not found in capture: {joined}")
-    return record
+    # Derive the confidence label from the evidence, exactly as the deterministic
+    # lane does (issue #28A / repo rule 11): an LLM proposal must never set its own
+    # confidence label, and every claim must carry the inputs and rationale that
+    # explain the label ("why this confidence", issue #58). Before this, the LLM
+    # lane hardcoded "medium" with no rationale, so the trust layer could not
+    # explain most production claims.
+    from .claims import with_derived_confidence
+
+    return with_derived_confidence(record)
 
 
 def claims_from_extraction(

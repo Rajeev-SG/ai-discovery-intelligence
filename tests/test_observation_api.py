@@ -200,3 +200,147 @@ def test_degraded_ledger_without_event_tables_is_operator_visible(client, caplog
         body = c.get("/events").json()
     assert body["count"] == 0
     assert any("change_event" in r.message for r in caplog.records)
+
+
+def test_surface_evidence_resolves_aliases_like_the_mechanics_path(client):
+    """Issue #58: a surface whose claims are stored under an alias must resolve to
+    the canonical registry id in the evidence read path too, so it renders its
+    evidence instead of a false "No evidence" (the gap #58 fixes)."""
+
+    c, _session, engine = client
+    # A real, validated claim stored under the alias "deepseek" (not the registry
+    # id "deepseek-chat"). Distinct content so it is not deduped against the
+    # fixture's widget-search claim.
+    C.persist_claim(
+        engine,
+        _claim_record(
+            surfaces=["deepseek"],
+            statement="DeepSeek had 9.9M monthly visits in February 2026.",
+        ),
+    )
+
+    aliased = c.get("/surfaces/deepseek-chat/evidence").json()
+    assert aliased["evidence_state"] == "evidenced"
+    assert aliased["claims"]
+
+    # The same claim is found by the per-surface claims filter.
+    assert c.get("/claims?surface=deepseek-chat").json()["total"] == 1
+
+    # The bulk projection is keyed by the canonical id, not the raw alias.
+    bulk = c.get("/surface-evidence").json()["surfaces"]
+    assert "deepseek-chat" in bulk
+    assert "deepseek" not in bulk
+
+
+def test_mechanics_endpoint_inlines_reconciliation_for_conflicting_claims(client, monkeypatch):
+    """Issue #58: the mechanics endpoint joins the backend reconciliation index onto
+    each evidence entry, so a conflict renders inline without React re-deriving it."""
+
+    c, _session, _engine = client
+    # Two real-shaped ledger rows that disagree on the same surface/subject/metric.
+    # Monkeypatch the ledger read so the test exercises the API wiring, not
+    # extraction (the alias path already has its own end-to-end test).
+    def _row(visits, claim_id):
+        return {
+            "claim_id": claim_id,
+            "topic": "retrieval_index",
+            "statement": f"ChatGPT retrieved ~{visits} results per query.",
+            "surfaces": ["chatgpt"],
+            "status": "current",
+            "relationship": "new",
+            "confidence": "medium",
+            "confidence_detail": {"score": 0.5, "inputs": {}, "rationale": [], "derived": True},
+            "source": {
+                "source_id": "s",
+                "publisher": "P",
+                "url": "https://example.test/x",
+                "source_class": "official",
+            },
+            "dates": {"published_at": "2026-01-02", "observed_at": "2026-09-16T00:00:00+00:00"},
+            "methodology": {"measurement_mode": "vendor_estimate"},
+            "metrics": [
+                {
+                    "metric_id": "count",
+                    "label": "Results per query",
+                    "value_number": visits,
+                    "unit": "results",
+                }
+            ],
+            "provenance": [],
+            "evidence": [],
+            "extraction": {},
+        }
+
+    rows = [_row(2.4, "cr1"), _row(0.6, "cr2")]
+    monkeypatch.setattr("ai_discovery.claims.load_expanded_claims", lambda *a, **k: rows)
+
+    body = c.get("/mechanics").json()
+    surface = body["surfaces"].get("chatgpt")
+    assert surface is not None
+    recon_seen = [
+        rec
+        for dim in surface["dimensions"]
+        for a in dim["assertions"]
+        for e in a["evidence"]
+        for rec in e["reconciliation"]
+    ]
+    assert recon_seen, "expected an inline reconciliation record for differing claims"
+    assert all(rec["state"] and rec["relationship"] for rec in recon_seen)
+
+
+def test_alias_surface_filter_on_postgres_uses_the_jsonb_branch():
+    """Review F3: the alias-aware Postgres filter (`claim.surfaces::jsonb ?| text[]`)
+    must find a claim stored under an alias when queried by the canonical id.
+    The sqlite fixture cannot exercise this branch; this runs it on real Postgres
+    (skips when no Postgres is available, like tests/test_migration.py)."""
+
+    import os
+
+    psycopg = pytest.importorskip("psycopg")
+    from sqlalchemy import create_engine, text
+    from sqlalchemy.engine import make_url
+    from sqlalchemy.exc import SQLAlchemyError
+
+    base = os.environ.get("AI_DISCOVERY_TEST_DATABASE_URL") or (
+        "postgresql+psycopg://ai_discovery:ai_discovery@127.0.0.1:55432/ai_discovery"
+    )
+    # Force the psycopg (v3) driver: CI exposes a bare ``postgresql://`` URL, which
+    # SQLAlchemy would route to the uninstalled psycopg2. A dedicated database
+    # keeps this test off the real ledger entirely.
+    url = make_url(base)
+    if not url.drivername.endswith("psycopg"):
+        url = url.set(drivername="postgresql+psycopg")
+    dbname = "adi_alias_branch_test"
+    try:
+        admin = create_engine(url.set(database="postgres"))
+        with admin.connect() as conn:
+            conn.execution_options(isolation_level="AUTOCOMMIT")
+            conn.execute(text(f'DROP DATABASE IF EXISTS "{dbname}"'))
+            conn.execute(text(f'CREATE DATABASE "{dbname}"'))
+    except (psycopg.OperationalError, SQLAlchemyError, ImportError) as exc:  # pragma: no cover
+        pytest.skip(f"no Postgres available: {exc}")
+
+    engine = create_engine(url.set(database=dbname))
+    try:
+        C.init_ledger(engine)
+        rec = _claim_record(
+            surfaces=["deepseek"],
+            statement="DeepSeek alias row for the Postgres branch.",
+        )
+        C.persist_claim(engine, rec)
+
+        rows = C.load_expanded_claims(engine, surface="deepseek-chat")
+        assert len(rows) == 1, "the alias-aware Postgres branch must find the aliased claim"
+        assert rows[0]["surfaces"] == ["deepseek"]
+
+        # The alias and its canonical id are the same surface: either spelling
+        # resolves to the claim (the variant set includes both).
+        assert len(C.load_expanded_claims(engine, surface="deepseek")) == 1
+        # An unrelated surface still finds nothing on the same branch.
+        assert C.load_expanded_claims(engine, surface="chatgpt") == []
+    finally:
+        engine.dispose()
+        with admin.connect() as conn:
+            conn.execution_options(isolation_level="AUTOCOMMIT")
+            conn.execute(text(f'DROP DATABASE IF EXISTS "{dbname}"'))
+        admin.dispose()

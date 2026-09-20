@@ -104,8 +104,8 @@ export function fixtureSurfaces(): Record<string, SurfaceEvidence> {
       },
       history: [],
     },
-    "deepseek-chat": {
-      surface: "deepseek-chat",
+    grok: {
+      surface: "grok",
       evidence_state: "no_evidence",
       evidence_note: "No validated claim is linked to this surface yet.",
       claims: [],

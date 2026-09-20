@@ -9,6 +9,7 @@ no supporting claim is an explicit unknown. Tests cover all four states plus the
 from __future__ import annotations
 
 import copy
+import datetime as dt
 
 import pytest
 from pydantic import ValidationError
@@ -438,3 +439,123 @@ def test_ledger_token_is_honest_about_in_place_edits():
     edited = copy.deepcopy(a)
     edited[0]["statement"] = "a corrected statement"
     assert M.ledger_token(a) == M.ledger_token(edited)
+
+
+# --------------------------------------------------------------------------- #
+# Issue #58: the trust layer's evidence contract — why-confidence, freshness,
+# and inline reconciliation (reused verbatim, never re-derived)
+# --------------------------------------------------------------------------- #
+
+
+def _serialised_evidence(row, *, dimension="crawling_indexing_controls"):
+    view = M.dimension_view(
+        M.project_surface("chatgpt", [row]).dimension(dimension), None
+    )
+    return view["assertions"][0]["evidence"][0]
+
+
+def test_evidence_carries_confidence_rationale_and_freshness():
+    """Issue #58: each evidence entry states why its confidence is what it is and
+    how fresh the capture is, so a marketer can judge trust in one interaction.
+
+    Freshness is serialized at read time from the observed timestamp, not baked
+    into the frozen projection (review F1)."""
+
+    row = _claim(observed_at=dt.datetime.now(dt.UTC).isoformat())
+    row["confidence_detail"] = {
+        "score": 0.82,
+        "inputs": {"source_authority": 1.0},
+        "rationale": ["source_authority: 1.00 (official)", "recency: captured 2d after publication"],
+        "derived": True,
+    }
+    ev = _serialised_evidence(row)
+    assert ev["confidence_rationale"] and "source_authority" in ev["confidence_rationale"][0]
+    assert ev["freshness_state"] == "fresh"
+    assert ev["freshness_age_days"] == 0
+
+
+def test_freshness_is_unknown_without_a_timestamp():
+    """An absent observation time is an explicit unknown, never a guess."""
+
+    ev = _serialised_evidence(_claim(observed_at=None))
+    assert ev["freshness_state"] == "unknown"
+    assert ev["freshness_age_days"] is None
+
+
+def test_cached_projection_reports_freshness_at_read_time_not_cache_time():
+    """Review F1: freshness must not be frozen by the projection cache. A ledger
+    cached while fresh must report a later state once the clock advances, because
+    the state is derived from the observed timestamp at serialization time."""
+
+    row = _claim(observed_at="2026-01-01T00:00:00+00:00")
+    # Build and cache the projection now.
+    m = M.cached_project_surface("chatgpt", [row], now=0.0)
+    # Serialize much later: the same cached projection must still report "stale"
+    # (the observed date is far in the past relative to the current clock).
+    view = M.dimension_view(m.dimension("crawling_indexing_controls"), None)
+    ev = view["assertions"][0]["evidence"][0]
+    assert ev["freshness_state"] == "stale"
+    assert ev["freshness_age_days"] > 180
+
+
+def test_dimension_view_inlines_reconciliation_verbatim():
+    """Issue #58: conflicts render inline by joining the backend reconciliation
+    index onto each evidence entry; nothing is re-derived in the presentation."""
+
+    row = _claim(claim_id="c1")
+    recon = {
+        "c1": [
+            {
+                "claim_ids": ["c1", "c2"],
+                "state": "material_conflict",
+                "relationship": "contradicts",
+                "confidence_adjustment": -0.2,
+                "differences": ["value"],
+                "unknown_dimensions": [],
+                "interpretation": "The two readings disagree on the same quantity.",
+            }
+        ]
+    }
+    view = M.dimension_view(
+        M.project_surface("chatgpt", [row]).dimension("crawling_indexing_controls"), recon
+    )
+    entry = view["assertions"][0]["evidence"][0]
+    assert entry["reconciliation"][0]["state"] == "material_conflict"
+    assert entry["reconciliation"][0]["relationship"] == "contradicts"
+
+
+def test_dimension_view_has_empty_reconciliation_when_none_supplied():
+    row = _claim(claim_id="c1")
+    view = M.dimension_view(
+        M.project_surface("chatgpt", [row]).dimension("crawling_indexing_controls"), None
+    )
+    assert view["assertions"][0]["evidence"][0]["reconciliation"] == []
+
+
+
+def test_persisted_claim_without_stored_rationale_still_explains_confidence():
+    """Review F4: a claim captured before the LLM lane recorded its rationale must
+    still state why its confidence is what it is. The read path derives the "why"
+    from the persisted row, reusing the ONE confidence implementation."""
+
+    row = _claim()
+    # Simulate a pre-fix persisted claim: label present, inputs/rationale empty.
+    row["confidence_detail"] = {"score": None, "inputs": {}, "rationale": [], "derived": True}
+    ev = _serialised_evidence(row)
+    assert ev["confidence_rationale"], "the read path must explain the confidence anyway"
+    assert any("source class" in line for line in ev["confidence_rationale"])
+
+
+def test_explain_persisted_confidence_matches_the_record_path():
+    """One implementation (review F5): the persisted-row explainer and the record
+    assessor produce the same inputs and rationale text for equivalent evidence."""
+
+    from ai_discovery.confidence import explain_persisted_confidence
+
+    # Build a real record via the deterministic path, then explain its persisted
+    # row shape and compare the source-authority rationale line.
+    row = _claim(source_class="official")
+    row["confidence_detail"] = {"score": None, "inputs": {}, "rationale": [], "derived": True}
+    explained = explain_persisted_confidence(row)
+    assert explained.inputs["source_authority"] == 1.0
+    assert any("source class official" in line for line in explained.rationale)

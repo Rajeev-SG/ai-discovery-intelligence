@@ -434,3 +434,62 @@ def _same_value(first: StudyClaim, second: StudyClaim) -> bool:
     if first.value is None or second.value is None:
         return False
     return abs(first.value - second.value) <= 1e-9 * max(1.0, abs(first.value))
+
+
+def _cached_index(token: str, rows: list[dict]):
+    """Build the index once per ledger token (issue #58 review F2).
+
+    ``reconcile_persisted`` is a pure function with no write side effects, but it
+    is pairwise within groups (O(n^2)), so recomputing it on every GET is wasted
+    work. The index is cached on the same ledger-content token the mechanics
+    projection uses, so a page view reuses it and a new claim rebuilds it.
+    """
+
+    from .mechanics import _cached  # shared bounded cache + lock
+
+    return _cached(f"recon:{token}", token, lambda: _build_index(rows), now=None)
+
+
+def cached_reconciliation_index(rows: list[dict]) -> dict[str, list[dict]]:
+    """``reconciliation_index`` cached per ledger token (read path, no writes)."""
+
+    from .mechanics import ledger_token
+
+    return _cached_index(ledger_token(rows), rows)
+
+
+def reconciliation_index(rows: list[dict]) -> dict[str, list[dict]]:
+    """Index persisted reconciliation by the claim ids it relates.
+
+    Issue #58: the evidence/trust layer shows conflicts *inline* on a mechanics
+    dimension without reimplementing reconciliation in React. This reuses
+    :func:`reconcile_persisted` unchanged and reshapes its output so the frontend
+    only has to join on ``claim_id`` — the same read-time join it already performs
+    for the reconciliation page. Claim ids are the ``<claim_id>:<metric_id>`` form
+    the comparison uses; the bare claim id is also indexed so a UI holding only a
+    claim id still finds its relationships.
+    """
+
+    return _build_index(rows)
+
+
+def _build_index(rows: list[dict]) -> dict[str, list[dict]]:
+    """The uncached index builder (see :func:`cached_reconciliation_index`)."""
+
+    index: dict[str, list[dict]] = {}
+    for rec in reconcile_persisted(rows):
+        payload = {
+            "claim_ids": list(rec.claim_ids),
+            "state": rec.state,
+            "relationship": rec.relationship,
+            "confidence_adjustment": rec.confidence_adjustment,
+            "differences": list(rec.differences),
+            "unknown_dimensions": list(rec.unknown_dimensions),
+            "interpretation": rec.interpretation,
+        }
+        for cid in rec.claim_ids:
+            index.setdefault(cid, []).append(payload)
+            bare = cid.split(":", 1)[0]
+            if bare != cid:
+                index.setdefault(bare, []).append(payload)
+    return index

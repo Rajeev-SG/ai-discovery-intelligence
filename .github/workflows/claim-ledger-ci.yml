@@ -57,6 +57,17 @@ jobs:
             exit 1
           fi
 
+      - name: Production-dialect alias test must run, not skip
+        # The alias-aware jsonb ?| filter only runs on Postgres; a silent skip would
+        # let the alias fix regress on the production database alone (issue #58 F3).
+        run: |
+          output=$(uv run pytest tests/test_observation_api.py::test_alias_surface_filter_on_postgres_uses_the_jsonb_branch -q -rs --tb=short)
+          echo "$output"
+          if echo "$output" | grep -qi "skipped"; then
+            echo "::error::Production-dialect alias test skipped; the Postgres service is unavailable"
+            exit 1
+          fi
+
       - name: Lint
         run: uv run ruff check src tests scripts
 

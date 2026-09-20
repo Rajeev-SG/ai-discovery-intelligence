@@ -31,6 +31,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from .observations import freshness_of as _freshness
+
 # --------------------------------------------------------------------------- #
 # Dimensions (the canonical, frozen set required by issue #56)
 # --------------------------------------------------------------------------- #
@@ -327,6 +329,15 @@ class MechanicsEvidence(BaseModel):
     effective_from: dt.date | None = None
     confidence: str
     confidence_score: float | None = None
+    #: The label the read-time-synthesised rationale actually supports, when a
+    #: rationale had to be derived (legacy claims). ``None`` when the stored
+    #: rationale and label came from the same persisted computation. Lets the UI
+    #: state any discrepancy explicitly instead of implying agreement (DELTA-1).
+    derived_label: str | None = None
+    #: Why the confidence is what it is, copied verbatim from the evidence-derived
+    #: confidence rationale (issue #58: "a one-line why this confidence"). A
+    #: marketer can read the reason without learning the confidence model.
+    confidence_rationale: tuple[str, ...] = ()
     measurement_mode: str | None = None
     methodology_notes: str | None = None
     limitations: tuple[str, ...] = ()
@@ -512,8 +523,25 @@ def _evidence_from_claim(row: dict[str, Any], canonical_scope: str | None = None
     if geo:
         regions = (str(geo),)
 
+    rationale = tuple((row.get("confidence_detail") or {}).get("rationale") or ())
+    derived_label = None
+    if not rationale:
+        # A claim captured before the LLM lane recorded its rationale still has to
+        # explain its confidence (issue #58 review F4). Derive the "why" at read
+        # time from the persisted row, reusing the ONE confidence implementation;
+        # the persisted label is never rewritten. The derived label is surfaced
+        # separately (review DELTA-1) so the rationale is never shown next to a
+        # label it does not support. Bounded to the request path, so it is never
+        # frozen into the cached projection payload.
+        from .confidence import explain_persisted_confidence
+
+        assessment = explain_persisted_confidence(row)
+        rationale = tuple(assessment.rationale)
+        derived_label = assessment.label
     raw_surfaces = list(row.get("surfaces") or [])
     return MechanicsEvidence(
+        confidence_rationale=rationale,
+        derived_label=derived_label,
         claim_id=row["claim_id"],
         source_id=source.get("source_id"),
         publisher=source.get("publisher"),
@@ -721,8 +749,17 @@ def project_all(
 # --------------------------------------------------------------------------- #
 
 
-def dimension_view(state: DimensionState) -> dict[str, Any]:
-    """The marketer-safe view of one mechanics dimension."""
+def dimension_view(
+    state: DimensionState, reconciliation: dict[str, list[dict]] | None = None
+) -> dict[str, Any]:
+    """The marketer-safe view of one mechanics dimension.
+
+    ``reconciliation`` is the read-only index from
+    :func:`ai_discovery.reconciliation.reconciliation_index`. When present, each
+    evidence entry carries the persisted reconciliation records that name its
+    claim, so a conflict renders *inline* without reimplementing reconciliation in
+    React (issue #58). The backend decision is shown verbatim; the UI only joins.
+    """
 
     meta = DIMENSION_META.get(state.dimension, {})
     return {
@@ -749,6 +786,13 @@ def dimension_view(state: DimensionState) -> dict[str, Any]:
                         "effective_from": e.effective_from.isoformat() if e.effective_from else None,
                         "confidence": e.confidence,
                         "confidence_score": e.confidence_score,
+                        "confidence_rationale": list(e.confidence_rationale),
+                        "derived_label": e.derived_label,
+                        # Freshness is derived HERE, at serialization time, from the
+                        # persisted observation time — never baked into the cached
+                        # projection (review F1: a cached "fresh · 0d" would drift).
+                        "freshness_state": _freshness(e.observed_at)["state"],
+                        "freshness_age_days": _freshness(e.observed_at)["age_days"],
                         "measurement_mode": e.measurement_mode,
                         "methodology_notes": e.methodology_notes,
                         "limitations": list(e.limitations),
@@ -759,6 +803,7 @@ def dimension_view(state: DimensionState) -> dict[str, Any]:
                         "claimed_surface_value": e.claimed_surface_value,
                         "canonical_surface_id": e.canonical_surface_id,
                         "methodology_completeness": e.methodology_completeness,
+                        "reconciliation": (reconciliation or {}).get(e.claim_id, []),
                     }
                     for e in a.evidence
                 ],
@@ -792,12 +837,14 @@ def unmapped_claim_surfaces(
     return {sid: sorted(ids) for sid, ids in sorted(seen.items())}
 
 
-def mechanics_view(mechanics: SurfaceMechanics) -> dict[str, Any]:
+def mechanics_view(
+    mechanics: SurfaceMechanics, reconciliation: dict[str, list[dict]] | None = None
+) -> dict[str, Any]:
     """The marketer-safe payload for one surface's mechanics projection."""
 
     return {
         "surface": mechanics.surface_id,
-        "dimensions": [dimension_view(d) for d in mechanics.dimensions],
+        "dimensions": [dimension_view(d, reconciliation) for d in mechanics.dimensions],
         "coverage": mechanics.coverage(),
         "evidenced_dimension_count": mechanics.evidenced_dimension_count(),
         "dimension_count": len(MECHANICS_DIMENSIONS),

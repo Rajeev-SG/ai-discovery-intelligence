@@ -133,3 +133,18 @@ are not surfaces at all (a category like `answer-engines`, a cited domain like
 See `proof/phase2/ISSUE_56_PROOF.md`: a complete real ChatGPT mechanics payload and
 a deliberately under-documented surface (`deepseek-chat`) whose unknowns remain
 explicit rather than inferred, both generated from the production ledger.
+
+## Evidence & trust layer (issue #58)
+
+The mechanics evidence contract carries what a marketer needs to judge trust in
+one interaction: `confidence_rationale` (why this confidence), `freshness_state`
+and `freshness_age_days`, plus the existing publisher, public URL,
+`evidence_class`, dates, methodology and scope. `GET /mechanics` and
+`GET /surfaces/{id}/mechanics` additionally join the single reconciliation service
+(`reconciliation_index` over `reconcile_persisted`) onto each evidence entry, so a
+conflict is shown inline and the UI never re-derives a reconciliation decision.
+
+The read paths that group claims by surface (`/surface-evidence`,
+`/surfaces/{id}/evidence`, `?surface=`) resolve aliases to the canonical registry
+id via `registry.surface_id_variants`, so the mechanics projection and the legacy
+evidence paths agree on surface identity. See `proof/phase2/ISSUE_58_PROOF.md`.

@@ -123,8 +123,10 @@ test("search, filter, sort and expanded DeepSeek detail", async ({ page }) => {
   await expect(page.getByTestId("detail-deepseek-chat")).toBeVisible();
   await expect(page.getByTestId("detail-deepseek-chat")).toContainText("Upstream retrieval index/provider");
   await expect(page.getByTestId("detail-deepseek-chat")).toContainText("chat.deepseek.com");
-  // Issue #23: a surface with no validated claim shows an explicit no-evidence state.
-  await expect(page.getByTestId("detail-deepseek-chat")).toContainText("No evidence");
+  // Issue #58: DeepSeek's claims are stored under the alias "deepseek"; the read
+  // path must resolve them, so a surface with aliased claims now shows its real
+  // evidence instead of a false "No evidence".
+  await expect(page.getByTestId("detail-deepseek-chat")).toContainText("validated claim");
   await page.screenshot({ path: `${SHOTS}/desktop-expanded-deepseek.png` });
 });
 
