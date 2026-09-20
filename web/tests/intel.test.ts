@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { fetchBrief, fetchEvents } from "../lib/intel";
+import { changeWindow, fetchBrief, fetchEvents } from "../lib/intel";
 
 const ORIGINAL = process.env.EVIDENCE_API_URL;
 
@@ -172,5 +172,27 @@ describe("clampText (review F5)", () => {
     const long = "x".repeat(500);
     expect(clampText(long, 320).length).toBeLessThanOrEqual(321);
     expect(clampText(long, 320).endsWith("…")).toBe(true);
+  });
+});
+
+
+describe("changeWindow truncation (issue #55 review)", () => {
+  const items = Array.from({ length: 12 }, (_, i) => i);
+  it("does not disclose a short feed", () => {
+    const w = changeWindow([1, 2, 3], 5);
+    expect(w.truncated).toBe(false);
+    expect(w.shown).toHaveLength(3);
+    expect(w.total).toBe(3);
+  });
+  it("discloses and caps a long feed", () => {
+    const w = changeWindow(items, 5);
+    expect(w.truncated).toBe(true);
+    expect(w.shown).toHaveLength(5);
+    expect(w.total).toBe(12);
+  });
+  it("does not disclose when the feed exactly fills the cap", () => {
+    const w = changeWindow(items.slice(0, 5), 5);
+    expect(w.truncated).toBe(false);
+    expect(w.total).toBe(5);
   });
 });

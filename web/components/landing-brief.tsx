@@ -8,6 +8,11 @@ import { CONFIDENCE_LABELS, evidenceHref, type ConfidenceLabel } from "@/lib/pov
  * the material change, why it matters, the agency action, confidence and
  * significance. A `state:"empty"` brief says "no material item qualifies this
  * week" — distinct from an unreachable backend, which says so plainly.
+ *
+ * Each card leads with the change, confidence and significance. The standing
+ * "why it matters" / "agency action" framing is deterministic per event type
+ * (`config/brief_copy.yaml`), so it repeats across items; it is disclosed behind
+ * a per-card expander to keep the default view readable.
  */
 function confidenceLabel(value: string): string {
   return CONFIDENCE_LABELS[value as ConfidenceLabel] ?? value;
@@ -20,34 +25,35 @@ function BriefCard({ item }: { item: BriefItem }) {
         <span className="pill brief-confidence">confidence: {confidenceLabel(item.confidence)}</span>
         <span className="pill brief-significance">significance {item.significance.toFixed(2)}</span>
         {item.is_watch_item ? <span className="pill brief-watch">watch item</span> : null}
+        {item.surfaces.map((surface) => (
+          <Link
+            className="pill pill-surface"
+            key={surface}
+            href={`/surfaces?q=${encodeURIComponent(surface)}`}
+          >
+            {surface}
+          </Link>
+        ))}
       </div>
       <p className="brief-change">{clampText(item.change)}</p>
-      <dl className="brief-why">
-        <div>
-          <dt>Why it matters</dt>
-          <dd>{clampText(item.why_it_matters)}</dd>
-        </div>
-        <div>
-          <dt>Agency action</dt>
-          <dd>{clampText(item.agency_action)}</dd>
-        </div>
-      </dl>
-      <p className="brief-meta">
-        {item.surfaces.length ? (
-          <span className="brief-surfaces">
-            {item.surfaces.map((surface) => (
-              <Link className="pill pill-surface" key={surface} href={`/surfaces?q=${encodeURIComponent(surface)}`}>
-                {surface}
-              </Link>
-            ))}
-          </span>
-        ) : null}
+      <details className="brief-why-details">
+        <summary>Why it matters &amp; what to do</summary>
+        <dl className="brief-why">
+          <div>
+            <dt>Why it matters</dt>
+            <dd>{clampText(item.why_it_matters)}</dd>
+          </div>
+          <div>
+            <dt>Agency action</dt>
+            <dd>{clampText(item.agency_action)}</dd>
+          </div>
+        </dl>
         {item.evidence_ids.length ? (
-          <span className="brief-evidence">
+          <p className="brief-evidence">
             <Link href={evidenceHref(item.evidence_ids[0])}>Evidence →</Link>
-          </span>
+          </p>
         ) : null}
-      </p>
+      </details>
     </li>
   );
 }

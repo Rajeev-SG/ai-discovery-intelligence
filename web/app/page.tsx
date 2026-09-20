@@ -28,7 +28,6 @@ export default async function Page() {
   return (
     <div className="landing">
       <header className="landing-hero">
-        <p className="eyebrow">AI Discovery Intelligence</p>
         <h1>What changed, what matters, what we believe</h1>
         <p className="landing-subtitle">
           A source-backed read on how consumer AI discovery surfaces find, retrieve, cite and

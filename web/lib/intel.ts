@@ -140,6 +140,15 @@ export function eventTypeLabel(value: string): string {
   return EVENT_TYPE_LABELS[value] ?? titleCaseEventType(value);
 }
 
+/**
+ * The change feed shown on the landing and whether it was truncated. Pure, so
+ * both branches (short feed ⇒ no disclosure, long feed ⇒ disclosure) are
+ * deterministically testable without a live backend.
+ */
+export function changeWindow<T>(items: T[], cap: number): { shown: T[]; total: number; truncated: boolean } {
+  return { shown: items.slice(0, cap), total: items.length, truncated: items.length > cap };
+}
+
 /** Defensive clamp for unbounded backend prose (issue #45 review F5). */
 export function clampText(value: string, max = 320): string {
   const trimmed = value.trim();

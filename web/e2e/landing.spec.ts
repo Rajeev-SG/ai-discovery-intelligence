@@ -74,11 +74,24 @@ test("landing shows real changes, brief and current POV from the live API", asyn
   const changeList = changes.getByTestId("change-list");
   if ((await changeList.count()) > 0) {
     const items = changeList.locator("> li");
-    expect(await items.count()).toBeGreaterThanOrEqual(1);
+    const count = await items.count();
+    expect(count).toBeGreaterThanOrEqual(1);
     expect((await items.first().innerText()).trim().length).toBeGreaterThan(10);
-    // Truncation is disclosed when the feed exceeds the landing's limit.
-    if ((await items.count()) === 8) {
-      await expect(changes.getByTestId("changes-truncation")).toBeVisible();
+
+    // Truncation disclosure must agree with the section's own shown/total data
+    // attributes (which mirror the rendered list), and be present iff the total
+    // exceeds what was shown. Reading the real totals avoids pinning the cap or
+    // the copy wording, and makes BOTH branches assert — a missing disclosure on
+    // a truncated feed fails, and a spurious one on a short feed fails too.
+    const shown = Number(await changes.getAttribute("data-change-shown"));
+    const total = Number(await changes.getAttribute("data-change-total"));
+    expect(shown).toBe(count);
+    const truncation = changes.getByTestId("changes-truncation");
+    if (total > shown) {
+      await expect(truncation).toBeVisible();
+      await expect(truncation).toContainText(`of ${total}`);
+    } else {
+      await expect(truncation).toHaveCount(0);
     }
     await page.screenshot({ path: shot(testInfo, "changes"), fullPage: false });
   } else {
@@ -88,6 +101,9 @@ test("landing shows real changes, brief and current POV from the live API", asyn
   const briefList = brief.getByTestId("brief-list");
   if ((await briefList.count()) > 0) {
     const first = brief.getByTestId("brief-item").first();
+    // The standing "why it matters / agency action" framing is disclosed behind a
+    // per-card expander (the copy repeats across items), so open it before checking.
+    await first.locator("details summary").first().click();
     await expect(first).toContainText("Why it matters");
     await expect(first).toContainText("Agency action");
     await page.screenshot({ path: shot(testInfo, "brief"), fullPage: false });
