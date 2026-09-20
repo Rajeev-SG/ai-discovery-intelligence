@@ -1,22 +1,52 @@
-import { ObservationPlane } from "@/components/observation-plane";
-import { applyEvidence, fetchSurfaceEvidence } from "@/lib/evidence";
-import { loadRegistry } from "@/lib/registry";
-import { toSurfaceRows } from "@/lib/surfaces";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { LandingBrief } from "@/components/landing-brief";
+import { LandingChanges } from "@/components/landing-changes";
+import { LandingPov } from "@/components/landing-pov";
+import { fetchBrief, fetchEvents } from "@/lib/intel";
+import { loadPov } from "@/lib/pov.server";
+
+export const metadata: Metadata = {
+  title: "AI Discovery Intelligence",
+  description:
+    "What changed, what matters and what we currently believe about how consumer AI discovery surfaces find, retrieve, cite and recommend information.",
+};
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Intelligence-first landing (issue #45). Leads with what changed (real
+ * `/events`), what matters (real `/brief`) and what we currently believe (the
+ * canonical POV), then points at the secondary Explore surfaces view. The POV
+ * artifact is committed, so its read is local; the two live endpoints degrade
+ * to explicit, distinguishable states when the backend is unreachable.
+ */
 export default async function Page() {
-  const registry = loadRegistry();
-  const rows = toSurfaceRows(registry);
-  // Overlay real evidence when the evidence service is configured; otherwise the
-  // plane keeps its explicit no-evidence state.
-  const bySurface = await fetchSurfaceEvidence();
-  const withEvidence = applyEvidence(rows, bySurface);
+  const [events, brief] = await Promise.all([fetchEvents(), fetchBrief()]);
+  const pov = loadPov();
+
   return (
-    <ObservationPlane
-      rows={withEvidence}
-      registryVersion={registry.version}
-      lastReviewed={registry.lastReviewed}
-    />
+    <div className="landing">
+      <header className="landing-hero">
+        <p className="eyebrow">AI Discovery Intelligence</p>
+        <h1>What changed, what matters, what we believe</h1>
+        <p className="landing-subtitle">
+          A source-backed read on how consumer AI discovery surfaces find, retrieve, cite and
+          recommend information — updated as the evidence changes.
+        </p>
+        <nav className="landing-actions" aria-label="Landing navigation">
+          <Link className="landing-button" href="/surfaces">
+            Explore surfaces
+          </Link>
+          <Link className="landing-link" href="/reconciliation">
+            Reconciled evidence →
+          </Link>
+        </nav>
+      </header>
+
+      <LandingChanges outcome={events} />
+      <LandingBrief outcome={brief} />
+      <LandingPov view={pov} />
+    </div>
   );
 }

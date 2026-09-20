@@ -122,9 +122,12 @@ export function formatDateTime(iso: string | null): string {
   return date.toISOString().slice(0, 16).replace("T", " ") + " UTC";
 }
 
-/** Link an evidence/claim id to the observation-plane evidence drill-down. */
+/**
+ * Link an evidence/claim id to the observation-plane evidence drill-down, which
+ * now lives at `/surfaces` (issue #45 moved the registry off the root).
+ */
 export function evidenceHref(claimId: string): string {
-  return `/?evidence=${encodeURIComponent(claimId)}`;
+  return `/surfaces?evidence=${encodeURIComponent(claimId)}`;
 }
 
 function asEvidence(raw: unknown): PovEvidence {

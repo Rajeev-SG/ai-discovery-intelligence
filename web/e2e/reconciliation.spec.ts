@@ -77,7 +77,7 @@ test("links back into the evidence surface route", async ({ page }) => {
   await gotoOrSkip(page);
   const link = page.locator('[data-testid^="recon-link-"]').first();
   await expect(link).toBeVisible();
-  await expect(link).toHaveAttribute("href", /\/\?surface=/);
+  await expect(link).toHaveAttribute("href", /\/surfaces\?surface=/);
 });
 
 test("mobile layout keeps both sides and the interpretation readable", async ({ page }, testInfo) => {
