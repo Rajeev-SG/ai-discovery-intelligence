@@ -2,6 +2,16 @@
 
 This file records repository/product changes. The generated intelligence changelog will live separately in the canonical data store and `pov/CHANGELOG.md` once implemented.
 
+## 2026-09-20 (issue #59)
+
+- **Evidence-backed marketing implications.** `src/ai_discovery/implications.py`
+  maps evidenced mechanics dimensions + ledger topics to marketer action families
+  via an auditable rule table; every implication carries supporting claim ids,
+  surfaces/modes/regions, confidence, actionability, significance (reusing the POV
+  machinery) and contradicting evidence. `/implications` and
+  `/surfaces/{id}/implications`; new `/implications` UI page. Unknown / no-action
+  is an explicit monitor-only state. Proof: `proof/phase2/ISSUE_59_PROOF.md`.
+
 ## 2026-09-20 (issue #58)
 
 - **Surface-alias read-path fix.** `/surface-evidence` and

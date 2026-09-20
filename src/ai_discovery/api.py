@@ -460,6 +460,59 @@ def list_mechanics(db: Session = Depends(get_db)) -> dict:  # noqa: B008 - FastA
     }
 
 
+@app.get("/implications", tags=["implications"])
+def list_implications(db: Session = Depends(get_db)) -> dict:  # noqa: B008 - FastAPI DI
+    """Evidence-backed marketing implications for every registry surface.
+
+    Deterministic and evidence-linked (issue #59): each implication names the
+    supporting claim ids, surfaces/modes/regions, confidence, actionability and
+    rationale, and reuses the tested mechanics projection and significance
+    machinery. Surfaces with no actionable evidenced mechanic return an explicit
+    ``monitor_only`` state — unknown is a valid answer, never invented advice.
+    """
+
+    from .claims import load_expanded_claims
+    from .implications import derive_surface, implications_view
+    from .mechanics import cached_project_all
+
+    registry_ids = _surface_registry_ids()
+    claims = load_expanded_claims(_ledger_engine(db))
+    projection = cached_project_all(registry_ids, claims)
+    per_surface = {
+        sid: derive_surface(sid, projection[sid], claims) for sid in registry_ids
+    }
+    return implications_view(per_surface)
+
+
+@app.get("/surfaces/{surface_id}/implications", tags=["implications"])
+def get_surface_implications(
+    surface_id: str,
+    db: Session = Depends(get_db),  # noqa: B008 - FastAPI DI
+) -> dict:
+    """Marketing implications for one surface, or an explicit monitor-only state."""
+
+    from .claims import load_expanded_claims
+    from .implications import derive_surface, implication_view
+    from .mechanics import cached_project_surface
+
+    registry_ids = _surface_registry_ids()
+    if surface_id not in registry_ids:
+        return {
+            "surface": surface_id,
+            "state": "unknown_surface",
+            "note": "Surface is not in the canonical registry.",
+            "implications": [],
+        }
+    claims = load_expanded_claims(_ledger_engine(db))
+    result = derive_surface(surface_id, cached_project_surface(surface_id, claims), claims)
+    return {
+        "surface": surface_id,
+        "monitor_only": result.monitor_only,
+        "note": result.note,
+        "implications": [implication_view(i) for i in result.implications],
+    }
+
+
 @app.get("/surfaces/{surface_id}/mechanics", tags=["mechanics"])
 def get_surface_mechanics(
     surface_id: str,
