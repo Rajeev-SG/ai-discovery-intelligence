@@ -1,0 +1,931 @@
+{
+  "extraction_version": "claim-extraction-0.1.0",
+  "claims": [
+    {
+      "source": {
+        "source_id": "google-search-central-ai",
+        "publisher": "Google",
+        "url": "https://developers.google.com/search/docs/appearance/ai-features",
+        "canonical_url": "https://developers.google.com/search/docs/appearance/ai-features",
+        "source_class": "official"
+      },
+      "topic": "retrieval_index",
+      "statement": "Google's AI Mode and AI Overviews may use a query fan-out technique, issuing multiple related searches across subtopics and data sources to build one response.",
+      "surfaces": [
+        "google-ai-mode",
+        "google-ai-overviews"
+      ],
+      "methodology": {
+        "measurement_mode": "official_documentation",
+        "metric_family": {
+          "value": "query fan-out behaviour",
+          "quote": "Both AI Overviews and AI Mode may use a \"query fan-out\" technique \u2014 issuing multiple related searches across subtopics and data sources \u2014 to develop a response."
+        },
+        "metric_definition": {
+          "value": "issuing multiple related searches across subtopics and data sources",
+          "quote": "issuing multiple related searches across subtopics and data sources \u2014 to develop a response."
+        },
+        "unit_of_analysis": {
+          "value": "a single AI response",
+          "quote": "Both AI Overviews and AI Mode may use a \"query fan-out\" technique \u2014 issuing multiple related searches across subtopics and data sources \u2014 to develop a response."
+        },
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "devices": null,
+        "limitations": [
+          "Documents stated technique, not an observed fan-out rate."
+        ],
+        "methodology_notes": {
+          "value": "Google Search Central AI-features documentation.",
+          "quote": "AI features and your website"
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "fanout_used",
+          "label": "AI Mode and AI Overviews may use query fan-out",
+          "comparator": "qualitative_finding",
+          "definition": {
+            "value": "query fan-out technique",
+            "quote": "query fan-out\" technique"
+          },
+          "value": {
+            "value": "query fan-out",
+            "quote": "query fan-out\" technique"
+          },
+          "unit": {
+            "value": "technique",
+            "quote": "Both AI Overviews and AI Mode may use a \"query fan-out\" technique \u2014 issuing multiple related searches across subtopics and data sources \u2014 to develop a response."
+          },
+          "window": {
+            "value": "current documentation",
+            "quote": "Both AI Overviews and AI Mode may use a \"query fan-out\" technique \u2014 issuing multiple related searches across subtopics and data sources \u2014 to develop a response."
+          },
+          "scope": {
+            "value": "AI Mode and AI Overviews",
+            "quote": "Both AI Overviews and AI Mode may use"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "Both AI Overviews and AI Mode may use a \"query fan-out\" technique \u2014 issuing multiple related searches across subtopics and data sources \u2014 to develop a response."
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "google_ai_fanout_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new"
+    },
+    {
+      "source": {
+        "source_id": "google-search-central-ai",
+        "publisher": "Google",
+        "url": "https://developers.google.com/search/docs/appearance/ai-features",
+        "canonical_url": "https://developers.google.com/search/docs/appearance/ai-features",
+        "source_class": "official"
+      },
+      "topic": "retrieval_index",
+      "statement": "Google shows AI Overviews only when its systems judge them additive to classic Search, so they often do not trigger at all.",
+      "surfaces": [
+        "google-ai-overviews"
+      ],
+      "methodology": {
+        "measurement_mode": "official_documentation",
+        "metric_family": {
+          "value": "AI Overview trigger condition",
+          "quote": "AI Overviews are only shown when our systems determine that it is additive to classic Search, and as such, often don't trigger."
+        },
+        "metric_definition": {
+          "value": "shown only when systems determine it is additive to classic Search",
+          "quote": "AI Overviews are only shown when our systems determine that it is additive to classic Search, and as such, often don't trigger."
+        },
+        "unit_of_analysis": {
+          "value": "a search query",
+          "quote": "AI Overviews are only shown when our systems determine that it is additive to classic Search, and as such, often don't trigger."
+        },
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "devices": null,
+        "limitations": [
+          "Publisher states a policy; no trigger rate is published."
+        ],
+        "methodology_notes": {
+          "value": "Google Search Central AI-features documentation.",
+          "quote": "AI features and your website"
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "ai_overview_trigger",
+          "label": "AI Overviews trigger conditionally",
+          "comparator": "qualitative_finding",
+          "definition": {
+            "value": "additive to classic Search",
+            "quote": "additive to classic Search"
+          },
+          "value": {
+            "value": "conditional, often does not trigger",
+            "quote": "AI Overviews are only shown when our systems determine that it is additive to classic Search, and as such, often don't trigger."
+          },
+          "unit": {
+            "value": "policy",
+            "quote": "AI Overviews are only shown when our systems determine that it is additive to classic Search, and as such, often don't trigger."
+          },
+          "window": {
+            "value": "current documentation",
+            "quote": "AI Overviews are only shown when our systems determine that it is additive to classic Search, and as such, often don't trigger."
+          },
+          "scope": {
+            "value": "AI Overviews",
+            "quote": "AI Overviews are only shown"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "AI Overviews are only shown when our systems determine that it is additive to classic Search, and as such, often don't trigger."
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "google_ai_trigger_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new"
+    },
+    {
+      "source": {
+        "source_id": "google-search-central-ai",
+        "publisher": "Google",
+        "url": "https://developers.google.com/search/docs/appearance/ai-features",
+        "canonical_url": "https://developers.google.com/search/docs/appearance/ai-features",
+        "source_class": "official"
+      },
+      "topic": "citations_sources",
+      "statement": "While generating an AI response, Google's models identify additional supporting web pages and display a wider, more diverse set of links than classic web search.",
+      "surfaces": [
+        "google-ai-mode",
+        "google-ai-overviews"
+      ],
+      "methodology": {
+        "measurement_mode": "official_documentation",
+        "metric_family": {
+          "value": "supporting-link presentation",
+          "quote": "While responses are being generated, our advanced models identify more supporting web pages, allowing us to display a wider and more diverse set of helpful links associated with the response than with a classic web search"
+        },
+        "metric_definition": {
+          "value": "models identify more supporting web pages during generation",
+          "quote": "While responses are being generated, our advanced models identify more supporting web pages, allowing us to display a wider and more diverse set of helpful links associated with the response than with a classic web search"
+        },
+        "unit_of_analysis": {
+          "value": "a generated response",
+          "quote": "While responses are being generated, our advanced models identify more supporting web pages, allowing us to display a wider and more diverse set of helpful links associated with the response than with a classic web search"
+        },
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "devices": null,
+        "limitations": [
+          "Qualitative vendor claim; no link-count measurement."
+        ],
+        "methodology_notes": {
+          "value": "Google Search Central AI-features documentation.",
+          "quote": "AI features and your website"
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "supporting_links",
+          "label": "More supporting links than classic search",
+          "comparator": "qualitative_finding",
+          "definition": {
+            "value": "supporting web pages",
+            "quote": "supporting web pages"
+          },
+          "value": {
+            "value": "wider and more diverse set of helpful links",
+            "quote": "While responses are being generated, our advanced models identify more supporting web pages, allowing us to display a wider and more diverse set of helpful links associated with the response than with a classic web search"
+          },
+          "unit": {
+            "value": "links displayed",
+            "quote": "While responses are being generated, our advanced models identify more supporting web pages, allowing us to display a wider and more diverse set of helpful links associated with the response than with a classic web search"
+          },
+          "window": {
+            "value": "current documentation",
+            "quote": "While responses are being generated, our advanced models identify more supporting web pages, allowing us to display a wider and more diverse set of helpful links associated with the response than with a classic web search"
+          },
+          "scope": {
+            "value": "AI Mode and AI Overviews",
+            "quote": "our advanced models"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "While responses are being generated, our advanced models identify more supporting web pages, allowing us to display a wider and more diverse set of helpful links associated with the response than with a classic web search"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "google_ai_supporting_links_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new"
+    },
+    {
+      "source": {
+        "source_id": "google-search-central-ai",
+        "publisher": "Google",
+        "url": "https://developers.google.com/search/docs/appearance/ai-features",
+        "canonical_url": "https://developers.google.com/search/docs/appearance/ai-features",
+        "source_class": "official"
+      },
+      "topic": "retrieval_index",
+      "statement": "Google states AI Mode and AI Overviews may use different models and techniques, so their responses and links vary between the two surfaces.",
+      "surfaces": [
+        "google-ai-mode",
+        "google-ai-overviews"
+      ],
+      "methodology": {
+        "measurement_mode": "official_documentation",
+        "metric_family": {
+          "value": "mode-level technique variation",
+          "quote": "AI Mode and AI Overviews may use different models and techniques, so the set of responses and links they show will vary."
+        },
+        "metric_definition": {
+          "value": "may use different models and techniques",
+          "quote": "AI Mode and AI Overviews may use different models and techniques, so the set of responses and links they show will vary."
+        },
+        "unit_of_analysis": {
+          "value": "surface (AI Mode vs AI Overviews)",
+          "quote": "AI Mode and AI Overviews may use different models and techniques, so the set of responses and links they show will vary."
+        },
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "devices": null,
+        "limitations": [
+          "States variation exists; does not enumerate the differences."
+        ],
+        "methodology_notes": {
+          "value": "Google Search Central AI-features documentation.",
+          "quote": "AI features and your website"
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "mode_variation",
+          "label": "Responses vary between AI Mode and AI Overviews",
+          "comparator": "qualitative_finding",
+          "definition": {
+            "value": "different models and techniques",
+            "quote": "different models and techniques"
+          },
+          "value": {
+            "value": "responses and links will vary",
+            "quote": "AI Mode and AI Overviews may use different models and techniques, so the set of responses and links they show will vary."
+          },
+          "unit": {
+            "value": "surface",
+            "quote": "AI Mode and AI Overviews may use different models and techniques, so the set of responses and links they show will vary."
+          },
+          "window": {
+            "value": "current documentation",
+            "quote": "AI Mode and AI Overviews may use different models and techniques, so the set of responses and links they show will vary."
+          },
+          "scope": {
+            "value": "AI Mode and AI Overviews",
+            "quote": "AI Mode and AI Overviews may use"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "AI Mode and AI Overviews may use different models and techniques, so the set of responses and links they show will vary."
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "google_ai_mode_variation_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new"
+    },
+    {
+      "source": {
+        "source_id": "openai-platform-bots",
+        "publisher": "OpenAI",
+        "url": "https://platform.openai.com/docs/bots",
+        "canonical_url": "https://platform.openai.com/docs/bots",
+        "source_class": "official"
+      },
+      "topic": "crawler_index_policy",
+      "statement": "OpenAI's ChatGPT-User agent is not used to crawl the web automatically; it acts only in response to a user action.",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "methodology": {
+        "measurement_mode": "official_documentation",
+        "metric_family": {
+          "value": "crawler user-agent purpose",
+          "quote": "ChatGPT-User is not used for crawling the web in an automatic fashion."
+        },
+        "metric_definition": {
+          "value": "not used for crawling the web in an automatic fashion",
+          "quote": "ChatGPT-User is not used for crawling the web in an automatic fashion."
+        },
+        "unit_of_analysis": {
+          "value": "user agent ChatGPT-User",
+          "quote": "ChatGPT-User is not used for crawling the web in an automatic fashion."
+        },
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "devices": null,
+        "limitations": [
+          "Documents agent purpose, not observed crawl rates."
+        ],
+        "methodology_notes": {
+          "value": "OpenAI crawler documentation.",
+          "quote": "Overview of OpenAI Crawlers"
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "chatgpt_user_not_automatic",
+          "label": "ChatGPT-User is user-triggered only",
+          "comparator": "qualitative_finding",
+          "definition": {
+            "value": "user-initiated action",
+            "quote": "ChatGPT-User is not used for crawling the web in an automatic fashion."
+          },
+          "value": {
+            "value": "not used for crawling the web in an automatic fashion",
+            "quote": "ChatGPT-User is not used for crawling the web in an automatic fashion."
+          },
+          "unit": {
+            "value": "user agent",
+            "quote": "ChatGPT-User is not used for crawling the web in an automatic fashion."
+          },
+          "window": {
+            "value": "current documentation",
+            "quote": "ChatGPT-User is not used for crawling the web in an automatic fashion."
+          },
+          "scope": {
+            "value": "ChatGPT",
+            "quote": "ChatGPT-User"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "ChatGPT-User is not used for crawling the web in an automatic fashion."
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "openai_chatgpt_user_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new"
+    },
+    {
+      "source": {
+        "source_id": "openai-platform-bots",
+        "publisher": "OpenAI",
+        "url": "https://platform.openai.com/docs/bots",
+        "canonical_url": "https://platform.openai.com/docs/bots",
+        "source_class": "official"
+      },
+      "topic": "crawler_index_policy",
+      "statement": "OpenAI states the ChatGPT-User agent does not determine whether content appears in Search; that is governed separately.",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "methodology": {
+        "measurement_mode": "official_documentation",
+        "metric_family": {
+          "value": "search eligibility control",
+          "quote": "ChatGPT-User is not used to determine whether content may appear in Search."
+        },
+        "metric_definition": {
+          "value": "not used to determine whether content may appear in Search",
+          "quote": "ChatGPT-User is not used to determine whether content may appear in Search."
+        },
+        "unit_of_analysis": {
+          "value": "user agent ChatGPT-User",
+          "quote": "ChatGPT-User is not used to determine whether content may appear in Search."
+        },
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "devices": null,
+        "limitations": [
+          "Documents a control boundary, not observed behaviour."
+        ],
+        "methodology_notes": {
+          "value": "OpenAI crawler documentation.",
+          "quote": "Overview of OpenAI Crawlers"
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "search_eligibility_separate",
+          "label": "ChatGPT-User does not control Search eligibility",
+          "comparator": "qualitative_finding",
+          "definition": {
+            "value": "appear in Search",
+            "quote": "ChatGPT-User is not used to determine whether content may appear in Search."
+          },
+          "value": {
+            "value": "not used to determine whether content may appear in Search",
+            "quote": "ChatGPT-User is not used to determine whether content may appear in Search."
+          },
+          "unit": {
+            "value": "user agent",
+            "quote": "ChatGPT-User is not used to determine whether content may appear in Search."
+          },
+          "window": {
+            "value": "current documentation",
+            "quote": "ChatGPT-User is not used to determine whether content may appear in Search."
+          },
+          "scope": {
+            "value": "ChatGPT",
+            "quote": "ChatGPT-User"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "ChatGPT-User is not used to determine whether content may appear in Search."
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "openai_search_eligibility_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new"
+    },
+    {
+      "source": {
+        "source_id": "ahrefs-blog-ai",
+        "publisher": "Ahrefs",
+        "url": "https://ahrefs.com/blog/ai-search-traffic/",
+        "canonical_url": "https://ahrefs.com/blog/ai-search-traffic/",
+        "source_class": "visibility_research"
+      },
+      "topic": "citations_sources",
+      "statement": "Ahrefs research found ChatGPT converts roughly half of the URLs it retrieves for a query into citations, retrieving dozens but citing about 50%.",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "methodology": {
+        "measurement_mode": "vendor_estimate",
+        "metric_family": {
+          "value": "retrieved-to-cited conversion",
+          "quote": "although ChatGPT retrieves dozens of URLs to answer a single query, according to our research, it only ends up citing ~50% of them"
+        },
+        "metric_definition": {
+          "value": "share of retrieved URLs that become citations",
+          "quote": "although ChatGPT retrieves dozens of URLs to answer a single query, according to our research, it only ends up citing ~50% of them"
+        },
+        "unit_of_analysis": {
+          "value": "URLs retrieved per query",
+          "quote": "although ChatGPT retrieves dozens of URLs to answer a single query, according to our research, it only ends up citing ~50% of them"
+        },
+        "denominator": {
+          "value": "URLs retrieved",
+          "quote": "although ChatGPT retrieves dozens of URLs to answer a single query, according to our research, it only ends up citing ~50% of them"
+        },
+        "prompt_universe": null,
+        "sample_size": null,
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "devices": null,
+        "limitations": [
+          "Vendor research; exact prompt sample not shown in the capture."
+        ],
+        "methodology_notes": {
+          "value": "Ahrefs research on ChatGPT citations.",
+          "quote": "although ChatGPT retrieves dozens of URLs to answer a single query, according to our research, it only ends up citing ~50% of them"
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "cited_share_of_retrieved",
+          "label": "~50% of retrieved URLs are cited",
+          "comparator": "share_of_total",
+          "definition": {
+            "value": "retrieved URLs that become citations",
+            "quote": "although ChatGPT retrieves dozens of URLs to answer a single query, according to our research, it only ends up citing ~50% of them"
+          },
+          "value": {
+            "value": "~50%",
+            "quote": "~50% of them"
+          },
+          "unit": {
+            "value": "percent of retrieved URLs",
+            "quote": "although ChatGPT retrieves dozens of URLs to answer a single query, according to our research, it only ends up citing ~50% of them"
+          },
+          "window": {
+            "value": "Ahrefs study window",
+            "quote": "although ChatGPT retrieves dozens of URLs to answer a single query, according to our research, it only ends up citing ~50% of them"
+          },
+          "scope": {
+            "value": "ChatGPT",
+            "quote": "although ChatGPT retrieves dozens of URLs to answer a single query, according to our research, it only ends up citing ~50% of them"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "although ChatGPT retrieves dozens of URLs to answer a single query, according to our research, it only ends up citing ~50% of them"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "ahrefs_retrieved_to_cited_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new"
+    },
+    {
+      "source": {
+        "source_id": "ahrefs-blog-ai",
+        "publisher": "Ahrefs",
+        "url": "https://ahrefs.com/blog/ai-search-traffic/",
+        "canonical_url": "https://ahrefs.com/blog/ai-search-traffic/",
+        "source_class": "visibility_research"
+      },
+      "topic": "citations_sources",
+      "statement": "Ahrefs found the average cited page in ChatGPT is about 500 days old, so recency is not the dominant citation factor.",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "methodology": {
+        "measurement_mode": "vendor_estimate",
+        "metric_family": {
+          "value": "cited-page age",
+          "quote": "The average cited page is 500 days old (and still getting picked)"
+        },
+        "metric_definition": {
+          "value": "average age of a cited page",
+          "quote": "The average cited page is 500 days old (and still getting picked)"
+        },
+        "unit_of_analysis": {
+          "value": "cited page",
+          "quote": "The average cited page is 500 days old (and still getting picked)"
+        },
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "devices": null,
+        "limitations": [
+          "Vendor research; sample not shown in the capture."
+        ],
+        "methodology_notes": {
+          "value": "Ahrefs research on ChatGPT citations.",
+          "quote": "The average cited page is 500 days old (and still getting picked)"
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "avg_cited_page_age",
+          "label": "Average cited page ~500 days old",
+          "comparator": "approx",
+          "definition": {
+            "value": "age of a cited page",
+            "quote": "The average cited page is 500 days old (and still getting picked)"
+          },
+          "value": {
+            "value": "500",
+            "quote": "500 days old"
+          },
+          "unit": {
+            "value": "days",
+            "quote": "days old"
+          },
+          "window": {
+            "value": "Ahrefs study window",
+            "quote": "The average cited page is 500 days old (and still getting picked)"
+          },
+          "scope": {
+            "value": "ChatGPT cited pages",
+            "quote": "The average cited page is 500 days old (and still getting picked)"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "The average cited page is 500 days old (and still getting picked)"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "ahrefs_cited_page_age_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new"
+    },
+    {
+      "source": {
+        "source_id": "ahrefs-blog-ai",
+        "publisher": "Ahrefs",
+        "url": "https://ahrefs.com/blog/ai-search-traffic/",
+        "canonical_url": "https://ahrefs.com/blog/ai-search-traffic/",
+        "source_class": "visibility_research"
+      },
+      "topic": "retrieval_index",
+      "statement": "Ahrefs reports that ChatGPT's retrieval results carry a title, snippet, URL and ID, and it uses these to decide which pages to open and cite before reading full content.",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "methodology": {
+        "measurement_mode": "vendor_estimate",
+        "metric_family": {
+          "value": "retrieval candidate fields",
+          "quote": "when ChatGPT retrieves results, each one comes back with the page title, a brief snippet or summary, the URL, and an ID number"
+        },
+        "metric_definition": {
+          "value": "fields returned per retrieved result",
+          "quote": "when ChatGPT retrieves results, each one comes back with the page title, a brief snippet or summary, the URL, and an ID number"
+        },
+        "unit_of_analysis": {
+          "value": "retrieved result",
+          "quote": "when ChatGPT retrieves results, each one comes back with the page title, a brief snippet or summary, the URL, and an ID number"
+        },
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "devices": null,
+        "limitations": [
+          "Vendor research; describes a pre-open gatekeeping layer."
+        ],
+        "methodology_notes": {
+          "value": "Ahrefs research on ChatGPT citations.",
+          "quote": "when ChatGPT retrieves results, each one comes back with the page title, a brief snippet or summary, the URL, and an ID number"
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "retrieval_candidate_fields",
+          "label": "Retrieval results carry title/snippet/URL/ID",
+          "comparator": "qualitative_finding",
+          "definition": {
+            "value": "per-result fields",
+            "quote": "when ChatGPT retrieves results, each one comes back with the page title, a brief snippet or summary, the URL, and an ID number"
+          },
+          "value": {
+            "value": "title, snippet, URL, ID",
+            "quote": "when ChatGPT retrieves results, each one comes back with the page title, a brief snippet or summary, the URL, and an ID number"
+          },
+          "unit": {
+            "value": "fields",
+            "quote": "when ChatGPT retrieves results, each one comes back with the page title, a brief snippet or summary, the URL, and an ID number"
+          },
+          "window": {
+            "value": "Ahrefs study window",
+            "quote": "when ChatGPT retrieves results, each one comes back with the page title, a brief snippet or summary, the URL, and an ID number"
+          },
+          "scope": {
+            "value": "ChatGPT retrieval",
+            "quote": "when ChatGPT retrieves results, each one comes back with the page title, a brief snippet or summary, the URL, and an ID number"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "when ChatGPT retrieves results, each one comes back with the page title, a brief snippet or summary, the URL, and an ID number"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "ahrefs_retrieval_fields_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new"
+    },
+    {
+      "source": {
+        "source_id": "perplexity-blog",
+        "publisher": "Perplexity",
+        "url": "https://www.perplexity.ai/hub/blog",
+        "canonical_url": "https://www.perplexity.ai/hub/blog",
+        "source_class": "official"
+      },
+      "topic": "retrieval_index",
+      "statement": "Perplexity Research publishes Q2D-Web, a first-stage retriever benchmark built on agent queries and web documents, indicating its search stack is evaluated at the retrieval stage.",
+      "surfaces": [
+        "perplexity"
+      ],
+      "methodology": {
+        "measurement_mode": "official_documentation",
+        "metric_family": {
+          "value": "first-stage retriever benchmark",
+          "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+        },
+        "metric_definition": {
+          "value": "Evaluating First-Stage Retrievers at Scale",
+          "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+        },
+        "unit_of_analysis": {
+          "value": "web document retrieval",
+          "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+        },
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "devices": null,
+        "limitations": [
+          "Vendor research publication; describes evaluation, not production behaviour."
+        ],
+        "methodology_notes": {
+          "value": "Perplexity Research blog index.",
+          "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "first_stage_retriever_benchmark",
+          "label": "Perplexity benchmarks first-stage retrieval",
+          "comparator": "qualitative_finding",
+          "definition": {
+            "value": "first-stage retriever",
+            "quote": "First-Stage Retrievers"
+          },
+          "value": {
+            "value": "published benchmark Q2D-Web",
+            "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+          },
+          "unit": {
+            "value": "benchmark",
+            "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+          },
+          "window": {
+            "value": "Sep 2026",
+            "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+          },
+          "scope": {
+            "value": "Perplexity",
+            "quote": "Perplexity Research"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "Q2D-Web: Evaluating First-Stage Retrievers at Scale"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "perplexity_first_stage_retriever_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new"
+    }
+  ]
+}
