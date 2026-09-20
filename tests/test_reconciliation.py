@@ -249,3 +249,55 @@ def _view_from(claim):
             }
         ],
     }
+
+
+# --------------------------------------------------------------------------- #
+# Issue #58 review: the reconciliation index is cached per ledger token and the
+# read path performs no database writes
+# --------------------------------------------------------------------------- #
+
+
+def test_cached_reconciliation_index_reuses_until_the_ledger_changes():
+    """Review F2: the index must be built once per ledger token, not per request."""
+
+    from ai_discovery import mechanics as M
+    from ai_discovery import reconciliation as R
+
+    M.clear_projection_cache()
+    rows = [
+        {
+            "claim_id": "c1",
+            "topic": "audience_usage",
+            "statement": "x",
+            "surfaces": ["chatgpt"],
+            "status": "current",
+            "relationship": "new",
+            "confidence": "medium",
+            "confidence_detail": {"score": 0.5, "inputs": {}, "rationale": [], "derived": True},
+            "source": {"source_id": "s", "publisher": "P", "url": "https://e.test", "source_class": "official"},
+            "dates": {"published_at": "2026-01-02", "observed_at": "2026-09-16T00:00:00+00:00"},
+            "methodology": {},
+            "metrics": [{"metric_id": "m1", "label": "L", "value_number": 1.0, "unit": "%"}],
+            "provenance": [],
+            "evidence": [],
+            "extraction": {},
+        }
+    ]
+    first = R.cached_reconciliation_index(rows)
+    second = R.cached_reconciliation_index(rows)
+    assert first is second, "same ledger token must reuse the cached index"
+    M.clear_projection_cache()
+
+
+def test_reconciliation_read_path_has_no_database_side_effects():
+    """Review F2: the reconciliation helpers are pure — no session/engine touched."""
+
+    import inspect
+
+    from ai_discovery import reconciliation as R
+
+    for fn in (R.reconcile_persisted, R.reconciliation_index, R.cached_reconciliation_index):
+        src = inspect.getsource(fn)
+        assert "session" not in src and "commit" not in src and "engine" not in src, (
+            f"{fn.__name__} must not perform database IO on the read path"
+        )

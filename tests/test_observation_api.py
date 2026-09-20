@@ -286,3 +286,57 @@ def test_mechanics_endpoint_inlines_reconciliation_for_conflicting_claims(client
     ]
     assert recon_seen, "expected an inline reconciliation record for differing claims"
     assert all(rec["state"] and rec["relationship"] for rec in recon_seen)
+
+
+def test_alias_surface_filter_on_postgres_uses_the_jsonb_branch():
+    """Review F3: the alias-aware Postgres filter (`claim.surfaces::jsonb ?| text[]`)
+    must find a claim stored under an alias when queried by the canonical id.
+    The sqlite fixture cannot exercise this branch; this runs it on real Postgres
+    (skips when no Postgres is available, like tests/test_migration.py)."""
+
+    import os
+
+    psycopg = pytest.importorskip("psycopg")
+    from sqlalchemy import create_engine, text
+    from sqlalchemy.engine import make_url
+    from sqlalchemy.exc import SQLAlchemyError
+
+    base = os.environ.get("AI_DISCOVERY_TEST_DATABASE_URL") or (
+        "postgresql+psycopg://ai_discovery:ai_discovery@127.0.0.1:55432/ai_discovery"
+    )
+    # A dedicated database keeps this test off the real ledger entirely.
+    admin_url = make_url(base)
+    dbname = "adi_alias_branch_test"
+    try:
+        admin = create_engine(admin_url.set(database="postgres"))
+        with admin.connect() as conn:
+            conn.execution_options(isolation_level="AUTOCOMMIT")
+            conn.execute(text(f'DROP DATABASE IF EXISTS "{dbname}"'))
+            conn.execute(text(f'CREATE DATABASE "{dbname}"'))
+    except (psycopg.OperationalError, SQLAlchemyError) as exc:  # pragma: no cover
+        pytest.skip(f"no Postgres available: {exc}")
+
+    engine = create_engine(admin_url.set(database=dbname))
+    try:
+        C.init_ledger(engine)
+        rec = _claim_record(
+            surfaces=["deepseek"],
+            statement="DeepSeek alias row for the Postgres branch.",
+        )
+        C.persist_claim(engine, rec)
+
+        rows = C.load_expanded_claims(engine, surface="deepseek-chat")
+        assert len(rows) == 1, "the alias-aware Postgres branch must find the aliased claim"
+        assert rows[0]["surfaces"] == ["deepseek"]
+
+        # The alias and its canonical id are the same surface: either spelling
+        # resolves to the claim (the variant set includes both).
+        assert len(C.load_expanded_claims(engine, surface="deepseek")) == 1
+        # An unrelated surface still finds nothing on the same branch.
+        assert C.load_expanded_claims(engine, surface="chatgpt") == []
+    finally:
+        engine.dispose()
+        with admin.connect() as conn:
+            conn.execution_options(isolation_level="AUTOCOMMIT")
+            conn.execute(text(f'DROP DATABASE IF EXISTS "{dbname}"'))
+        admin.dispose()

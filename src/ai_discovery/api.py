@@ -439,7 +439,7 @@ def list_mechanics(db: Session = Depends(get_db)) -> dict:  # noqa: B008 - FastA
         mechanics_view,
         unmapped_claim_surfaces,
     )
-    from .reconciliation import reconciliation_index
+    from .reconciliation import cached_reconciliation_index as reconciliation_index
 
     # Raw expanded ledger rows: the projection needs each claim's methodology and
     # provenance, not just the product-shaped claim view. cached_project_all
@@ -473,7 +473,7 @@ def get_surface_mechanics(
 
     from .claims import load_expanded_claims
     from .mechanics import cached_project_surface, mechanics_view
-    from .reconciliation import reconciliation_index
+    from .reconciliation import cached_reconciliation_index as reconciliation_index
 
     registry_ids = _surface_registry_ids()
     if surface_id not in registry_ids:

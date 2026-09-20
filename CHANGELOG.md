@@ -22,6 +22,12 @@ This file records repository/product changes. The generated intelligence changel
   deterministic lane (repo rule 11 / issue #28A), so every persisted claim can
   explain its label.
 - Proven on the real production ledger; see `proof/phase2/ISSUE_58_PROOF.md`.
+- Review-hardening (frontier F1–F5): freshness is derived at serialization time
+  from `observed_at` (never frozen by the projection cache); the reconciliation
+  index is cached on the ledger token and the read path is confirmed pure; added a
+  real-Postgres test for the alias-aware `jsonb ?|` filter; the read path derives
+  the why-confidence for claims persisted without a stored rationale; and the
+  freshness thresholds have one shared implementation.
 
 ## 2026-09-19 (issue #7)
 

@@ -74,16 +74,16 @@ class ConfidenceAssessment(BaseModel):
     model_asserted: str | None = None  # any label the spec/model proposed; never authoritative
 
 
-def _recency_score(record: ClaimRecord) -> tuple[float, str]:
+def _recency_score(published_at: dt.date | None, observed_at: dt.datetime | None) -> tuple[float, str]:
     """How fresh the capture is relative to the study's publication."""
 
-    observed = record.dates.observed_at
-    published = record.dates.published_at.value
-    if published is None:
+    if published_at is None:
         return 0.4, "publication date unknown"
-    if observed.tzinfo is None:
-        observed = observed.replace(tzinfo=dt.UTC)
-    age_days = (observed.date() - published).days
+    if observed_at is None:
+        return 0.4, "observation time unknown"
+    if observed_at.tzinfo is None:
+        observed_at = observed_at.replace(tzinfo=dt.UTC)
+    age_days = (observed_at.date() - published_at).days
     if age_days <= 30:
         return 1.0, f"captured {age_days}d after publication"
     if age_days <= 180:
@@ -93,41 +93,30 @@ def _recency_score(record: ClaimRecord) -> tuple[float, str]:
     return 0.2, f"captured {age_days}d after publication (stale)"
 
 
-def _methodology_score(record: ClaimRecord) -> tuple[float, str]:
-    known = sum(1 for f in _METHODOLOGY_FIELDS if getattr(record.methodology, f).known)
-    score = round(known / len(_METHODOLOGY_FIELDS), 4)
-    return score, f"{known}/{len(_METHODOLOGY_FIELDS)} methodology fields stated"
+def _methodology_score(known: int, total: int) -> tuple[float, str]:
+    return round(known / total, 4), f"{known}/{total} methodology fields stated"
 
 
-def _sample_score(record: ClaimRecord) -> tuple[float, str]:
-    sample = record.methodology.sample_size
-    if not sample.known:
+def _sample_score(sample_value: object | None) -> tuple[float, str]:
+    if sample_value is None:
         return 0.3, "no sample size stated"
-    return 0.9, f"sample size stated: {sample.value}"
+    return 0.9, f"sample size stated: {sample_value}"
 
 
-def _geography_score(record: ClaimRecord) -> tuple[float, str]:
-    geo = record.methodology.geography
-    if geo.known:
-        return 0.9, f"geography stated: {geo.value}"
-    if record.methodology.geography_basis not in ("not_stated", "", None):
-        return 0.5, f"geography inferred ({record.methodology.geography_basis})"
+def _geography_score(geography: str | None, geography_basis: str | None) -> tuple[float, str]:
+    if geography:
+        return 0.9, f"geography stated: {geography}"
+    if geography_basis not in ("not_stated", "", None):
+        return 0.5, f"geography inferred ({geography_basis})"
     return 0.3, "geography not stated"
 
 
-def _directness_score(record: ClaimRecord) -> tuple[float, str]:
+def _directness_score(quoted: int, total: int) -> tuple[float, str]:
     """A value backed by a verbatim quote is more direct than one via a selector."""
 
-    quoted = 0
-    total = 0
-    for metric in record.metrics:
-        total += 1
-        if metric.value.locator and metric.value.locator.quote:
-            quoted += 1
     if total == 0:
         return 0.5, "no metric values"
-    score = round(quoted / total, 4)
-    return score, f"{quoted}/{total} metric values carry a verbatim quote"
+    return round(quoted / total, 4), f"{quoted}/{total} metric values carry a verbatim quote"
 
 
 def _corroboration_score(corroborating_sources: int) -> tuple[float, str]:
@@ -136,6 +125,54 @@ def _corroboration_score(corroborating_sources: int) -> tuple[float, str]:
     if corroborating_sources == 1:
         return 0.7, "1 independent corroborating source"
     return 1.0, f"{corroborating_sources} independent corroborating sources"
+
+
+def confidence_inputs(
+    *,
+    source_class: str,
+    methodology_known: int,
+    methodology_total: int,
+    sample_value: object | None,
+    geography: str | None,
+    geography_basis: str | None,
+    published_at: dt.date | None,
+    observed_at: dt.datetime | None,
+    quoted_metrics: int,
+    total_metrics: int,
+    corroborating_sources: int = 0,
+    weights: dict[str, float] | None = None,
+) -> ConfidenceAssessment:
+    """The single confidence derivation (issue #58 review F5: one implementation).
+
+    Takes primitives so both the record path (:func:`assess_confidence`) and the
+    persisted-row explainer (:func:`explain_persisted_confidence`) call the same
+    logic and produce identical inputs and rationale text. ``model_asserted`` is
+    never consulted; the label is a pure function of the derived inputs.
+    """
+
+    from .brief import ConfidenceScorer
+
+    scorer = ConfidenceScorer.from_config() if weights is None else ConfidenceScorer(**weights)
+
+    rationale: list[str] = []
+    inputs: dict[str, float] = {}
+
+    inputs["source_authority"] = SOURCE_AUTHORITY.get(source_class, 0.3)
+    rationale.append(f"source class {source_class}")
+
+    for name, (value, why) in (
+        ("methodology_transparency", _methodology_score(methodology_known, methodology_total)),
+        ("sample_strength", _sample_score(sample_value)),
+        ("recency", _recency_score(published_at, observed_at)),
+        ("geography_fit", _geography_score(geography, geography_basis)),
+        ("directness", _directness_score(quoted_metrics, total_metrics)),
+        ("corroboration", _corroboration_score(corroborating_sources)),
+    ):
+        inputs[name] = value
+        rationale.append(f"{name}: {why}")
+
+    score = scorer.score(**inputs)
+    return ConfidenceAssessment(label=scorer.label(score).value, score=score, inputs=inputs, rationale=rationale)
 
 
 def assess_confidence(
@@ -151,35 +188,80 @@ def assess_confidence(
     label: the label is a pure function of the derived inputs.
     """
 
-    from .brief import ConfidenceScorer
+    methodology_known = sum(1 for f in _METHODOLOGY_FIELDS if getattr(record.methodology, f).known)
+    sample = record.methodology.sample_size
+    quoted = sum(1 for m in record.metrics if m.value.locator and m.value.locator.quote)
+    assessment = confidence_inputs(
+        source_class=record.evidence.source_class,
+        methodology_known=methodology_known,
+        methodology_total=len(_METHODOLOGY_FIELDS),
+        sample_value=sample.value if sample.known else None,
+        geography=record.methodology.geography.value,
+        geography_basis=record.methodology.geography_basis,
+        published_at=record.dates.published_at.value,
+        observed_at=record.dates.observed_at,
+        quoted_metrics=quoted,
+        total_metrics=len(record.metrics),
+        corroborating_sources=corroborating_sources,
+        weights=weights,
+    )
+    return assessment.model_copy(update={"model_asserted": model_asserted})
 
-    scorer = ConfidenceScorer.from_config() if weights is None else ConfidenceScorer(**weights)
 
-    rationale: list[str] = []
-    inputs: dict[str, float] = {}
+def explain_persisted_confidence(row: dict[str, Any], *, corroborating_sources: int = 0) -> ConfidenceAssessment:
+    """Derive inputs + rationale for an ALREADY-PERSISTED claim row.
 
-    inputs["source_authority"] = SOURCE_AUTHORITY.get(record.evidence.source_class, 0.3)
-    rationale.append(f"source class {record.evidence.source_class}")
+    Reuses the one confidence implementation above so a claim captured before the
+    LLM lane recorded its rationale (issue #58 review F4) can still explain its
+    confidence at read time. The persisted ``confidence`` label is never changed
+    here; the derived inputs are what the trust layer needs to state *why*.
+    """
 
-    for name, (value, why) in (
-        ("methodology_transparency", _methodology_score(record)),
-        ("sample_strength", _sample_score(record)),
-        ("recency", _recency_score(record)),
-        ("geography_fit", _geography_score(record)),
-        ("directness", _directness_score(record)),
-        ("corroboration", _corroboration_score(corroborating_sources)),
-    ):
-        inputs[name] = value
-        rationale.append(f"{name}: {why}")
-
-    score = scorer.score(**inputs)
-    label = scorer.label(score)
-    return ConfidenceAssessment(
-        label=label.value,
-        score=score,
-        inputs=inputs,
-        rationale=rationale,
-        model_asserted=model_asserted,
+    methodology = row.get("methodology") or {}
+    metrics = row.get("metrics") or []
+    dates = row.get("dates") or {}
+    source = row.get("source") or {}
+    published = dates.get("published_at")
+    observed = dates.get("observed_at")
+    published_at = None
+    if published:
+        try:
+            published_at = dt.date.fromisoformat(str(published)[:10])
+        except ValueError:
+            published_at = None
+    observed_at = None
+    if observed:
+        try:
+            observed_at = dt.datetime.fromisoformat(str(observed))
+        except ValueError:
+            observed_at = None
+    methodology_known = sum(1 for f in _METHODOLOGY_FIELDS if methodology.get(f))
+    quoted = sum(
+        1
+        for loc in (row.get("provenance") or [])
+        if loc.get("locator_kind") == "verbatim_quote" and loc.get("quote")
+    )
+    # Count quoting only over metric-bearing locators, matching _directness_score
+    # on the record path (metrics[..] locators).
+    metric_quoted = sum(
+        1
+        for loc in (row.get("provenance") or [])
+        if str(loc.get("field_path") or "").startswith("metrics[")
+        and loc.get("locator_kind") == "verbatim_quote"
+        and loc.get("quote")
+    )
+    return confidence_inputs(
+        source_class=source.get("source_class") or "other",
+        methodology_known=methodology_known,
+        methodology_total=len(_METHODOLOGY_FIELDS),
+        sample_value=methodology.get("sample_size"),
+        geography=methodology.get("geography"),
+        geography_basis=methodology.get("geography_basis"),
+        published_at=published_at,
+        observed_at=observed_at,
+        quoted_metrics=metric_quoted or quoted,
+        total_metrics=max(len(metrics), 1),
+        corroborating_sources=corroborating_sources,
     )
 
 

@@ -31,7 +31,14 @@ def _iso(value: dt.datetime | None) -> str | None:
     return value.isoformat()
 
 
-def _freshness(observed: dt.datetime | None) -> dict[str, Any]:
+#: The one freshness state machine (issue #58 review F5): thresholds and state
+#: names live here and every read path — the claim view and the mechanics
+#: projection — calls this, so two UI surfaces can never disagree about the same
+#: capture's freshness.
+FRESHNESS_THRESHOLDS = {"fresh_days": 7, "recent_days": 45, "aging_days": 180}
+
+
+def freshness_of(observed: dt.datetime | None) -> dict[str, Any]:
     """Freshness of a claim/capture, as an explicit state (never a guess)."""
 
     if observed is None:
@@ -39,11 +46,11 @@ def _freshness(observed: dt.datetime | None) -> dict[str, Any]:
     if observed.tzinfo is None:
         observed = observed.replace(tzinfo=dt.UTC)
     age = (dt.datetime.now(dt.UTC) - observed).days
-    if age <= 7:
+    if age <= FRESHNESS_THRESHOLDS["fresh_days"]:
         state = "fresh"
-    elif age <= 45:
+    elif age <= FRESHNESS_THRESHOLDS["recent_days"]:
         state = "recent"
-    elif age <= 180:
+    elif age <= FRESHNESS_THRESHOLDS["aging_days"]:
         state = "aging"
     else:
         state = "stale"
@@ -82,6 +89,15 @@ def claim_view(row: dict[str, Any]) -> dict[str, Any]:
     metrics = row.get("metrics") or []
     evidence = row.get("evidence") or []
     detail = row.get("confidence_detail") or {}
+    rationale = list(detail.get("rationale") or [])
+    if not rationale:
+        # A claim persisted before the LLM lane recorded its rationale still has to
+        # explain its confidence (issue #58 review F4). Derive the "why" at read
+        # time, reusing the ONE confidence implementation; the persisted label is
+        # never rewritten.
+        from .confidence import explain_persisted_confidence
+
+        rationale = list(explain_persisted_confidence(row).rationale)
     # The latest evidence row carries the observed_at used for freshness.
     latest_observed = None
     for entry in evidence:
@@ -100,7 +116,7 @@ def claim_view(row: dict[str, Any]) -> dict[str, Any]:
         "confidence_detail": {
             "score": detail.get("score"),
             "inputs": detail.get("inputs") or {},
-            "rationale": detail.get("rationale") or [],
+            "rationale": rationale,
             "derived": True,
         },
         "value": [
@@ -139,8 +155,12 @@ def claim_view(row: dict[str, Any]) -> dict[str, Any]:
             for e in evidence
         ],
         "dates": row.get("dates") or {},
-        "freshness": _freshness(observed),
+        "freshness": freshness_of(observed),
     }
+
+
+#: Back-compat alias; prefer ``freshness_of``.
+_freshness = freshness_of
 
 
 def _parse(value: Any) -> dt.datetime | None:

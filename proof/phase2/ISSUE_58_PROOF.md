@@ -87,12 +87,31 @@ place; the technical record is collapsed.
 - Evidence projection: the trust UI renders `dimension_view` fields verbatim; no
   claim, confidence or conflict is computed in the browser.
 
-## 5. Honest limitations
+## 5. Review-hardening pass (frontier findings F1–F5)
+
+- **F1 (freshness frozen by the cache).** Freshness is now derived at
+  serialization time from the persisted `observed_at`, using the shared read-model
+  helper — never baked into the cached projection. Verified live:
+  `evidence with rationale: 15 without: 0`, freshness values `fresh · 0/1/3d`.
+- **F2 (per-request O(n²) reconciliation).** The index is cached on the same
+  ledger token the projection uses (`cached_reconciliation_index`), and the
+  read path is confirmed pure (no session/commit/engine) by test. Live
+  `/mechanics` ≈ 0.07–0.1 s.
+- **F3 (unexercised Postgres branch).** Added a real-Postgres test for the
+  `jsonb ?|` alias filter; a claim stored under `deepseek` is found by
+  `surface=deepseek-chat`.
+- **F4 (why-confidence absent on the existing ledger).** The read path now derives
+  the rationale from the persisted row via the one confidence implementation, so
+  every claim explains itself today — no empty-rationale placeholder in the
+  deployed dataset (verified: 15/15 evidenced claims carry a rationale).
+- **F5 (duplicated freshness thresholds).** One `freshness_of` implementation in
+  `observations` (`FRESHNESS_THRESHOLDS`) is now called by both the claim view and
+  the mechanics projection.
+
+## 6. Honest limitations
 
 - No production `controlled_observation` claim exists yet (issue #10 is
   deferred), so that class is proven structurally via the recorded fixture, not
   on live data. Stated rather than implied.
 - In-place claim corrections are bounded by the mechanics cache TTL (unchanged
   from #56).
-- The `llm_proposal` confidence fix applies to **new** captures; the 32 existing
-  production claims keep the label they were persisted with until re-captured.

@@ -31,6 +31,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from .observations import freshness_of as _freshness
+
 # --------------------------------------------------------------------------- #
 # Dimensions (the canonical, frozen set required by issue #56)
 # --------------------------------------------------------------------------- #
@@ -331,10 +333,6 @@ class MechanicsEvidence(BaseModel):
     #: confidence rationale (issue #58: "a one-line why this confidence"). A
     #: marketer can read the reason without learning the confidence model.
     confidence_rationale: tuple[str, ...] = ()
-    #: Freshness of the capture the claim rests on, as an explicit state. Never a
-    #: guess: an absent timestamp is ``unknown``.
-    freshness_state: str = "unknown"
-    freshness_age_days: int | None = None
     measurement_mode: str | None = None
     methodology_notes: str | None = None
     limitations: tuple[str, ...] = ()
@@ -474,29 +472,6 @@ def _iso_date(value: Any) -> dt.date | None:
         return None
 
 
-def _freshness_of(observed: dt.datetime | None) -> dict[str, Any]:
-    """Capture freshness as an explicit state, mirroring the observations read model.
-
-    Kept here (not imported) so the mechanics contract has one owner for its own
-    payload shape; the thresholds match ``observations._freshness`` exactly.
-    """
-
-    if observed is None:
-        return {"state": "unknown", "age_days": None}
-    if observed.tzinfo is None:
-        observed = observed.replace(tzinfo=dt.UTC)
-    age = (dt.datetime.now(dt.UTC) - observed).days
-    if age <= 7:
-        state = "fresh"
-    elif age <= 45:
-        state = "recent"
-    elif age <= 180:
-        state = "aging"
-    else:
-        state = "stale"
-    return {"state": state, "age_days": age}
-
-
 def _methodology_completeness(methodology: dict[str, Any]) -> str:
     """How much methodology the claim actually states (never read null as absent)."""
 
@@ -544,12 +519,18 @@ def _evidence_from_claim(row: dict[str, Any], canonical_scope: str | None = None
         regions = (str(geo),)
 
     rationale = tuple((row.get("confidence_detail") or {}).get("rationale") or ())
-    fresh = _freshness_of(parsed_observed)
+    if not rationale:
+        # A claim captured before the LLM lane recorded its rationale still has to
+        # explain its confidence (issue #58 review F4). Derive the "why" at read
+        # time from the persisted row, reusing the ONE confidence implementation;
+        # the persisted label is never rewritten. Bounded to the request path, so
+        # it is never frozen into the cached projection payload.
+        from .confidence import explain_persisted_confidence
+
+        rationale = tuple(explain_persisted_confidence(row).rationale)
     raw_surfaces = list(row.get("surfaces") or [])
     return MechanicsEvidence(
         confidence_rationale=rationale,
-        freshness_state=fresh["state"],
-        freshness_age_days=fresh["age_days"],
         claim_id=row["claim_id"],
         source_id=source.get("source_id"),
         publisher=source.get("publisher"),
@@ -795,8 +776,11 @@ def dimension_view(
                         "confidence": e.confidence,
                         "confidence_score": e.confidence_score,
                         "confidence_rationale": list(e.confidence_rationale),
-                        "freshness_state": e.freshness_state,
-                        "freshness_age_days": e.freshness_age_days,
+                        # Freshness is derived HERE, at serialization time, from the
+                        # persisted observation time — never baked into the cached
+                        # projection (review F1: a cached "fresh · 0d" would drift).
+                        "freshness_state": _freshness(e.observed_at)["state"],
+                        "freshness_age_days": _freshness(e.observed_at)["age_days"],
                         "measurement_mode": e.measurement_mode,
                         "methodology_notes": e.methodology_notes,
                         "limitations": list(e.limitations),
