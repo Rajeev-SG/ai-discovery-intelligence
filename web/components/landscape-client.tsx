@@ -24,54 +24,64 @@ export function LandscapeClient({ projection }: { projection: LandscapeProjectio
   const pathname = usePathname();
 
   const availableIds = projection.surfaces.map((s) => s.id);
+  const availableKey = availableIds.join(",");
 
-  // The URL is the source of truth for EXTERNAL navigation (a pasted shared link,
-  // back/forward). An ABSENT ?compare= means "use the curated default"; a PRESENT
-  // one is honoured verbatim (even below the compare minimum, where the UI just
-  // asks for one more) so a short shared selection is never silently reset.
-  const resolveFromUrl = useCallback((): Set<string> => {
-    const raw = searchParams.get("compare");
-    if (raw === null) {
-      return new Set([...DEFAULT_COMPARISON_IDS].filter((id) => availableIds.includes(id)));
-    }
-    return new Set(parseComparisonIds(raw).filter((id) => availableIds.includes(id)));
-  }, [searchParams, availableIds]);
+  // Read the LIVE url at action time. `useSearchParams()` is a render-time
+  // snapshot that a `history.replaceState` write does not update, so building the
+  // next URL from it would drop any other live query parameter (issue #60 review).
+  const liveCompare = useCallback((): string | null => {
+    if (typeof window === "undefined") return searchParams.get("compare");
+    return new URLSearchParams(window.location.search).get("compare");
+  }, [searchParams]);
 
-  const urlCompare = searchParams.get("compare");
-  const [selected, setSelected] = useState<Set<string>>(() => resolveFromUrl());
+  const selectFrom = useCallback(
+    (raw: string | null): Set<string> => {
+      const available = availableKey ? availableKey.split(",") : [];
+      if (raw === null) {
+        return new Set([...DEFAULT_COMPARISON_IDS].filter((id) => available.includes(id)));
+      }
+      return new Set(parseComparisonIds(raw).filter((id) => available.includes(id)));
+    },
+    [availableKey],
+  );
 
-  // Re-derive only when the raw URL param changes underneath us AND differs from
-  // the state we would already serialize — so a shared link / back-forward updates
-  // the view, while a user toggle (which writes the same param) does not clobber
-  // local state (issue #60 review).
+  const [selected, setSelected] = useState<Set<string>>(() =>
+    selectFrom(searchParams.get("compare")),
+  );
+
+  // The URL is the source of truth for EXTERNAL navigation. Back/forward fires a
+  // popstate (which `replaceState` does not), so subscribing to it re-derives the
+  // selection from the live URL — a shared link and history navigation always
+  // agree with what is shown.
   useEffect(() => {
-    const fromUrl = resolveFromUrl();
-    setSelected((prev) => {
-      const same =
-        prev.size === fromUrl.size && [...prev].every((id) => fromUrl.has(id));
-      return same ? prev : fromUrl;
-    });
-    // Keyed on the raw URL param; resolveFromUrl is stable per param.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [urlCompare]);
+    const onPop = () => setSelected(selectFrom(liveCompare()));
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [selectFrom, liveCompare]);
 
   const toggle = (id: string) => {
     const next = new Set(selected);
     if (next.has(id)) next.delete(id);
     else if (next.size < COMPARISON_MAX) next.add(id);
     setSelected(next);
-    // A user-initiated change writes the URL so the view stays shareable. The
-    // param is always written (even below the minimum) so it round-trips exactly.
+    // Build the next URL from the LIVE query at action time, so any other live
+    // parameter (utm_*, etc.) survives; always write `compare` so it round-trips.
     const ids = availableIds.filter((x) => next.has(x));
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(
+      typeof window !== "undefined" ? window.location.search : "",
+    );
     params.set("compare", ids.join(","));
-    window.history.replaceState(null, "", `${pathname}?${params.toString()}`);
+    if (typeof window !== "undefined") {
+      window.history.replaceState(null, "", `${pathname}?${params.toString()}`);
+    }
   };
 
   // Ids present in a shared URL that are not in this curated landscape are dropped
   // (never fetched). Surface that explicitly rather than silently narrowing the
   // comparison (issue #60 review: client and /landscape/comparison must not
   // diverge silently; the endpoint is the validated API path).
+  // Use the render-time param here (not window) so SSR and hydration agree; the
+  // dropped-id notice is about a pasted/shared link, which `searchParams` carries.
   const requestedIds = parseComparisonIds(searchParams.get("compare"));
   const droppedIds = requestedIds.filter((id) => !availableIds.includes(id));
 

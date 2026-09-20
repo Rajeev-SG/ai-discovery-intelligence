@@ -49,22 +49,38 @@ test("comparison selection is stored in the URL", async ({ page }) => {
 });
 
 
-test("a shared ?compare= URL round-trips and survives back/forward", async ({ page }) => {
+test("a shared ?compare= URL round-trips and a toggle preserves other query params", async ({ page }) => {
   test.skip(!HAS_API, "requires EVIDENCE_API_URL or EVIDENCE_FIXTURE=1");
   test.skip((page.viewportSize()?.width ?? 0) < 861, "desktop layout");
 
-  // Load a shared selection of two real surfaces.
-  await page.goto("/landscape?compare=chatgpt,deepseek-chat");
+  // A shared link carrying a second query parameter.
+  await page.goto("/landscape?compare=chatgpt,deepseek-chat&utm_source=share");
   await expect(page.getByTestId("comparison-table")).toBeVisible();
-  // The rendered columns match the URL, not the curated default.
   await expect(page.getByTestId("cmp-col-chatgpt")).toBeVisible();
   await expect(page.getByTestId("cmp-col-deepseek-chat")).toBeVisible();
-  await expect(page.getByTestId("cmp-col-google-gemini")).toHaveCount(0);
 
-  // A user toggle updates the URL, and a fresh navigation honours the new one.
+  // A toggle must not destroy the foreign query parameter (issue #60 review).
+  await page.getByTestId("compare-toggle-google-gemini").click();
+  await page.waitForTimeout(150);
+  expect(page.url()).toContain("utm_source=share");
+  await expect(page.getByTestId("cmp-col-google-gemini")).toBeVisible();
+});
+
+test("history back/forward re-derives the comparison from the URL", async ({ page }) => {
+  test.skip(!HAS_API, "requires EVIDENCE_API_URL or EVIDENCE_FIXTURE=1");
+  test.skip((page.viewportSize()?.width ?? 0) < 861, "desktop layout");
+
+  await page.goto("/landscape?compare=chatgpt,deepseek-chat");
+  await expect(page.getByTestId("cmp-col-deepseek-chat")).toBeVisible();
+
+  // A user navigation to a different shared selection, then back.
   await page.goto("/landscape?compare=chatgpt,google-gemini");
   await expect(page.getByTestId("cmp-col-google-gemini")).toBeVisible();
-  await expect(page.getByTestId("cmp-col-deepseek-chat")).toHaveCount(0);
+  await page.goBack();
+  await page.waitForTimeout(300);
+  // The rendered matrix must follow the URL after back/forward (not a stale set).
+  await expect(page.getByTestId("cmp-col-deepseek-chat")).toBeVisible();
+  await expect(page.getByTestId("cmp-col-google-gemini")).toHaveCount(0);
 });
 
 test("an unknown id in a shared URL is surfaced, not silently dropped", async ({ page }) => {
