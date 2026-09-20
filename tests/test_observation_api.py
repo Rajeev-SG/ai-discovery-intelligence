@@ -304,19 +304,23 @@ def test_alias_surface_filter_on_postgres_uses_the_jsonb_branch():
     base = os.environ.get("AI_DISCOVERY_TEST_DATABASE_URL") or (
         "postgresql+psycopg://ai_discovery:ai_discovery@127.0.0.1:55432/ai_discovery"
     )
-    # A dedicated database keeps this test off the real ledger entirely.
-    admin_url = make_url(base)
+    # Force the psycopg (v3) driver: CI exposes a bare ``postgresql://`` URL, which
+    # SQLAlchemy would route to the uninstalled psycopg2. A dedicated database
+    # keeps this test off the real ledger entirely.
+    url = make_url(base)
+    if not url.drivername.endswith("psycopg"):
+        url = url.set(drivername="postgresql+psycopg")
     dbname = "adi_alias_branch_test"
     try:
-        admin = create_engine(admin_url.set(database="postgres"))
+        admin = create_engine(url.set(database="postgres"))
         with admin.connect() as conn:
             conn.execution_options(isolation_level="AUTOCOMMIT")
             conn.execute(text(f'DROP DATABASE IF EXISTS "{dbname}"'))
             conn.execute(text(f'CREATE DATABASE "{dbname}"'))
-    except (psycopg.OperationalError, SQLAlchemyError) as exc:  # pragma: no cover
+    except (psycopg.OperationalError, SQLAlchemyError, ImportError) as exc:  # pragma: no cover
         pytest.skip(f"no Postgres available: {exc}")
 
-    engine = create_engine(admin_url.set(database=dbname))
+    engine = create_engine(url.set(database=dbname))
     try:
         C.init_ledger(engine)
         rec = _claim_record(
