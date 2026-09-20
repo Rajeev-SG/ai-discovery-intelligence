@@ -1,0 +1,117 @@
+{
+  "surface": "deepseek-chat",
+  "dimensions": [
+    {
+      "dimension": "search_trigger",
+      "label": "Search / retrieval trigger",
+      "definition": "When and why the surface decides to retrieve from the live web rather than answer from model weights.",
+      "state": "unknown",
+      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "assertions": []
+    },
+    {
+      "dimension": "retrieval_provider",
+      "label": "Retrieval provider / index",
+      "definition": "Which index or upstream search provider backs retrieval.",
+      "state": "unknown",
+      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "assertions": []
+    },
+    {
+      "dimension": "query_rewrite",
+      "label": "Query rewrite / fan-out",
+      "definition": "Whether and how the user query is rewritten, decomposed or fanned out into multiple sub-queries.",
+      "state": "unknown",
+      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "assertions": []
+    },
+    {
+      "dimension": "crawling_indexing_controls",
+      "label": "Crawling and indexing controls",
+      "definition": "Crawler user-agents, robots directives and site-side controls that govern what is fetched and indexed.",
+      "state": "unknown",
+      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "assertions": []
+    },
+    {
+      "dimension": "freshness_recrawl",
+      "label": "Freshness / recrawl",
+      "definition": "How quickly changed content is refetched and reflected.",
+      "state": "unknown",
+      "note": "No validated claim for this surface covers this dimension. Unknown is a valid, explicit answer, not a missing value.",
+      "assertions": []
+    },
+    {
+      "dimension": "candidate_selection_reranking",
+      "label": "Candidate selection / reranking",
+      "definition": "How retrieved candidates are filtered, ranked or reranked before an answer is composed.",
+      "state": "unknown",
+      "note": "No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it.",
+      "assertions": []
+    },
+    {
+      "dimension": "citation_presentation",
+      "label": "Citation / source presentation",
+      "definition": "Whether sources are shown, and in what form (inline links, cards, footnotes, absent).",
+      "state": "unknown",
+      "note": "No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it.",
+      "assertions": []
+    },
+    {
+      "dimension": "shopping_product_feed",
+      "label": "Shopping / product feed",
+      "definition": "Product, catalogue or feed behaviour in commercial results.",
+      "state": "unknown",
+      "note": "No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it.",
+      "assertions": []
+    },
+    {
+      "dimension": "local_retrieval",
+      "label": "Local retrieval",
+      "definition": "Use of local/place retrieval or map data.",
+      "state": "unknown",
+      "note": "No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it.",
+      "assertions": []
+    },
+    {
+      "dimension": "social_community_retrieval",
+      "label": "Social / community retrieval",
+      "definition": "Use of social, forum or community sources (e.g. Reddit).",
+      "state": "unknown",
+      "note": "No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it.",
+      "assertions": []
+    },
+    {
+      "dimension": "mode_region_differences",
+      "label": "Mode / model / account / region differences",
+      "definition": "How behaviour differs across modes, models, account tiers or regions.",
+      "state": "unknown",
+      "note": "No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it.",
+      "assertions": []
+    },
+    {
+      "dimension": "answer_type",
+      "label": "Direct vs retrieval-backed answer",
+      "definition": "Whether a response is a direct model answer or grounded in retrieved sources.",
+      "state": "unknown",
+      "note": "No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it.",
+      "assertions": []
+    },
+    {
+      "dimension": "marketer_controllable_inputs",
+      "label": "Marketer-controllable eligibility inputs",
+      "definition": "Signals a marketer can change (markup, feeds, robots policy, content structure) that affect eligibility.",
+      "state": "unknown",
+      "note": "No evidenced mechanics dimension maps to this surface yet; the ledger holds no claim kind that speaks to it.",
+      "assertions": []
+    }
+  ],
+  "coverage": {
+    "known": 0,
+    "partially_known": 0,
+    "conflicting": 0,
+    "unknown": 13
+  },
+  "evidenced_dimension_count": 0,
+  "dimension_count": 13
+}

@@ -77,12 +77,16 @@ export function DetailDrawer({ row, open, onOpenChange, label }: DetailDrawerPro
                   <ChipList values={row.discoveryModeLabels} empty="No discovery mode recorded yet." />
                 </Section>
 
-                <Section title="Retrieval architecture">
+                <Section title="Retrieval architecture (registry metadata)">
                   <p className="detail-lead">
+                    <span className="registry-metadata-tag">Registry metadata — not evidence</span>{" "}
                     Registry status: <strong>{row.retrievalStatusLabel}</strong>.{" "}
                     {row.retrievalUnknown
-                      ? "The retrieval stack below is genuinely unknown — this is information, not a missing value."
-                      : "Some behaviour is documented; the gaps below are still not evidenced."}
+                      ? "The registry flags the retrieval stack as genuinely unknown."
+                      : "The registry records some documented behaviour."}{" "}
+                    This is a coarse registry scorecard, not an evidenced mechanics
+                    finding; the evidence-backed mechanics view is on the surface's
+                    mechanics projection.
                   </p>
                   <ul className="unknown-list">
                     {row.retrievalUnknownNotes.map((note) => (

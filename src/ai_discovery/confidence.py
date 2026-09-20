@@ -43,6 +43,9 @@ SOURCE_AUTHORITY: dict[str, float] = {
     "vendor_blog": 0.45,
     # Discovery-only aggregators are never canonical, so they score lowest.
     "open_discovery": 0.3,
+    # First-party controlled observation: directly observed behaviour, but a
+    # narrow sample and no publisher methodology; between official and editorial.
+    "controlled_observation": 0.6,
     "other": 0.3,
 }
 
