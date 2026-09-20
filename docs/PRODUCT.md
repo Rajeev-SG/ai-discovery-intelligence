@@ -45,3 +45,15 @@ Each included item answers:
 ### Living POV
 
 A stable executive SEO/AEO/GEO POV document is maintained from canonical claims. It changes only when material evidence changes. Every edit produces a traceable changelog event with supporting evidence IDs.
+
+## Marketing implications (issue #59)
+
+The marketer's final question — "why does this matter, and what should I do?" — is
+answered only from validated mechanics/evidence. `src/ai_discovery/implications.py`
+holds an auditable rule table (mechanics dimension + ledger topic -> action
+family); a rule fires only when the surface's mechanics projection carries an
+evidenced dimension of that kind and a real claim on that surface has the rule's
+topic. Every implication carries its supporting claim ids, applicable
+surfaces/modes/regions, confidence, actionability (distinct from confidence),
+significance, and any contradicting evidence. Unknown is a valid output: a surface
+with no actionable evidenced mechanic returns an explicit monitor-only state.
