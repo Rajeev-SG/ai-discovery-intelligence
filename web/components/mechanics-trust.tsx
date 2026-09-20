@@ -111,6 +111,19 @@ function EvidenceTrust({ evidence }: { evidence: MechanicsEvidence }) {
         <strong>Why this confidence:</strong> {whyConfidence(evidence)}
       </p>
 
+      {/* When the rationale had to be re-derived from the persisted evidence, state
+          the label it actually supports. If that differs from the stored label the
+          claim carries, say so explicitly rather than implying agreement (issue
+          #58 review DELTA-1). */}
+      {evidence.derived_label && evidence.derived_label !== evidence.confidence ? (
+        <p className="trust-derived-note" data-testid="trust-derived-note">
+          This rationale was re-derived from the stored evidence and supports{" "}
+          <strong>{evidence.derived_label}</strong> confidence, while the claim is
+          recorded as <strong>{evidence.confidence}</strong>.{" "}
+          {evidence.derived_label === "high" ? "The stored label is the more cautious reading." : null}
+        </p>
+      ) : null}
+
       {(evidence.methodology_notes || evidence.measurement_mode || (evidence.methodology_completeness ?? "") !== "") ? (
         <p className="trust-methodology">
           <strong>Methodology:</strong>{" "}

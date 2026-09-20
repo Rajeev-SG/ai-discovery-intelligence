@@ -90,14 +90,21 @@ def claim_view(row: dict[str, Any]) -> dict[str, Any]:
     evidence = row.get("evidence") or []
     detail = row.get("confidence_detail") or {}
     rationale = list(detail.get("rationale") or [])
+    derived_label = None
+    derived_score = None
     if not rationale:
         # A claim persisted before the LLM lane recorded its rationale still has to
         # explain its confidence (issue #58 review F4). Derive the "why" at read
         # time, reusing the ONE confidence implementation; the persisted label is
-        # never rewritten.
+        # never rewritten. The derived label is surfaced separately (review DELTA-1)
+        # so a trust layer can never show a rationale that justifies a label the
+        # claim does not carry: the two are stated as persisted vs derived.
         from .confidence import explain_persisted_confidence
 
-        rationale = list(explain_persisted_confidence(row).rationale)
+        assessment = explain_persisted_confidence(row)
+        rationale = list(assessment.rationale)
+        derived_label = assessment.label
+        derived_score = assessment.score
     # The latest evidence row carries the observed_at used for freshness.
     latest_observed = None
     for entry in evidence:
@@ -118,6 +125,11 @@ def claim_view(row: dict[str, Any]) -> dict[str, Any]:
             "inputs": detail.get("inputs") or {},
             "rationale": rationale,
             "derived": True,
+            # Set only when the rationale was synthesised at read time; names the
+            # label/score the rationale actually supports so the UI can show any
+            # discrepancy with the persisted label explicitly (review DELTA-1).
+            "derived_label": derived_label,
+            "derived_score": derived_score,
         },
         "value": [
             {

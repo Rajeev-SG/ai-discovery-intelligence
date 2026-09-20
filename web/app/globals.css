@@ -843,3 +843,16 @@ main { flex: 1; }
 @media (max-width: 640px) {
   .trust-evidence-grid { grid-template-columns: 1fr; }
 }
+
+/* Derived-confidence note (issue #58 review DELTA-1): states the label a
+   re-derived rationale actually supports when it differs from the stored label. */
+.trust-derived-note {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #241c10;
+  border: 1px solid rgba(217, 164, 65, 0.35);
+  color: #e0c48a;
+}

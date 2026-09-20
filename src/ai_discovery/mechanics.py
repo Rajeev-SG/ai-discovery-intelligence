@@ -329,6 +329,11 @@ class MechanicsEvidence(BaseModel):
     effective_from: dt.date | None = None
     confidence: str
     confidence_score: float | None = None
+    #: The label the read-time-synthesised rationale actually supports, when a
+    #: rationale had to be derived (legacy claims). ``None`` when the stored
+    #: rationale and label came from the same persisted computation. Lets the UI
+    #: state any discrepancy explicitly instead of implying agreement (DELTA-1).
+    derived_label: str | None = None
     #: Why the confidence is what it is, copied verbatim from the evidence-derived
     #: confidence rationale (issue #58: "a one-line why this confidence"). A
     #: marketer can read the reason without learning the confidence model.
@@ -519,18 +524,24 @@ def _evidence_from_claim(row: dict[str, Any], canonical_scope: str | None = None
         regions = (str(geo),)
 
     rationale = tuple((row.get("confidence_detail") or {}).get("rationale") or ())
+    derived_label = None
     if not rationale:
         # A claim captured before the LLM lane recorded its rationale still has to
         # explain its confidence (issue #58 review F4). Derive the "why" at read
         # time from the persisted row, reusing the ONE confidence implementation;
-        # the persisted label is never rewritten. Bounded to the request path, so
-        # it is never frozen into the cached projection payload.
+        # the persisted label is never rewritten. The derived label is surfaced
+        # separately (review DELTA-1) so the rationale is never shown next to a
+        # label it does not support. Bounded to the request path, so it is never
+        # frozen into the cached projection payload.
         from .confidence import explain_persisted_confidence
 
-        rationale = tuple(explain_persisted_confidence(row).rationale)
+        assessment = explain_persisted_confidence(row)
+        rationale = tuple(assessment.rationale)
+        derived_label = assessment.label
     raw_surfaces = list(row.get("surfaces") or [])
     return MechanicsEvidence(
         confidence_rationale=rationale,
+        derived_label=derived_label,
         claim_id=row["claim_id"],
         source_id=source.get("source_id"),
         publisher=source.get("publisher"),
@@ -776,6 +787,7 @@ def dimension_view(
                         "confidence": e.confidence,
                         "confidence_score": e.confidence_score,
                         "confidence_rationale": list(e.confidence_rationale),
+                        "derived_label": e.derived_label,
                         # Freshness is derived HERE, at serialization time, from the
                         # persisted observation time — never baked into the cached
                         # projection (review F1: a cached "fresh · 0d" would drift).

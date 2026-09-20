@@ -21,6 +21,7 @@ exact inputs and a human-readable rationale, so the label can always be explaine
 from __future__ import annotations
 
 import datetime as dt
+from collections.abc import Mapping
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -221,6 +222,22 @@ def explain_persisted_confidence(row: dict[str, Any], *, corroborating_sources: 
     metrics = row.get("metrics") or []
     dates = row.get("dates") or {}
     source = row.get("source") or {}
+
+    def _flat(value: Any) -> Any:
+        """Unwrap a persisted field that may be a raw value or a Provenanced envelope.
+
+        The ledger stores provenanced fields flat (``"geography": "US"``), but a row
+        shaped like the in-memory ``ClaimRecord`` (``{"value": ..., "locator": ...}``)
+        or a ``{"known": true, "value": ...}`` envelope must not be counted as a
+        non-empty dict — that was the shape assumption review DELTA-2(a) flagged.
+        """
+
+        if isinstance(value, Mapping):
+            if "known" in value and not value.get("known"):
+                return None
+            return value.get("value")
+        return value
+
     published = dates.get("published_at")
     observed = dates.get("observed_at")
     published_at = None
@@ -235,32 +252,36 @@ def explain_persisted_confidence(row: dict[str, Any], *, corroborating_sources: 
             observed_at = dt.datetime.fromisoformat(str(observed))
         except ValueError:
             observed_at = None
-    methodology_known = sum(1 for f in _METHODOLOGY_FIELDS if methodology.get(f))
-    quoted = sum(
-        1
+    methodology_known = sum(1 for f in _METHODOLOGY_FIELDS if _flat(methodology.get(f)) not in (None, ""))
+    # Directness on the record path counts metric values backed by a verbatim quote.
+    # Match that exactly: only ``metrics[..]`` locators count, so a non-metric
+    # verbatim quote can never inflate directness (review DELTA-2(c)), and a
+    # metric-less claim yields 0.5 "no metric values" like the record path rather
+    # than a false 0.0 (review DELTA-2(b)).
+    # Count distinct metrics whose VALUE carries a verbatim quote, matching the
+    # record path's ``quoted_metrics / total_metrics`` (a metric's definition, unit
+    # and window quotes must not each count as a separate direct reading). Review
+    # DELTA-2(c): a non-metric verbatim quote never counts.
+    quoted_metric_ids = {
+        str(loc.get("field_path"))
         for loc in (row.get("provenance") or [])
-        if loc.get("locator_kind") == "verbatim_quote" and loc.get("quote")
-    )
-    # Count quoting only over metric-bearing locators, matching _directness_score
-    # on the record path (metrics[..] locators).
-    metric_quoted = sum(
-        1
-        for loc in (row.get("provenance") or [])
-        if str(loc.get("field_path") or "").startswith("metrics[")
+        if str(loc.get("field_path") or "").endswith(".value")
+        and str(loc.get("field_path") or "").startswith("metrics[")
         and loc.get("locator_kind") == "verbatim_quote"
         and loc.get("quote")
-    )
+    }
+    metric_quoted = len(quoted_metric_ids)
     return confidence_inputs(
         source_class=source.get("source_class") or "other",
         methodology_known=methodology_known,
         methodology_total=len(_METHODOLOGY_FIELDS),
-        sample_value=methodology.get("sample_size"),
-        geography=methodology.get("geography"),
+        sample_value=_flat(methodology.get("sample_size")),
+        geography=_flat(methodology.get("geography")),
         geography_basis=methodology.get("geography_basis"),
         published_at=published_at,
         observed_at=observed_at,
-        quoted_metrics=metric_quoted or quoted,
-        total_metrics=max(len(metrics), 1),
+        quoted_metrics=metric_quoted,
+        total_metrics=len(metrics),
         corroborating_sources=corroborating_sources,
     )
 

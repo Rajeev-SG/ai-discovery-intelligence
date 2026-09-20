@@ -30,6 +30,9 @@ export interface MechanicsEvidence {
   confidence_score: number | null;
   /** Why the confidence is what it is — copied verbatim from the backend. */
   confidence_rationale: string[];
+  /** The label the synthesised rationale supports when it differs from the shown
+   *  label; null when rationale and label came from the same computation. */
+  derived_label?: string | null;
   /** Capture freshness as an explicit state; never a guess. */
   freshness_state: string;
   freshness_age_days: number | null;

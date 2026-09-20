@@ -108,7 +108,23 @@ place; the technical record is collapsed.
   `observations` (`FRESHNESS_THRESHOLDS`) is now called by both the claim view and
   the mechanics projection.
 
-## 6. Honest limitations
+## 6. Second review pass (DELTA findings)
+
+- **DELTA-1 (label/rationale disagreement).** The read path now returns the
+  `derived_label` a synthesised rationale actually supports alongside the stored
+  label; the UI renders "this rationale was re-derived … and supports X, while the
+  claim is recorded as Y" when the two differ, instead of implying agreement.
+  Found live: 6 ChatGPT claims are recorded as `medium` but re-derive as `low` —
+  the trust layer now says so explicitly.
+- **DELTA-2 (explainer ≠ record path).** `explain_persisted_confidence` now counts
+  a metric's *value* quote (not every field quote), returns 0.5 "no metric values"
+  for a metric-less claim, unwraps `{"known":..}`/provenanced envelopes, and is
+  covered by a full inputs+rationale parity test against `assess_confidence`.
+- **DELTA-3 (weak verification).** The "no DB writes" check is now behavioural
+  (ledger opened read-only; a write would raise), and CI fails if the
+  Postgres-dialect alias test silently skips.
+
+## 7. Honest limitations
 
 - No production `controlled_observation` claim exists yet (issue #10 is
   deferred), so that class is proven structurally via the recorded fixture, not

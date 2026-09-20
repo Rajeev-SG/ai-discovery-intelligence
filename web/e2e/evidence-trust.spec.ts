@@ -70,4 +70,8 @@ test("inline conflict and controlled observation are distinct from vendor docume
   expect(body).toContain("Directly observed");
   expect(body).toContain("Vendor-documented");
   expect(body).toContain("Compare the contradicting evidence");
+
+  // DELTA-1: a re-derived rationale that supports a label other than the stored
+  // one is surfaced explicitly, never shown as if it agreed.
+  await expect(dialog.getByTestId("trust-derived-note").first()).toBeVisible();
 });

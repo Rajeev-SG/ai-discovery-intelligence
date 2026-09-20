@@ -171,3 +171,37 @@ describe("evidence & trust helpers (issue #58)", () => {
     expect(unknownFresh.freshness_age_days).toBeNull();
   });
 });
+
+
+describe("derived-confidence divergence (issue #58 DELTA-1)", () => {
+  it("carries the derived label so the UI can surface a label/rationale mismatch", () => {
+    // A legacy claim recorded as "medium" whose re-derived rationale supports
+    // "high" must travel with that derived label so the UI never implies agreement.
+    const legacy: import("../lib/mechanics").MechanicsEvidence = {
+      claim_id: "legacy-1",
+      source_id: "s",
+      publisher: "OpenAI",
+      url: "https://platform.openai.com/docs/bots",
+      source_class: "official",
+      evidence_class: "official_documentation",
+      published_at: "2026-09-01",
+      observed_at: "2026-09-19T00:00:00Z",
+      effective_from: null,
+      confidence: "medium",
+      confidence_score: null,
+      confidence_rationale: ["source class official"],
+      derived_label: "high",
+      freshness_state: "fresh",
+      freshness_age_days: 1,
+      measurement_mode: null,
+      methodology_notes: null,
+      limitations: [],
+      modes: [],
+      regions: [],
+      relates_to_claim_id: null,
+      relationship: "new",
+      reconciliation: [],
+    };
+    expect(legacy.derived_label).not.toBe(legacy.confidence);
+  });
+});

@@ -64,7 +64,10 @@ const CHATGPT: SurfaceMechanics = {
                 effective_from: null,
                 confidence: "medium",
                 confidence_score: 0.62,
-                confidence_rationale: ["source_authority: 1.00 (official)"],
+                // A legacy claim whose re-derived rationale supports a different
+                // label: the UI must surface the mismatch (issue #58 DELTA-1).
+                derived_label: "low",
+                confidence_rationale: ["source class official"],
                 freshness_state: "fresh",
                 freshness_age_days: 1,
                 measurement_mode: "official_documentation",
