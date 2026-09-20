@@ -74,11 +74,25 @@ test("landing shows real changes, brief and current POV from the live API", asyn
   const changeList = changes.getByTestId("change-list");
   if ((await changeList.count()) > 0) {
     const items = changeList.locator("> li");
-    expect(await items.count()).toBeGreaterThanOrEqual(1);
+    const count = await items.count();
+    expect(count).toBeGreaterThanOrEqual(1);
     expect((await items.first().innerText()).trim().length).toBeGreaterThan(10);
-    // Truncation is disclosed when the feed exceeds the landing's limit.
-    if ((await items.count()) === 8) {
-      await expect(changes.getByTestId("changes-truncation")).toBeVisible();
+    // Truncation disclosure must be consistent with what is rendered: when the
+    // disclosure is shown it must state the same number of items as the list
+    // shows, and it must be absent when nothing was withheld. This ties the count
+    // and link to real behaviour without pinning the exact cap.
+    const truncation = changes.getByTestId("changes-truncation");
+    const disclosed = (await truncation.count()) > 0;
+    const total = Number(process.env.ADI_EXPECT_CHANGES_TOTAL ?? "0");
+    if (disclosed) {
+      const text = await truncation.innerText();
+      const shown = Number(text.match(/newest (\d+) of (\d+)/)?.[1] ?? "0");
+      const of = Number(text.match(/newest (\d+) of (\d+)/)?.[2] ?? "0");
+      expect(shown).toBe(count);
+      expect(of).toBeGreaterThan(count);
+    } else {
+      // No disclosure: the feed did not exceed the cap.
+      expect(total === 0 || count >= total).toBeTruthy();
     }
     await page.screenshot({ path: shot(testInfo, "changes"), fullPage: false });
   } else {

@@ -37,6 +37,9 @@ export default async function Page() {
           <Link className="landing-button" href="/surfaces">
             Explore surfaces
           </Link>
+          <Link className="landing-link" href="/reconciliation">
+            Reconciled evidence →
+          </Link>
         </nav>
       </header>
 

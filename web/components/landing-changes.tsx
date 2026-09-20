@@ -53,33 +53,37 @@ export function LandingChanges({ outcome }: { outcome: EventsOutcome }) {
             {items.map((event) => {
               const claim = (event.claims ?? [])[0];
               const surfaces = event.surfaces ?? [];
-              const row = (
-                <>
-                  <span className="change-meta">
-                    <span className="change-type">{eventTypeLabel(event.event_type)}</span>
-                    <span className="change-date">{eventDate(event)}</span>
-                    {surfaces.length ? (
-                      <span className="change-surfaces-inline">
-                        {surfaces.slice(0, 1).join("")}
-                        {surfaces.length > 1 ? ` +${surfaces.length - 1}` : ""}
-                      </span>
-                    ) : null}
-                  </span>
-                  <span className="change-title">{event.title}</span>
-                </>
-              );
               return (
                 <li className="change-item" key={event.id} data-testid={`change-${event.id}`}>
-                  {claim ? (
-                    <Link className="change-row" href={evidenceHref(claim)}>
-                      {row}
+                  <div className="change-row">
+                    <span className="change-meta">
+                      <span className="change-type">{eventTypeLabel(event.event_type)}</span>
+                      <span className="change-date">{eventDate(event)}</span>
+                      {surfaces.length ? (
+                        <span className="change-surfaces-inline">
+                          <Link
+                            className="change-surface-link"
+                            href={`/surfaces?q=${encodeURIComponent(surfaces[0])}`}
+                          >
+                            {surfaces[0]}
+                          </Link>
+                          {surfaces.length > 1 ? ` +${surfaces.length - 1}` : ""}
+                        </span>
+                      ) : null}
+                    </span>
+                    {claim ? (
+                      <Link className="change-title change-title-link" href={evidenceHref(claim)}>
+                        {event.title}
+                      </Link>
+                    ) : (
+                      <span className="change-title">{event.title}</span>
+                    )}
+                    {claim ? (
                       <span className="change-chevron" aria-hidden="true">
                         →
                       </span>
-                    </Link>
-                  ) : (
-                    <div className="change-row change-row-static">{row}</div>
-                  )}
+                    ) : null}
+                  </div>
                 </li>
               );
             })}
