@@ -3,7 +3,9 @@
 Core surfaces × 13 canonical dimensions (contract from #56).
 K = known, P = partial, C = conflicting, · = unknown (explicit).
 
-**Evidenced cells: 21 of 208 (10%).**
+**Evidenced cells: 24 of 221 (10%).**
+
+**Partial coverage - this is NOT a complete rebalance.** 6 of 17 core surfaces have any mechanics evidence; the remaining 11 are entirely `unknown` because no public evidence has been captured for them yet (the target of #10), not because they were overlooked.
 
 | surface | trigger | provider | rewrite | crawl | fresh | rank | cite | shop | local | social | mode | answer | control | evidenced |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -23,6 +25,7 @@ K = known, P = partial, C = conflicting, · = unknown (explicit).
 | kimi | · | · | · | · | · | · | · | · | · | · | · | · | · | 0/13 |
 | baidu-ai-search | · | · | · | · | · | · | · | · | · | · | · | · | · | 0/13 |
 | naver-ai | K | K | K | · | · | · | · | · | · | · | · | · | · | 3/13 |
+| yandex-ai-search | K | K | K | · | · | · | · | · | · | · | · | · | · | 3/13 |
 
 Legend — dimensions:
 - `search_trigger` — trigger

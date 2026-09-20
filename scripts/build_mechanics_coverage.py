@@ -47,7 +47,7 @@ CORE_SURFACES = [
     "chatgpt", "google-gemini", "google-ai-mode", "google-ai-overviews",
     "microsoft-copilot", "bing-copilot-search", "claude", "perplexity",
     "deepseek-chat", "grok", "meta-ai", "doubao", "qwen-consumer", "kimi",
-    "baidu-ai-search", "naver-ai",
+    "baidu-ai-search", "naver-ai", "yandex-ai-search",
 ]
 
 DIM_SHORT = {
@@ -94,6 +94,7 @@ def main() -> int:
         rows.append(f"| {sid} | " + " | ".join(cells) + f" | {m.evidenced_dimension_count()}/13 |")
 
     total_cells = sum(projection[s].evidenced_dimension_count() for s in core)
+    evidenced_surfaces = sum(1 for s in core if projection[s].evidenced_dimension_count() > 0)
     matrix = [
         "# Issue #57 — mechanics coverage matrix",
         "",
@@ -102,6 +103,11 @@ def main() -> int:
         "",
         f"**Evidenced cells: {total_cells} of {len(core) * len(MECHANICS_DIMENSIONS)} "  # noqa: ISC004
         f"({total_cells * 100 // (len(core) * len(MECHANICS_DIMENSIONS))}%).**",
+        "",
+        f"**Partial coverage - this is NOT a complete rebalance.** {evidenced_surfaces} of "
+        + f"{len(core)} core surfaces have any mechanics evidence; the remaining "
+        + f"{len(core) - evidenced_surfaces} are entirely `unknown` because no public evidence "
+        + "has been captured for them yet (the target of #10), not because they were overlooked.",
         "",
         *head,
         *sep,

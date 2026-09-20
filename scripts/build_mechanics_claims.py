@@ -47,6 +47,8 @@ SOURCES = {
     "peec-blog": {
         "source_id": "peec-blog",
         "publisher": "Peec AI",
+        # Index/blog listing capture: the page is an index, not a single article.
+        # Recorded as a limitation on the claims drawn from it.
         "url": "https://peec.ai/blog",
         "canonical_url": "https://peec.ai/blog",
         "source_class": "visibility_research",
@@ -54,22 +56,22 @@ SOURCES = {
     "sistrix-ai-citation-drift": {
         "source_id": "sistrix-ai-citation-drift",
         "publisher": "SISTRIX",
-        "url": "https://www.sistrix.com/blog/",
-        "canonical_url": "https://www.sistrix.com/blog/",
+        "url": "https://www.sistrix.com/blog/ai-citation-drift-how-stable-are-sources-in-ai-search-results/",
+        "canonical_url": "https://www.sistrix.com/blog/ai-citation-drift-how-stable-are-sources-in-ai-search-results/",
         "source_class": "visibility_research",
     },
     "naver-ai-tab-launch-2026-06": {
         "source_id": "naver-ai-tab-launch-2026-06",
         "publisher": "NAVER",
-        "url": "https://www.navercorp.com/en/press/",
-        "canonical_url": "https://www.navercorp.com/en/press/",
+        "url": "https://www.navercorp.com/media/pressReleasesDetail?seq=10034442",
+        "canonical_url": "https://www.navercorp.com/media/pressReleasesDetail?seq=10034442",
         "source_class": "official",
     },
     "yandex-ai-search-pretrain-2026-09": {
         "source_id": "yandex-ai-search-pretrain-2026-09",
         "publisher": "Yandex",
-        "url": "https://yandex.com/company/press_center/",
-        "canonical_url": "https://yandex.com/company/press_center/",
+        "url": "https://yandex.com/company/news/2026-09-14-01",
+        "canonical_url": "https://yandex.com/company/news/2026-09-14-01",
         "source_class": "official",
     },
     "perplexity-blog": {
@@ -748,7 +750,10 @@ def specs() -> list[dict]:
             "language": None,
             "language_basis": "not_stated",
             "devices": None,
-            "limitations": ["Vendor research headline; full method not in the capture."],
+            "limitations": [
+                "Vendor research headline; full method not in the capture.",
+                "Source capture is Peec's blog index; the specific article URL is not in the capture.",
+            ],
             "methodology_notes": _qv("Peec AI expert research on ChatGPT fan-outs.", fan_q),
         },
         "metrics": [
@@ -762,7 +767,9 @@ def specs() -> list[dict]:
                 scope=_qv("ChatGPT", "ChatGPT fan-outs"),
             )
         ],
-        "dates": {"published_at": None, "modified_at": None, "measured_window": None,
+        "dates": {"published_at": "2026-02-12",
+                  "published_at_selector": "page stamp 'Feb 12, 2026'",
+                  "modified_at": None, "measured_window": None,
                   "observed_at": OBSERVED["peec-blog"]},
         "capture_anchors": [{"kind": "verbatim_quote", "quote": fan_q}],
         "extraction": {"method": "deterministic_parser", "tool": "ai_discovery.claims",
@@ -793,7 +800,10 @@ def specs() -> list[dict]:
             "language": None,
             "language_basis": "not_stated",
             "devices": None,
-            "limitations": ["Vendor panel; geography/language not stated in the capture."],
+            "limitations": [
+                "Vendor panel; geography/language not stated in the capture.",
+                "Source capture is Peec's blog index; the specific article URL is not in the capture.",
+            ],
             "methodology_notes": _qv("Peec AI 500,000-prompt analysis.", ov_q),
         },
         "metrics": [
@@ -808,7 +818,9 @@ def specs() -> list[dict]:
                 comparator="share_of_total",
             )
         ],
-        "dates": {"published_at": None, "modified_at": None, "measured_window": None,
+        "dates": {"published_at": "2026-05-28",
+                  "published_at_selector": "page stamp 'May 28, 2026'",
+                  "modified_at": None, "measured_window": None,
                   "observed_at": OBSERVED["peec-blog"]},
         "capture_anchors": [{"kind": "verbatim_quote", "quote": ov_q}],
         "extraction": {"method": "deterministic_parser", "tool": "ai_discovery.claims",
@@ -856,7 +868,9 @@ def specs() -> list[dict]:
                 comparator="share_of_total",
             )
         ],
-        "dates": {"published_at": None, "modified_at": None, "measured_window": None,
+        "dates": {"published_at": "2026-05-01",
+                  "published_at_selector": "datePublished",
+                  "modified_at": None, "measured_window": None,
                   "observed_at": OBSERVED["sistrix-ai-citation-drift"]},
         "capture_anchors": [{"kind": "verbatim_quote", "quote": de_q}],
         "extraction": {"method": "deterministic_parser", "tool": "ai_discovery.claims",
@@ -885,12 +899,17 @@ def specs() -> list[dict]:
             "prompt_universe": None,
             "sample_size": None,
             "time_window": None,
-            "geography": _qv("South Korea", "NAVER"),
-            "geography_basis": "publisher_scope",
-            "language": _qv("Korean", "NAVER"),
-            "language_basis": "publisher_scope",
+            # The capture is an English-language global press release; it does not
+            # establish the claim's geography or language, so those stay unknown.
+            "geography": None,
+            "geography_basis": "not_stated",
+            "language": None,
+            "language_basis": "not_stated",
             "devices": None,
-            "limitations": ["Vendor product announcement; describes a feature, not measured usage."],
+            "limitations": [
+                "Vendor product announcement; describes a feature, not measured usage.",
+                "English-language global press release: geography/language not stated.",
+            ],
             "methodology_notes": _qv("NAVER AI Tab launch press release.", map_q),
         },
         "metrics": [
@@ -904,7 +923,9 @@ def specs() -> list[dict]:
                 scope=_qv("NAVER AI Tab", "AI Tab"),
             )
         ],
-        "dates": {"published_at": None, "modified_at": None, "measured_window": None,
+        "dates": {"published_at": "2026-06-26",
+                  "published_at_selector": "page stamp 'June 26, 2026'",
+                  "modified_at": None, "measured_window": None,
                   "observed_at": OBSERVED["naver-ai-tab-launch-2026-06"]},
         "capture_anchors": [{"kind": "verbatim_quote", "quote": map_q}],
         "extraction": {"method": "deterministic_parser", "tool": "ai_discovery.claims",
@@ -932,12 +953,15 @@ def specs() -> list[dict]:
             "prompt_universe": None,
             "sample_size": None,
             "time_window": None,
-            "geography": _qv("South Korea", "NAVER"),
-            "geography_basis": "publisher_scope",
-            "language": _qv("Korean", "NAVER"),
-            "language_basis": "publisher_scope",
+            "geography": None,
+            "geography_basis": "not_stated",
+            "language": None,
+            "language_basis": "not_stated",
             "devices": None,
-            "limitations": ["Vendor description; not an independent measurement."],
+            "limitations": [
+                "Vendor description; not an independent measurement.",
+                "English-language global press release: geography/language not stated.",
+            ],
             "methodology_notes": _qv("NAVER AI Tab launch press release.", act_q),
         },
         "metrics": [
@@ -951,7 +975,9 @@ def specs() -> list[dict]:
                 scope=_qv("NAVER AI Tab", "AI Tab"),
             )
         ],
-        "dates": {"published_at": None, "modified_at": None, "measured_window": None,
+        "dates": {"published_at": "2026-06-26",
+                  "published_at_selector": "page stamp 'June 26, 2026'",
+                  "modified_at": None, "measured_window": None,
                   "observed_at": OBSERVED["naver-ai-tab-launch-2026-06"]},
         "capture_anchors": [{"kind": "verbatim_quote", "quote": act_q}],
         "extraction": {"method": "deterministic_parser", "tool": "ai_discovery.claims",
@@ -980,8 +1006,8 @@ def specs() -> list[dict]:
             "prompt_universe": None,
             "sample_size": None,
             "time_window": None,
-            "geography": _qv("Russia", "Yandex"),
-            "geography_basis": "publisher_scope",
+            "geography": None,
+            "geography_basis": "not_stated",
             "language": _qv("Russian", "Russian-language"),
             "language_basis": "source_stated",
             "devices": None,
@@ -1000,7 +1026,7 @@ def specs() -> list[dict]:
             )
         ],
         "dates": {"published_at": "2026-09-14",
-                  "published_at_selector": "page stamp 'September 14, 2026'",
+                  "published_at_selector": "'September 14, 2026'",
                   "modified_at": None, "measured_window": None,
                   "observed_at": OBSERVED["yandex-ai-search-pretrain-2026-09"]},
         "capture_anchors": [{"kind": "verbatim_quote", "quote": yq}],

@@ -125,3 +125,34 @@ def test_mechanics_claims_span_multiple_core_surfaces():
         "naver-ai", "yandex-ai-search",
     }
     assert len(surfaces & core) >= 5
+
+
+def test_geography_language_are_not_derived_from_a_brand_name(bundle):
+    """Review delta-2: a brand name in the page is not evidence of geography/language.
+
+    Where the capture does not establish geography/language, the field must be
+    null with basis 'not_stated' — never anchored on the brand name.
+    """
+
+    for claim in bundle["claims"]:
+        method = claim["methodology"]
+        geo = method.get("geography")
+        lang = method.get("language")
+        for field, value, key in (("geography", geo, "geography"), ("language", lang, "language")):
+            if value is None:
+                continue
+            quote = value.get("quote", "")
+            # A geography/language value must have a real supporting anchor, not
+            # just the vendor's own name.
+            brand = claim["source"]["publisher"].split()[0].lower()
+            assert quote.strip().lower() != brand, (key, quote, claim["source"]["publisher"])
+
+
+def test_new_sources_point_at_article_urls_not_bare_indexes(bundle):
+    """Review delta-3: source URLs must resolve to the quoted evidence page."""
+
+    urls = {c["source"]["source_id"]: c["source"]["url"] for c in bundle["claims"]}
+    # The SISTRIX, NAVER and Yandex sources point at their specific pages.
+    assert "ai-citation-drift" in urls["sistrix-ai-citation-drift"]
+    assert "pressReleasesDetail" in urls["naver-ai-tab-launch-2026-06"]
+    assert "2026-09-14-01" in urls["yandex-ai-search-pretrain-2026-09"]

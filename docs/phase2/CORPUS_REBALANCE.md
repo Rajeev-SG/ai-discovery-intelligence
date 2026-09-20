@@ -61,6 +61,26 @@ regional claim was added because the real captures for the CN/KR/JP/RU surfaces
 carry no mechanics evidence; inventing one would violate the evidence contract.
 That gap is the explicit target of #10 (controlled observation).
 
+## Coverage is partial and stated as such
+
+This is **not** a complete rebalance. 6 of 17 core surfaces have any mechanics
+evidence; the other 11 are entirely `unknown` because **no public evidence has
+been captured for them yet** — not because they were overlooked. The coverage
+matrix headline states the un-evidenced count explicitly. Filling it is the job
+of #10 (controlled observation) and later capture pushes, not of inference.
+
+Two data-quality rules the review enforced:
+
+- **No brand-name evidence.** Geography/language are set only when the capture
+  actually establishes them. The NAVER press release is an English-language
+  global page, so its claims carry `geography=None`/`language=None`
+  (`basis='not_stated'`), not `South Korea`/`Korean` inferred from the brand.
+- **Source URLs resolve to the evidence.** The new sources point at their
+  specific article pages (SISTRIX AI-citation-drift article, NAVER press-release
+  detail, Yandex news item); where a capture is a blog index (Peec), that
+  limitation is recorded on the claims rather than presenting the index URL as
+  the article.
+
 ## Honest boundary
 
 - Topic→dimension gating (from #56) means a citation *share* still lights no

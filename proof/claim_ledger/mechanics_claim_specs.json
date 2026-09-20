@@ -970,7 +970,8 @@
         "language_basis": "not_stated",
         "devices": null,
         "limitations": [
-          "Vendor research headline; full method not in the capture."
+          "Vendor research headline; full method not in the capture.",
+          "Source capture is Peec's blog index; the specific article URL is not in the capture."
         ],
         "methodology_notes": {
           "value": "Peec AI expert research on ChatGPT fan-outs.",
@@ -1005,7 +1006,8 @@
         }
       ],
       "dates": {
-        "published_at": null,
+        "published_at": "2026-02-12",
+        "published_at_selector": "page stamp 'Feb 12, 2026'",
         "modified_at": null,
         "measured_window": null,
         "observed_at": "2026-09-16T21:55:00+00:00"
@@ -1071,7 +1073,8 @@
         "language_basis": "not_stated",
         "devices": null,
         "limitations": [
-          "Vendor panel; geography/language not stated in the capture."
+          "Vendor panel; geography/language not stated in the capture.",
+          "Source capture is Peec's blog index; the specific article URL is not in the capture."
         ],
         "methodology_notes": {
           "value": "Peec AI 500,000-prompt analysis.",
@@ -1106,7 +1109,8 @@
         }
       ],
       "dates": {
-        "published_at": null,
+        "published_at": "2026-05-28",
+        "published_at_selector": "page stamp 'May 28, 2026'",
         "modified_at": null,
         "measured_window": null,
         "observed_at": "2026-09-16T21:55:00+00:00"
@@ -1130,8 +1134,8 @@
       "source": {
         "source_id": "sistrix-ai-citation-drift",
         "publisher": "SISTRIX",
-        "url": "https://www.sistrix.com/blog/",
-        "canonical_url": "https://www.sistrix.com/blog/",
+        "url": "https://www.sistrix.com/blog/ai-citation-drift-how-stable-are-sources-in-ai-search-results/",
+        "canonical_url": "https://www.sistrix.com/blog/ai-citation-drift-how-stable-are-sources-in-ai-search-results/",
         "source_class": "visibility_research"
       },
       "topic": "citations_sources",
@@ -1204,7 +1208,8 @@
         }
       ],
       "dates": {
-        "published_at": null,
+        "published_at": "2026-05-01",
+        "published_at_selector": "datePublished",
         "modified_at": null,
         "measured_window": null,
         "observed_at": "2026-09-16T21:55:00+00:00"
@@ -1228,8 +1233,8 @@
       "source": {
         "source_id": "naver-ai-tab-launch-2026-06",
         "publisher": "NAVER",
-        "url": "https://www.navercorp.com/en/press/",
-        "canonical_url": "https://www.navercorp.com/en/press/",
+        "url": "https://www.navercorp.com/media/pressReleasesDetail?seq=10034442",
+        "canonical_url": "https://www.navercorp.com/media/pressReleasesDetail?seq=10034442",
         "source_class": "official"
       },
       "topic": "retrieval_index",
@@ -1255,19 +1260,14 @@
         "prompt_universe": null,
         "sample_size": null,
         "time_window": null,
-        "geography": {
-          "value": "South Korea",
-          "quote": "NAVER"
-        },
-        "geography_basis": "publisher_scope",
-        "language": {
-          "value": "Korean",
-          "quote": "NAVER"
-        },
-        "language_basis": "publisher_scope",
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
         "devices": null,
         "limitations": [
-          "Vendor product announcement; describes a feature, not measured usage."
+          "Vendor product announcement; describes a feature, not measured usage.",
+          "English-language global press release: geography/language not stated."
         ],
         "methodology_notes": {
           "value": "NAVER AI Tab launch press release.",
@@ -1302,7 +1302,8 @@
         }
       ],
       "dates": {
-        "published_at": null,
+        "published_at": "2026-06-26",
+        "published_at_selector": "page stamp 'June 26, 2026'",
         "modified_at": null,
         "measured_window": null,
         "observed_at": "2026-09-16T21:55:00+00:00"
@@ -1326,8 +1327,8 @@
       "source": {
         "source_id": "naver-ai-tab-launch-2026-06",
         "publisher": "NAVER",
-        "url": "https://www.navercorp.com/en/press/",
-        "canonical_url": "https://www.navercorp.com/en/press/",
+        "url": "https://www.navercorp.com/media/pressReleasesDetail?seq=10034442",
+        "canonical_url": "https://www.navercorp.com/media/pressReleasesDetail?seq=10034442",
         "source_class": "official"
       },
       "topic": "retrieval_index",
@@ -1353,19 +1354,14 @@
         "prompt_universe": null,
         "sample_size": null,
         "time_window": null,
-        "geography": {
-          "value": "South Korea",
-          "quote": "NAVER"
-        },
-        "geography_basis": "publisher_scope",
-        "language": {
-          "value": "Korean",
-          "quote": "NAVER"
-        },
-        "language_basis": "publisher_scope",
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
         "devices": null,
         "limitations": [
-          "Vendor description; not an independent measurement."
+          "Vendor description; not an independent measurement.",
+          "English-language global press release: geography/language not stated."
         ],
         "methodology_notes": {
           "value": "NAVER AI Tab launch press release.",
@@ -1400,7 +1396,8 @@
         }
       ],
       "dates": {
-        "published_at": null,
+        "published_at": "2026-06-26",
+        "published_at_selector": "page stamp 'June 26, 2026'",
         "modified_at": null,
         "measured_window": null,
         "observed_at": "2026-09-16T21:55:00+00:00"
@@ -1424,8 +1421,8 @@
       "source": {
         "source_id": "yandex-ai-search-pretrain-2026-09",
         "publisher": "Yandex",
-        "url": "https://yandex.com/company/press_center/",
-        "canonical_url": "https://yandex.com/company/press_center/",
+        "url": "https://yandex.com/company/news/2026-09-14-01",
+        "canonical_url": "https://yandex.com/company/news/2026-09-14-01",
         "source_class": "official"
       },
       "topic": "retrieval_index",
@@ -1451,11 +1448,8 @@
         "prompt_universe": null,
         "sample_size": null,
         "time_window": null,
-        "geography": {
-          "value": "Russia",
-          "quote": "Yandex"
-        },
-        "geography_basis": "publisher_scope",
+        "geography": null,
+        "geography_basis": "not_stated",
         "language": {
           "value": "Russian",
           "quote": "Russian-language"
@@ -1499,7 +1493,7 @@
       ],
       "dates": {
         "published_at": "2026-09-14",
-        "published_at_selector": "page stamp 'September 14, 2026'",
+        "published_at_selector": "'September 14, 2026'",
         "modified_at": null,
         "measured_window": null,
         "observed_at": "2026-09-16T21:55:00+00:00"
