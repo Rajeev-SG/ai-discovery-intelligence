@@ -68,6 +68,12 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: End-to-end product proof
+        # The reconciliation e2e (issue #47) needs a reachable evidence API;
+        # set EVIDENCE_API_URL to point it at one. Against a dead/absent ledger
+        # the spec skips with a clear message rather than failing on
+        # infrastructure, so the merge gate never depends on a hardcoded host.
+        env:
+          EVIDENCE_API_URL: ${{ vars.EVIDENCE_API_URL }}
         run: npx playwright test
 
       - name: Upload proof screenshots

@@ -538,3 +538,92 @@ main { flex: 1; }
   .pov-prop-head { flex-direction: column; }
   .pov-prop-badges { justify-content: flex-start; }
 }
+
+/* --- Reconciled evidence (issue #47) -------------------------------------- */
+
+.recon { max-width: 1040px; margin: 0 auto; padding: 24px 20px 60px; }
+.recon-header h1 { margin: 0 0 8px; font-size: 26px; }
+.recon-intro { color: var(--text-muted); max-width: 74ch; margin: 0 0 8px; }
+.recon-source { color: var(--text-muted); font-size: 12px; margin: 0 0 22px; }
+.recon-empty-state { color: var(--text-muted); font-style: italic; margin: 12px 0 0; }
+
+.recon-groups { display: flex; flex-direction: column; gap: 30px; }
+.recon-group-head { display: flex; align-items: baseline; gap: 10px; }
+.recon-group-head h2 { margin: 0; font-size: 18px; }
+.recon-group-count {
+  font-size: 12px; color: var(--text-muted); border: 1px solid var(--border);
+  border-radius: 999px; padding: 1px 9px;
+}
+.recon-group-note { margin: 4px 0 14px; color: var(--text-muted); font-size: 13px; max-width: 74ch; }
+.recon-rel-list { display: flex; flex-direction: column; gap: 14px; }
+
+.recon-rel {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+  padding: 16px 18px;
+}
+/* Contested and non-comparable states are visually distinct, not alarmist. */
+.recon-rel-conflict { border-left-color: var(--danger); }
+.recon-rel-unresolved { border-left-color: var(--warn); }
+.recon-rel-incomparable { border-left-color: var(--accent); }
+.recon-rel-temporal { border-left-color: var(--ok); }
+.recon-rel-compatible { border-left-color: var(--ok); }
+
+.recon-rel-head { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+.recon-rel-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.recon-badge {
+  font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 2px 9px; border-radius: 999px; border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.recon-badge-relationship { color: var(--text); border-color: var(--border); }
+.recon-badge-state { font-family: var(--mono); text-transform: none; letter-spacing: 0; }
+.recon-badge-contested { background: var(--warn-soft); border-color: rgba(240, 182, 74, 0.5); color: #ffd693; }
+.recon-badge-superseded { background: var(--accent-soft); border-color: rgba(87, 182, 255, 0.4); color: var(--accent); text-transform: none; letter-spacing: 0; }
+.recon-adjustment { margin: 0; font-size: 12px; color: var(--text-muted); }
+.recon-adjustment strong { color: var(--text); font-family: var(--mono); }
+
+.recon-sides { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0 0; }
+.recon-side { border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px 14px; background: #0f151d; }
+.recon-side-superseded { opacity: 0.78; }
+.recon-side-missing { display: flex; align-items: center; }
+.recon-side-missing-note { color: var(--text-muted); font-style: italic; margin: 0; }
+.recon-side-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
+.recon-side-statement { margin: 0; font-size: 14px; font-weight: 600; }
+.recon-side-values { margin: 10px 0 0; }
+.recon-value-row { display: flex; gap: 8px; padding: 3px 0; }
+.recon-value-row dt { color: var(--text-muted); font-size: 12px; min-width: 40%; }
+.recon-value-row dd { margin: 0; font-size: 13px; }
+.recon-value { font-family: var(--mono); }
+.recon-value-unknown { color: var(--text-muted); font-style: italic; font-family: inherit; }
+.recon-value-window, .recon-value-scope { color: var(--text-muted); font-size: 12px; }
+.recon-side-ref { margin: 8px 0 0; color: var(--text-muted); font-size: 12px; }
+.recon-side-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0 0; color: var(--text-muted); font-size: 12px; }
+.recon-side-topic { text-transform: capitalize; }
+
+.recon-interpretation {
+  margin: 14px 0 0; padding: 10px 14px; border-left: 3px solid var(--border);
+  background: #0f151d; border-radius: 0 8px 8px 0; font-size: 13px;
+}
+.recon-interpretation-label {
+  display: block; margin-bottom: 3px; color: var(--text-muted);
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
+}
+
+.recon-context { margin: 12px 0 0; }
+.recon-context > summary { cursor: pointer; color: var(--accent); font-size: 13px; }
+.recon-context-body { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 10px 0 0; }
+.recon-context-block h4 { margin: 0 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); }
+.recon-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.recon-chip { font-size: 12px; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--border); }
+.recon-chip-diff { background: var(--warn-soft); border-color: rgba(240, 182, 74, 0.4); }
+.recon-chip-unknown { color: var(--text-muted); font-style: italic; }
+.recon-empty { color: var(--text-muted); font-style: italic; margin: 0; font-size: 13px; }
+
+@media (max-width: 720px) {
+  .recon-sides { grid-template-columns: 1fr; }
+  .recon-context-body { grid-template-columns: 1fr; }
+  .recon-rel-head { flex-direction: column; }
+}
