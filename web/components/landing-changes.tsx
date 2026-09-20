@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { eventTypeLabel, type EventsOutcome } from "@/lib/intel";
+import { changeWindow, eventTypeLabel, type EventsOutcome } from "@/lib/intel";
 import { formatDate } from "@/lib/evidence";
 import { evidenceHref } from "@/lib/pov";
 
@@ -24,10 +24,15 @@ function eventDate(event: { effective_from?: string | null; published_at?: strin
  * date share one meta line; surfaces are chips only when they add context.
  */
 export function LandingChanges({ outcome }: { outcome: EventsOutcome }) {
-  const items = outcome.items.slice(0, HOW_MANY);
-  const total = outcome.items.length;
+  const { shown: items, total, truncated } = changeWindow(outcome.items, HOW_MANY);
   return (
-    <section className="landing-section" aria-labelledby="landing-changes-title" data-testid="landing-changes">
+    <section
+      className="landing-section"
+      aria-labelledby="landing-changes-title"
+      data-testid="landing-changes"
+      data-change-shown={items.length}
+      data-change-total={total}
+    >
       <header className="landing-section-head">
         <div>
           <p className="eyebrow">Latest material changes</p>
@@ -88,7 +93,7 @@ export function LandingChanges({ outcome }: { outcome: EventsOutcome }) {
               );
             })}
           </ol>
-          {total > HOW_MANY ? (
+          {truncated ? (
             <p className="change-truncation" data-testid="changes-truncation">
               Showing the newest {HOW_MANY} of {total} changes.{" "}
               <Link href="/surfaces">All changes in Explore surfaces →</Link>
