@@ -1,35 +1,41 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AI Discovery Intelligence — Observation plane",
+  title: "AI Discovery Intelligence",
   description:
-    "A source-backed view of how consumer AI discovery surfaces find, retrieve, cite and recommend information.",
+    "What changed, what matters and what we currently believe about how consumer AI discovery surfaces find, retrieve, cite and recommend information.",
 };
+
+const NAV = [
+  { href: "/", label: "Intelligence" },
+  { href: "/surfaces", label: "Explore surfaces" },
+  { href: "/pov", label: "POV" },
+  { href: "/reconciliation", label: "Reconciliation" },
+];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-GB">
       <body>
-        <a className="skip-link" href="#plane-main">
-          Skip to the surface registry
+        <a className="skip-link" href="#content">
+          Skip to content
         </a>
         <div className="page-shell">
           <nav className="site-nav" aria-label="Product surfaces">
-            <span className="site-nav-brand">AI Discovery Intelligence</span>
+            <Link className="site-nav-brand" href="/">
+              AI Discovery Intelligence
+            </Link>
             <ul>
-              <li>
-                <span aria-current="page">Observation plane</span>
-              </li>
-              <li aria-disabled="true">
-                <span className="nav-coming-soon">Weekly brief (issue 06)</span>
-              </li>
-              <li aria-disabled="true">
-                <span className="nav-coming-soon">Living POV (issue 07)</span>
-              </li>
+              {NAV.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href}>{item.label}</Link>
+                </li>
+              ))}
             </ul>
           </nav>
-          <main id="plane-main">{children}</main>
+          <main id="content">{children}</main>
         </div>
       </body>
     </html>

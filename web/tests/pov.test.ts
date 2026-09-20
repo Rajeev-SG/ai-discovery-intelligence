@@ -217,7 +217,7 @@ describe("presentation helpers", () => {
   });
 
   it("links evidence ids into the observation plane", () => {
-    expect(evidenceHref("abc")).toBe("/?evidence=abc");
-    expect(evidenceHref("a b")).toBe("/?evidence=a%20b");
+    expect(evidenceHref("abc")).toBe("/surfaces?evidence=abc");
+    expect(evidenceHref("a b")).toBe("/surfaces?evidence=a%20b");
   });
 });

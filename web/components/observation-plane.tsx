@@ -319,8 +319,8 @@ export function ObservationPlane({ rows, registryVersion, lastReviewed }: Observ
           <h1>Consumer AI discovery surfaces</h1>
           <p className="plane-subtitle">
             Every entry in <code>config/surfaces.yaml</code> — registry v{registryVersion}, reviewed{" "}
-            {lastReviewed}. Evidence is not ingested yet, so unknown retrieval architecture and missing
-            evidence are stated explicitly rather than shown blank.
+            {lastReviewed}. Unknown retrieval architecture and missing evidence are stated explicitly
+            rather than shown blank.
           </p>
         </div>
         <dl className="plane-stats">

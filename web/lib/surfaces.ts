@@ -189,7 +189,6 @@ export function buildHaystack(surface: RegistrySurface, lastReviewed: string): s
     label(RETRIEVAL_STATUS_LABELS, surface.retrieval_status),
     ...retrievalUnknowns(surface.retrieval_status),
     lastReviewed,
-    "not yet ingested",
     "unknown",
   ]
     .join(" ")

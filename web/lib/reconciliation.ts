@@ -270,9 +270,12 @@ export function formatAdjustment(adjustment: number | null): string {
   return `${rounded > 0 ? "+" : "\u2212"}${Math.abs(rounded)}`;
 }
 
-/** Link back into the evidence surface route (detail drill-down lives in #46). */
+/**
+ * Link back into the evidence surface route (detail drill-down lives in #46).
+ * The registry matrix moved to `/surfaces` in issue #45.
+ */
 export function surfaceHref(surface: string): string {
-  return `/?surface=${encodeURIComponent(surface)}`;
+  return `/surfaces?surface=${encodeURIComponent(surface)}`;
 }
 
 function normalizeClaims(body: unknown): ReconClaim[] {

@@ -1,13 +1,17 @@
-# Observation plane (web)
+# AI Discovery Intelligence (web)
 
-The first product slice: a searchable, sortable, filterable and expandable
-global map of every consumer AI discovery surface in the canonical registry
-(`../config/surfaces.yaml`).
+The product shell. The root route (`/`) is the intelligence-first landing —
+latest material changes from the live `/events` feed, the weekly executive
+brief from `/brief`, and the current POV projected from the committed canonical
+artifact. The supporting routes are `/surfaces` (the searchable, sortable,
+filterable 35-surface registry matrix and evidence drill-down), `/pov` (the
+living POV and changelog) and `/reconciliation` (the persisted reconciliation
+ledger).
 
-This is issue 01 only. It renders **registry facts** and states retrieval
-unknowns and missing evidence explicitly. It does **not** ingest evidence:
-source acquisition (issue 02) and the claim ledger (issue 03) own live
-provenance, so nothing here is presented as a researched claim.
+Evidence is served by the read-only FastAPI evidence API (`EVIDENCE_API_URL`);
+the web app fetches it server-side and never re-derives a claim, confidence or
+reconciliation decision in the browser. Registry facts are rendered verbatim,
+with retrieval unknowns and missing evidence stated explicitly.
 
 ## Adopted stack (per `../docs/OSS_STACK.md`)
 
@@ -76,7 +80,7 @@ Screenshots are written to `proof/`.
 
 ## Column model
 
-The registry supplies no evidence yet, so the evidence columns are honest
-placeholders: Citation evidence (`Not yet ingested`), Confidence (`Not yet
-assessed`), Last verified (`Registry reviewed <date>`). They become real
-values when issues 02/03 land.
+Citation evidence, confidence and last-verified columns carry the live claim
+summary for each surface when the evidence API is configured; a surface with no
+linked validated claim shows an explicit no-evidence state rather than a blank
+cell.
