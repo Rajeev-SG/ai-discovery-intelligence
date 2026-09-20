@@ -3,7 +3,7 @@
 Core surfaces × 13 canonical dimensions (contract from #56).
 K = known, P = partial, C = conflicting, · = unknown (explicit).
 
-**Evidenced cells: 18 of 208 (8%).**
+**Evidenced cells: 21 of 208 (10%).**
 
 | surface | trigger | provider | rewrite | crawl | fresh | rank | cite | shop | local | social | mode | answer | control | evidenced |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -22,7 +22,7 @@ K = known, P = partial, C = conflicting, · = unknown (explicit).
 | qwen-consumer | · | · | · | · | · | · | · | · | · | · | · | · | · | 0/13 |
 | kimi | · | · | · | · | · | · | · | · | · | · | · | · | · | 0/13 |
 | baidu-ai-search | · | · | · | · | · | · | · | · | · | · | · | · | · | 0/13 |
-| naver-ai | · | · | · | · | · | · | · | · | · | · | · | · | · | 0/13 |
+| naver-ai | K | K | K | · | · | · | · | · | · | · | · | · | · | 3/13 |
 
 Legend — dimensions:
 - `search_trigger` — trigger

@@ -25,18 +25,33 @@ value is invented. Every new claim is tagged with a canonical mechanics topic.
 | Average cited ChatGPT page is ~500 days old | citations_sources | chatgpt | independent |
 | ChatGPT retrieval returns title/snippet/URL/ID before opening a page | retrieval_index | chatgpt | independent |
 | Perplexity benchmarks first-stage retrieval (Q2D-Web) | retrieval_index | perplexity | official |
+| ChatGPT fan-out length doubled in 4 months (20M+ fan-outs) | retrieval_index | chatgpt | independent |
+| AI Overviews appear in 86% of 500k sampled prompts | retrieval_index | google-ai-overviews | independent |
+| Google AI Mode: own domain in only 43% of brand queries | citations_sources | google-ai-mode | independent |
+| NAVER AI Tab surfaces Map info + reservations in answers | retrieval_index | naver-ai | official |
+| NAVER AI Tab connects answers to shopping/place/actions | retrieval_index | naver-ai | official |
+| Yandex open-sourced Alice AI Search Pretrain (Search answers) | retrieval_index | yandex-ai-search | official |
 
 ## Before → after
 
 See `proof/phase2/CORPUS_DISTRIBUTION.md` and `proof/phase2/MECHANICS_COVERAGE_MATRIX.md`.
 
-- `retrieval_index`: **0 → 5** (was completely empty).
+- `retrieval_index`: **0 → 9** (was completely empty).
 - `crawler_index_policy`: **1 → 3**.
-- `citations_sources`: **10 → 13** (with retrieval-gate content, not just shares).
+- `citations_sources`: **10 → 14** (with retrieval-gate/age content, not just shares).
 - `audience_usage`: **16 → 16** — **no new share/audience claim added**.
-- Evidenced mechanics (surface × dimension) cells: **6 → 18** of 208.
-- Change events derived from the new claims: **10** (retrieval/index change ×5,
-  citation-source shift ×3, crawler policy ×2).
+- Evidenced mechanics (surface × dimension) cells: **6 → 21** of 208.
+- Core surfaces with any mechanics evidence: **1 → 6** (chatgpt, google-ai-mode,
+  google-ai-overviews, perplexity, naver-ai, yandex-ai-search).
+- Change events derived from the new claims: **16**.
+
+## Operator-facing, not a one-off script
+
+The same extraction path (`build_records()` in `scripts/build_mechanics_claims.py`)
+is exposed as a Dagster asset, `mechanics_claims`, in `src/ai_discovery/pipeline.py`
+(depends on `feed_items`). So the scheduled pipeline persists the quote-verified
+mechanics claims and derives their change events — the CLI and the pipeline share
+one code path.
 
 ## Source-class and regional diversity
 

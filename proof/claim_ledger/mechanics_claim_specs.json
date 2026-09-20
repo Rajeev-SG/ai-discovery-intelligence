@@ -926,6 +926,598 @@
       },
       "status": "current",
       "relationship": "new"
+    },
+    {
+      "source": {
+        "source_id": "peec-blog",
+        "publisher": "Peec AI",
+        "url": "https://peec.ai/blog",
+        "canonical_url": "https://peec.ai/blog",
+        "source_class": "visibility_research"
+      },
+      "topic": "retrieval_index",
+      "statement": "Peec AI research on over 20 million ChatGPT fan-outs found fan-out length doubled in four months, showing query decomposition changes over time.",
+      "surfaces": [
+        "chatgpt"
+      ],
+      "methodology": {
+        "measurement_mode": "vendor_estimate",
+        "metric_family": {
+          "value": "ChatGPT fan-out length over time",
+          "quote": "ChatGPT fan-outs have doubled in length in 4 months"
+        },
+        "metric_definition": {
+          "value": "fan-out length doubling",
+          "quote": "ChatGPT fan-outs have doubled in length in 4 months"
+        },
+        "unit_of_analysis": {
+          "value": "ChatGPT fan-out",
+          "quote": "ChatGPT fan-outs have doubled in length in 4 months"
+        },
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": {
+          "value": "over 20 million ChatGPT fan-outs",
+          "quote": "over 20 million ChatGPT fan-outs"
+        },
+        "time_window": {
+          "value": "4 months",
+          "quote": "in 4 months"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "devices": null,
+        "limitations": [
+          "Vendor research headline; full method not in the capture."
+        ],
+        "methodology_notes": {
+          "value": "Peec AI expert research on ChatGPT fan-outs.",
+          "quote": "ChatGPT fan-outs have doubled in length in 4 months"
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "fanout_length_growth",
+          "label": "ChatGPT fan-outs doubled in length",
+          "comparator": "qualitative_finding",
+          "definition": {
+            "value": "fan-out length",
+            "quote": "fan-outs have doubled in length"
+          },
+          "value": {
+            "value": "doubled",
+            "quote": "doubled in length"
+          },
+          "unit": {
+            "value": "multiple",
+            "quote": "ChatGPT fan-outs have doubled in length in 4 months"
+          },
+          "window": {
+            "value": "4 months",
+            "quote": "in 4 months"
+          },
+          "scope": {
+            "value": "ChatGPT",
+            "quote": "ChatGPT fan-outs"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "ChatGPT fan-outs have doubled in length in 4 months"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "peec_fanout_length_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new"
+    },
+    {
+      "source": {
+        "source_id": "peec-blog",
+        "publisher": "Peec AI",
+        "url": "https://peec.ai/blog",
+        "canonical_url": "https://peec.ai/blog",
+        "source_class": "visibility_research"
+      },
+      "topic": "retrieval_index",
+      "statement": "Peec AI's analysis of 500,000 prompts found Google AI Overviews appear in 86% of sampled prompts, making them a high-frequency retrieval surface.",
+      "surfaces": [
+        "google-ai-overviews"
+      ],
+      "methodology": {
+        "measurement_mode": "vendor_estimate",
+        "metric_family": {
+          "value": "AI Overview appearance rate",
+          "quote": "AI Overviews appear 86% of the time in our sample"
+        },
+        "metric_definition": {
+          "value": "share of prompts where AI Overviews appear",
+          "quote": "AI Overviews appear 86% of the time in our sample"
+        },
+        "unit_of_analysis": {
+          "value": "prompt",
+          "quote": "AI Overviews appear 86% of the time in our sample"
+        },
+        "denominator": {
+          "value": "500,000 prompts",
+          "quote": "500,000 prompts"
+        },
+        "prompt_universe": {
+          "value": "500,000 prompts",
+          "quote": "500,000 prompts"
+        },
+        "sample_size": {
+          "value": "500,000 prompts",
+          "quote": "500,000 prompts"
+        },
+        "time_window": null,
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "devices": null,
+        "limitations": [
+          "Vendor panel; geography/language not stated in the capture."
+        ],
+        "methodology_notes": {
+          "value": "Peec AI 500,000-prompt analysis.",
+          "quote": "AI Overviews appear 86% of the time in our sample"
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "ai_overview_appearance_rate",
+          "label": "AI Overviews appear in 86% of sampled prompts",
+          "comparator": "share_of_total",
+          "definition": {
+            "value": "appearance rate",
+            "quote": "AI Overviews appear 86% of the time"
+          },
+          "value": {
+            "value": "86",
+            "quote": "86%"
+          },
+          "unit": {
+            "value": "percent of prompts",
+            "quote": "86% of the time"
+          },
+          "window": {
+            "value": "Peec sample",
+            "quote": "AI Overviews appear 86% of the time in our sample"
+          },
+          "scope": {
+            "value": "Google AI Overviews",
+            "quote": "AI Overviews"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "AI Overviews appear 86% of the time in our sample"
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "peec_ai_overview_rate_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new"
+    },
+    {
+      "source": {
+        "source_id": "sistrix-ai-citation-drift",
+        "publisher": "SISTRIX",
+        "url": "https://www.sistrix.com/blog/",
+        "canonical_url": "https://www.sistrix.com/blog/",
+        "source_class": "visibility_research"
+      },
+      "topic": "citations_sources",
+      "statement": "SISTRIX found that in Google AI Mode a brand's own domain appears in only 43% of brand queries across 17 weeks, so brand queries frequently surface other sources.",
+      "surfaces": [
+        "google-ai-mode"
+      ],
+      "methodology": {
+        "measurement_mode": "vendor_estimate",
+        "metric_family": {
+          "value": "own-domain share of brand queries",
+          "quote": "In Google AI Mode, the brand\u2019s own domain appears in only 43% of brand queries across all 17 weeks."
+        },
+        "metric_definition": {
+          "value": "share of brand queries where the brand's domain appears",
+          "quote": "In Google AI Mode, the brand\u2019s own domain appears in only 43% of brand queries across all 17 weeks."
+        },
+        "unit_of_analysis": {
+          "value": "brand query",
+          "quote": "In Google AI Mode, the brand\u2019s own domain appears in only 43% of brand queries across all 17 weeks."
+        },
+        "denominator": {
+          "value": "brand queries over 17 weeks",
+          "quote": "across all 17 weeks"
+        },
+        "prompt_universe": null,
+        "sample_size": null,
+        "time_window": {
+          "value": "17 weeks",
+          "quote": "across all 17 weeks"
+        },
+        "geography": null,
+        "geography_basis": "not_stated",
+        "language": null,
+        "language_basis": "not_stated",
+        "devices": null,
+        "limitations": [
+          "Vendor study; brand set and languages not enumerated here."
+        ],
+        "methodology_notes": {
+          "value": "SISTRIX AI citation-drift study.",
+          "quote": "In Google AI Mode, the brand\u2019s own domain appears in only 43% of brand queries across all 17 weeks."
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "own_domain_brand_query_share",
+          "label": "Own domain appears in 43% of brand queries",
+          "comparator": "share_of_total",
+          "definition": {
+            "value": "own-domain share",
+            "quote": "appears in only 43% of brand queries"
+          },
+          "value": {
+            "value": "43",
+            "quote": "43%"
+          },
+          "unit": {
+            "value": "percent of brand queries",
+            "quote": "43% of brand queries"
+          },
+          "window": {
+            "value": "17 weeks",
+            "quote": "across all 17 weeks"
+          },
+          "scope": {
+            "value": "Google AI Mode",
+            "quote": "In Google AI Mode"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "In Google AI Mode, the brand\u2019s own domain appears in only 43% of brand queries across all 17 weeks."
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "sistrix_ai_mode_brand_query_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new"
+    },
+    {
+      "source": {
+        "source_id": "naver-ai-tab-launch-2026-06",
+        "publisher": "NAVER",
+        "url": "https://www.navercorp.com/en/press/",
+        "canonical_url": "https://www.navercorp.com/en/press/",
+        "source_class": "official"
+      },
+      "topic": "retrieval_index",
+      "statement": "NAVER's AI Tab shows NAVER Map information and real-time reservation slots inside its answers, a local-retrieval behaviour.",
+      "surfaces": [
+        "naver-ai"
+      ],
+      "methodology": {
+        "measurement_mode": "official_documentation",
+        "metric_family": {
+          "value": "local/place retrieval in answers",
+          "quote": "The official version of AI Tab also introduces features that display NAVER Map information and available time slots for real-time reservations directly within its answers."
+        },
+        "metric_definition": {
+          "value": "local data shown inside answers",
+          "quote": "The official version of AI Tab also introduces features that display NAVER Map information and available time slots for real-time reservations directly within its answers."
+        },
+        "unit_of_analysis": {
+          "value": "AI Tab answer",
+          "quote": "The official version of AI Tab also introduces features that display NAVER Map information and available time slots for real-time reservations directly within its answers."
+        },
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "time_window": null,
+        "geography": {
+          "value": "South Korea",
+          "quote": "NAVER"
+        },
+        "geography_basis": "publisher_scope",
+        "language": {
+          "value": "Korean",
+          "quote": "NAVER"
+        },
+        "language_basis": "publisher_scope",
+        "devices": null,
+        "limitations": [
+          "Vendor product announcement; describes a feature, not measured usage."
+        ],
+        "methodology_notes": {
+          "value": "NAVER AI Tab launch press release.",
+          "quote": "The official version of AI Tab also introduces features that display NAVER Map information and available time slots for real-time reservations directly within its answers."
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "local_data_in_answers",
+          "label": "AI Tab surfaces NAVER Map and reservations",
+          "comparator": "qualitative_finding",
+          "definition": {
+            "value": "local data in answers",
+            "quote": "display NAVER Map information"
+          },
+          "value": {
+            "value": "NAVER Map info + reservation slots",
+            "quote": "display NAVER Map information and available time slots"
+          },
+          "unit": {
+            "value": "feature",
+            "quote": "The official version of AI Tab also introduces features that display NAVER Map information and available time slots for real-time reservations directly within its answers."
+          },
+          "window": {
+            "value": "launch",
+            "quote": "The official version of AI Tab also introduces features that display NAVER Map information and available time slots for real-time reservations directly within its answers."
+          },
+          "scope": {
+            "value": "NAVER AI Tab",
+            "quote": "AI Tab"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "The official version of AI Tab also introduces features that display NAVER Map information and available time slots for real-time reservations directly within its answers."
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "naver_ai_tab_local_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new"
+    },
+    {
+      "source": {
+        "source_id": "naver-ai-tab-launch-2026-06",
+        "publisher": "NAVER",
+        "url": "https://www.navercorp.com/en/press/",
+        "canonical_url": "https://www.navercorp.com/en/press/",
+        "source_class": "official"
+      },
+      "topic": "retrieval_index",
+      "statement": "NAVER describes AI Tab as an agentic search service that connects answers to real-world actions including shopping, place discovery and reservations.",
+      "surfaces": [
+        "naver-ai"
+      ],
+      "methodology": {
+        "measurement_mode": "official_documentation",
+        "metric_family": {
+          "value": "agentic search scope",
+          "quote": "AI Tab is an agentic search service that understands users\u2019 search intent and context to provide answers, and goes beyond that by connecting them to real-world actions such as shopping, place discovery and reservations."
+        },
+        "metric_definition": {
+          "value": "answers connected to real-world actions",
+          "quote": "AI Tab is an agentic search service that understands users\u2019 search intent and context to provide answers, and goes beyond that by connecting them to real-world actions such as shopping, place discovery and reservations."
+        },
+        "unit_of_analysis": {
+          "value": "AI Tab service",
+          "quote": "AI Tab is an agentic search service that understands users\u2019 search intent and context to provide answers, and goes beyond that by connecting them to real-world actions such as shopping, place discovery and reservations."
+        },
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "time_window": null,
+        "geography": {
+          "value": "South Korea",
+          "quote": "NAVER"
+        },
+        "geography_basis": "publisher_scope",
+        "language": {
+          "value": "Korean",
+          "quote": "NAVER"
+        },
+        "language_basis": "publisher_scope",
+        "devices": null,
+        "limitations": [
+          "Vendor description; not an independent measurement."
+        ],
+        "methodology_notes": {
+          "value": "NAVER AI Tab launch press release.",
+          "quote": "AI Tab is an agentic search service that understands users\u2019 search intent and context to provide answers, and goes beyond that by connecting them to real-world actions such as shopping, place discovery and reservations."
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "agentic_search_scope",
+          "label": "AI Tab connects answers to shopping/place/reservations",
+          "comparator": "qualitative_finding",
+          "definition": {
+            "value": "real-world actions",
+            "quote": "connecting them to real-world actions"
+          },
+          "value": {
+            "value": "shopping, place discovery, reservations",
+            "quote": "shopping, place discovery and reservations"
+          },
+          "unit": {
+            "value": "action types",
+            "quote": "AI Tab is an agentic search service that understands users\u2019 search intent and context to provide answers, and goes beyond that by connecting them to real-world actions such as shopping, place discovery and reservations."
+          },
+          "window": {
+            "value": "launch",
+            "quote": "AI Tab is an agentic search service that understands users\u2019 search intent and context to provide answers, and goes beyond that by connecting them to real-world actions such as shopping, place discovery and reservations."
+          },
+          "scope": {
+            "value": "NAVER AI Tab",
+            "quote": "AI Tab"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": null,
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "AI Tab is an agentic search service that understands users\u2019 search intent and context to provide answers, and goes beyond that by connecting them to real-world actions such as shopping, place discovery and reservations."
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "naver_ai_tab_agentic_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new"
+    },
+    {
+      "source": {
+        "source_id": "yandex-ai-search-pretrain-2026-09",
+        "publisher": "Yandex",
+        "url": "https://yandex.com/company/press_center/",
+        "canonical_url": "https://yandex.com/company/press_center/",
+        "source_class": "official"
+      },
+      "topic": "retrieval_index",
+      "statement": "Yandex open-sourced Alice AI Search Pretrain, the base language model behind the system that generates AI answers in Yandex Search.",
+      "surfaces": [
+        "yandex-ai-search"
+      ],
+      "methodology": {
+        "measurement_mode": "press_release",
+        "metric_family": {
+          "value": "answer-generation model",
+          "quote": "Yandex has open-sourced Alice AI Search Pretrain, the base language model behind the system used to generate AI answers in Yandex Search."
+        },
+        "metric_definition": {
+          "value": "base model behind search AI answers",
+          "quote": "Yandex has open-sourced Alice AI Search Pretrain, the base language model behind the system used to generate AI answers in Yandex Search."
+        },
+        "unit_of_analysis": {
+          "value": "search AI answer model",
+          "quote": "Yandex has open-sourced Alice AI Search Pretrain, the base language model behind the system used to generate AI answers in Yandex Search."
+        },
+        "denominator": null,
+        "prompt_universe": null,
+        "sample_size": null,
+        "time_window": null,
+        "geography": {
+          "value": "Russia",
+          "quote": "Yandex"
+        },
+        "geography_basis": "publisher_scope",
+        "language": {
+          "value": "Russian",
+          "quote": "Russian-language"
+        },
+        "language_basis": "source_stated",
+        "devices": null,
+        "limitations": [
+          "Vendor press release; describes the model, not retrieval behaviour."
+        ],
+        "methodology_notes": {
+          "value": "Yandex press release.",
+          "quote": "Yandex has open-sourced Alice AI Search Pretrain, the base language model behind the system used to generate AI answers in Yandex Search."
+        }
+      },
+      "metrics": [
+        {
+          "metric_id": "search_answer_model",
+          "label": "Alice AI Search Pretrain generates Search AI answers",
+          "comparator": "qualitative_finding",
+          "definition": {
+            "value": "model behind AI answers in Search",
+            "quote": "the base language model behind the system used to generate AI answers"
+          },
+          "value": {
+            "value": "Alice AI Search Pretrain",
+            "quote": "Alice AI Search Pretrain"
+          },
+          "unit": {
+            "value": "model",
+            "quote": "Yandex has open-sourced Alice AI Search Pretrain, the base language model behind the system used to generate AI answers in Yandex Search."
+          },
+          "window": {
+            "value": "Sep 2026",
+            "quote": "September 14, 2026"
+          },
+          "scope": {
+            "value": "Yandex Search",
+            "quote": "Yandex Search"
+          }
+        }
+      ],
+      "dates": {
+        "published_at": "2026-09-14",
+        "published_at_selector": "page stamp 'September 14, 2026'",
+        "modified_at": null,
+        "measured_window": null,
+        "observed_at": "2026-09-16T21:55:00+00:00"
+      },
+      "capture_anchors": [
+        {
+          "kind": "verbatim_quote",
+          "quote": "Yandex has open-sourced Alice AI Search Pretrain, the base language model behind the system used to generate AI answers in Yandex Search."
+        }
+      ],
+      "extraction": {
+        "method": "deterministic_parser",
+        "tool": "ai_discovery.claims",
+        "rule_id": "yandex_search_answer_model_v1",
+        "version": "claim-extraction-0.1.0"
+      },
+      "status": "current",
+      "relationship": "new"
     }
   ]
 }

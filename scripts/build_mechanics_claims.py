@@ -28,6 +28,10 @@ OUT = REPO / "proof" / "claim_ledger" / "mechanics_claim_specs.json"
 
 # Per-capture observed_at (when the capture was taken; see captures.json).
 OBSERVED = {
+    "peec-blog": "2026-09-16T21:55:00+00:00",
+    "sistrix-ai-citation-drift": "2026-09-16T21:55:00+00:00",
+    "naver-ai-tab-launch-2026-06": "2026-09-16T21:55:00+00:00",
+    "yandex-ai-search-pretrain-2026-09": "2026-09-16T21:55:00+00:00",
     "google-search-central-ai": "2026-09-16T21:55:00+00:00",
     "openai-platform-bots": "2026-09-16T21:55:00+00:00",
     "ahrefs-blog-ai": "2026-09-16T21:55:00+00:00",
@@ -40,6 +44,34 @@ PUBLISHED = {
 }
 
 SOURCES = {
+    "peec-blog": {
+        "source_id": "peec-blog",
+        "publisher": "Peec AI",
+        "url": "https://peec.ai/blog",
+        "canonical_url": "https://peec.ai/blog",
+        "source_class": "visibility_research",
+    },
+    "sistrix-ai-citation-drift": {
+        "source_id": "sistrix-ai-citation-drift",
+        "publisher": "SISTRIX",
+        "url": "https://www.sistrix.com/blog/",
+        "canonical_url": "https://www.sistrix.com/blog/",
+        "source_class": "visibility_research",
+    },
+    "naver-ai-tab-launch-2026-06": {
+        "source_id": "naver-ai-tab-launch-2026-06",
+        "publisher": "NAVER",
+        "url": "https://www.navercorp.com/en/press/",
+        "canonical_url": "https://www.navercorp.com/en/press/",
+        "source_class": "official",
+    },
+    "yandex-ai-search-pretrain-2026-09": {
+        "source_id": "yandex-ai-search-pretrain-2026-09",
+        "publisher": "Yandex",
+        "url": "https://yandex.com/company/press_center/",
+        "canonical_url": "https://yandex.com/company/press_center/",
+        "source_class": "official",
+    },
     "perplexity-blog": {
         "source_id": "perplexity-blog",
         "publisher": "Perplexity",
@@ -690,7 +722,310 @@ def specs() -> list[dict]:
         "relationship": "new",
     })
 
+
+    # --------------------------------------------------------------- Peec AI
+    pe = SOURCES["peec-blog"]
+    fan_q = "ChatGPT fan-outs have doubled in length in 4 months"
+    out.append({
+        "source": pe,
+        "topic": "retrieval_index",
+        "statement": (
+            "Peec AI research on over 20 million ChatGPT fan-outs found fan-out length "
+            "doubled in four months, showing query decomposition changes over time."
+        ),
+        "surfaces": ["chatgpt"],
+        "methodology": {
+            "measurement_mode": "vendor_estimate",
+            "metric_family": _qv("ChatGPT fan-out length over time", fan_q),
+            "metric_definition": _qv("fan-out length doubling", fan_q),
+            "unit_of_analysis": _qv("ChatGPT fan-out", fan_q),
+            "denominator": None,
+            "prompt_universe": None,
+            "sample_size": _qv("over 20 million ChatGPT fan-outs", "over 20 million ChatGPT fan-outs"),
+            "time_window": _qv("4 months", "in 4 months"),
+            "geography": None,
+            "geography_basis": "not_stated",
+            "language": None,
+            "language_basis": "not_stated",
+            "devices": None,
+            "limitations": ["Vendor research headline; full method not in the capture."],
+            "methodology_notes": _qv("Peec AI expert research on ChatGPT fan-outs.", fan_q),
+        },
+        "metrics": [
+            _metric(
+                "fanout_length_growth",
+                "ChatGPT fan-outs doubled in length",
+                definition=_qv("fan-out length", "fan-outs have doubled in length"),
+                value=_qv("doubled", "doubled in length"),
+                unit=_qv("multiple", fan_q),
+                window=_qv("4 months", "in 4 months"),
+                scope=_qv("ChatGPT", "ChatGPT fan-outs"),
+            )
+        ],
+        "dates": {"published_at": None, "modified_at": None, "measured_window": None,
+                  "observed_at": OBSERVED["peec-blog"]},
+        "capture_anchors": [{"kind": "verbatim_quote", "quote": fan_q}],
+        "extraction": {"method": "deterministic_parser", "tool": "ai_discovery.claims",
+                       "rule_id": "peec_fanout_length_v1", "version": "claim-extraction-0.1.0"},
+        "status": "current", "relationship": "new",
+    })
+
+    ov_q = "AI Overviews appear 86% of the time in our sample"
+    out.append({
+        "source": pe,
+        "topic": "retrieval_index",
+        "statement": (
+            "Peec AI's analysis of 500,000 prompts found Google AI Overviews appear in 86% "
+            "of sampled prompts, making them a high-frequency retrieval surface."
+        ),
+        "surfaces": ["google-ai-overviews"],
+        "methodology": {
+            "measurement_mode": "vendor_estimate",
+            "metric_family": _qv("AI Overview appearance rate", ov_q),
+            "metric_definition": _qv("share of prompts where AI Overviews appear", ov_q),
+            "unit_of_analysis": _qv("prompt", ov_q),
+            "denominator": _qv("500,000 prompts", "500,000 prompts"),
+            "prompt_universe": _qv("500,000 prompts", "500,000 prompts"),
+            "sample_size": _qv("500,000 prompts", "500,000 prompts"),
+            "time_window": None,
+            "geography": None,
+            "geography_basis": "not_stated",
+            "language": None,
+            "language_basis": "not_stated",
+            "devices": None,
+            "limitations": ["Vendor panel; geography/language not stated in the capture."],
+            "methodology_notes": _qv("Peec AI 500,000-prompt analysis.", ov_q),
+        },
+        "metrics": [
+            _metric(
+                "ai_overview_appearance_rate",
+                "AI Overviews appear in 86% of sampled prompts",
+                definition=_qv("appearance rate", "AI Overviews appear 86% of the time"),
+                value=_qv("86", "86%"),
+                unit=_qv("percent of prompts", "86% of the time"),
+                window=_qv("Peec sample", ov_q),
+                scope=_qv("Google AI Overviews", "AI Overviews"),
+                comparator="share_of_total",
+            )
+        ],
+        "dates": {"published_at": None, "modified_at": None, "measured_window": None,
+                  "observed_at": OBSERVED["peec-blog"]},
+        "capture_anchors": [{"kind": "verbatim_quote", "quote": ov_q}],
+        "extraction": {"method": "deterministic_parser", "tool": "ai_discovery.claims",
+                       "rule_id": "peec_ai_overview_rate_v1", "version": "claim-extraction-0.1.0"},
+        "status": "current", "relationship": "new",
+    })
+
+    # --------------------------------------------------------------- SISTRIX
+    si = SOURCES["sistrix-ai-citation-drift"]
+    de_q = "In Google AI Mode, the brand’s own domain appears in only 43% of brand queries across all 17 weeks."
+    out.append({
+        "source": si,
+        "topic": "citations_sources",
+        "statement": (
+            "SISTRIX found that in Google AI Mode a brand's own domain appears in only 43% of "
+            "brand queries across 17 weeks, so brand queries frequently surface other sources."
+        ),
+        "surfaces": ["google-ai-mode"],
+        "methodology": {
+            "measurement_mode": "vendor_estimate",
+            "metric_family": _qv("own-domain share of brand queries", de_q),
+            "metric_definition": _qv("share of brand queries where the brand's domain appears", de_q),
+            "unit_of_analysis": _qv("brand query", de_q),
+            "denominator": _qv("brand queries over 17 weeks", "across all 17 weeks"),
+            "prompt_universe": None,
+            "sample_size": None,
+            "time_window": _qv("17 weeks", "across all 17 weeks"),
+            "geography": None,
+            "geography_basis": "not_stated",
+            "language": None,
+            "language_basis": "not_stated",
+            "devices": None,
+            "limitations": ["Vendor study; brand set and languages not enumerated here."],
+            "methodology_notes": _qv("SISTRIX AI citation-drift study.", de_q),
+        },
+        "metrics": [
+            _metric(
+                "own_domain_brand_query_share",
+                "Own domain appears in 43% of brand queries",
+                definition=_qv("own-domain share", "appears in only 43% of brand queries"),
+                value=_qv("43", "43%"),
+                unit=_qv("percent of brand queries", "43% of brand queries"),
+                window=_qv("17 weeks", "across all 17 weeks"),
+                scope=_qv("Google AI Mode", "In Google AI Mode"),
+                comparator="share_of_total",
+            )
+        ],
+        "dates": {"published_at": None, "modified_at": None, "measured_window": None,
+                  "observed_at": OBSERVED["sistrix-ai-citation-drift"]},
+        "capture_anchors": [{"kind": "verbatim_quote", "quote": de_q}],
+        "extraction": {"method": "deterministic_parser", "tool": "ai_discovery.claims",
+                       "rule_id": "sistrix_ai_mode_brand_query_v1", "version": "claim-extraction-0.1.0"},
+        "status": "current", "relationship": "new",
+    })
+
+    # --------------------------------------------------------------- NAVER
+    na = SOURCES["naver-ai-tab-launch-2026-06"]
+    map_q = ("The official version of AI Tab also introduces features that display NAVER Map "
+             "information and available time slots for real-time reservations directly within its answers.")
+    out.append({
+        "source": na,
+        "topic": "retrieval_index",
+        "statement": (
+            "NAVER's AI Tab shows NAVER Map information and real-time reservation slots inside "
+            "its answers, a local-retrieval behaviour."
+        ),
+        "surfaces": ["naver-ai"],
+        "methodology": {
+            "measurement_mode": "official_documentation",
+            "metric_family": _qv("local/place retrieval in answers", map_q),
+            "metric_definition": _qv("local data shown inside answers", map_q),
+            "unit_of_analysis": _qv("AI Tab answer", map_q),
+            "denominator": None,
+            "prompt_universe": None,
+            "sample_size": None,
+            "time_window": None,
+            "geography": _qv("South Korea", "NAVER"),
+            "geography_basis": "publisher_scope",
+            "language": _qv("Korean", "NAVER"),
+            "language_basis": "publisher_scope",
+            "devices": None,
+            "limitations": ["Vendor product announcement; describes a feature, not measured usage."],
+            "methodology_notes": _qv("NAVER AI Tab launch press release.", map_q),
+        },
+        "metrics": [
+            _metric(
+                "local_data_in_answers",
+                "AI Tab surfaces NAVER Map and reservations",
+                definition=_qv("local data in answers", "display NAVER Map information"),
+                value=_qv("NAVER Map info + reservation slots", "display NAVER Map information and available time slots"),
+                unit=_qv("feature", map_q),
+                window=_qv("launch", map_q),
+                scope=_qv("NAVER AI Tab", "AI Tab"),
+            )
+        ],
+        "dates": {"published_at": None, "modified_at": None, "measured_window": None,
+                  "observed_at": OBSERVED["naver-ai-tab-launch-2026-06"]},
+        "capture_anchors": [{"kind": "verbatim_quote", "quote": map_q}],
+        "extraction": {"method": "deterministic_parser", "tool": "ai_discovery.claims",
+                       "rule_id": "naver_ai_tab_local_v1", "version": "claim-extraction-0.1.0"},
+        "status": "current", "relationship": "new",
+    })
+
+    act_q = ("AI Tab is an agentic search service that understands users’ search intent and "
+             "context to provide answers, and goes beyond that by connecting them to real-world "
+             "actions such as shopping, place discovery and reservations.")
+    out.append({
+        "source": na,
+        "topic": "retrieval_index",
+        "statement": (
+            "NAVER describes AI Tab as an agentic search service that connects answers to "
+            "real-world actions including shopping, place discovery and reservations."
+        ),
+        "surfaces": ["naver-ai"],
+        "methodology": {
+            "measurement_mode": "official_documentation",
+            "metric_family": _qv("agentic search scope", act_q),
+            "metric_definition": _qv("answers connected to real-world actions", act_q),
+            "unit_of_analysis": _qv("AI Tab service", act_q),
+            "denominator": None,
+            "prompt_universe": None,
+            "sample_size": None,
+            "time_window": None,
+            "geography": _qv("South Korea", "NAVER"),
+            "geography_basis": "publisher_scope",
+            "language": _qv("Korean", "NAVER"),
+            "language_basis": "publisher_scope",
+            "devices": None,
+            "limitations": ["Vendor description; not an independent measurement."],
+            "methodology_notes": _qv("NAVER AI Tab launch press release.", act_q),
+        },
+        "metrics": [
+            _metric(
+                "agentic_search_scope",
+                "AI Tab connects answers to shopping/place/reservations",
+                definition=_qv("real-world actions", "connecting them to real-world actions"),
+                value=_qv("shopping, place discovery, reservations", "shopping, place discovery and reservations"),
+                unit=_qv("action types", act_q),
+                window=_qv("launch", act_q),
+                scope=_qv("NAVER AI Tab", "AI Tab"),
+            )
+        ],
+        "dates": {"published_at": None, "modified_at": None, "measured_window": None,
+                  "observed_at": OBSERVED["naver-ai-tab-launch-2026-06"]},
+        "capture_anchors": [{"kind": "verbatim_quote", "quote": act_q}],
+        "extraction": {"method": "deterministic_parser", "tool": "ai_discovery.claims",
+                       "rule_id": "naver_ai_tab_agentic_v1", "version": "claim-extraction-0.1.0"},
+        "status": "current", "relationship": "new",
+    })
+
+    # --------------------------------------------------------------- Yandex
+    ya = SOURCES["yandex-ai-search-pretrain-2026-09"]
+    yq = ("Yandex has open-sourced Alice AI Search Pretrain, the base language model behind the "
+          "system used to generate AI answers in Yandex Search.")
+    out.append({
+        "source": ya,
+        "topic": "retrieval_index",
+        "statement": (
+            "Yandex open-sourced Alice AI Search Pretrain, the base language model behind the "
+            "system that generates AI answers in Yandex Search."
+        ),
+        "surfaces": ["yandex-ai-search"],
+        "methodology": {
+            "measurement_mode": "press_release",
+            "metric_family": _qv("answer-generation model", yq),
+            "metric_definition": _qv("base model behind search AI answers", yq),
+            "unit_of_analysis": _qv("search AI answer model", yq),
+            "denominator": None,
+            "prompt_universe": None,
+            "sample_size": None,
+            "time_window": None,
+            "geography": _qv("Russia", "Yandex"),
+            "geography_basis": "publisher_scope",
+            "language": _qv("Russian", "Russian-language"),
+            "language_basis": "source_stated",
+            "devices": None,
+            "limitations": ["Vendor press release; describes the model, not retrieval behaviour."],
+            "methodology_notes": _qv("Yandex press release.", yq),
+        },
+        "metrics": [
+            _metric(
+                "search_answer_model",
+                "Alice AI Search Pretrain generates Search AI answers",
+                definition=_qv("model behind AI answers in Search", "the base language model behind the system used to generate AI answers"),
+                value=_qv("Alice AI Search Pretrain", "Alice AI Search Pretrain"),
+                unit=_qv("model", yq),
+                window=_qv("Sep 2026", "September 14, 2026"),
+                scope=_qv("Yandex Search", "Yandex Search"),
+            )
+        ],
+        "dates": {"published_at": "2026-09-14",
+                  "published_at_selector": "page stamp 'September 14, 2026'",
+                  "modified_at": None, "measured_window": None,
+                  "observed_at": OBSERVED["yandex-ai-search-pretrain-2026-09"]},
+        "capture_anchors": [{"kind": "verbatim_quote", "quote": yq}],
+        "extraction": {"method": "deterministic_parser", "tool": "ai_discovery.claims",
+                       "rule_id": "yandex_search_answer_model_v1", "version": "claim-extraction-0.1.0"},
+        "status": "current", "relationship": "new",
+    })
+
     return out
+
+
+def build_records():
+    """Extract every mechanics claim spec against its real capture. Shared by the
+    CLI and the Dagster asset so there is exactly one extraction code path."""
+
+    from ai_discovery.claims import Capture, extract_capture_text, extract_claim
+
+    bundle = {"extraction_version": "claim-extraction-0.1.0", "claims": specs()}
+    captures: dict[str, Capture] = {}
+    for name in {c["source"]["source_id"] for c in bundle["claims"]}:
+        raw = (CAPTURES / f"{name}.html").read_bytes()
+        captures[name] = Capture(
+            raw=raw, text=extract_capture_text(raw.decode("utf-8", errors="replace"))
+        )
+    return [extract_claim(spec=spec, capture=captures[spec["source"]["source_id"]]) for spec in bundle["claims"]]
 
 
 def main() -> int:
@@ -698,23 +1033,13 @@ def main() -> int:
     ap.add_argument("--persist", action="store_true", help="persist validated claims to the DB")
     args = ap.parse_args()
 
-    from ai_discovery.claims import Capture, extract_capture_text, extract_claim
-
     bundle = {"extraction_version": "claim-extraction-0.1.0", "claims": specs()}
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(bundle, indent=2) + "\n", encoding="utf-8")
     print(f"wrote {len(bundle['claims'])} mechanics claim specs -> {OUT.relative_to(REPO)}")
 
-    # Verify each spec extracts (quotes present) against its real capture.
-    captures: dict[str, Capture] = {}
-    for name in {c["source"]["source_id"] for c in bundle["claims"]}:
-        path = CAPTURES / f"{name}.html"
-        raw = path.read_bytes()
-        captures[name] = Capture(raw=raw, text=extract_capture_text(raw.decode("utf-8", errors="replace")))
-    records = []
-    for spec in bundle["claims"]:
-        record = extract_claim(spec=spec, capture=captures[spec["source"]["source_id"]])
-        records.append(record)
+    records = build_records()
+    for record, spec in zip(records, bundle["claims"]):
         print(f"  OK {record.claim_id} [{record.topic}] {spec['statement'][:60]}")
 
     if args.persist:
