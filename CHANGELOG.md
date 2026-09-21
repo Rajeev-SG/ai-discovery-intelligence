@@ -2,6 +2,17 @@
 
 This file records repository/product changes. The generated intelligence changelog will live separately in the canonical data store and `pov/CHANGELOG.md` once implemented.
 
+## 2026-09-20 (issue #61)
+
+- **Marketer-first information architecture.** The homepage now answers the four
+  marketer questions in order — what platforms exist → how discovery works → how
+  we know / can we trust it → why it matters — with live, evidence-derived counts
+  and links into `/landscape`, `/surfaces` (Evidence & trust) and `/implications`.
+  Latest changes, weekly brief and POV are demoted to a "Returning users" area.
+  Navigation is reset around user-facing concepts; POV becomes "What this means"
+  and Reconciliation "Evidence reconciliation" as secondary links. Proof:
+  `proof/phase2/ISSUE_61_PROOF.md`.
+
 ## 2026-09-20 (issue #60)
 
 - **Marketer-first landscape + mechanics comparison.**

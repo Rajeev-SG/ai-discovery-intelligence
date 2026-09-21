@@ -8,13 +8,18 @@ export const metadata: Metadata = {
     "What changed, what matters and what we currently believe about how consumer AI discovery surfaces find, retrieve, cite and recommend information.",
 };
 
-const NAV = [
-  { href: "/", label: "Intelligence" },
+// Marketer-first navigation (issue #61): the four user-facing concepts lead;
+// internal architecture terms (POV, reconciliation) are demoted below a divider
+// and reachable but no longer drive primary navigation.
+const NAV_PRIMARY = [
+  { href: "/", label: "Home" },
   { href: "/landscape", label: "Landscape" },
-  { href: "/surfaces", label: "Explore surfaces" },
   { href: "/implications", label: "Marketing implications" },
-  { href: "/pov", label: "POV" },
-  { href: "/reconciliation", label: "Reconciliation" },
+  { href: "/surfaces", label: "Explore surfaces" },
+];
+const NAV_SECONDARY = [
+  { href: "/pov", label: "What this means" },
+  { href: "/reconciliation", label: "Evidence reconciliation" },
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -30,8 +35,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               AI Discovery Intelligence
             </Link>
             <ul>
-              {NAV.map((item) => (
+              {NAV_PRIMARY.map((item) => (
                 <li key={item.href}>
+                  <Link href={item.href}>{item.label}</Link>
+                </li>
+              ))}
+              {NAV_SECONDARY.map((item) => (
+                <li key={item.href} className="site-nav-secondary">
                   <Link href={item.href}>{item.label}</Link>
                 </li>
               ))}
