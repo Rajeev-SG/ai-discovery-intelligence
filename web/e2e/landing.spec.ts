@@ -168,14 +168,18 @@ test("navigates into Explore surfaces, which keeps all 35 and narrows on search"
 
 test("with no backend, the questions render explicit unavailable answers (not implied zero)", async ({ page }) => {
   // F1: a backend outage must be distinguishable from a reachable-but-empty
-  // source. This test only runs in a no-API environment, so it is skipped when a
-  // live API is wired in (where the populated answers are the correct state).
-  test.skip(HAS_API, "no-API environment only");
+  // source. `NEXT_PUBLIC_NO_BACKEND=1` is set by the dedicated CI job that starts
+  // the server with no EVIDENCE_API_URL / EVIDENCE_FIXTURE, so this test runs (and
+  // asserts) exactly in the degraded environment it describes.
+  test.skip(process.env.NO_BACKEND_PROOF !== "1", "run by the no-backend CI job");
   await page.goto("/");
   const questions = page.getByTestId("home-questions");
   await expect(questions).toBeVisible();
-  // Each question reports the unavailable state explicitly.
-  const unavailable = questions.locator('[data-state="unavailable"]');
-  expect(await unavailable.count()).toBeGreaterThanOrEqual(1);
+  // EVERY question must report unavailable — a partial outage is not acceptable.
+  const all = questions.locator("[data-testid^=home-q]");
+  expect(await all.count()).toBe(4);
+  expect(await questions.locator('[data-state="unavailable"]').count()).toBe(4);
+  expect(await questions.locator('[data-state="populated"]').count()).toBe(0);
+  expect(await questions.locator('[data-state="empty"]').count()).toBe(0);
   await expect(questions).toContainText(/unavailable right now/i);
 });
