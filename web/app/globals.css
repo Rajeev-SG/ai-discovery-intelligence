@@ -949,3 +949,30 @@ main { flex: 1; }
   .landscape-page { padding: 18px 16px 40px; }
   .landscape-grid { grid-template-columns: 1fr; }
 }
+
+/* ---------------------------------------------------------------------- */
+/* Marketer-first front door (issue #61).                                 */
+/* ---------------------------------------------------------------------- */
+.home-questions-section { margin-top: 8px; }
+.home-questions { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; counter-reset: q; }
+.home-question { display: flex; gap: 12px; border: 1px solid var(--border); border-radius: 10px; padding: 14px; background: var(--surface); }
+.home-question-n { flex: 0 0 auto; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: #16212e; color: #8fbde8; }
+.home-question-body { display: flex; flex-direction: column; gap: 4px; }
+.home-question-body h3 { margin: 0; font-size: 15px; }
+.home-question-answer { margin: 0; font-size: 13px; line-height: 1.5; }
+.home-question-evidence { margin: 0; font-size: 11px; color: var(--text-muted); }
+.home-question-cta { margin-top: 2px; font-size: 13px; font-weight: 600; }
+.home-latest { margin-top: 34px; border-top: 1px solid var(--border); padding-top: 22px; }
+.home-latest .landing-section { margin-top: 16px; }
+.site-nav-secondary {
+  opacity: 0.72;
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 1px solid var(--border);
+}
+.home-question.state-unavailable { border-color: rgba(217, 100, 65, 0.45); }
+.home-question.state-empty { border-color: rgba(217, 164, 65, 0.4); }
+
+@media (max-width: 640px) {
+  .home-questions { grid-template-columns: 1fr; }
+}

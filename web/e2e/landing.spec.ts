@@ -41,9 +41,16 @@ async function assertSingleState(
 test("landing renders a single, well-formed state per section", async ({ page }, testInfo) => {
   await page.goto("/");
 
-  // Hero frames the product, not the registry.
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("What changed");
-  await expect(page.getByRole("link", { name: "Explore surfaces", exact: true }).first()).toBeVisible();
+  // The front door answers the marketer's questions, not the analyst's feed
+  // (issue #61): above the fold states what the product is for, in marketer terms.
+  const h1 = page.getByRole("heading", { level: 1 });
+  await expect(h1).toContainText(/AI discovery|discovery works/i);
+  // The four questions are first-class and link to the four destinations.
+  for (const q of ["home-q1", "home-q2", "home-q3", "home-q4"]) {
+    await expect(page.getByTestId(q)).toBeVisible();
+  }
+  await expect(page.getByTestId("home-questions")).toContainText("What AI discovery platforms exist?");
+  await expect(page.getByTestId("home-questions")).toContainText("Why does this matter for marketers?");
 
   // Each section renders exactly one of populated / explicit-empty / unavailable.
   await assertSingleState(page, "landing-changes", ["change-list", "changes-empty", "changes-unavailable"]);
@@ -52,6 +59,22 @@ test("landing renders a single, well-formed state per section", async ({ page },
 
   // POV is canonical (committed artifact), so it must always have propositions.
   expect(await page.getByTestId("pov-summary").locator("> li").count()).toBeGreaterThanOrEqual(1);
+
+  // Internal architecture terms no longer drive the primary navigation: the
+  // primary list and the secondary "More" list are STRUCTURALLY separate (F2).
+  const primaryNav = page.getByRole("navigation", { name: "Product surfaces" });
+  const primaryList = primaryNav.locator(".site-nav-primary");
+  const secondaryList = primaryNav.getByRole("list", { name: "More" });
+  await expect(primaryList).toBeVisible();
+  await expect(secondaryList).toBeVisible();
+  const primaryText = await primaryList.innerText();
+  expect(primaryText).not.toMatch(/POV|Reconciliation|What this means|Evidence reconciliation/);
+  // The demoted destinations remain reachable in the secondary list.
+  await expect(secondaryList.getByRole("link", { name: "What this means" })).toBeVisible();
+  await expect(secondaryList.getByRole("link", { name: "Evidence reconciliation" })).toBeVisible();
+
+  // Latest changes / weekly brief are demoted below the questions.
+  await expect(page.getByTestId("home-latest-title")).toContainText(/Latest changes/i);
 
   // The stale "awaiting ingestion" copy is nowhere on the landing.
   expect(await page.locator("body").innerText()).not.toContain("awaiting ingestion");
@@ -140,4 +163,23 @@ test("navigates into Explore surfaces, which keeps all 35 and narrows on search"
   expect(after).toBeLessThan(35);
 
   await page.screenshot({ path: shot(testInfo, "explore-surfaces"), fullPage: false });
+});
+
+
+test("with no backend, the questions render explicit unavailable answers (not implied zero)", async ({ page }) => {
+  // F1: a backend outage must be distinguishable from a reachable-but-empty
+  // source. `NEXT_PUBLIC_NO_BACKEND=1` is set by the dedicated CI job that starts
+  // the server with no EVIDENCE_API_URL / EVIDENCE_FIXTURE, so this test runs (and
+  // asserts) exactly in the degraded environment it describes.
+  test.skip(process.env.NO_BACKEND_PROOF !== "1", "run by the no-backend CI job");
+  await page.goto("/");
+  const questions = page.getByTestId("home-questions");
+  await expect(questions).toBeVisible();
+  // EVERY question must report unavailable — a partial outage is not acceptable.
+  const all = questions.locator("[data-testid^=home-q]");
+  expect(await all.count()).toBe(4);
+  expect(await questions.locator('[data-state="unavailable"]').count()).toBe(4);
+  expect(await questions.locator('[data-state="populated"]').count()).toBe(0);
+  expect(await questions.locator('[data-state="empty"]').count()).toBe(0);
+  await expect(questions).toContainText(/unavailable right now/i);
 });

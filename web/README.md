@@ -1,12 +1,16 @@
 # AI Discovery Intelligence (web)
 
-The product shell. The root route (`/`) is the intelligence-first landing —
-latest material changes from the live `/events` feed, the weekly executive
-brief from `/brief`, and the current POV projected from the committed canonical
-artifact. The supporting routes are `/surfaces` (the searchable, sortable,
-filterable 35-surface registry matrix and evidence drill-down), `/pov` (the
-living POV and changelog) and `/reconciliation` (the persisted reconciliation
-ledger).
+The product shell. The root route (`/`) is the marketer-first front door (issue #61): it answers,
+in order, what AI discovery platforms exist (`/landscape`), how their discovery
+works (the landscape comparison), how strong the evidence is (`/surfaces`,
+Evidence & trust) and what it means for marketers (`/implications`). Latest
+changes, the weekly brief and the current POV are demoted to a "Returning users"
+area. The supporting routes are `/landscape` (the curated landscape + mechanics
+comparison), `/implications` (evidence-backed marketing implications),
+`/surfaces` (the searchable 35-surface registry matrix and evidence drill-down),
+`/pov` (the living POV and changelog, linked as "What this means") and
+`/reconciliation` (the persisted reconciliation ledger, linked as "Evidence
+reconciliation").
 
 Evidence is served by the read-only FastAPI evidence API (`EVIDENCE_API_URL`);
 the web app fetches it server-side and never re-derives a claim, confidence or

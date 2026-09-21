@@ -86,6 +86,18 @@ jobs:
           # Playwright webServer inherits this env.
           WEB_PORT=3110 EVIDENCE_FIXTURE=all-monitor npx playwright test e2e/implications.spec.ts -g "all-monitor" --project=desktop-chromium
 
+      - name: No-backend degraded state (issue #61 F1)
+        # Start the product with NO EVIDENCE_API_URL / EVIDENCE_FIXTURE and prove the
+        # homepage renders the four explicit "unavailable" answers, not a confident
+        # zero. Runs the landing spec's no-backend test in its real environment.
+        env:
+          NO_BACKEND_PROOF: "1"
+          # Explicitly clear the job-level fixture so the server really has no API.
+          EVIDENCE_FIXTURE: ""
+          EVIDENCE_API_URL: ""
+        run: |
+          WEB_PORT=3109 npx playwright test e2e/landing.spec.ts -g "no backend" --project=desktop-chromium
+
       - name: Upload proof screenshots
         if: always()
         uses: actions/upload-artifact@v4

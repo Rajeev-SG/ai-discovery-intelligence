@@ -5,16 +5,21 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "AI Discovery Intelligence",
   description:
-    "What changed, what matters and what we currently believe about how consumer AI discovery surfaces find, retrieve, cite and recommend information.",
+    "Which AI discovery platforms matter, how their search and retrieval work, how strong the evidence is, and what it means for marketers — built on source-backed mechanics.",
 };
 
-const NAV = [
-  { href: "/", label: "Intelligence" },
+// Marketer-first navigation (issue #61): the four user-facing concepts lead;
+// internal architecture terms (POV, reconciliation) are grouped into a separate,
+// visually divided "More" list so they no longer sit in the primary nav bar.
+const NAV_PRIMARY = [
+  { href: "/", label: "Home" },
   { href: "/landscape", label: "Landscape" },
-  { href: "/surfaces", label: "Explore surfaces" },
   { href: "/implications", label: "Marketing implications" },
-  { href: "/pov", label: "POV" },
-  { href: "/reconciliation", label: "Reconciliation" },
+  { href: "/surfaces", label: "Explore surfaces" },
+];
+const NAV_SECONDARY = [
+  { href: "/pov", label: "What this means" },
+  { href: "/reconciliation", label: "Evidence reconciliation" },
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -29,8 +34,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link className="site-nav-brand" href="/">
               AI Discovery Intelligence
             </Link>
-            <ul>
-              {NAV.map((item) => (
+            <ul className="site-nav-primary">
+              {NAV_PRIMARY.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href}>{item.label}</Link>
+                </li>
+              ))}
+            </ul>
+            <ul className="site-nav-secondary" aria-label="More">
+              {NAV_SECONDARY.map((item) => (
                 <li key={item.href}>
                   <Link href={item.href}>{item.label}</Link>
                 </li>
