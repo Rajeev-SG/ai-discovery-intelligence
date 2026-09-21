@@ -18,13 +18,24 @@ import type { MechanicsProjection } from "@/lib/mechanics";
  * says so rather than implying zero.
  */
 
+type AnswerState = "populated" | "empty" | "unavailable";
+
 interface Question {
   n: number;
   question: string;
+  /** The resolved answer text. */
   answer: string;
+  /** Exactly one of populated / empty / unavailable (issue #61 review F1). */
+  state: AnswerState;
   href: string;
   cta: string;
   evidence: string;
+}
+
+/** A milestone count that is either a real number, an explicit empty, or unknown. */
+function countState(value: number | null): AnswerState {
+  if (value === null) return "unavailable";
+  return value > 0 ? "populated" : "empty";
 }
 
 function buildQuestions(
@@ -32,23 +43,59 @@ function buildQuestions(
   mechanics: MechanicsProjection | null,
   implications: ImplicationsProjection | null,
 ): Question[] {
-  const surfaceCount = landscape?.surfaces.length ?? null;
-  const evidenced = Object.values(mechanics?.surfaces ?? {}).reduce(
-    (n, s) => n + s.evidenced_dimension_count,
-    0,
-  );
-  const evidencedSurfaces = Object.values(mechanics?.surfaces ?? {}).filter(
-    (s) => s.evidenced_dimension_count > 0,
-  ).length;
-  const actionable = implications?.count ?? null;
+  // `null` projection == the source is unreachable; a present-but-zero count ==
+  // the source is reachable and genuinely empty. The two are ALWAYS distinct, so
+  // a backend outage is never rendered as a confident homepage (issue #61 F1).
+  const surfaceCount = landscape ? landscape.surfaces.length : null;
+  const evidenced =
+    mechanics === null
+      ? null
+      : Object.values(mechanics.surfaces).reduce(
+          (n, s) => n + s.evidenced_dimension_count,
+          0,
+        );
+  const actionable = implications ? implications.count : null;
+
+  const unavailableAnswer: Record<number, string> = {
+    1: "The landscape source is unavailable right now, so the platform list cannot be shown.",
+    2: "The mechanics source is unavailable right now, so the comparison cannot be shown.",
+    3: "The evidence source is unavailable right now, so findings cannot be shown.",
+    4: "The implications source is unavailable right now, so actions cannot be shown.",
+  };
+  const emptyAnswer: Record<number, string> = {
+    1: "No landscape surface is currently configured.",
+    2: "No surface carries evidenced mechanics yet — unknown is a valid answer.",
+    3: "No evidenced mechanics finding is recorded yet.",
+    4: "No evidence-backed implication is currently derivable — monitor only.",
+  };
+
+  const states: Record<number, AnswerState> = {
+    1: countState(surfaceCount),
+    2: countState(evidenced),
+    3: countState(evidenced),
+    4: countState(actionable),
+  };
+
+  const populated: Record<number, string> = {
+    1: `${surfaceCount} major consumer AI discovery surfaces, with vendor, geography, discovery modes and evidenced reach.`,
+    2: `Compare retrieval, citation, crawl and commercial mechanics across surfaces — ${evidenced} evidenced mechanics dimension${evidenced === 1 ? "" : "s"} in total.`,
+    3: `${evidenced} evidenced mechanics dimension${evidenced === 1 ? "" : "s"} across the surfaces, each with its publisher, evidence class, dates and confidence.`,
+    4: `${actionable} evidence-backed marketing implication${actionable === 1 ? "" : "s"} — or an explicit monitor-only state where evidence is insufficient.`,
+  };
+
+  const answerFor = (n: number): string =>
+    states[n] === "unavailable"
+      ? unavailableAnswer[n]
+      : states[n] === "empty"
+        ? emptyAnswer[n]
+        : populated[n];
 
   return [
     {
       n: 1,
       question: "What AI discovery platforms exist?",
-      answer: surfaceCount
-        ? `${surfaceCount} major consumer AI discovery surfaces, with vendor, geography, discovery modes and evidenced reach.`
-        : "The major consumer AI discovery surfaces and how they differ.",
+      answer: answerFor(1),
+      state: states[1],
       href: "/landscape",
       cta: "See the landscape",
       evidence: "Registry facts are labelled; reach is evidenced.",
@@ -56,10 +103,8 @@ function buildQuestions(
     {
       n: 2,
       question: "How does their search and discovery work?",
-      answer:
-        evidencedSurfaces > 0
-          ? `Compare retrieval, citation, crawl and commercial mechanics across surfaces — ${evidencedSurfaces} surface${evidencedSurfaces === 1 ? "" : "s"} carry evidenced mechanics.`
-          : "Compare retrieval, citation, crawl and commercial mechanics across surfaces.",
+      answer: answerFor(2),
+      state: states[2],
       href: "/landscape",
       cta: "Compare how discovery works",
       evidence: "Every dimension is evidenced or explicitly unknown.",
@@ -67,9 +112,8 @@ function buildQuestions(
     {
       n: 3,
       question: "How do we know — and can we trust it?",
-      answer: evidenced > 0
-        ? `${evidenced} evidenced mechanics dimensions across the surfaces, each with its publisher, evidence class, dates and confidence.`
-        : "Every finding carries its publisher, evidence class, dates and confidence.",
+      answer: answerFor(3),
+      state: states[3],
       href: "/surfaces",
       cta: "Inspect evidence & trust",
       evidence: "Vendor documentation, independent research and direct observation stay distinct.",
@@ -77,9 +121,8 @@ function buildQuestions(
     {
       n: 4,
       question: "Why does this matter for marketers?",
-      answer: actionable
-        ? `${actionable} evidence-backed marketing implication${actionable === 1 ? "" : "s"} — or an explicit monitor-only state where evidence is insufficient.`
-        : "Evidence-backed marketing implications, or an explicit monitor-only state.",
+      answer: answerFor(4),
+      state: states[4],
       href: "/implications",
       cta: "See marketing implications",
       evidence: "No generic advice: every action cites its supporting claims.",
@@ -100,7 +143,12 @@ export function HomeQuestions({
   return (
     <ol className="home-questions" data-testid="home-questions">
       {questions.map((q) => (
-        <li key={q.n} className="home-question" data-testid={`home-q${q.n}`}>
+        <li
+          key={q.n}
+          className={`home-question state-${q.state}`}
+          data-testid={`home-q${q.n}`}
+          data-state={q.state}
+        >
           <div className="home-question-n" aria-hidden="true">
             {q.n}
           </div>

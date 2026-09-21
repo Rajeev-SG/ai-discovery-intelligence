@@ -964,7 +964,14 @@ main { flex: 1; }
 .home-question-cta { margin-top: 2px; font-size: 13px; font-weight: 600; }
 .home-latest { margin-top: 34px; border-top: 1px solid var(--border); padding-top: 22px; }
 .home-latest .landing-section { margin-top: 16px; }
-.site-nav-secondary { opacity: 0.72; }
+.site-nav-secondary {
+  opacity: 0.72;
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 1px solid var(--border);
+}
+.home-question.state-unavailable { border-color: rgba(217, 100, 65, 0.45); }
+.home-question.state-empty { border-color: rgba(217, 164, 65, 0.4); }
 
 @media (max-width: 640px) {
   .home-questions { grid-template-columns: 1fr; }

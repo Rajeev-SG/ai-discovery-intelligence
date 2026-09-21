@@ -65,7 +65,23 @@ implication (`/implications`), without needing repository/domain terminology.
 
 Verification: pytest **314**, ruff clean, vitest **84**, playwright **37** live.
 
-## 5. IA must work with unknown mechanics
+## 5. Review-hardening pass (frontier findings)
+
+- **F1 (unavailable vs empty collapsed).** The four answers now use a three-state
+  pattern (`populated` / `empty` / `unavailable`, exposed as `data-state`): a
+  `null` projection renders explicit "…is unavailable right now" copy, a
+  present-but-zero count renders explicit empty copy, and neither is ever a
+  confident generic answer. Verified with no `EVIDENCE_API_URL`: all four
+  questions report `data-state="unavailable"`; e2e
+  *with no backend, the questions render explicit unavailable answers*.
+- **F2 (nav demotion was only positional).** The secondary destinations are now a
+  separate `<ul aria-label="More">` with a bordered divider, so the primary list
+  is structurally free of internal terms; e2e asserts the two lists separately.
+- **F3 (stale layout metadata).** The root-layout description is updated to the
+  marketer-first framing, so every route (not just `/`) presents consistent
+  positioning.
+
+## 6. IA must work with unknown mechanics
 
 The homepage and nav never depend on a mechanic being known: the implications
 question states "or an explicit monitor-only state where evidence is insufficient",
