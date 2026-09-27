@@ -100,7 +100,15 @@ class ExtractedMetric(BaseModel):
                     data["label"] = data[key]
                     break
             if "label" not in data and data.get("definition"):
-                data["label"] = str(data["definition"])[:40]
+                # Issue #69: a hard 40-character cut produced truncated nonsense
+                # labels ("percentage of AI users who dislike chatb"). Cut at a
+                # word boundary instead, and only when genuinely needed.
+                text = str(data["definition"]).strip()
+                if len(text) <= 80:
+                    data["label"] = text
+                else:
+                    cut = text[:80].rsplit(" ", 1)[0]
+                    data["label"] = cut + "…"
         if isinstance(data, dict) and not data.get("value_quote") and data.get("quote"):
             data["value_quote"] = data["quote"]
         return data

@@ -47,7 +47,9 @@ test("monitor-only surfaces are shown explicitly, not as invented actions", asyn
   // which is the normal, honest state.
   const monitor = page.getByTestId("impl-monitor-list");
   if ((await monitor.count()) > 0) {
-    await expect(monitor).toContainText(/watch|monitor/i);
+    // Issue #69: the monitor list is progressive disclosure behind its summary.
+    await page.locator(".impl-monitor-details summary").click();
+    await expect(monitor).toContainText(/research gap|not ready/i);
   }
 });
 
@@ -58,8 +60,10 @@ test("an all-monitor-only ledger shows the monitor state, not a blank empty stat
 
   await page.goto("/implications");
   // Review impl-004: with zero actionable implications the monitor list must show,
-  // never the generic "nothing here" empty state.
+  // never the generic "nothing here" empty state. Issue #69: the list is
+  // progressive disclosure behind its summary.
+  await page.locator(".impl-monitor-details summary").click();
   await expect(page.getByTestId("impl-monitor-list")).toBeVisible();
   await expect(page.getByTestId("impl-empty")).toHaveCount(0);
-  await expect(page.getByTestId("impl-monitor-list")).toContainText(/watch|monitor/i);
+  await expect(page.getByTestId("impl-monitor-list")).toContainText(/research gap|not ready/i);
 });

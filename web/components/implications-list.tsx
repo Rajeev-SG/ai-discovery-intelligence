@@ -13,15 +13,29 @@ import {
   familyLabel,
   type Implication,
   type ImplicationsProjection,
+  type ImplicationSource,
 } from "@/lib/implications";
 
-function ClaimRefs({ ids, label }: { ids: string[]; label: string }) {
-  if (!ids.length) return null;
+/**
+ * Readable citations (issue #69): publisher names linked to the public source,
+ * not truncated claim-ID hashes. The technical ids stay in the drill-down.
+ */
+function SourceRefs({ sources, label }: { sources: ImplicationSource[]; label: string }) {
+  if (!sources.length) return null;
   return (
     <p className="impl-evidence-line">
       <span className="impl-evidence-label">{label}:</span>{" "}
-      {ids.map((id) => (
-        <code key={id}>{id.slice(0, 10)}</code>
+      {sources.map((source, i) => (
+        <span key={`${source.claim_id}-${i}`}>
+          {i > 0 ? " · " : ""}
+          {source.url ? (
+            <a href={source.url} target="_blank" rel="noreferrer noopener" className="impl-source-link">
+              {source.publisher ?? "Public source"}
+            </a>
+          ) : (
+            <span>{source.publisher ?? "Public source"}</span>
+          )}
+        </span>
       ))}
     </p>
   );
@@ -58,9 +72,9 @@ function ImplicationCard({ impl, showSurfaces = true }: { impl: Implication; sho
         </p>
       ) : null}
 
-      <ClaimRefs ids={impl.supporting_claim_ids} label="Supported by" />
-      {impl.contradicting_claim_ids.length ? (
-        <ClaimRefs ids={impl.contradicting_claim_ids} label="Contradicted by" />
+      <SourceRefs sources={impl.supporting_sources ?? []} label="Supported by" />
+      {impl.contradicting_sources?.length ? (
+        <SourceRefs sources={impl.contradicting_sources} label="Contradicted by" />
       ) : null}
 
       <details className="impl-technical">
@@ -117,18 +131,23 @@ export function ImplicationsList({ projection }: { projection: ImplicationsProje
 
       {monitorSurfaces.length ? (
         <section className="impl-section impl-monitor">
-          <h2>Monitor only</h2>
+          <h2>Not yet ready for platform-specific guidance</h2>
           <p className="impl-intro">
-            These surfaces have no evidenced, actionable mechanic. The correct action is
-            to watch, not to act on assumption.
+            For these platforms we have not yet verified enough information to
+            recommend platform-specific changes. Their commercial relevance depends
+            on your market and customers — this is a research gap, not a
+            recommendation to ignore them.{" "}
+            <details className="impl-monitor-details">
+              <summary>Show the {monitorSurfaces.length} platform{monitorSurfaces.length === 1 ? "" : "s"}</summary>
+              <ul className="impl-monitor-list" data-testid="impl-monitor-list">
+                {monitorSurfaces.map((s) => (
+                  <li key={s.surface}>
+                    <strong>{s.surface}</strong> — {s.note}
+                  </li>
+                ))}
+              </ul>
+            </details>
           </p>
-          <ul className="impl-monitor-list" data-testid="impl-monitor-list">
-            {monitorSurfaces.map((s) => (
-              <li key={s.surface}>
-                <strong>{s.surface}</strong> — {s.note}
-              </li>
-            ))}
-          </ul>
         </section>
       ) : null}
     </div>

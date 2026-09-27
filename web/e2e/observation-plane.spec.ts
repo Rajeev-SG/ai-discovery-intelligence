@@ -174,7 +174,7 @@ test("keyboard-only navigation can filter and expand", async ({ page }) => {
   await page.getByTestId("cell-deepseek-chat-retrieval").focus();
   await page.keyboard.press("Enter");
   await expect(page.getByRole("dialog")).toBeVisible();
-  await expect(page.getByRole("dialog")).toContainText("Retrieval architecture");
+  await expect(page.getByRole("dialog")).toContainText("Registry profile");
 
   // Escape closes the focus-trapped drawer and returns focus.
   await page.keyboard.press("Escape");
@@ -195,6 +195,6 @@ test("mobile layout exposes the registry and a detail panel", async ({ page }) =
   await expect(page.getByTestId("card-doubao")).toBeVisible();
   await expect(page.getByTestId("card-deepseek-chat")).toBeVisible();
   await page.getByTestId("card-open-deepseek-chat").click();
-  await expect(page.getByRole("dialog")).toContainText("Retrieval architecture");
+  await expect(page.getByRole("dialog")).toContainText("Registry profile");
   await page.screenshot({ path: `${SHOTS}/mobile-detail-deepseek.png` });
 });

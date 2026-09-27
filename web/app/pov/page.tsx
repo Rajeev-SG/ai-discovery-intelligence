@@ -1,42 +1,35 @@
 import type { Metadata } from "next";
 import { PovChangelog } from "@/components/pov-changelog";
 import { PovProposition } from "@/components/pov-proposition";
-import { hasChanges } from "@/lib/pov";
 import { loadPov } from "@/lib/pov.server";
 
 export const metadata: Metadata = {
-  title: "Living POV — AI Discovery Intelligence",
+  title: "What this means — AI Discovery Intelligence",
   description:
-    "The agency's living point of view on AI discovery, with its evidence and change history.",
+    "The agency's standing position on AI discovery, with the evidence and change history behind each conclusion.",
 };
 
 /**
- * The Living POV surface (issue #49). Reachable directly at `/pov`; the shell
- * nav integration is issue #45's job. Data comes from the committed product
- * artifact (`web/lib/generated-pov.json`), projected through `@/lib/pov`, so
- * the page renders canonical state — never parsed Markdown.
+ * The standing-position page (issue #49; copy reset per issue #69). Reachable
+ * directly at `/pov`. Data comes from the committed product artifact
+ * (`web/lib/generated-pov.json`), projected through `@/lib/pov`, so the page
+ * renders canonical state — never parsed Markdown.
  */
 export default function PovPage() {
   const view = loadPov();
-  const changed = hasChanges(view);
   return (
     <div className="pov">
       <header className="pov-header">
-        <h1>Living POV</h1>
+        <h1>What this means — our standing position</h1>
         <p className="pov-intro">
-          The agency&apos;s standing position, evidence-gated and deterministic. Each
-          proposition changes only when a qualifying event clears the gate in{" "}
-          <code>config/pov_policy.yaml</code>; the change history below records every
-          adoption, and &ldquo;no change&rdquo; is a valid outcome.
-        </p>
-        <p className="pov-source">
-          Source: <code>{view.source}</code> · version {view.version} ·{" "}
-          {changed ? `${view.changelog.length} change${view.changelog.length === 1 ? "" : "s"} recorded` : "no POV change recorded"}
+          The conclusions we currently draw for marketers from the evidence we hold.
+          Each position changes only when the evidence justifies a change; the
+          changelog below records every change and the reason for it.
         </p>
       </header>
 
       <section className="pov-current" aria-labelledby="pov-current-title">
-        <h2 id="pov-current-title">Current POV</h2>
+        <h2 id="pov-current-title">Current position</h2>
         <div className="pov-props">
           {view.propositions.map((proposition) => (
             <PovProposition key={proposition.id} proposition={proposition} />
@@ -44,9 +37,12 @@ export default function PovPage() {
         </div>
       </section>
 
-      <section className="pov-history" aria-labelledby="pov-history-title">
-        <h2 id="pov-history-title">POV changelog</h2>
-        <PovChangelog revisions={view.changelog} />
+      <section id="changelog" className="pov-history" aria-labelledby="pov-history-title">
+        <h2 id="pov-history-title">Changelog</h2>
+        <PovChangelog
+          revisions={view.changelog}
+          labels={Object.fromEntries(view.propositions.map((p) => [p.id, p.section || p.id]))}
+        />
       </section>
     </div>
   );

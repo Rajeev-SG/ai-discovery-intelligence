@@ -48,6 +48,9 @@ export function LandscapeClient({ projection }: { projection: LandscapeProjectio
   const [selected, setSelected] = useState<Set<string>>(() =>
     selectFrom(searchParams.get("compare")),
   );
+  // Issue #69: a comparison selection is capped (max 6). A click that cannot be
+  // accepted must say so immediately beside the control, not silently no-op.
+  const [capNotice, setCapNotice] = useState<string | null>(null);
 
   // The URL is the source of truth for EXTERNAL navigation. Back/forward fires a
   // popstate (which `replaceState` does not), so subscribing to it re-derives the
@@ -61,8 +64,19 @@ export function LandscapeClient({ projection }: { projection: LandscapeProjectio
 
   const toggle = (id: string) => {
     const next = new Set(selected);
-    if (next.has(id)) next.delete(id);
-    else if (next.size < COMPARISON_MAX) next.add(id);
+    if (next.has(id)) {
+      next.delete(id);
+      setCapNotice(null);
+    } else if (next.size < COMPARISON_MAX) {
+      next.add(id);
+      setCapNotice(null);
+    } else {
+      const name = projection.surfaces.find((s) => s.id === id)?.name ?? id;
+      setCapNotice(
+        `${COMPARISON_MAX} of ${COMPARISON_MAX} selected — remove one to add ${name}.`,
+      );
+      return;
+    }
     setSelected(next);
     // Build the next URL from the LIVE query at action time, so any other live
     // parameter (utm_*, etc.) survives; always write `compare` so it round-trips.
@@ -111,6 +125,11 @@ export function LandscapeClient({ projection }: { projection: LandscapeProjectio
           <Link href="/surfaces">Explore the full 35-surface registry →</Link>
         </p>
         <LandscapeGrid surfaces={projection.surfaces} selected={selected} onToggle={toggle} />
+        {capNotice ? (
+          <p className="landscape-cap-notice" role="status" data-testid="compare-cap-notice">
+            {capNotice}
+          </p>
+        ) : null}
       </section>
 
       <section className="landscape-section">

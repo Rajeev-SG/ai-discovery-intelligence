@@ -25,6 +25,13 @@ export type ImplicationFamily =
 
 export type Actionability = "high" | "medium" | "low";
 
+/** A readable citation for one supporting/contradicting claim (issue #69). */
+export interface ImplicationSource {
+  claim_id: string;
+  publisher: string | null;
+  url: string | null;
+}
+
 export interface Implication {
   family: ImplicationFamily | string;
   action: string;
@@ -38,6 +45,9 @@ export interface Implication {
   actionability: Actionability | string;
   significance: number;
   contradicting_claim_ids: string[];
+  /** Readable citations (publisher + public URL) — issue #69. */
+  supporting_sources?: ImplicationSource[];
+  contradicting_sources?: ImplicationSource[];
   monitor_only: boolean;
   note: string;
 }

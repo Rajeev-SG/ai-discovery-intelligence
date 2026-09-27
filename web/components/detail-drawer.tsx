@@ -10,6 +10,11 @@ interface DetailDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   label: string;
+  /**
+   * A specific finding to highlight (issue #69): a `?evidence=<claim>` link
+   * opens the panel on that claim, scrolled into view.
+   */
+  highlightClaimId?: string | null;
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -39,7 +44,7 @@ function ChipList({ values, empty }: { values: string[]; empty: string }) {
  * shown verbatim; unknown retrieval architecture and missing evidence are shown
  * as explicit information rather than as blank cells.
  */
-export function DetailDrawer({ row, open, onOpenChange, label }: DetailDrawerProps) {
+export function DetailDrawer({ row, open, onOpenChange, label, highlightClaimId }: DetailDrawerProps) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -66,18 +71,10 @@ export function DetailDrawer({ row, open, onOpenChange, label }: DetailDrawerPro
               </div>
 
               <div className="drawer-body">
-                <Section title="Geography">
-                  <ChipList values={row.regionLabels} empty="No region recorded in the registry." />
-                </Section>
-
-                <Section title="Distribution channels">
-                  <ChipList values={row.distributionLabels} empty="No distribution channel recorded yet." />
-                </Section>
-
-                <Section title="Discovery modes">
-                  <ChipList values={row.discoveryModeLabels} empty="No discovery mode recorded yet." />
-                </Section>
-
+                {/* Evidence first (issue #69): the decision-useful material leads;
+                    registry facts (geography/distribution/modes) follow. The
+                    drawer no longer repeats the inline row's retrieval-unknowns
+                    registry notes — that duplication amplified every profile. */}
                 <Section title="Evidence & trust">
                   <p className="detail-lead">
                     How we know this, how strong the evidence is, and where sources disagree —
@@ -87,22 +84,16 @@ export function DetailDrawer({ row, open, onOpenChange, label }: DetailDrawerPro
                   <MechanicsTrustPanel surfaceId={row.id} />
                 </Section>
 
-                <Section title="Retrieval architecture (registry metadata)">
-                  <p className="detail-lead">
-                    <span className="registry-metadata-tag">Registry metadata — not evidence</span>{" "}
-                    Registry status: <strong>{row.retrievalStatusLabel}</strong>.{" "}
-                    {row.retrievalUnknown
-                      ? "The registry flags the retrieval stack as genuinely unknown."
-                      : "The registry records some documented behaviour."}{" "}
-                    This is a coarse registry scorecard, not an evidenced mechanics
-                    finding; the evidence-backed mechanics view is on the surface's
-                    mechanics projection.
+                <Section title="Registry profile (metadata, not evidence)">
+                  <ChipList values={row.regionLabels} empty="No region recorded in the registry." />
+                  <p className="muted">
+                    {row.distributionLabels.join(" · ") || "No distribution channel recorded."} —{" "}
+                    {row.discoveryModeLabels.join(" · ") || "No discovery mode recorded."}
                   </p>
-                  <ul className="unknown-list">
-                    {row.retrievalUnknownNotes.map((note) => (
-                      <li key={note}>{note}</li>
-                    ))}
-                  </ul>
+                  <p className="detail-hint">
+                    Registry status: {row.retrievalStatusLabel}. This is a coarse registry
+                    scorecard, not an evidenced mechanics finding.
+                  </p>
                 </Section>
 
                 <Section title="Official URLs">
@@ -121,7 +112,7 @@ export function DetailDrawer({ row, open, onOpenChange, label }: DetailDrawerPro
                   )}
                 </Section>
 
-                <EvidenceDetail surfaceId={row.id} />
+                <EvidenceDetail surfaceId={row.id} highlightClaimId={highlightClaimId} />
               </div>
             </>
           ) : null}

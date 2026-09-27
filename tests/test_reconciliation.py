@@ -217,8 +217,14 @@ def test_canonical_case_via_api(tmp_path):
         from ai_discovery.reconciliation import reconcile_persisted
 
         results = reconcile_persisted(rows)
-        assert len(results) == 1
-        assert results[0].state == "methodologically_incomparable"
+        # Issue #69: cross-metric pairs (citation_share vs mention_share) are an
+        # editorial comparison, not an auto-generated one — the persisted pairing
+        # no longer manufactures "incomparable" records for different metrics.
+        # The canonical finding remains available via the explicit curated case.
+        assert results == []
+        curated = compare_claims(CANONICAL_SEMRUSH, CANONICAL_AHREFS)
+        assert curated.state == "methodologically_incomparable"
+        assert curated.id.startswith("rec-")
     finally:
         api.app.dependency_overrides.clear()
         session.close()
@@ -252,9 +258,107 @@ def _view_from(claim):
 
 
 # --------------------------------------------------------------------------- #
-# Issue #58 review: the reconciliation index is cached per ledger token and the
-# read path performs no database writes
+# Issue #69: comparison eligibility, stable identity and deduplication
 # --------------------------------------------------------------------------- #
+
+
+def _ledger_row(claim_id, metric_id, label, value, unit="percent", **extra):
+    """An expanded-ledger-shaped row with one metric (issue #69 fixtures)."""
+
+    base = {
+        "claim_id": claim_id,
+        "statement": f"Study {claim_id} reports a figure.",
+        "surfaces": ["chatgpt"],
+        "status": "current",
+        "source": {"canonical_url": f"https://example.test/{claim_id}"},
+        "dates": {"published_at": "2026-08-15T00:00:00+00:00"},
+        "methodology": {
+            "denominator": "all_citations",
+            "geography": "US",
+            "measurement_mode": "consumer_web",
+            "unit_of_analysis": "same-panel",
+        },
+        "metrics": [
+            {"metric_id": metric_id, "label": label, "value_number": value, "unit": unit}
+        ],
+    }
+    base.update(extra)
+    return base
+
+
+def test_same_claim_multi_metric_never_compares_to_itself():
+    """The issue #69 small case: 3 metrics in one claim produce zero pairs, and
+    the bare claim id indexes zero duplicated records — not 6 stale entries."""
+
+    from ai_discovery.reconciliation import reconcile_persisted, reconciliation_index
+
+    row = _ledger_row("c1", "m1", "citation share", 27.0)
+    row["metrics"] = [
+        {"metric_id": f"m{i}", "label": f"metric {i}", "value_number": 10.0 + i, "unit": "percent"}
+        for i in range(3)
+    ]
+    results = reconcile_persisted([row])
+    assert results == []
+    index = reconciliation_index([row])
+    assert index.get("c1", []) == []
+
+
+def test_different_metrics_are_never_compared():
+    """A CTR finding and an audience total on the same surface never pair."""
+
+    from ai_discovery.reconciliation import reconcile_persisted
+
+    rows = [
+        _ledger_row("c1", "m1", "click-through rate", 27.0),
+        _ledger_row("c2", "m2", "monthly users", 2500000000.0),
+    ]
+    assert reconcile_persisted(rows) == []
+
+
+def test_compatible_unit_spellings_group_and_same_reading_is_skipped():
+    """0.5 percent and 0.5% are the same reading: no relationship is generated."""
+
+    from ai_discovery.reconciliation import reconcile_persisted
+
+    rows = [
+        _ledger_row("c1", "m1", "citation share", 0.5, unit="percent"),
+        _ledger_row("c2", "m2", "citation share", 0.5, unit="%"),
+    ]
+    assert reconcile_persisted(rows) == []
+
+
+def test_same_metric_different_values_still_compared_with_stable_id():
+    """Genuine same-quantity disagreement still surfaces, with a stable id."""
+
+    from ai_discovery.reconciliation import reconcile_persisted
+
+    rows = [
+        _ledger_row("c1", "m1", "citation share", 0.5, unit="percent"),
+        _ledger_row("c2", "m2", "citation share", 16.8, unit="%"),
+    ]
+    results = reconcile_persisted(rows)
+    assert len(results) == 1
+    assert results[0].id.startswith("rec-")
+    # Identity is deterministic and order-independent.
+    flipped = reconcile_persisted(rows[::-1])
+    assert flipped[0].id == results[0].id
+
+
+def test_index_deduplicates_relationships_per_claim_key():
+    """A multi-metric claim's relationships are indexed once per unique record."""
+
+    from ai_discovery.reconciliation import reconciliation_index
+
+    rows = [
+        _ledger_row("c1", "m1", "citation share", 0.5),
+        _ledger_row("c2", "m2", "citation share", 16.8),
+    ]
+    index = reconciliation_index(rows)
+    # Both the metric-qualified and bare keys exist, and each holds the single
+    # unique relationship exactly once.
+    for key in ("c1", "c1:m1", "c2", "c2:m2"):
+        assert len(index.get(key, [])) == 1
+        assert index[key][0]["id"].startswith("rec-")
 
 
 def test_cached_reconciliation_index_reuses_until_the_ledger_changes():
@@ -287,6 +391,12 @@ def test_cached_reconciliation_index_reuses_until_the_ledger_changes():
     second = R.cached_reconciliation_index(rows)
     assert first is second, "same ledger token must reuse the cached index"
     M.clear_projection_cache()
+
+
+# --------------------------------------------------------------------------- #
+# Issue #58 review: the reconciliation index is cached per ledger token and the
+# read path performs no database writes
+# --------------------------------------------------------------------------- #
 
 
 def test_reconciliation_read_path_performs_no_database_writes(tmp_path):

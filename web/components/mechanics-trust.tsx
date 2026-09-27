@@ -173,11 +173,17 @@ function EvidenceTrust({ evidence }: { evidence: MechanicsEvidence }) {
 }
 
 /**
- * An inline conflict. The interpretation, state and relationship are the
- * backend's own reconciliation output — this only presents them and links to the
- * full reconciliation view. Nothing is re-derived here.
+ * An inline conflict note. The interpretation, state and relationship are the
+ * backend's own reconciliation output — this only presents it. Issue #69: the
+ * "compare the contradicting evidence" deep link is offered ONLY when the
+ * record is a genuine disagreement (a methodological difference is not a
+ * contradiction), and it anchors to the precise relationship.
  */
 function ConflictNote({ record }: { record: ReconciliationRecord }) {
+  const isGenuineConflict =
+    record.relationship === "contradicts" ||
+    record.relationship === "supersedes" ||
+    record.state === "material_conflict";
   return (
     <li className="trust-conflict" data-testid="trust-conflict">
       <span className="chip chip-conflict">{record.state.replace(/_/g, " ")}</span>
@@ -185,9 +191,11 @@ function ConflictNote({ record }: { record: ReconciliationRecord }) {
       {record.differences?.length ? (
         <p className="muted">Differs on: {record.differences.join(", ")}</p>
       ) : null}
-      <Link className="trust-conflict-link" href="/reconciliation">
-        Compare the contradicting evidence →
-      </Link>
+      {isGenuineConflict && record.id ? (
+        <Link className="trust-conflict-link" href={`/reconciliation#${record.id}`}>
+          Compare the contradicting evidence →
+        </Link>
+      ) : null}
     </li>
   );
 }

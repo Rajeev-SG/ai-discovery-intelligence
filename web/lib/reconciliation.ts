@@ -31,6 +31,8 @@ export type ReconciliationRelationship =
 
 /** One persisted relationship between two or more claims. */
 export interface ReconciliationItem {
+  /** Stable relationship id (issue #69) — used for deep links and dedupe. */
+  id?: string;
   claim_ids: string[];
   state: ReconciliationState;
   relationship: ReconciliationRelationship;

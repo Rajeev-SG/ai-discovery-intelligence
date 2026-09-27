@@ -79,10 +79,16 @@ IMPLICATION_RULES: tuple[ImplicationRule, ...] = (
         dimension="crawling_indexing_controls",
         topic="crawler_index_policy",
         action=(
-            "Confirm the crawler user-agents named in the vendor documentation are "
-            "allowed in robots.txt, and that any disallow is deliberate."
+            "Check search eligibility separately from AI-training policy: confirm the "
+            "vendor's documented search crawler is allowed in robots.txt and any firewall "
+            "rules, and record your deliberate allow/block decision for each documented "
+            "crawler user-agent."
         ),
-        rationale="The surface's crawler controls are vendor-documented, so eligibility is a decision you control.",
+        rationale=(
+            "Vendor documentation separates search crawling from training and user-initiated "
+            "access, so eligibility is a decision you control. Meeting it does not guarantee "
+            "retrieval, citation, recommendation or traffic."
+        ),
     ),
     ImplicationRule(
         family="crawlability_eligibility",
@@ -95,8 +101,15 @@ IMPLICATION_RULES: tuple[ImplicationRule, ...] = (
         family="indexability_freshness",
         dimension="freshness_recrawl",
         topic="crawler_index_policy",
-        action="Align update cadence with the documented recrawl window so time-sensitive content is refreshed within it.",
-        rationale="A documented freshness/recrawl mechanic sets how quickly changed content can be reflected.",
+        action=(
+            "Where the surface documents a genuine recrawl or freshness window, verify it "
+            "on your own priority pages before aligning publishing cadence."
+        ),
+        rationale=(
+            "A documented recrawl/freshness mechanic suggests how quickly changed content "
+            "can be reflected. A crawler-policy adjustment timing is not a refresh "
+            "guarantee, so verify on real pages rather than assume a publishing SLA."
+        ),
     ),
     ImplicationRule(
         family="citation_visibility",
@@ -157,6 +170,21 @@ IMPLICATION_RULES: tuple[ImplicationRule, ...] = (
 )
 
 
+class SupportSource(BaseModel):
+    """A readable citation for one supporting/contradicting claim (issue #69).
+
+    Replaces raw claim-ID strips in the reading layer: the implication card
+    shows the publisher (linked to the public source) instead of opaque
+    truncated hashes.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    claim_id: str
+    publisher: str | None = None
+    url: str | None = None
+
+
 class Implication(BaseModel):
     """One evidence-linked marketing implication."""
 
@@ -177,6 +205,10 @@ class Implication(BaseModel):
     significance: float
     #: Contradicting evidence, when the supporting claims are contested.
     contradicting_claim_ids: tuple[str, ...] = ()
+    #: Readable citations (publisher + public URL) for the supporting and
+    # contradicting claims, in the same order as the id tuples.
+    supporting_sources: tuple[SupportSource, ...] = ()
+    contradicting_sources: tuple[SupportSource, ...] = ()
     #: True for the explicit no-action outcome.
     monitor_only: bool = False
     note: str = ""
@@ -245,6 +277,16 @@ def surface_implications(
         contradicting: list[str] = []
         modes: set[str] = set()
         regions: set[str] = set()
+
+        def _source_of(claim_id: str) -> SupportSource:
+            row = by_claim.get(claim_id) or {}
+            source = row.get("source") or {}
+            return SupportSource(
+                claim_id=claim_id,
+                publisher=source.get("publisher"),
+                url=source.get("url"),
+            )
+
         for assertion in dim.assertions:
             for ev in assertion.evidence:
                 row = by_claim.get(ev.claim_id)
@@ -276,12 +318,14 @@ def surface_implications(
         except (ValueError, KeyError, TypeError):  # pragma: no cover - defensive read path
             significance = 0.0
 
+        supporting_unique = tuple(dict.fromkeys(supporting))
+        contradicting_unique = tuple(dict.fromkeys(contradicting))
         out.append(
             Implication(
                 family=rule.family,
                 action=rule.action,
                 rationale=rule.rationale,
-                supporting_claim_ids=tuple(dict.fromkeys(supporting)),
+                supporting_claim_ids=supporting_unique,
                 supporting_dimensions=(rule.dimension,),
                 surfaces=(surface_id,),
                 modes=tuple(sorted(modes)),
@@ -289,7 +333,9 @@ def surface_implications(
                 confidence=confidence,
                 actionability=_actionability(rule.dimension, rule.topic),
                 significance=significance,
-                contradicting_claim_ids=tuple(dict.fromkeys(contradicting)),
+                contradicting_claim_ids=contradicting_unique,
+                supporting_sources=tuple(_source_of(c) for c in supporting_unique),
+                contradicting_sources=tuple(_source_of(c) for c in contradicting_unique),
             )
         )
     return out
@@ -345,16 +391,17 @@ def derive_surface(
         d.dimension for d in mechanics.dimensions if d.state == "unknown"
     )
     note = (
-        "No evidenced, marketer-actionable mechanic for this surface yet. "
-        "Monitor rather than act: unknown is a valid answer."
+        "Platform-specific guidance is not ready for this service yet. Not enough "
+        "information has been verified to recommend platform-specific changes; this is "
+        "a research gap, not a recommendation to ignore the platform."
     )
     monitor = Implication(
         family="monitor",
-        action="Monitor this surface; do not act on assumption until a mechanic is evidenced.",
+        action="Re-check this surface when new validated evidence arrives; no platform-specific change is recommended now.",
         rationale=(
             "The evidence does not yet support a specific action for this surface, so "
-            "taking one would be a guess. Watching for validated mechanics is the "
-            "correct next step."
+            "taking one would be a guess. Commercial relevance depends on your market and "
+            "customers; watching for validated mechanics is the correct next step."
         ),
         supporting_claim_ids=(),
         supporting_dimensions=(),
@@ -402,6 +449,12 @@ def cross_surface_implications(
         surfaces = tuple(sorted({s for m in members for s in m.surfaces}))
         supporting = tuple(dict.fromkeys(c for m in members for c in m.supporting_claim_ids))
         contradicting = tuple(dict.fromkeys(c for m in members for c in m.contradicting_claim_ids))
+        supporting_sources = tuple(
+            dict.fromkeys(s for m in members for s in m.supporting_sources)
+        )
+        contradicting_sources = tuple(
+            dict.fromkeys(s for m in members for s in m.contradicting_sources)
+        )
         modes = tuple(sorted({x for m in members for x in m.modes}))
         regions = tuple(sorted({x for m in members for x in m.regions}))
         confidence = min((m.confidence for m in members), key=_confidence_rank)
@@ -419,6 +472,8 @@ def cross_surface_implications(
                     "surfaces": surfaces,
                     "supporting_claim_ids": supporting,
                     "contradicting_claim_ids": contradicting,
+                    "supporting_sources": supporting_sources,
+                    "contradicting_sources": contradicting_sources,
                     "modes": modes,
                     "regions": regions,
                     "confidence": confidence,
@@ -436,12 +491,17 @@ def cross_surface_implications(
 def implication_view(impl: Implication) -> dict[str, Any]:
     """The marketer-safe payload for one implication."""
 
+    def _source(s: SupportSource) -> dict[str, Any]:
+        return {"claim_id": s.claim_id, "publisher": s.publisher, "url": s.url}
+
     return {
         "family": impl.family,
         "action": impl.action,
         "rationale": impl.rationale,
         "supporting_claim_ids": list(impl.supporting_claim_ids),
         "supporting_dimensions": list(impl.supporting_dimensions),
+        "supporting_sources": [_source(s) for s in impl.supporting_sources],
+        "contradicting_sources": [_source(s) for s in impl.contradicting_sources],
         "surfaces": list(impl.surfaces),
         "modes": list(impl.modes),
         "regions": list(impl.regions),

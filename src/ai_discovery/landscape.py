@@ -57,6 +57,11 @@ COMPARISON_DIMENSIONS: tuple[str, ...] = (
 
 assert set(COMPARISON_DIMENSIONS) <= set(MECHANICS_DIMENSIONS)
 
+#: Issue #69: Google AI Overviews dominates current recorded change volume and is
+#: treated elsewhere as a core platform, so it belongs in the curated landscape
+#: even though its consumer journey differs from a conversational assistant.
+LANDSCAPE_IDS = LANDSCAPE_IDS + ("google-ai-overviews",)
+
 
 class LandscapeSurface(BaseModel):
     """One marketer-facing landscape row."""
@@ -109,6 +114,14 @@ def _reach(
     or nothing. A metric that names the surface itself (in its label or scope) is
     preferred over a joint metric, so a shared multi-surface claim never attributes
     another surface's number to this one.
+
+    Issue #69 P0: the metric must actually measure audience size or market
+    share. Reach is a *population* figure, so the metric label/scope/definition
+    must match an audience-size pattern (users, market share, adoption, ...) and
+    must NOT be an attitude/sentiment or engagement-intensity measure — a
+    "percentage of users who dislike chatbot ads" is an attitude survey, and
+    "144.6 minutes" is time spent; neither is reach. A claim whose only metrics
+    fail this test yields no reach figure at all rather than a mislabelled one.
     """
 
     rank = {"unknown": 0, "low": 1, "medium": 2, "high": 3}
@@ -151,15 +164,45 @@ def _reach(
             unit = m.get("unit") or ""
             text = f"{label}: {value}{(' ' + unit) if unit else ''}"
             # Prefer a metric named for this surface; then by confidence.
-            haystack = f"{label} {m.get('scope') or ''}".lower()
+            haystack = f"{label} {m.get('scope') or ''} {m.get('definition') or ''}".lower()
             names_surface = any(tok in haystack for tok in name_tokens)
             if multi and not names_surface:
+                continue
+            # Reach eligibility (issue #69): an audience-size/market-share metric
+            # only. Attitude/sentiment and engagement-intensity measures never
+            # count as reach, whatever their sample size.
+            if not _REACH_METRIC.search(haystack) or _NON_REACH_METRIC.search(haystack):
                 continue
             key = (1 if names_surface else 0, rank.get(row.get("confidence"), 0))
             if key > best_key:
                 best_key = key
                 best = (text, row.get("claim_id"), row.get("confidence"))
     return best
+
+
+#: A metric counts as reach only when its text states an audience-size or
+#: market-share measure (issue #69 P0: reach is a population figure).
+_REACH_METRIC = re.compile(
+    r"\b("
+    r"monthly (?:active )?users|mau|weekly (?:active )?users|daily (?:active )?users|dau|"
+    r"(?:active |registered |total |monthly |weekly |daily )?users\b|user base|"
+    r"market share|share of (?:the |ai |search |chatbot )?(?:market|traffic|usage)|"
+    r"adoption|installs|downloads|audience (?:size|reach)|reach\b"
+    r")",
+    re.IGNORECASE,
+)
+
+#: ...and never when it is an attitude/sentiment survey or an engagement-intensity
+#: (time-spent) measure. These are different quantities, not interchangeable
+#: reach figures (issue #69: DeepSeek's ad-dislike survey, Doubao's 144.6 minutes).
+_NON_REACH_METRIC = re.compile(
+    r"\b("
+    r"dislike|hate|sentiment|attitude|opinion|prefer(?:ence|red)?|trust|satisfaction|"
+    r"frustrat\w+|annoy\w+|minutes?|hours?|seconds?|duration|time spent|time on|"
+    r"engagement|sessions?\b|churn|retention"
+    r")",
+    re.IGNORECASE,
+)
 
 
 def _relevance(mechanics: SurfaceMechanics, surface_name: str) -> str:

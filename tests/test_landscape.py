@@ -179,3 +179,69 @@ def test_vendor_ambiguous_joint_claim_is_not_attributed():
     rows = {r.id: r for r in L.build_landscape(registry, _projection(registry, [joint]), [joint])}
     assert rows["google-gemini"].reach_metric is None
     assert rows["google-ai-mode"].reach_metric is None
+
+
+# --------------------------------------------------------------------------- #
+# Issue #69 P0: reach is a population figure, not any audience_usage number
+# --------------------------------------------------------------------------- #
+
+
+def test_reach_excludes_attitude_survey_metrics():
+    """A 'percentage of AI users who dislike chatbot ads' survey metric is an
+    attitude measure, not DeepSeek's reach — no figure rather than a wrong one."""
+
+    registry = _registry()
+    claim = _claim(
+        claim_id="deepseek-attitude",
+        surfaces=("deepseek-chat",),
+        topic="audience_usage",
+        statement="A survey found 4 in 10 AI users dislike chatbot ads.",
+        value_number=40.0,
+        label="percentage of AI users who dislike chatbot ads",
+    )
+    rows = {r.id: r for r in L.build_landscape(registry, _projection(registry, [claim]), [claim])}
+    assert rows["deepseek-chat"].reach_metric is None
+
+
+def test_reach_excludes_engagement_duration_metrics():
+    """Doubao's 144.6 minutes is time spent (engagement intensity), not reach."""
+
+    registry = _registry()
+    claim = _claim(
+        claim_id="doubao-duration",
+        surfaces=("doubao",),
+        topic="audience_usage",
+        statement="Doubao users spend an average of 144.6 minutes per month.",
+        value_number=144.6,
+        label="average monthly usage time",
+    )
+    claim["metrics"][0]["unit"] = "minutes"
+    rows = {r.id: r for r in L.build_landscape(registry, _projection(registry, [claim]), [claim])}
+    assert rows["doubao"].reach_metric is None
+
+
+def test_reach_still_accepts_market_share_and_user_counts():
+    """Genuine audience-size metrics remain eligible for the reach figure."""
+
+    registry = _registry()
+    share = _claim(
+        claim_id="share",
+        surfaces=("chatgpt",),
+        topic="audience_usage",
+        statement="ChatGPT holds 79.4% of AI chatbot traffic.",
+        value_number=79.4,
+        label="market share",
+    )
+    users = _claim(
+        claim_id="users",
+        surfaces=("doubao",),
+        topic="audience_usage",
+        statement="Doubao reports 150 million monthly active users.",
+        value_number=150000000,
+        label="monthly active users",
+    )
+    users["metrics"][0]["unit"] = "users"
+    claim_metrics = [share, users]
+    rows = {r.id: r for r in L.build_landscape(registry, _projection(registry, claim_metrics), claim_metrics)}
+    assert rows["chatgpt"].reach_metric == "market share: 79.4 %"
+    assert rows["doubao"].reach_metric == "monthly active users: 150,000,000 users"
