@@ -23,9 +23,7 @@ function EvidenceList({ items, kind }: { items: PovEvidence[]; kind: "supporting
               {CONFIDENCE_LABELS[bullet.confidence]}
             </span>
             <span className="pov-evidence-date">effective {formatDate(bullet.effective_at)}</span>
-            {bullet.claim_id ? (
-              <a href={evidenceHref(bullet.claim_id)}>evidence {bullet.claim_id.slice(0, 12)}</a>
-            ) : null}
+            {bullet.claim_id ? <a href={evidenceHref(bullet.claim_id)}>see the evidence →</a> : null}
           </span>
         </li>
       ))}
@@ -41,8 +39,11 @@ export function PovProposition({ proposition }: { proposition: PovPropositionMod
     <section className="pov-prop" id={proposition.id} aria-labelledby={`${proposition.id}-title`}>
       <header className="pov-prop-head">
         <div>
-          <p className="pov-prop-section">{proposition.section}</p>
-          <h2 id={`${proposition.id}-title`}>{proposition.id}</h2>
+          {/* Issue #69: the human section name is the heading; the canonical id
+              stays the anchor target and a hover title, out of the reading layer. */}
+          <h2 id={`${proposition.id}-title`} title={`id: ${proposition.id}`}>
+            {proposition.section}
+          </h2>
         </div>
         <div className="pov-prop-badges">
           <span className={`pill pov-conf-${proposition.confidence}`}>

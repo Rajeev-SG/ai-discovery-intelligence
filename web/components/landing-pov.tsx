@@ -75,7 +75,10 @@ export function LandingPov({ view }: { view: PovView }) {
       <div className="pov-recent">
         <h3>Recent POV change</h3>
         {recent.length ? (
-          <PovChangelog revisions={recent} />
+          <PovChangelog
+            revisions={recent}
+            labels={Object.fromEntries(view.propositions.map((p) => [p.id, p.section || p.id]))}
+          />
         ) : (
           <p className="pov-empty" role="status">
             No POV change has been adopted — the gate adopted nothing rather than fabricating churn.

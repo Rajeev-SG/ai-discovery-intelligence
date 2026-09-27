@@ -15,7 +15,14 @@ import {
  * nothing). Reading-layer copy shows human labels and links; raw event ids and
  * significance stay in the technical details.
  */
-export function PovChangelog({ revisions }: { revisions: PovRevision[] }) {
+export function PovChangelog({
+  revisions,
+  labels,
+}: {
+  revisions: PovRevision[];
+  /** proposition id -> human label (issue #69: ids out of the reading layer). */
+  labels?: Record<string, string>;
+}) {
   if (!revisions.length) {
     return (
       <p className="pov-empty" role="status">
@@ -29,8 +36,8 @@ export function PovChangelog({ revisions }: { revisions: PovRevision[] }) {
       {revisions.map((revision) => (
         <li className="pov-change" key={`${revision.proposition_id}-${revision.changed_at}-${revision.event_id}`}>
           <header className="pov-change-head">
-            <a className="pov-change-prop" href={`/pov#${revision.proposition_id}`}>
-              {revision.proposition_id}
+            <a className="pov-change-prop" href={`/pov#${revision.proposition_id}`} title={revision.proposition_id}>
+              {labels?.[revision.proposition_id] ?? revision.proposition_id}
             </a>
             <span className="pov-change-date">{formatDateTime(revision.changed_at)}</span>
           </header>

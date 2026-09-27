@@ -246,27 +246,34 @@ export function ObservationPlane({ rows, registryVersion, lastReviewed, claimSur
   });
 
   const urlState: PlaneUrlState = useMemo(
-    () => ({
-      q: (table.state.globalFilter as string | undefined) ?? "",
-      sort: table.state.sorting as SortingState,
-      filters: Object.fromEntries(
-        (table.state.columnFilters as ColumnFiltersState).map((filter) => [
-          filter.id,
-          Array.isArray(filter.value) ? filter.value.map(String) : [String(filter.value)],
-        ]),
-      ),
-      expanded: Object.entries((table.state.expanded ?? {}) as Record<string, boolean>)
-        .filter(([, value]) => value)
-        .map(([id]) => id),
-      // Only persist column visibility when it differs from the default, so a
-      // pristine view stays a clean URL.
-      cols: isDefaultColumnVisibility(table) ? [] : table.getAllLeafColumns().filter((c) => c.getIsVisible()).map((c) => c.id),
-      // The open detail panel is shareable state: a stable platform URL (and,
-      // when opened from a finding link, the finding itself). Closing the panel
-      // clears both, returning the URL to the unfiltered view.
-      surface: drawerOpen && drawerRowId ? drawerRowId : "",
-      evidence: drawerOpen && drawerRowId ? (highlightClaimId ?? "") : "",
-    }),
+    () => {
+      const sorting = table.state.sorting as SortingState;
+      // The default sort (priority asc) is not state worth persisting: a pristine
+      // view keeps a clean URL, and Reset returns to it.
+      const isDefaultSort =
+        sorting.length === 1 && sorting[0].id === "priority" && !sorting[0].desc;
+      return {
+        q: (table.state.globalFilter as string | undefined) ?? "",
+        sort: isDefaultSort ? [] : sorting,
+        filters: Object.fromEntries(
+          (table.state.columnFilters as ColumnFiltersState).map((filter) => [
+            filter.id,
+            Array.isArray(filter.value) ? filter.value.map(String) : [String(filter.value)],
+          ]),
+        ),
+        expanded: Object.entries((table.state.expanded ?? {}) as Record<string, boolean>)
+          .filter(([, value]) => value)
+          .map(([id]) => id),
+        // Only persist column visibility when it differs from the default, so a
+        // pristine view stays a clean URL.
+        cols: isDefaultColumnVisibility(table) ? [] : table.getAllLeafColumns().filter((c) => c.getIsVisible()).map((c) => c.id),
+        // The open detail panel is shareable state: a stable platform URL (and,
+        // when opened from a finding link, the finding itself). Closing the panel
+        // clears both, returning the URL to the unfiltered view.
+        surface: drawerOpen && drawerRowId ? drawerRowId : "",
+        evidence: drawerOpen && drawerRowId ? (highlightClaimId ?? "") : "",
+      };
+    },
     [table, allRows.length, drawerOpen, drawerRowId, highlightClaimId],
   );
 

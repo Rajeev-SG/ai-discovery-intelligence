@@ -39,7 +39,10 @@ export default function PovPage() {
 
       <section id="changelog" className="pov-history" aria-labelledby="pov-history-title">
         <h2 id="pov-history-title">Changelog</h2>
-        <PovChangelog revisions={view.changelog} />
+        <PovChangelog
+          revisions={view.changelog}
+          labels={Object.fromEntries(view.propositions.map((p) => [p.id, p.section || p.id]))}
+        />
       </section>
     </div>
   );

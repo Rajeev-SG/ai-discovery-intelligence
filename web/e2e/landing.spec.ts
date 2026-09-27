@@ -42,9 +42,10 @@ test("landing renders a single, well-formed state per section", async ({ page },
   await page.goto("/");
 
   // The front door answers the marketer's questions, not the analyst's feed
-  // (issue #61): above the fold states what the product is for, in marketer terms.
+  // (issue #61; copy reset per issue #69): above the fold states what the
+  // product is for, in marketer terms.
   const h1 = page.getByRole("heading", { level: 1 });
-  await expect(h1).toContainText(/AI discovery|discovery works/i);
+  await expect(h1).toContainText(/customers find and choose|AI changes/i);
   // The four questions are first-class and link to the four destinations.
   for (const q of ["home-q1", "home-q2", "home-q3", "home-q4"]) {
     await expect(page.getByTestId(q)).toBeVisible();

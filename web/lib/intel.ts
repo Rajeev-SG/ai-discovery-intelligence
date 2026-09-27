@@ -9,7 +9,7 @@
  * backend ("the brief service is not reachable right now"). It never invents
  * data: an error yields `status: "error"` and the view says so.
  */
-import { evidenceApiBase, type EvidenceEvent } from "./evidence";
+import { evidenceApiBase, fixtureMode, type EvidenceEvent } from "./evidence";
 
 export type IntelStatus = "ok" | "empty" | "error" | "unconfigured";
 
@@ -59,8 +59,60 @@ const NO_BASE = "EVIDENCE_API_URL is not configured";
  */
 export const INTEL_FETCH_TIMEOUT_MS = 2500;
 
+/**
+ * Recorded-fixture mode (EVIDENCE_FIXTURE=1) for the landing intelligence
+ * sections, mirroring the real `/events` and `/brief` payloads so the homepage
+ * can be tested structurally without a live backend (issue #69: the
+ * fixture-mode e2e suite must exercise the same paths as production). Static,
+ * recorded data only — never used in production.
+ */
+const FIXTURE_EVENTS: EvidenceEvent[] = [
+  {
+    id: "fx-event-1",
+    event_type: "crawler_policy",
+    title: "OpenAI documents how quickly its systems adjust after a robots.txt update.",
+    surfaces: ["chatgpt"],
+    claims: ["fx-crawler-1"],
+    evidence_urls: ["https://developers.openai.com/api/docs/bots"],
+    observed_at: "2026-09-19T16:00:00Z",
+  },
+  {
+    id: "fx-event-2",
+    event_type: "citation_share",
+    title: "SISTRIX reports weekly citation churn for ChatGPT and Google AI Mode.",
+    surfaces: ["chatgpt", "google-ai-mode"],
+    claims: ["fx-inline-2"],
+    observed_at: "2026-09-17T00:00:00Z",
+  },
+];
+
+const FIXTURE_BRIEF: Brief = {
+  state: "ready",
+  generated_at: "2026-09-20T06:00:00Z",
+  window_start: "2026-09-14",
+  window_end: "2026-09-20",
+  items: [
+    {
+      change: "OpenAI documents that search results adjust within about a day of a robots.txt update.",
+      why_it_matters:
+        "Search eligibility and AI-training policy are separate controls; a blocking decision takes effect quickly once corrected.",
+      agency_action:
+        "Record the deliberate allow/block decision per documented crawler user-agent, then verify on priority pages.",
+      confidence: "medium",
+      significance: 3.63,
+      evidence_ids: ["fx-crawler-1"],
+      surfaces: ["chatgpt"],
+      is_watch_item: false,
+      observed_at: "2026-09-19T16:00:00Z",
+    },
+  ],
+};
+
 /** Latest material change events, newest first. */
 export async function fetchEvents(): Promise<EventsOutcome> {
+  if (fixtureMode()) {
+    return { status: "ok", items: FIXTURE_EVENTS };
+  }
   if (!evidenceApiBase()) {
     console.error(`[intel] GET /events skipped: ${NO_BASE}`);
     return { status: "unconfigured", items: [] };
@@ -85,6 +137,9 @@ export async function fetchEvents(): Promise<EventsOutcome> {
 
 /** The current weekly executive brief. */
 export async function fetchBrief(): Promise<BriefOutcome> {
+  if (fixtureMode()) {
+    return { status: "ok", brief: FIXTURE_BRIEF };
+  }
   if (!evidenceApiBase()) {
     console.error(`[intel] GET /brief skipped: ${NO_BASE}`);
     return { status: "unconfigured", brief: null };

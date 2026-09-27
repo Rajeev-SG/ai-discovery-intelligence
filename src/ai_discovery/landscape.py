@@ -57,6 +57,11 @@ COMPARISON_DIMENSIONS: tuple[str, ...] = (
 
 assert set(COMPARISON_DIMENSIONS) <= set(MECHANICS_DIMENSIONS)
 
+#: Issue #69: Google AI Overviews dominates current recorded change volume and is
+#: treated elsewhere as a core platform, so it belongs in the curated landscape
+#: even though its consumer journey differs from a conversational assistant.
+LANDSCAPE_IDS = LANDSCAPE_IDS + ("google-ai-overviews",)
+
 
 class LandscapeSurface(BaseModel):
     """One marketer-facing landscape row."""
