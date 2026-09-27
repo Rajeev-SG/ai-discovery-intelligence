@@ -50,6 +50,8 @@ export interface MechanicsEvidence {
 
 /** One persisted reconciliation record, as the backend emitted it (never re-derived). */
 export interface ReconciliationRecord {
+  /** Stable relationship id (issue #69) — used for dedupe and deep links. */
+  id?: string;
   claim_ids: string[];
   state: string;
   relationship: string;

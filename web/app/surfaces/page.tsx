@@ -24,11 +24,20 @@ export default async function SurfacesPage() {
   // plane keeps its explicit no-evidence state.
   const bySurface = await fetchSurfaceEvidence();
   const withEvidence = applyEvidence(rows, bySurface);
+  // claim_id -> surface ids, so a shared `?evidence=<claim>` link opens the
+  // detail panel of the surface that actually carries the finding (issue #69).
+  const claimSurfaces: Record<string, string[]> = {};
+  for (const [surfaceId, evidence] of Object.entries(bySurface)) {
+    for (const claim of evidence.claims ?? []) {
+      (claimSurfaces[claim.claim_id] ??= []).push(surfaceId);
+    }
+  }
   return (
     <ObservationPlane
       rows={withEvidence}
       registryVersion={registry.version}
       lastReviewed={registry.lastReviewed}
+      claimSurfaces={claimSurfaces}
     />
   );
 }

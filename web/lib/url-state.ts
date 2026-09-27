@@ -1,7 +1,11 @@
 /**
  * URL state for the observation plane. Only meaningful, shareable state is
- * persisted: search, sorting, column filters, expanded rows and visible
- * columns. Everything else stays out of the URL.
+ * persisted: search, sorting, column filters, expanded rows, visible columns,
+ * and — since issue #69 — the selected platform (`surface`) and the selected
+ * finding (`evidence`) when a detail panel is open. Everything else stays out
+ * of the URL. `surface`/`evidence` are consumed from an incoming shared link
+ * before the URL is canonicalised, so links to a platform or a finding open
+ * the thing they promise and survive reload and back/forward.
  */
 export interface PlaneUrlState {
   q: string;
@@ -9,6 +13,10 @@ export interface PlaneUrlState {
   filters: Record<string, string[]>;
   expanded: string[];
   cols: string[];
+  /** A platform detail panel opened for this surface id (stable platform URL). */
+  surface: string;
+  /** A specific finding/claim highlighted inside the open detail panel. */
+  evidence: string;
 }
 
 export const EMPTY_URL_STATE: PlaneUrlState = {
@@ -17,6 +25,8 @@ export const EMPTY_URL_STATE: PlaneUrlState = {
   filters: {},
   expanded: [],
   cols: [],
+  surface: "",
+  evidence: "",
 };
 
 function parsePairs(raw: string | null): Array<{ id: string; desc: boolean }> {
@@ -43,6 +53,8 @@ export function encodeUrlState(state: PlaneUrlState): string {
   }
   if (state.expanded.length) params.set("expanded", [...state.expanded].sort().join(","));
   if (state.cols.length) params.set("cols", state.cols.join(","));
+  if (state.surface.trim()) params.set("surface", state.surface.trim());
+  if (state.evidence.trim()) params.set("evidence", state.evidence.trim());
   return params.toString();
 }
 
@@ -74,6 +86,8 @@ export function decodeUrlState(params: URLSearchParams | Record<string, string |
       .split(",")
       .map((v) => v.trim())
       .filter(Boolean),
+    surface: (get("surface") ?? "").trim(),
+    evidence: (get("evidence") ?? "").trim(),
   };
 }
 

@@ -41,18 +41,17 @@ export default async function Page() {
     <div className="landing home">
       <header className="landing-hero">
         <p className="eyebrow">AI Discovery Intelligence</p>
-        <h1>How AI discovery works — and what it means for you</h1>
+        <h1>Understand how AI changes the way customers find and choose your brand</h1>
         <p className="landing-subtitle">
-          A source-backed read on the consumer AI platforms that now answer questions,
-          how each finds, retrieves and cites information, how strong the evidence is,
-          and what a marketer should do about it.
+          Learn which platforms matter, how they select information, and what your
+          marketing team can do next — each finding backed by its public source.
         </p>
         <nav className="landing-actions" aria-label="Landing navigation">
           <Link className="landing-button" href="/landscape">
-            Start with the landscape
+            Understand the landscape
           </Link>
-          <Link className="landing-link" href="/surfaces">
-            Explore all surfaces →
+          <Link className="landing-link" href="#latest">
+            See the latest developments →
           </Link>
         </nav>
       </header>
@@ -71,14 +70,14 @@ export default async function Page() {
         />
       </section>
 
-      <section className="landing-section home-latest" aria-labelledby="home-latest-title" data-testid="home-latest-title">
+      <section id="latest" className="landing-section home-latest" aria-labelledby="home-latest-title" data-testid="home-latest-title">
         <header className="landing-section-head">
           <div>
-            <p className="eyebrow">Returning users</p>
-            <h2 id="home-latest-title">Latest changes and the weekly brief</h2>
+            <p className="eyebrow">Latest developments</p>
+            <h2 id="home-latest-title">What changed, and what we believe now</h2>
             <p className="landing-lede">
-              What changed recently and what the standing position currently says. Useful
-              intelligence for returning readers, not the front door.
+              Recent platform developments, the weekly brief and the current standing
+              position. New here? Start with the four questions above.
             </p>
           </div>
         </header>

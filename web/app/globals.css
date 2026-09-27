@@ -32,7 +32,9 @@ body {
 }
 
 a { color: var(--accent); }
-code { font-family: var(--mono); font-size: 0.92em; }
+/* Issue #69: long technical identifiers must never spill out of their card or
+   force the page wide; wrapping is local to the element. */
+code { font-family: var(--mono); font-size: 0.92em; overflow-wrap: anywhere; word-break: break-word; }
 
 .sr-only {
   position: absolute;
@@ -379,7 +381,9 @@ main { flex: 1; }
   position: fixed;
   top: 0; right: 0; bottom: 0;
   z-index: 90;
-  width: min(560px, 96vw);
+  /* Issue #69: a book-sized profile does not fit a 560px column; give the
+     full detail panel room to read while staying a panel. */
+  width: min(760px, 96vw);
   background: #0f161f;
   border-left: 1px solid var(--border);
   box-shadow: -24px 0 60px rgba(0, 0, 0, 0.6);
@@ -414,6 +418,8 @@ main { flex: 1; }
 /* Evidence drill-down (issue #46) */
 .evidence-claims { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
 .evidence-claim { border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; background: var(--bg-raised); }
+/* A finding opened from a direct `?evidence=` link is marked on arrival. */
+.evidence-claim.is-highlighted { border-left: 3px solid var(--accent); background: #12212c; }
 .evidence-claim-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .evidence-claim-index { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
 .chip-confidence { background: var(--accent-soft); border-color: rgba(87, 182, 255, 0.4); }
@@ -761,7 +767,9 @@ main { flex: 1; }
   .landing { padding: 18px 16px 40px; }
   .landing-hero h1 { font-size: 25px; }
   .site-nav { gap: 12px; padding: 10px 16px; }
-  .site-nav ul { gap: 12px; }
+  /* Issue #69: compact on mobile without dropping destinations — one
+     scrollable row instead of a 134px wrapped stack. */
+  .site-nav ul { gap: 12px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
   .pov-summary { grid-template-columns: 1fr; }
   .change-meta { flex: 1 1 100%; }
   .change-row { flex-wrap: wrap; gap: 4px 12px; }
@@ -866,7 +874,7 @@ main { flex: 1; }
 .impl-list { display: flex; flex-direction: column; gap: 28px; margin-top: 24px; }
 .impl-section h2 { margin: 0 0 6px; font-size: 18px; }
 .impl-intro { margin: 0 0 14px; color: var(--text-muted); font-size: 13px; line-height: 1.6; max-width: 760px; }
-.impl-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+.impl-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 14px; }
 .impl-card {
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -886,14 +894,16 @@ main { flex: 1; }
 .chip.impl-actionability.actionability-medium { background: #241f10; color: #e0c48a; }
 .chip.impl-actionability.actionability-low { background: #20242a; color: #9aa5b1; }
 .impl-action { margin: 0; font-size: 14px; line-height: 1.55; font-weight: 500; }
-.impl-rationale, .impl-scope, .impl-evidence-line { margin: 0; font-size: 12px; line-height: 1.55; color: var(--text-muted); }
+.impl-rationale, .impl-scope, .impl-evidence-line { margin: 0; font-size: 13px; line-height: 1.55; color: var(--text-muted); }
 .impl-evidence-line code { margin-right: 6px; background: #14181f; padding: 1px 5px; border-radius: 4px; font-size: 11px; }
 .impl-surface-link { margin-right: 8px; }
 .impl-technical summary { font-size: 12px; color: var(--text-muted); cursor: pointer; }
 .impl-technical-line { font-size: 11px; color: var(--text-muted); line-height: 1.55; margin: 6px 0 0; }
-.impl-note { margin: 0; font-size: 11px; color: var(--text-muted); font-style: italic; }
+.impl-note { margin: 0; font-size: 12px; color: var(--text-muted); font-style: italic; }
 .impl-monitor-list { margin: 8px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.7; color: var(--text-muted); }
+.impl-monitor-details summary { cursor: pointer; color: var(--accent); font-size: 13px; }
 .impl-empty { margin-top: 24px; color: var(--text-muted); font-size: 14px; }
+.impl-source-link { overflow-wrap: anywhere; }
 
 @media (max-width: 640px) {
   .impl-page { padding: 18px 16px 40px; }
@@ -909,7 +919,18 @@ main { flex: 1; }
 .landscape-section { margin-top: 28px; }
 .landscape-section h2 { margin: 0 0 6px; font-size: 18px; }
 .landscape-section-note { margin: 0 0 16px; color: var(--text-muted); font-size: 13px; line-height: 1.6; max-width: 800px; }
-.landscape-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+.landscape-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap: 14px; }
+/* Issue #69: an unaccepted comparison click explains the cap immediately. */
+.landscape-cap-notice {
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-left: 3px solid #e0c48a;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+}
 .landscape-card { border: 1px solid var(--border); border-radius: 10px; padding: 14px; background: var(--surface); display: flex; flex-direction: column; gap: 8px; }
 .landscape-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
 .landscape-card-head h3 { margin: 0; font-size: 16px; }
@@ -954,7 +975,9 @@ main { flex: 1; }
 /* Marketer-first front door (issue #61).                                 */
 /* ---------------------------------------------------------------------- */
 .home-questions-section { margin-top: 8px; }
-.home-questions { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; counter-reset: q; }
+/* Issue #69: four questions read as a balanced 2×2 on desktop — the previous
+   auto-fill grid stranded the fourth card on its own row. */
+.home-questions { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; counter-reset: q; }
 .home-question { display: flex; gap: 12px; border: 1px solid var(--border); border-radius: 10px; padding: 14px; background: var(--surface); }
 .home-question-n { flex: 0 0 auto; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: #16212e; color: #8fbde8; }
 .home-question-body { display: flex; flex-direction: column; gap: 4px; }

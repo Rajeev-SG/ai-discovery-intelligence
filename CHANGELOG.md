@@ -2,6 +2,41 @@
 
 This file records repository/product changes. The generated intelligence changelog will live separately in the canonical data store and `pov/CHANGELOG.md` once implemented.
 
+## 2026-09-27 (issue #69)
+
+- **Evidence-to-conclusion accuracy (P0).** A finding now lights a mechanics
+  dimension only when its own text answers that dimension's question:
+  `search_trigger`/`retrieval_provider`/`query_rewrite` are content-gated (a
+  citation-decline trend, a retriever benchmark or a model release no longer
+  fills them), `freshness_recrawl` no longer treats a robots-policy adjustment
+  timing as a recrawl window, and local reservation/booking language gates
+  `local_retrieval`. Reach figures are restricted to audience-size/market-share
+  metrics (an ad-dislike survey and usage minutes are no longer "reach"), and
+  metric labels are truncated at a word boundary instead of a hard 40-char cut.
+- **URL state contract.** `?surface=` and `?evidence=` are now part of the
+  observation-plane URL state: platform/finding links open the intended detail
+  panel, survive reload and back/forward, and reset returns to the genuinely
+  unfiltered view (including column visibility).
+- **Reconciliation eligibility + deduplication.** Persisted comparison pairs only
+  claims reporting the same metric in the same unit family on the same surface,
+  never compares a claim's own metrics to each other, normalises compatible unit
+  spellings, gives every relationship a stable id, and deduplicates the
+  per-claim index (no more repeated "methodologically incomparable" cards).
+- **IA/navigation.** Evidence reconciliation is removed from the public
+  navigation (kept as an internal research view, deep-linkable by record id);
+  navigation gains an `aria-current` active state; the homepage anchor and the
+  POV changelog proposition links now resolve.
+- **Reading-layer content.** Raw claim-id strips are replaced by readable
+  publisher citations on implication cards; significance scores move behind
+  technical disclosure; internal design notes and `pov/state.yaml` source paths
+  are removed from public copy; duplicate claim records are collapsed in the
+  evidence drill-down.
+- **UI repairs.** Implications/landscape grid overflow fixed (`minmax(min(...))`),
+  code identifiers wrap instead of spilling, the detail panel is wider
+  (760px) and evidence-first with the duplicated registry-notes section removed,
+  comparison cap clicks explain the limit immediately, mobile nav is compact,
+  and `/favicon.ico` resolves.
+
 ## 2026-09-20 (issue #61)
 
 - **Marketer-first information architecture.** The homepage now answers the four

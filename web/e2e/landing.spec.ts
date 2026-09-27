@@ -74,7 +74,7 @@ test("landing renders a single, well-formed state per section", async ({ page },
   await expect(secondaryList.getByRole("link", { name: "Evidence reconciliation" })).toBeVisible();
 
   // Latest changes / weekly brief are demoted below the questions.
-  await expect(page.getByTestId("home-latest-title")).toContainText(/Latest changes/i);
+  await expect(page.getByTestId("home-latest-title")).toContainText(/What changed/i);
 
   // The stale "awaiting ingestion" copy is nowhere on the landing.
   expect(await page.locator("body").innerText()).not.toContain("awaiting ingestion");

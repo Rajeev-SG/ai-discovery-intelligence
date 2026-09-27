@@ -2,6 +2,7 @@ import Link from "next/link";
 import { clampText, type BriefOutcome, type BriefItem } from "@/lib/intel";
 import { formatDate } from "@/lib/evidence";
 import { CONFIDENCE_LABELS, evidenceHref, type ConfidenceLabel } from "@/lib/pov";
+import { surfaceName } from "@/lib/surface-names";
 
 /**
  * Weekly executive brief (issue #45). Renders the real `GET /brief` output:
@@ -23,21 +24,24 @@ function BriefCard({ item }: { item: BriefItem }) {
     <li className="brief-item" data-testid="brief-item">
       <div className="brief-item-head">
         <span className="pill brief-confidence">confidence: {confidenceLabel(item.confidence)}</span>
-        <span className="pill brief-significance">significance {item.significance.toFixed(2)}</span>
         {item.is_watch_item ? <span className="pill brief-watch">watch item</span> : null}
         {item.surfaces.map((surface) => (
           <Link
             className="pill pill-surface"
             key={surface}
-            href={`/surfaces?q=${encodeURIComponent(surface)}`}
+            href={`/surfaces?surface=${encodeURIComponent(surface)}`}
           >
-            {surface}
+            {surfaceName(surface)}
           </Link>
         ))}
       </div>
       <p className="brief-change">{clampText(item.change)}</p>
       <details className="brief-why-details">
         <summary>Why it matters &amp; what to do</summary>
+        <p className="brief-significance muted">
+          Significance {item.significance.toFixed(2)} — a screening score for what the
+          agency gate adopted; it is not a business impact estimate.
+        </p>
         <dl className="brief-why">
           <div>
             <dt>Why it matters</dt>

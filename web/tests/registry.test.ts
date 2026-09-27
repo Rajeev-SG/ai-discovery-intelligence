@@ -102,6 +102,8 @@ describe("URL state", () => {
       filters: { regions: ["china"], retrieval: ["Under-documented"] },
       expanded: ["deepseek-chat"],
       cols: ["name", "regions"],
+      surface: "",
+      evidence: "",
     };
     const encoded = encodeUrlState(state);
     const decoded = decodeUrlState(new URLSearchParams(encoded));
@@ -112,7 +114,25 @@ describe("URL state", () => {
     expect(decoded.cols).toEqual(state.cols);
   });
 
+  it("round-trips a selected platform and finding (issue #69)", () => {
+    const state = {
+      q: "",
+      sort: [],
+      filters: {},
+      expanded: [],
+      cols: [],
+      surface: "chatgpt",
+      evidence: "0b187a5b6f942c1d",
+    };
+    const encoded = encodeUrlState(state);
+    expect(encoded).toContain("surface=chatgpt");
+    expect(encoded).toContain(`evidence=${encodeURIComponent("0b187a5b6f942c1d")}`);
+    const decoded = decodeUrlState(new URLSearchParams(encoded));
+    expect(decoded.surface).toBe("chatgpt");
+    expect(decoded.evidence).toBe("0b187a5b6f942c1d");
+  });
+
   it("encodes nothing when pristine", () => {
-    expect(encodeUrlState({ q: "", sort: [], filters: {}, expanded: [], cols: [] })).toBe("");
+    expect(encodeUrlState({ q: "", sort: [], filters: {}, expanded: [], cols: [], surface: "", evidence: "" })).toBe("");
   });
 });

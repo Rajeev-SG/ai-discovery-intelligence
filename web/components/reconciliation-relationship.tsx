@@ -123,6 +123,7 @@ export function ReconciliationRelationship({ relationship }: { relationship: Res
   const { item, sides } = relationship;
   return (
     <article
+      id={item.id}
       className={`recon-rel recon-rel-${relationship.category}${relationship.contested ? " recon-rel-contested" : ""}`}
       data-testid="recon-rel"
       data-state={item.state}

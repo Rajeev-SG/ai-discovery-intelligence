@@ -2,6 +2,7 @@ import Link from "next/link";
 import { changeWindow, eventTypeLabel, type EventsOutcome } from "@/lib/intel";
 import { formatDate } from "@/lib/evidence";
 import { evidenceHref } from "@/lib/pov";
+import { surfaceName } from "@/lib/surface-names";
 
 /**
  * Latest material changes (issue #45). Renders the newest persisted change
@@ -38,7 +39,7 @@ export function LandingChanges({ outcome }: { outcome: EventsOutcome }) {
           <p className="eyebrow">Latest material changes</p>
           <h2 id="landing-changes-title">What changed</h2>
           <p className="landing-lede">
-            The newest persisted change events against the surface registry, newest first.
+            Recent developments across the platforms we track, newest first.
           </p>
         </div>
       </header>
@@ -68,9 +69,9 @@ export function LandingChanges({ outcome }: { outcome: EventsOutcome }) {
                         <span className="change-surfaces-inline">
                           <Link
                             className="change-surface-link"
-                            href={`/surfaces?q=${encodeURIComponent(surfaces[0])}`}
+                            href={`/surfaces?surface=${encodeURIComponent(surfaces[0])}`}
                           >
-                            {surfaces[0]}
+                            {surfaceName(surfaces[0])}
                           </Link>
                           {surfaces.length > 1 ? ` +${surfaces.length - 1}` : ""}
                         </span>
@@ -96,7 +97,7 @@ export function LandingChanges({ outcome }: { outcome: EventsOutcome }) {
           {truncated ? (
             <p className="change-truncation" data-testid="changes-truncation">
               Showing the newest {HOW_MANY} of {total} changes.{" "}
-              <Link href="/surfaces">All changes in Explore surfaces →</Link>
+              <Link href="/pov#changelog">Full change history →</Link>
             </p>
           ) : null}
         </>

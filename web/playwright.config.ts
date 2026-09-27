@@ -18,7 +18,10 @@ export default defineConfig({
     timeout: 30_000,
   },
   projects: [
-    { name: "desktop-chromium", use: { ...devices["Desktop Chrome"] } },
-    { name: "mobile-chromium", use: { ...devices["Pixel 7"] } },
+    // PLAYWRIGHT_CHANNEL=chrome runs the suite against the system Chrome. Used on
+    // hosts where Playwright's bundled chromium cannot be installed (e.g. macOS 12);
+    // CI and default runs keep the bundled browser.
+    { name: "desktop-chromium", use: { ...devices["Desktop Chrome"], ...(process.env.PLAYWRIGHT_CHANNEL ? { channel: process.env.PLAYWRIGHT_CHANNEL } : {}) } },
+    { name: "mobile-chromium", use: { ...devices["Pixel 7"], ...(process.env.PLAYWRIGHT_CHANNEL ? { channel: process.env.PLAYWRIGHT_CHANNEL } : {}) } },
   ],
 });

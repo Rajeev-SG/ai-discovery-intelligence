@@ -57,12 +57,16 @@ function ValueRow({ value }: { value: EvidenceValue }) {
   );
 }
 
-function ClaimCard({ claim, index }: { claim: EvidenceClaim; index: number }) {
+function ClaimCard({ claim, index, highlighted }: { claim: EvidenceClaim; index: number; highlighted?: boolean }) {
   const detail = claim.confidence_detail;
   const rationale = detail?.rationale ?? [];
   const inputs = Object.entries(detail?.inputs ?? {});
   return (
-    <li className="evidence-claim" data-testid={`claim-${claim.claim_id}`}>
+    <li
+      className={`evidence-claim${highlighted ? " is-highlighted" : ""}`}
+      data-testid={`claim-${claim.claim_id}`}
+      tabIndex={-1}
+    >
       <header className="evidence-claim-head">
         <span className="evidence-claim-index">Claim {index + 1}</span>
         <span className="chip">{claim.topic}</span>
@@ -252,7 +256,7 @@ function LatestChange({ evidence }: { evidence: SurfaceEvidence }) {
  * history. Technical provenance is collapsed by default so the top stays a
  * concise summary.
  */
-export function EvidenceDetail({ surfaceId, summary }: { surfaceId: string; summary?: SurfaceEvidence }) {
+export function EvidenceDetail({ surfaceId, summary, highlightClaimId }: { surfaceId: string; summary?: SurfaceEvidence; highlightClaimId?: string | null }) {
   const [detail, setDetail] = useState<SurfaceDetail | null>(
     summary
       ? { evidence: summary, status: { evidence: "skipped", claims: "skipped", events: "skipped" } }
@@ -273,6 +277,17 @@ export function EvidenceDetail({ surfaceId, summary }: { surfaceId: string; summ
       active = false;
     };
   }, [surfaceId]);
+
+  // Issue #69: an `?evidence=<claim>` link opens the panel on that finding —
+  // scroll it into view once the detail payload has loaded.
+  useEffect(() => {
+    if (!detail || !highlightClaimId) return;
+    const node = document.querySelector<HTMLElement>(`[data-testid="claim-${CSS.escape(highlightClaimId)}"]`);
+    if (node) {
+      node.scrollIntoView({ block: "start" });
+      node.focus({ preventScroll: true });
+    }
+  }, [detail, highlightClaimId]);
 
   if (error) {
     return (
@@ -297,7 +312,21 @@ export function EvidenceDetail({ surfaceId, summary }: { surfaceId: string; summ
   }
 
   const { evidence, status } = detail;
-  const claims = evidence.claims ?? [];
+  // Issue #69: duplicate claim records inflated the visible evidence counts
+  // (e.g. several versions of the same CTR statement). Collapse records with an
+  // identical statement AND identical metric values to one card.
+  const allClaims = evidence.claims ?? [];
+  const seenKeys = new Set<string>();
+  const claims = allClaims.filter((claim) => {
+    const key = `${claim.statement ?? ""}|${(claim.value ?? [])
+      .map((v) => `${v.label}|${v.value_number ?? v.value_text ?? ""}|${v.unit ?? ""}`)
+      .sort()
+      .join(";")}`;
+    if (seenKeys.has(key)) return false;
+    seenKeys.add(key);
+    return true;
+  });
+  const duplicatesRemoved = allClaims.length - claims.length;
   const lead = leadingClaim(claims);
   const hasEvents = (evidence.history?.length ?? 0) > 0;
 
@@ -340,6 +369,7 @@ export function EvidenceDetail({ surfaceId, summary }: { surfaceId: string; summ
           <strong>
             {claims.length} validated claim{claims.length === 1 ? "" : "s"}.
           </strong>{" "}
+          {duplicatesRemoved > 0 ? `${duplicatesRemoved} duplicate record${duplicatesRemoved === 1 ? "" : "s"} collapsed. ` : null}
           {lead
             ? `Leading confidence ${lead.confidence}${
                 lead.confidence_detail.score != null ? ` (${lead.confidence_detail.score})` : ""
@@ -348,7 +378,12 @@ export function EvidenceDetail({ surfaceId, summary }: { surfaceId: string; summ
         </p>
         <ul className="evidence-claims" data-testid="evidence-claims">
           {claims.map((claim, index) => (
-            <ClaimCard key={claim.claim_id} claim={claim} index={index} />
+            <ClaimCard
+              key={claim.claim_id}
+              claim={claim}
+              index={index}
+              highlighted={Boolean(highlightClaimId) && claim.claim_id === highlightClaimId}
+            />
           ))}
         </ul>
       </section>

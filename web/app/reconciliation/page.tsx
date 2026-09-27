@@ -24,10 +24,11 @@ export default async function ReconciliationPage() {
       <header className="recon-header">
         <h1>Reconciled evidence</h1>
         <p className="recon-intro">
-          The agency reconciles every validated claim against the others. Each relationship below
-          is persisted, not inferred in the browser: it records how the findings relate, which
-          context dimensions differ or are unknown, the agency&rsquo;s interpretation, and the
-          confidence adjustment that follows.
+          An internal research view: it records how validated findings relate —
+          agreeing, updating, superseding, contradicting or merely measured
+          differently — so conclusions elsewhere can show their caveats at the
+          point of need. It is not part of the briefing experience; the
+          decision-ready reading lives on the Landscape and Implications pages.
         </p>
         {reconciliation && (
           <p className="recon-source" data-testid="recon-total">

@@ -9,6 +9,11 @@ import {
 /**
  * The POV change history, chronological (oldest first — the projection sorts it).
  * An empty changelog is a valid, visible outcome: "no POV change".
+ *
+ * Issue #69: the proposition link always targets `/pov#<id>` — a bare `#id`
+ * here silently targeted the *current* page (on the homepage it matched
+ * nothing). Reading-layer copy shows human labels and links; raw event ids and
+ * significance stay in the technical details.
  */
 export function PovChangelog({ revisions }: { revisions: PovRevision[] }) {
   if (!revisions.length) {
@@ -24,21 +29,25 @@ export function PovChangelog({ revisions }: { revisions: PovRevision[] }) {
       {revisions.map((revision) => (
         <li className="pov-change" key={`${revision.proposition_id}-${revision.changed_at}-${revision.event_id}`}>
           <header className="pov-change-head">
-            <a className="pov-change-prop" href={`#${revision.proposition_id}`}>
+            <a className="pov-change-prop" href={`/pov#${revision.proposition_id}`}>
               {revision.proposition_id}
             </a>
             <span className="pov-change-date">{formatDateTime(revision.changed_at)}</span>
           </header>
           <p className="pov-change-reason">{revision.reason}</p>
           <p className="pov-change-meta">
-            <span className="pill">significance {revision.significance.toFixed(2)}</span>
             <span className={`pill pov-conf-${revision.confidence}`}>
               confidence: {CONFIDENCE_LABELS[revision.confidence as ConfidenceLabel] ?? revision.confidence}
             </span>
-            {revision.event_id ? <span className="pov-change-event">event {revision.event_id}</span> : null}
           </p>
           <details className="pov-change-statement">
-            <summary>Before → after</summary>
+            <summary>Before → after &amp; method</summary>
+            <p className="pov-change-method">
+              {revision.evidence_ids.length
+                ? `${revision.evidence_ids.length} supporting observation${revision.evidence_ids.length === 1 ? "" : "s"}.`
+                : null}{" "}
+              Significance {revision.significance.toFixed(2)}.
+            </p>
             <div className="pov-diff">
               <div>
                 <h3>Before</h3>
@@ -52,12 +61,7 @@ export function PovChangelog({ revisions }: { revisions: PovRevision[] }) {
           </details>
           {revision.evidence_ids.length ? (
             <p className="pov-change-evidence">
-              Evidence:{" "}
-              {revision.evidence_ids.map((id) => (
-                <a key={id} href={evidenceHref(id)}>
-                  {id.slice(0, 12)}
-                </a>
-              ))}
+              <a href={evidenceHref(revision.evidence_ids[0])}>See the evidence →</a>
             </p>
           ) : null}
         </li>

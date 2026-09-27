@@ -28,6 +28,12 @@ interface ObservationPlaneProps {
   rows: SurfaceRow[];
   registryVersion: number;
   lastReviewed: string;
+  /**
+   * claim_id -> surface ids holding it (from the bulk evidence payload). Lets an
+   * incoming `?evidence=<claim>` link open the detail panel of the surface that
+   * actually carries the finding (issue #69: links must deliver their promise).
+   */
+  claimSurfaces?: Record<string, string[]>;
 }
 
 function titleise(value: string): string {
@@ -196,13 +202,23 @@ const FACETS: Array<{ id: string; label: string; testId: string; labelFor: (valu
   { id: "retrieval", label: "Retrieval status", testId: "retrieval", labelFor: (v) => v },
 ];
 
-export function ObservationPlane({ rows, registryVersion, lastReviewed }: ObservationPlaneProps) {
+export function ObservationPlane({ rows, registryVersion, lastReviewed, claimSurfaces = {} }: ObservationPlaneProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const initial = useMemo(() => decodeUrlState(searchParams), []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const [drawerRowId, setDrawerRowId] = useState<string | null>(initial.expanded[0] ?? null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  // Incoming shared links are consumed ONCE before the URL is canonicalised
+  // (issue #69): `?surface=` opens that platform's detail panel; `?evidence=`
+  // resolves the claim to its surface via the bulk evidence payload and opens
+  // the panel on that finding. The drawer selection is then persisted in the
+  // URL so reload and back/forward keep it.
+  const initialSurface =
+    initial.surface || (initial.evidence ? (claimSurfaces[initial.evidence]?.[0] ?? "") : "");
+  const [drawerRowId, setDrawerRowId] = useState<string | null>(initial.expanded[0] ?? initialSurface ?? null);
+  const [drawerOpen, setDrawerOpen] = useState(
+    Boolean(initialSurface) && rows.some((row) => row.id === initialSurface),
+  );
+  const [highlightClaimId, setHighlightClaimId] = useState<string | null>(initial.evidence || null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const table = useTable({
@@ -245,8 +261,13 @@ export function ObservationPlane({ rows, registryVersion, lastReviewed }: Observ
       // Only persist column visibility when it differs from the default, so a
       // pristine view stays a clean URL.
       cols: isDefaultColumnVisibility(table) ? [] : table.getAllLeafColumns().filter((c) => c.getIsVisible()).map((c) => c.id),
+      // The open detail panel is shareable state: a stable platform URL (and,
+      // when opened from a finding link, the finding itself). Closing the panel
+      // clears both, returning the URL to the unfiltered view.
+      surface: drawerOpen && drawerRowId ? drawerRowId : "",
+      evidence: drawerOpen && drawerRowId ? (highlightClaimId ?? "") : "",
     }),
-    [table, allRows.length],
+    [table, allRows.length, drawerOpen, drawerRowId, highlightClaimId],
   );
 
   // Keep the URL shareable. `history.replaceState` is used rather than a Next
@@ -294,8 +315,11 @@ export function ObservationPlane({ rows, registryVersion, lastReviewed }: Observ
     [table],
   );
 
-  const openDrawer = (rowId: string) => {
+  const openDrawer = (rowId: string, evidence?: string | null) => {
     setDrawerRowId(rowId);
+    // A user-initiated open starts at the platform profile; only a finding
+    // link (`?evidence=`) highlights a specific claim.
+    setHighlightClaimId(evidence ?? null);
     setDrawerOpen(true);
   };
   const drawerRow = rows.find((row) => row.id === drawerRowId) ?? null;
@@ -398,10 +422,15 @@ export function ObservationPlane({ rows, registryVersion, lastReviewed }: Observ
             className="link-button"
             data-testid="reset-all"
             onClick={() => {
-              table.resetGlobalFilter();
-              table.resetColumnFilters();
-              table.resetSorting();
+              // Issue #69: reset returns the plane to the UNFILTERED view. The
+              // previous `reset*()` helpers restored `initialState`, which was
+              // seeded from the URL — so URL-loaded state (q, facets) survived
+              // Reset. Set the defaults explicitly, including column visibility.
+              table.setGlobalFilter("");
+              table.setColumnFilters([]);
+              table.setSorting([{ id: "priority", desc: false }]);
               table.setExpanded({});
+              table.setColumnVisibility({});
             }}
           >
             Reset
@@ -611,7 +640,13 @@ export function ObservationPlane({ rows, registryVersion, lastReviewed }: Observ
         })}
       </ul>
 
-      <DetailDrawer row={drawerRow} open={drawerOpen} onOpenChange={setDrawerOpen} label="Surface detail" />
+      <DetailDrawer
+        row={drawerRow}
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        label="Surface detail"
+        highlightClaimId={drawerOpen ? highlightClaimId : null}
+      />
     </div>
   );
 }

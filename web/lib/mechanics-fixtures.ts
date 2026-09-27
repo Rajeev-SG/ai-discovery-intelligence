@@ -121,6 +121,7 @@ const CHATGPT: SurfaceMechanics = {
                 relationship: "new",
                 reconciliation: [
                   {
+                    id: "rec-fixture-inline-conflict",
                     claim_ids: ["fx-inline-2", "fx-inline-3"],
                     state: "material_conflict",
                     relationship: "contradicts",
