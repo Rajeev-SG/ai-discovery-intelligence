@@ -237,10 +237,12 @@ def test_view_exposes_no_private_snapshot_fields():
     blob = repr(view)
     for forbidden in ("snapshot_path", "capture_hash", "/var/", "/private/"):
         assert forbidden not in blob
-    # crawler_index_policy maps to crawling_indexing_controls, freshness_recrawl
-    # and marketer_controllable_inputs -> 3 known, 10 unknown.
-    assert view["coverage"]["unknown"] == 10
-    assert view["evidenced_dimension_count"] == 3
+    # crawler_index_policy maps to crawling_indexing_controls and (via the
+    # robots.txt content gate) marketer_controllable_inputs -> 2 known, 11
+    # unknown. A policy-adjustment statement is not a freshness/recrawl finding
+    # (issue #69), so freshness_recrawl stays unknown.
+    assert view["coverage"]["unknown"] == 11
+    assert view["evidenced_dimension_count"] == 2
 
 
 def test_view_carries_the_evidence_contract_fields():
@@ -278,7 +280,7 @@ def test_deepseek_alias_attaches_claim_to_canonical_surface():
     assert resolve_surface_id("deepseek") == "deepseek-chat"
     assert resolve_surface_id("naver-ai-tab") == "naver-ai"
     m = M.project_surface("deepseek-chat", [_claim(surfaces=("deepseek",))])
-    assert m.evidenced_dimension_count() == 3  # crawler_index_policy maps to 3 dims
+    assert m.evidenced_dimension_count() == 2  # crawler_index_policy maps to 2 dims (issue #69)
 
 
 def test_non_surface_values_are_not_coerced():
@@ -325,6 +327,96 @@ def test_social_and_local_stay_unknown_without_a_matching_signal():
     m = M.project_surface("chatgpt", [_claim(topic="citations_sources")])
     assert m.state_of("social_community_retrieval") == "unknown"
     assert m.state_of("local_retrieval") == "unknown"
+
+
+# --------------------------------------------------------------------------- #
+# Issue #69 P0: a finding must answer the dimension's question to be evidence
+# --------------------------------------------------------------------------- #
+
+
+def test_citation_decline_does_not_light_retrieval_trigger_provider_or_fanout():
+    """The audited Mobile.de case: a 66% citation-share decline is a citation
+    trend. It does not say when search fires, which index supplies results, or
+    how queries decompose."""
+
+    claim = _claim(
+        topic="retrieval_index",
+        statement="ChatGPT's citations of Mobile.de declined 66% over four months.",
+    )
+    m = M.project_surface("chatgpt", [claim])
+    assert m.state_of("search_trigger") == "unknown"
+    assert m.state_of("retrieval_provider") == "unknown"
+    assert m.state_of("query_rewrite") == "unknown"
+
+
+def test_retriever_benchmark_does_not_light_production_mechanics():
+    """The audited Perplexity case: publishing a retriever benchmark does not by
+    itself establish the consumer product's trigger, index or fan-out."""
+
+    claim = _claim(
+        surfaces=("perplexity",),
+        topic="retrieval_index",
+        statement="Perplexity Research published Q2D-Web, a first-stage retriever benchmark and leaderboard.",
+    )
+    m = M.project_surface("perplexity", [claim])
+    assert m.evidenced_dimension_count() == 0
+
+
+def test_trigger_provider_and_fanout_light_only_with_matching_language():
+    """Each retrieval dimension answers only when the claim's text addresses it."""
+
+    def d(statement):
+        return M.project_surface(
+            "chatgpt", [_claim(topic="retrieval_index", statement=statement)]
+        )
+
+    trigger = d("ChatGPT triggers a web search only when the prompt needs fresh information.")
+    provider = d("ChatGPT search retrieves results via an upstream search engine index supplied by Bing.")
+    fanout = d("Google AI Mode may use query fan-out, breaking the question into multiple sub-queries.")
+    noop = d("xAI released a new base model version for its assistant.")
+    assert trigger.state_of("search_trigger") == "known"
+    assert provider.state_of("retrieval_provider") == "known"
+    assert fanout.state_of("query_rewrite") == "known"
+    assert noop.evidenced_dimension_count() == 0
+
+
+def test_robots_policy_adjustment_is_not_a_freshness_finding():
+    """The audited ChatGPT case: '~24 hours to adjust after a robots.txt update'
+    is crawler-policy behaviour, not a content recrawl/freshness window."""
+
+    claim = _claim(
+        topic="crawler_index_policy",
+        statement="It can take approximately 24 hours for OpenAI's systems to adjust for search results after a site's robots.txt update.",
+    )
+    m = M.project_surface("chatgpt", [claim])
+    assert m.state_of("freshness_recrawl") == "unknown"
+    assert m.state_of("crawling_indexing_controls") == "known"
+    assert m.state_of("marketer_controllable_inputs") == "known"
+
+
+def test_genuine_recrawl_language_lights_freshness():
+    claim = _claim(
+        topic="crawler_index_policy",
+        statement="Googlebot recrawls updated pages within days; content freshness affects how soon changes appear.",
+    )
+    m = M.project_surface("chatgpt", [claim])
+    assert m.state_of("freshness_recrawl") == "known"
+
+
+def test_local_reservation_language_lights_local_retrieval():
+    """The audited NAVER case: a local reservation/booking mechanic is local
+    retrieval even without explicit 'sources from' phrasing."""
+
+    claim = _claim(
+        surfaces=("naver-ai",),
+        topic="retrieval_index",
+        statement="NAVER Map shows reservation slots for nearby restaurants, and bookings are tied to local places.",
+    )
+    m = M.project_surface("naver-ai", [claim])
+    assert m.state_of("local_retrieval") == "known"
+    # The generic statement lights nothing else (issue #69: no generic
+    # agentic-search line leading unrelated dimensions).
+    assert m.evidenced_dimension_count() == 1
 
 
 # --------------------------------------------------------------------------- #

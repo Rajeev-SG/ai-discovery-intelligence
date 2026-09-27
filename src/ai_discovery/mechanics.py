@@ -150,11 +150,21 @@ DIMENSION_TOPICS: dict[str, tuple[str, ...]] = {
     # topic that merely *might* relate (citations, commerce, optimisation) is
     # deliberately absent: it lights a dimension only through the explicit,
     # content-gated CLAIM_SIGNALS below, never by topic alone.
-    "search_trigger": ("retrieval_index",),
-    "retrieval_provider": ("retrieval_index",),
-    "query_rewrite": ("retrieval_index",),
+    #
+    # Issue #69 P0 remediation: NO dimension is lit by the coarse
+    # ``retrieval_index`` topic alone any more. A citation-share decline does
+    # not answer *when search fires*, *which index supplies results* or *how
+    # queries decompose*; a retriever benchmark does not establish a production
+    # index; a model release does not populate retrieval mechanics. These three
+    # dimensions are lit only through the content gates in CLAIM_SIGNALS.
+    "search_trigger": (),
+    "retrieval_provider": (),
+    "query_rewrite": (),
     "crawling_indexing_controls": ("crawler_index_policy",),
-    "freshness_recrawl": ("crawler_index_policy",),
+    # A robots.txt-policy adjustment timing (e.g. "~24 hours to adjust after a
+    # robots.txt change") is crawler *policy*, not a content freshness or
+    # recrawl guarantee: freshness_recrawl is lit only by a content gate.
+    "freshness_recrawl": (),
     "candidate_selection_reranking": (),
     "citation_presentation": (),
     "shopping_product_feed": (),
@@ -174,6 +184,60 @@ DIMENSION_TOPICS: dict[str, tuple[str, ...]] = {
 #: Deterministic and auditable by design — every gate is a stated pattern, and a
 #: new gate is a reviewed edit here, never a model judgement at request time.
 CLAIM_SIGNALS: dict[str, tuple[tuple[str, str], ...]] = {
+    # Issue #69 P0: these gates implement "a finding must answer the field's
+    # actual question before it can be marked known". Each pattern is a stated,
+    # auditable proxy for the dimension's question:
+    #   search_trigger        — WHEN/WHETHER the surface invokes search;
+    #   retrieval_provider    — WHICH index/engine supplies the results;
+    #   query_rewrite         — HOW the query is decomposed/rewritten (fan-out);
+    #   freshness_recrawl     — a recrawl/refresh behaviour for content, not a
+    #                           robots-policy adjustment timing.
+    "search_trigger": (
+        (
+            "retrieval_index",
+            (
+                r"\b(triggers?|triggered|triggering|initiat(?:es?|ing|ed)|invok\w+|fires?\b|"
+                r"fall(?:s|ing)? back|fallback|decid(?:es?|ing|ed) (?:to |whether )?(?:search|consult|query)|"
+                r"when (?:the |a |an |it )?(?:user|member|prompt|query|question)|"
+                r"(?:search|consult|quer(?:y|ies)) (?:the )?(?:web|internet|index) (?:only )?(?:when|if|for|instead)|"
+                r"only search|searches? the (?:web|internet)|real[- ]time|live (?:search|retriev\w+))\b"
+            ),
+        ),
+    ),
+    "retrieval_provider": (
+        (
+            "retrieval_index",
+            (
+                r"\b(search engine|web index|search index|(?:own|proprietary|internal|first[- ]party|"
+                r"third[- ]party|dedicated|upstream) (?:web |search )?index\w*|index(?:es|ing)? (?:of|built|maintained|powers?|supplie?s?|provide[ds]?)|"
+                r"powered by|built on|supplie[ds]? by|provided? by|via (?:bing|brave|google)|"
+                r"underlying (?:index|search|retriev\w+)|retriev\w+ (?:from|via|through) (?:a |an |the |its |their )?(?:index|search engine|provider))\b"
+            ),
+        ),
+    ),
+    "query_rewrite": (
+        (
+            "retrieval_index",
+            (
+                r"\b(fan[- ]?outs?|sub[- ]?quer\w+|quer(?:y|ies) (?:rewrite|rewrites|rewriting|rewrote|"
+                r"reformulat\w*|decompos\w*|expansion?|expands?|expanded|variants?|fanout|distributions?)|"
+                r"rewrite[sd]? (?:the |a |each )?quer|decompos\w+|reformulat\w+|"
+                r"break(?:s|ing)? (?:the |a |down )?(?:quer|prompt|question)|"
+                r"multiple (?:simultaneous |parallel )?quer(?:y|ies)|one question (?:into|to) (?:many|several|multiple))\b"
+            ),
+        ),
+    ),
+    "freshness_recrawl": (
+        (
+            "crawler_index_policy",
+            (
+                r"\b(recrawl|re-?crawl|re-?index(?:ing|es)?|refetch\w*|refresh\w*|fresh(?:ness)?|"
+                r"how (?:often|frequently|soon|quickly)|update (?:frequency|cadence|rate|window)|"
+                r"crawl (?:frequency|rate|interval)|(?:content|page|index|answer) (?:age[sd]?|aging|updating?|updated?)|"
+                r"new (?:content|pages|articles) (?:appear|reflected|included|indexed))\b"
+            ),
+        ),
+    ),
     "candidate_selection_reranking": (
         (
             "retrieval_index",
@@ -204,12 +268,29 @@ CLAIM_SIGNALS: dict[str, tuple[tuple[str, str], ...]] = {
     ),
     # Social/local need *sourcing* language, not merely a domain mention: a
     # "Reddit citation share" number is a share claim, not a stated mechanic.
+    # Issue #69: a local reservation/booking mechanic (e.g. NAVER Map reservation
+    # slots) is local retrieval even without explicit "sources from" language, so
+    # a reservation/booking statement near local/place language also gates in.
     "local_retrieval": (
         (
             "retrieval_index",
             (
                 r"\b(?:source[sd]? (?:from|via)|retriev\w* (?:from|via)|draws? (?:on|from)|uses?)\b"
                 r"[^.]{0,40}\b(?:local|maps?|places?|near me|geo(?:graphic)?)\b"
+            ),
+        ),
+        (
+            "retrieval_index",
+            (
+                r"\b(?:reservation|reservations|book(?:ing|ings)?|slot|slots|order|appointment)\b"
+                r"[^.]{0,40}\b(?:local|maps?|places?|near me)\b"
+            ),
+        ),
+        (
+            "retrieval_index",
+            (
+                r"\b(?:local|maps?|places?|near me)\b[^.]{0,40}"
+                r"\b(?:reservation|reservations|book(?:ing|ings)?|slot|slots|appointment)\b"
             ),
         ),
         (
@@ -702,15 +783,15 @@ def project_surface(surface_id: str, claims: list[dict[str, Any]]) -> SurfaceMec
     for dimension in MECHANICS_DIMENSIONS:
         rows = [r for r in _claims_for(claims, surface_id, dimension) if r.get("statement")]
         if not rows:
-            if not DIMENSION_TOPICS.get(dimension):
+            if not DIMENSION_TOPICS.get(dimension) and dimension not in CLAIM_SIGNALS:
                 note = (
                     "No evidenced mechanics dimension maps to this surface yet; "
                     "the ledger holds no claim kind that speaks to it."
                 )
             else:
                 note = (
-                    "No validated claim for this surface covers this dimension. "
-                    "Unknown is a valid, explicit answer, not a missing value."
+                    "No validated claim for this surface answers this dimension's "
+                    "question. Unknown is a valid, explicit answer, not a missing value."
                 )
             states.append(DimensionState(dimension=dimension, state="unknown", note=note))
             continue
@@ -840,15 +921,36 @@ def unmapped_claim_surfaces(
 def mechanics_view(
     mechanics: SurfaceMechanics, reconciliation: dict[str, list[dict]] | None = None
 ) -> dict[str, Any]:
-    """The marketer-safe payload for one surface's mechanics projection."""
+    """The marketer-safe payload for one surface's mechanics projection.
 
-    return {
+    Issue #69: a claim that lights several dimensions would otherwise repeat the
+    same reconciliation record in every dimension it touches (the ChatGPT panel
+    repeated the same warnings across ~238k words). Each reconciliation record is
+    shown once per surface profile, on the first evidence entry that carries it.
+    """
+
+    view: dict[str, Any] = {
         "surface": mechanics.surface_id,
         "dimensions": [dimension_view(d, reconciliation) for d in mechanics.dimensions],
         "coverage": mechanics.coverage(),
         "evidenced_dimension_count": mechanics.evidenced_dimension_count(),
         "dimension_count": len(MECHANICS_DIMENSIONS),
     }
+    seen: set[str] = set()
+    for dim in view["dimensions"]:
+        for assertion in dim["assertions"]:
+            for ev in assertion["evidence"]:
+                records = ev.get("reconciliation") or []
+                kept = []
+                for rec in records:
+                    rec_id = rec.get("id") or ""
+                    if rec_id:
+                        if rec_id in seen:
+                            continue
+                        seen.add(rec_id)
+                    kept.append(rec)
+                ev["reconciliation"] = kept
+    return view
 
 
 # --------------------------------------------------------------------------- #

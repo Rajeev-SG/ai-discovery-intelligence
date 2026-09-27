@@ -84,7 +84,9 @@ def test_unknown_mechanic_yields_explicit_monitor_not_action():
     assert len(result.implications) == 1
     assert result.implications[0].family == "monitor"
     assert result.implications[0].monitor_only is True
-    assert "Monitor" in result.note or "monitor" in result.note
+    # Issue #69: the monitor outcome frames the gap honestly (a research gap,
+    # not a recommendation to ignore) rather than "watch is the correct action".
+    assert "research gap" in result.note
 
 
 def test_wrong_topic_evidence_does_not_fire_a_rule():

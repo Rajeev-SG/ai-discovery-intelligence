@@ -243,8 +243,11 @@ def test_mechanics_endpoint_inlines_reconciliation_for_conflicting_claims(client
     def _row(visits, claim_id):
         return {
             "claim_id": claim_id,
-            "topic": "retrieval_index",
-            "statement": f"ChatGPT retrieved ~{visits} results per query.",
+            # Issue #69: the claim must actually assert a mechanics dimension for
+            # the projection to carry it as evidence — an inline-links statement
+            # lights citation_presentation via the content gate.
+            "topic": "citations_sources",
+            "statement": f"ChatGPT responses show results as inline links, ~{visits} cited links per answer.",
             "surfaces": ["chatgpt"],
             "status": "current",
             "relationship": "new",

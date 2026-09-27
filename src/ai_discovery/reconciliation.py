@@ -86,6 +86,26 @@ class Reconciliation(BaseModel):
     interpretation: str
     confidence_adjustment: float  # Applied to agency interpretation, not source claims.
 
+    @property
+    def id(self) -> str:
+        """Stable relationship identity (issue #69).
+
+        Deterministic from the sorted claim-id pair and the state, so the index
+        and the UI can deduplicate and anchor to a precise relationship.
+        """
+
+        return _relationship_id(self.claim_ids, self.state)
+
+
+def _relationship_id(claim_ids: tuple[str, str], state: str) -> str:
+    """A deterministic relationship id: sorted claim-id pair + state, hashed."""
+
+    import hashlib
+
+    a, b = sorted(claim_ids)
+    digest = hashlib.sha256(f"{a}|{b}|{state}".encode("utf-8")).hexdigest()[:16]
+    return f"rec-{digest}"
+
 
 def compare_claims(first: StudyClaim, second: StudyClaim) -> Reconciliation:
     """Conservative comparisons: no inferred mode, denominator or sampling frame.
@@ -113,6 +133,10 @@ def compare_claims(first: StudyClaim, second: StudyClaim) -> Reconciliation:
         and getattr(second, key) is not None
         and getattr(first, key) != getattr(second, key)
     )
+    # Compatible unit spellings (``percent``/``%``) are the same unit for
+    # comparison purposes (issue #69): normalise before flagging a difference.
+    if "unit" in differences and _unit_family(first.unit) == _unit_family(second.unit):
+        differences = tuple(d for d in differences if d != "unit")
     unknown = tuple(
         key
         for key in (*context, "period_start", "period_end", "value")
@@ -381,7 +405,14 @@ def _iso_date(value: str | None):
 
 
 def _subject_of(row: dict, source: dict) -> str:
-    """The entity two claims must share to be comparable at all."""
+    """The entity two claims must share to be comparable at all.
+
+    Issue #69: the ledger does not record a studied entity per claim, so this
+    falls back to the claim's surface value (platform scope) and, failing that,
+    the source host. It must never invent a shared entity. Comparability is
+    carried primarily by the (metric, unit-family) part of the grouping key in
+    :func:`reconcile_persisted`; this fallback stays coarse on purpose.
+    """
 
     import re
 
@@ -394,42 +425,86 @@ def _subject_of(row: dict, source: dict) -> str:
 
 
 def reconcile_persisted(rows: list[dict]) -> list[Reconciliation]:
-    """Compare persisted claims that share a surface, subject and metric.
+    """Compare persisted claims that plausibly measure the SAME quantity.
 
-    Grouping is ``(surface, subject, metric, unit)``: two claims only conflict
-    when they measure the *same* quantity, so a value on a different metric or
-    unit is not compared. Values are compared unit-aware (see :func:`_same_value`),
-    so 0.5 percent and 0.5 are not treated as the same reading. Each comparison is
-    grounded in stored, validated claims and preserves both sides.
+    Issue #69 remediation — comparison eligibility. Grouping is
+    ``(surface, subject, metric, unit-family)``: two claims are only compared
+    when they report the *same metric of the same surface in the same unit*.
+    This is the docstring the module always claimed; the previous
+    implementation grouped by ``(surface, subject)`` only, which compared every
+    pair of quantities on a platform (crawling speed vs model analysis speed,
+    click-through rates vs audience totals) and manufactured thousands of
+    "methodologically incomparable" records that read as doubt.
+
+    Two further eligibility gates:
+
+    * two StudyClaims derived from the SAME ledger claim (one claim carrying
+      several metrics) are never compared to each other — one claim's metrics
+      are not independent measurements;
+    * values are compared unit-aware (see :func:`_same_value`), with compatible
+      unit spellings normalised (``percent``/``%``), so 0.5 percent and 0.5%
+      are recognised as the same reading.
+
+    Cross-metric reconciliation (e.g. the curated Semrush/Ahrefs Reddit case)
+    is an editorial comparison, produced explicitly, never auto-generated here.
+    Each comparison is grounded in stored, validated claims and preserves both
+    sides. Values are compared unit-aware.
     """
 
     claims = [sc for row in rows for sc in study_claims_from_view(row)]
-    # Group by (surface, subject): two claims only conflict when they are about the
-    # same entity on the same surface. Metric/denominator differences are exactly
-    # what the comparison interprets, so they are compared, not used to group.
     groups: dict[tuple, list[StudyClaim]] = {}
     for claim in claims:
-        key = (claim.surface, _norm(claim.subject))
+        key = (
+            claim.surface,
+            _norm(claim.subject),
+            _norm(claim.metric),
+            _unit_family(claim.unit),
+        )
         groups.setdefault(key, []).append(claim)
 
     out: list[Reconciliation] = []
     for members in groups.values():
         for i, first in enumerate(members):
             for second in members[i + 1 :]:
+                # Same ledger claim, different metrics: not independent
+                # measurements, never compared (issue #69).
+                if first.evidence_ids and second.evidence_ids and first.evidence_ids[0] == second.evidence_ids[0]:
+                    continue
                 if _same_value(first, second):
                     continue
                 out.append(compare_claims(first, second))
     return out
 
 
+_UNIT_ALIASES: dict[str, str] = {
+    "percent": "%",
+    "percentage": "%",
+    "pct": "%",
+    "percentage points": "pp",
+    "percentage point": "pp",
+    "pts": "pp",
+    "points": "pp",
+}
+
+
+def _unit_family(unit: str | None) -> str | None:
+    """Normalise compatible unit spellings so ``percent`` and ``%`` group together."""
+
+    if unit is None:
+        return None
+    key = " ".join(unit.strip().lower().split())
+    return _UNIT_ALIASES.get(key, key or None)
+
+
 def _same_value(first: StudyClaim, second: StudyClaim) -> bool:
     """Unit-aware value equality: unlike units are never "the same reading".
 
     A relative tolerance absorbs float noise but is far smaller than any real
-    disagreement, so a genuine difference still surfaces.
+    disagreement, so a genuine difference still surfaces. Compatible unit
+    spellings (``percent``/``%``) are normalised first (issue #69).
     """
 
-    if first.unit != second.unit:
+    if _unit_family(first.unit) != _unit_family(second.unit):
         return False
     if first.value is None or second.value is None:
         return False
@@ -474,11 +549,19 @@ def reconciliation_index(rows: list[dict]) -> dict[str, list[dict]]:
 
 
 def _build_index(rows: list[dict]) -> dict[str, list[dict]]:
-    """The uncached index builder (see :func:`cached_reconciliation_index`)."""
+    """The uncached index builder (see :func:`cached_reconciliation_index`).
 
-    index: dict[str, list[dict]] = {}
+    Issue #69: each unique relationship appears at most once per claim key.
+    Previously a multi-metric claim produced the same relationship payload
+    under both the metric-qualified and the bare claim id, repeated once per
+    metric — the UI then rendered the same card many times. Records are keyed
+    by their stable :class:`Reconciliation` id and deduplicated on build.
+    """
+
+    index: dict[str, dict[str, dict]] = {}
     for rec in reconcile_persisted(rows):
         payload = {
+            "id": rec.id,
             "claim_ids": list(rec.claim_ids),
             "state": rec.state,
             "relationship": rec.relationship,
@@ -488,8 +571,6 @@ def _build_index(rows: list[dict]) -> dict[str, list[dict]]:
             "interpretation": rec.interpretation,
         }
         for cid in rec.claim_ids:
-            index.setdefault(cid, []).append(payload)
-            bare = cid.split(":", 1)[0]
-            if bare != cid:
-                index.setdefault(bare, []).append(payload)
-    return index
+            for key in {cid, cid.split(":", 1)[0]}:
+                index.setdefault(key, {})[rec.id] = payload
+    return {key: list(records.values()) for key, records in index.items()}
