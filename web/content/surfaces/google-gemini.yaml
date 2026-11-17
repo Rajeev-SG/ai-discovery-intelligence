@@ -1,0 +1,46 @@
+name: "Gemini"
+vendor: "Google"
+region: "global"
+summary: "The Gemini app can link to related sources and use Google’s Shopping Graph for product comparisons. Eligible US merchants can support checkout inside the Gemini web app."
+actions:
+  - title: "Trace the source of a brand claim"
+    description: "Open Sources or follow an inline source when Gemini provides one. Check whether the link supports the specific product claim before treating it as a citation."
+  - title: "Review Google-Extended before changing crawler rules"
+    description: "Decide whether to allow qualifying crawled content for Gemini training and grounding. The Google-Extended rule does not change Google Search inclusion or ranking."
+  - title: "Check the checkout setup for US offers"
+    description: "Review Google’s Universal Commerce Protocol (UCP) requirements. Selected retailers can open the integration hub in Merchant Center to validate the setup."
+mechanics:
+  - label: "When it searches"
+    description: "Gemini can provide related links under some responses. The general trigger for web retrieval is not documented by Google."
+  - label: "Where results come from"
+    description: "Google documents grounding from the Google Search index, related web links and use of its Shopping Graph for shopping answers."
+  - label: "Crawlers"
+    crawlers:
+      - userAgent: "Google-Extended"
+        purpose: "Controls use of qualifying crawled content for Gemini training and grounding"
+        blocked: "Restricts those uses while leaving Google Search inclusion and ranking unaffected"
+  - label: "Keeping a page out"
+    description: "Use the Google-Extended robots.txt token to restrict the documented training and grounding uses. Review Google Search controls separately."
+  - label: "Shopping"
+    description: "Gemini uses the Shopping Graph. Eligible listings can show a Buy button in the Gemini web app, with Google Pay and merchant fulfilment."
+  - label: "Ads"
+    undocumented: true
+  - label: "Measurement"
+    undocumented: true
+changes:
+  - date: "2026"
+    change: "Google published Merchant Center onboarding for UCP checkout on Search and Gemini."
+    why: "Retailers can check eligibility and set up checkout from Merchant Center."
+sources:
+  - title: "Google Gemini Help — Related sources"
+    url: https://support.google.com/gemini/answer/14143489
+    checked: 2026-11-17
+  - title: "Google Gemini Help — Shopping in Gemini Apps"
+    url: https://support.google.com/gemini/answer/16730149
+    checked: 2026-11-17
+  - title: "Google for Developers — Common crawlers and Google-Extended"
+    url: https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers
+    checked: 2026-11-17
+  - title: "Google Merchant Center — UCP integration hub"
+    url: https://support.google.com/merchants/answer/16992327
+    checked: 2026-11-17

@@ -1,0 +1,34 @@
+name: "Tencent Yuanbao Search"
+vendor: "Tencent"
+region: "China"
+summary: "Tencent’s Yuanbao Search at so.qq.com can search web pages, WeChat Official Account articles, Channels videos and academic publications. It uses Yuanbao’s models to turn results into answers."
+actions:
+  - title: "Check how your WeChat Official Account appears"
+    description: "Search for your official account and a current product launch in Yuanbao Search. Open the matching article and confirm it links to the right account."
+  - title: "Check the separate WeChat Channels path"
+    description: "Search for the same product and a specific demonstration or campaign video. Open the Channels result and verify the publisher and video are yours."
+  - title: "Verify the buyer’s entry point in QQ Browser"
+    description: "Select Yuanbao Search in QQ Browser’s search-engine settings. Run your priority brand or category query from the browser and inspect the response and source it opens."
+mechanics:
+  - label: "When it searches"
+    description: "People can search at so.qq.com or choose Yuanbao Search as their search engine in a current QQ Browser release."
+  - label: "Where results come from"
+    description: "Tencent documents web pages, Official Account articles, Channels videos and academic publications as sources for Yuanbao Search."
+  - label: "Crawlers"
+    undocumented: true
+  - label: "Keeping a page out"
+    undocumented: true
+  - label: "Shopping"
+    undocumented: true
+  - label: "Ads"
+    undocumented: true
+  - label: "Measurement"
+    undocumented: true
+changes:
+  - date: "Nov 2026"
+    change: "Tencent launched Yuanbao Search at so.qq.com and added it as a search-engine choice in QQ Browser."
+    why: "Brand teams can check whether their owned WeChat articles and videos surface outside the WeChat app."
+sources:
+  - title: "Tencent — Yuanbao Search launch"
+    url: https://cloud.tencent.com/developer/article/2781917
+    checked: 2026-11-17

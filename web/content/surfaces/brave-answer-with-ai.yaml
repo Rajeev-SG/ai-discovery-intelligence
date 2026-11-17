@@ -1,0 +1,40 @@
+name: "Brave Search AI Answers"
+vendor: "Brave"
+region: "global"
+summary: "Brave Search uses its search results for quick summaries with sources. Ask Brave gives users follow-up questions and can add shopping and local results."
+actions:
+  - title: "Check quick answers and Ask Brave separately"
+    description: "Run a priority query in Brave Search and open the references in the quick AI Answer. With Brave as your default search engine, end a query with two question marks to open Ask Brave directly and compare sources."
+  - title: "Delist a page through Brave’s own removal flow"
+    description: "Add a noindex directive and submit the page for re-fetching from Brave’s crawler help page. Brave needs to see the directive before it can remove the URL."
+  - title: "Check the product or local result inside Ask Brave"
+    description: "Ask a product or local shopping question and inspect any product or business result. Follow the listing to confirm that the destination, offer and business actually match."
+mechanics:
+  - label: "When it searches"
+    description: "Brave can show a quick summary for some questions. Users can open Ask Brave for longer answers, follow-ups or deep research."
+  - label: "Where results come from"
+    description: "Brave uses Search results and shows references for AI Answers. Ask Brave can add news, video, product and local results."
+  - label: "Crawlers"
+    description: "Brave documents its Search crawler for discovery and indexing."
+  - label: "Keeping a page out"
+    description: "Use noindex and let Brave fetch it. Brave says robots.txt does not prevent indexing."
+  - label: "Shopping"
+    description: "Ask Brave can display shopping and product results when relevant."
+  - label: "Ads"
+    undocumented: true
+  - label: "Measurement"
+    undocumented: true
+changes:
+  - date: "Sep 2025"
+    change: "Brave announced Ask Brave with follow-ups and richer results."
+    why: "Check the fuller conversation alongside the short summary when testing visibility."
+sources:
+  - title: "Brave — AI Answers and Ask Brave"
+    url: https://search.brave.com/help/ai
+    checked: 2026-11-17
+  - title: "Brave — Ask Brave launch"
+    url: https://brave.com/blog/ask-brave/
+    checked: 2026-11-17
+  - title: "Brave — Search crawler and re-fetching"
+    url: https://search.brave.com/help/brave-search-crawler
+    checked: 2026-11-17

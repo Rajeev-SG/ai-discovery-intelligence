@@ -1,0 +1,40 @@
+name: "Brave Leo"
+vendor: "Brave"
+region: "global"
+summary: "Leo works in the Brave browser. It can summarise the page a user is on and can bring Brave Search results into a conversation for current information."
+actions:
+  - title: "Check the in-page summary on a product or policy page"
+    description: "Open the exact page in Brave and ask Leo to summarise a key specification or returns condition. Compare the result with the visible detail on the page."
+  - title: "Run a separate question that needs current search results"
+    description: "Ask Leo about a current product, event or launch. When it marks the answer as using Brave Search, follow the Search link to inspect the results behind it."
+  - title: "Save a repeatable product-page check as a Leo Skill"
+    description: "On supported desktop or Android releases, save the comparison prompt as a Skill. Run the same check on the pages for each product variant and record where Leo omits a material detail."
+mechanics:
+  - label: "When it searches"
+    description: "Leo can work with the active page. It can also use Brave Search when current information is needed."
+  - label: "Where results come from"
+    description: "Page summaries use the active browsing context. Search-augmented answers draw on Brave Search."
+  - label: "Crawlers"
+    undocumented: true
+  - label: "Keeping a page out"
+    undocumented: true
+  - label: "Shopping"
+    undocumented: true
+  - label: "Ads"
+    undocumented: true
+  - label: "Measurement"
+    undocumented: true
+changes:
+  - date: "Dec 2025"
+    change: "Brave added Leo Skills for repeatable prompts on desktop and Android."
+    why: "Brand teams can run the same summary or comparison against different pages without retyping the prompt."
+sources:
+  - title: "Brave — Leo and real-time Brave Search results"
+    url: https://brave.com/blog/leo-real-time-results/
+    checked: 2026-11-17
+  - title: "Brave — Saved Leo Skills"
+    url: https://brave.com/blog/leo-skills/
+    checked: 2026-11-17
+  - title: "Brave — Leo browser assistant"
+    url: https://brave.com/leo/
+    checked: 2026-11-17

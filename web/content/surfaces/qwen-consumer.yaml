@@ -1,0 +1,34 @@
+name: "Qwen"
+vendor: "Alibaba"
+region: "China"
+summary: "The Chinese Qwen app can compare offers from Taobao and Tmall, take orders and help shoppers manage delivery. The Taobao app also has its own Qwen Shopping Assistant."
+actions:
+  - title: "Check the Taobao and Tmall offers Qwen can compare"
+    description: "In the Chinese Qwen app, ask for your product by category, budget and one meaningful attribute. Open any matching offer and verify the variant, use case and seller against the listing."
+  - title: "Review your festival discounts from the buyer’s checkout"
+    description: "Use the Qwen Shopping Assistant in Taobao’s Messages tab to check whether eligible promotions and coupons combine as expected."
+  - title: "Test how a price target works for your offer"
+    description: "In Taobao Shopping Assistant, check whether a buyer can set a target price for your item and preferred seller. Use the documented 30-day tracker when planning a promotion."
+mechanics:
+  - label: "When it searches"
+    description: "Shoppers can ask shopping questions in the Qwen app or open the Qwen Shopping Assistant from Messages in Taobao."
+  - label: "Where results come from"
+    description: "Shopping uses Alibaba’s Taobao and Tmall catalogue. The assistant in Taobao also uses customer reviews."
+  - label: "Crawlers"
+    undocumented: true
+  - label: "Keeping a page out"
+    undocumented: true
+  - label: "Shopping"
+    description: "Qwen supports comparison, ordering and delivery management. Taobao’s assistant can combine eligible discounts and track a price target for up to 30 days."
+  - label: "Ads"
+    undocumented: true
+  - label: "Measurement"
+    undocumented: true
+changes:
+  - date: "May 2026"
+    change: "Alibaba expanded the China Qwen app from selected categories to the full Taobao and Tmall catalogue."
+    why: "The assistant can compare and order from a much broader selection of marketplace offers."
+sources:
+  - title: "Alibaba Group — Qwen and the full Taobao catalogue"
+    url: https://home.alibabagroup.com/en-US/document-1991231293551017984
+    checked: 2026-11-17

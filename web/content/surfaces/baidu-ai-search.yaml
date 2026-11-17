@@ -1,0 +1,37 @@
+name: "Baidu AI Search"
+vendor: "Baidu"
+region: "China"
+summary: "Baidu Search can cite websites in generated answers. Its Search Resource Platform gives site owners tools to check crawl access, submit updated URLs and look for citation data as it becomes available."
+actions:
+  - title: "Check the AI Traffic Analysis panel"
+    description: "In Baidu Search Resource Platform, open AI流量分析 for your verified site. Check whether the rollout has reached your property before comparing citations, impressions and clicks."
+  - title: "Diagnose a missing page with Baidu’s crawl tool"
+    description: "Use 抓取诊断 in Search Resource Platform on the specific URL. If it is blocked, review the platform’s Robots tool for that URL before retrying."
+  - title: "Submit the affected URL after correcting a cited page"
+    description: "Use the Search Resource Platform’s URL submission tools when an old company or product page has been corrected or moved. Check whether the updated URL gets indexed."
+mechanics:
+  - label: "When it searches"
+    undocumented: true
+  - label: "Where results come from"
+    description: "Baidu says its conventional Search experience can include AI citations to sites."
+  - label: "Crawlers"
+    undocumented: true
+  - label: "Keeping a page out"
+    undocumented: true
+  - label: "Shopping"
+    undocumented: true
+  - label: "Ads"
+    undocumented: true
+  - label: "Measurement"
+    description: "Baidu announced staged access to citation, impression and click data for AI citations in conventional Baidu Search. It said complete data was unavailable at announcement."
+changes:
+  - date: "Sep 2026"
+    change: "Baidu announced the phased rollout of AI Traffic Analysis in Search Resource Platform."
+    why: "Site owners can check when first-party citation reporting becomes available for their property."
+sources:
+  - title: "Baidu — Search Resource Platform"
+    url: https://ziyuan.baidu.com/cooperateresource/index
+    checked: 2026-11-17
+  - title: "Baidu — AI Traffic Analysis announcement"
+    url: https://zy.baidu.com/academy/detail?id=3519
+    checked: 2026-11-17

@@ -1,0 +1,46 @@
+name: "Meta AI"
+vendor: "Meta"
+region: "global"
+summary: "Meta AI can draw on the web and on public content from Meta’s apps. Its shopping mode can put Facebook Marketplace listings alongside products from across the web."
+actions:
+  - title: "Test the brand handle in shopping mode"
+    description: "Type @ followed by your brand handle in Meta AI shopping mode. Check that the public content and products shown belong to the right account."
+  - title: "Check Marketplace offers near the buyer"
+    description: "If you sell on Facebook Marketplace, search in shopping mode from the relevant area and refine by price and distance. Open your listing and verify the location, price and condition."
+  - title: "Separate the ad test from the assistant check"
+    description: "Record Meta Ads delivery separately from what the assistant recommends. Meta’s announcement covers use of AI interactions to personalise other experiences, including ads across its apps."
+mechanics:
+  - label: "When it searches"
+    description: "People can ask from Meta AI or supported search and chat entry points in Meta apps. Shopping mode accepts product requests and follow-up filters."
+  - label: "Where results come from"
+    description: "Meta AI can use real-time web information, public content from Meta apps and news supplied by partners."
+  - label: "Crawlers"
+    undocumented: true
+  - label: "Keeping a page out"
+    undocumented: true
+  - label: "Shopping"
+    description: "Shopping mode can include local Marketplace listings and web products, with filters for price, style and distance. Users can use @ to browse public brand or creator content."
+  - label: "Ads"
+    description: "Meta says AI interactions can inform ad recommendations across its apps. Ad placement inside Meta AI answers is not documented by Meta."
+  - label: "Measurement"
+    undocumented: true
+changes:
+  - date: "May 2026"
+    change: "Meta added Marketplace and web products to Meta AI shopping mode and introduced browsing by brand handle."
+    why: "Marketers can check two different paths into a product recommendation."
+  - date: "Dec 2025"
+    change: "Meta announced real-time news partnerships with publishers including CNN, Le Monde Group and USA TODAY Co."
+    why: "News-related answers can send readers directly to participating publishers."
+sources:
+  - title: "Meta — Search across Meta apps"
+    url: https://about.fb.com/news/2024/04/meta-ai-assistant-built-with-llama-3/
+    checked: 2026-11-17
+  - title: "Meta — Muse Spark and shopping mode"
+    url: https://about.fb.com/news/2026/04/introducing-muse-spark-meta-superintelligence-labs/
+    checked: 2026-11-17
+  - title: "Meta — Real-time news partnerships"
+    url: https://about.fb.com/news/2025/12/bringing-more-real-time-news-and-content-to-meta-ai/
+    checked: 2026-11-17
+  - title: "Meta — AI interactions and ad recommendations"
+    url: https://about.fb.com/news/2025/10/improving-your-recommendations-apps-ai-meta/
+    checked: 2026-11-17

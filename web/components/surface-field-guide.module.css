@@ -85,6 +85,13 @@ a.pill[aria-current="page"] { background: var(--ink); color: #fff; }
   font-weight: 700;
   letter-spacing: -0.02em;
 }
+.page .intro {
+  margin-bottom: 24px;
+  font-size: clamp(24px, 4vw, 36px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.more li small { margin-top: 3px; font-size: 13px; line-height: 1.45; }
 .summary { max-width: 760px; color: var(--secondary); font-size: 19px; line-height: 1.6; }
 .checked { color: var(--muted); font-size: 13px; }
 

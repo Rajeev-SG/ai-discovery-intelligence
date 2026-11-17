@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "AI Discovery Intelligence",
-  description: "A field guide to how AI surfaces find, cite, recommend and advertise brands.",
+  description: "A field guide for media buyers and brand marketers on where brands appear in AI answers, shopping recommendations and ads.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

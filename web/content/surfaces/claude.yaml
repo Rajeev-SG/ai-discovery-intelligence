@@ -1,0 +1,46 @@
+name: "Claude"
+vendor: "Anthropic"
+region: "global"
+summary: "Claude can search for current information and cite the relevant pages. Anthropic documents separate robots.txt controls for search, user-requested page fetches and model training."
+actions:
+  - title: "Allow Claude-SearchBot for visibility in web search"
+    description: "Check robots.txt for each public subdomain where you want Claude to index pages for search. Audit product, support and press subdomains separately."
+  - title: "Choose whether Claude can open pages users ask about"
+    description: "Review the Claude-User rule independently of Claude-SearchBot. Blocking Claude-User prevents Claude from retrieving your content in response to an individual request."
+  - title: "Set model-training access independently"
+    description: "Review the ClaudeBot rule for the subdomains whose new content you want excluded from training datasets. Allow search or user fetches separately where appropriate."
+mechanics:
+  - label: "When it searches"
+    description: "When web search is enabled, Claude can use it for answers that benefit from current information."
+  - label: "Where results come from"
+    description: "Claude incorporates web information and attaches direct citations."
+  - label: "Crawlers"
+    crawlers:
+      - userAgent: "Claude-SearchBot"
+        purpose: "Search indexing and relevance"
+        blocked: "Prevents Anthropic from indexing the content for search optimisation"
+      - userAgent: "Claude-User"
+        purpose: "Fetches requested by Claude users"
+        blocked: "Prevents retrieval of the content in response to user requests"
+      - userAgent: "ClaudeBot"
+        purpose: "Collects content for model development"
+        blocked: "Signals that future material should be excluded from training datasets"
+  - label: "Keeping a page out"
+    description: "Set the relevant Anthropic bot rules in the top-level robots.txt on each subdomain you want to restrict."
+  - label: "Shopping"
+    description: "Claude can compare features, prices and reviews from web sources."
+  - label: "Ads"
+    undocumented: true
+  - label: "Measurement"
+    undocumented: true
+changes:
+  - date: "May 2025"
+    change: "Claude’s web search became available globally on all Claude plans."
+    why: "Cited product comparisons became available to shoppers beyond the original paid US rollout."
+sources:
+  - title: "Anthropic — Claude crawler controls"
+    url: https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler
+    checked: 2026-11-17
+  - title: "Anthropic — Claude web search"
+    url: https://claude.com/resources/articles/web-search
+    checked: 2026-11-17

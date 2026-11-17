@@ -1,0 +1,34 @@
+name: "Kimi"
+vendor: "Moonshot AI"
+region: "global"
+summary: "Kimi can search for current information, cite sources, look for similar images and open a specific URL. Brand teams can use those modes to check text claims and how product imagery is identified."
+actions:
+  - title: "Turn on Web-Connected Search for current product claims"
+    description: "Use the globe toggle below the input. Ask about a recent product launch or change and open the references for the claim you want to check."
+  - title: "Check a product image with Image Search"
+    description: "Upload your product image and ask Kimi to identify it and find its origin or similar images. Check which brands and sites appear in the results."
+  - title: "Paste the exact page where the claim is documented"
+    description: "Ask Kimi to read the specific product or policy URL. If an important detail only appears after the page loads, compare the answer with the visible page."
+mechanics:
+  - label: "When it searches"
+    description: "With Web-Connected Search enabled, Kimi decides whether a question needs current retrieval. It can also use image search or open a URL supplied by the user."
+  - label: "Where results come from"
+    description: "Moonshot describes using search engines and specialised databases, with reference links in search-based answers."
+  - label: "Crawlers"
+    undocumented: true
+  - label: "Keeping a page out"
+    undocumented: true
+  - label: "Shopping"
+    undocumented: true
+  - label: "Ads"
+    undocumented: true
+  - label: "Measurement"
+    undocumented: true
+changes:
+  - date: "Oct 2024"
+    change: "Moonshot introduced Exploratory Search, combining real-time retrieval with longer question breakdowns and references."
+    why: "Teams can follow the sources used to answer a multi-part product question."
+sources:
+  - title: "Moonshot AI — Kimi Search Guide"
+    url: https://www.kimi.com/en/help/features/search
+    checked: 2026-11-17

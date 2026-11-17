@@ -1,16 +1,12 @@
 # AI Discovery Intelligence (web)
 
-The product shell. The root route (`/`) is the marketer-first front door (issue #61): it answers,
-in order, what AI discovery platforms exist (`/landscape`), how their discovery
-works (the landscape comparison), how strong the evidence is (`/surfaces`,
-Evidence & trust) and what it means for marketers (`/implications`). Latest
-changes, the weekly brief and the current POV are demoted to a "Returning users"
-area. The supporting routes are `/landscape` (the curated landscape + mechanics
-comparison), `/implications` (evidence-backed marketing implications),
-`/surfaces` (the searchable 35-surface registry matrix and evidence drill-down),
-`/pov` (the living POV and changelog, linked as "What this means") and
-`/reconciliation` (the persisted reconciliation ledger, linked as "Evidence
-reconciliation").
+The home page lists the AI discovery field guides for media buyers and brand
+marketers. Each `/surfaces/<slug>` guide is built from editorial YAML in
+`content/surfaces/`. The directory shows a reason for each unpublished guide
+from `content/coming-soon.json`. The public guide can build without the evidence API.
+
+The legacy analysis routes remain available by direct URL. The registry is at
+`/archive/surfaces`, and existing `/surfaces` bookmarks still open it.
 
 Evidence is served by the read-only FastAPI evidence API (`EVIDENCE_API_URL`);
 the web app fetches it server-side and never re-derives a claim, confidence or

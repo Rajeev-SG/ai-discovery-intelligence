@@ -1,0 +1,37 @@
+name: "Grok"
+vendor: "xAI"
+region: "global"
+summary: "Grok can search both the web and X for current information and show live citations. That makes it possible to trace a claim to an ordinary web page or to a post on X."
+actions:
+  - title: "Check web and X sources separately"
+    description: "Ask a recent brand or category question in Grok’s search mode. Open live citations and record which claims came from X posts and which came from publisher or brand pages."
+  - title: "Check the original X post behind a fast-moving claim"
+    description: "For a launch, recall or announcement surfaced from X, open the cited post and verify its date and account. Compare the wording with the brand’s own announcement."
+  - title: "Use Grok’s research mode for a multi-source comparison"
+    description: "Repeat a question that needs several sources in its deeper research mode. Compare the sources used and check whether the final answer preserves important differences between them."
+mechanics:
+  - label: "When it searches"
+    description: "Grok has a search mode for live information and deeper research for questions that need more investigation."
+  - label: "Where results come from"
+    description: "xAI says Grok can search both the web and X and provide live citations."
+  - label: "Crawlers"
+    undocumented: true
+  - label: "Keeping a page out"
+    undocumented: true
+  - label: "Shopping"
+    undocumented: true
+  - label: "Ads"
+    undocumented: true
+  - label: "Measurement"
+    undocumented: true
+changes:
+  - date: "Feb 2025"
+    change: "xAI introduced DeepSearch with Grok 3."
+    why: "Brands gained a separate way to inspect how a longer investigation draws on the web and X."
+sources:
+  - title: "xAI — Grok search and research modes"
+    url: https://x.ai/grok
+    checked: 2026-11-17
+  - title: "xAI — Grok 3 and DeepSearch"
+    url: https://x.ai/news/grok-3
+    checked: 2026-11-17

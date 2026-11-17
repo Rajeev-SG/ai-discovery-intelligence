@@ -1,0 +1,43 @@
+name: "Alexa for Shopping (formerly Rufus)"
+vendor: "Amazon"
+region: "Amazon stores"
+summary: "Amazon combined Rufus with Alexa+ to create Alexa for Shopping. Buyers can ask questions in the main Amazon search bar, compare products and check price history."
+actions:
+  - title: "Check the response from your product page"
+    description: "Open Alexa for Shopping from an Amazon listing. Ask about a differentiating feature or compatibility constraint and compare the answer with the detail page, customer reviews and Q&A."
+  - title: "Check price history before planning a promotion"
+    description: "Ask Alexa for Shopping for the item’s price history, which Amazon says can cover up to a year. Check which offer a shopper sees when asking for a maximum budget."
+  - title: "Ask Amazon Ads about Sponsored Product and Brand prompts"
+    description: "If you run Amazon campaigns, confirm access for your account and market. Test whether the sponsored conversation answers the product questions buyers ask before purchase."
+mechanics:
+  - label: "When it searches"
+    description: "Shoppers can ask questions from the Amazon Shopping search bar or the dedicated Alexa for Shopping chat."
+  - label: "Where results come from"
+    description: "Amazon describes product data and web information combined with shopping history, user preferences and conversations from Alexa and Amazon."
+  - label: "Crawlers"
+    undocumented: true
+  - label: "Keeping a page out"
+    undocumented: true
+  - label: "Shopping"
+    description: "Alexa for Shopping supports product comparisons, price history and alerts. Shoppers can ask it to buy items at a target price."
+  - label: "Ads"
+    description: "Amazon reported introducing Sponsored Product and Brand prompts in Rufus. Confirm current availability for your account and market."
+  - label: "Measurement"
+    undocumented: true
+changes:
+  - date: "May 2026"
+    change: "Amazon combined Rufus and Alexa+ as Alexa for Shopping."
+    why: "Shoppers can ask about products from the main Amazon search bar as well as in the dedicated chat."
+  - date: "Apr 2026"
+    change: "Amazon reported introducing Sponsored Product and Brand prompts in Rufus."
+    why: "Eligible brands can test a paid prompt as an entry point to a product conversation."
+sources:
+  - title: "Amazon — Alexa for Shopping launch and features"
+    url: https://www.aboutamazon.com/news/retail/alexa-for-shopping-ai-assistant
+    checked: 2026-11-17
+  - title: "Amazon — How Rufus answers shopping questions"
+    url: https://www.aboutamazon.com/news/retail/amazon-rufus
+    checked: 2026-11-17
+  - title: "Amazon — Sponsored Product and Brand prompts"
+    url: https://www.aboutamazon.com/news/company-news/andy-jassy-amazon-ads-q1-2026-earnings
+    checked: 2026-11-17
