@@ -1,0 +1,37 @@
+name: "DeepSeek Chat"
+vendor: "DeepSeek"
+region: "global"
+summary: "DeepSeek Chat can search the web, open pages and link to citations. Its search and deep-thinking search give brand teams two ways to check what evidence supports an answer."
+actions:
+  - title: "Check the answer with web search enabled"
+    description: "Ask a product comparison that depends on current facts and enable Search. Open the citation attached to the claim you want to verify."
+  - title: "Repeat the same question with deep thinking and search"
+    description: "Check the pages opened in the multistep search and compare them with the final citations. Record differences in sources across the two modes."
+  - title: "Send the exact product or support URL"
+    description: "Ask DeepSeek Chat to open a specific page and extract the disputed specification or policy. Compare the page-reading result with what the open-web answer reported."
+mechanics:
+  - label: "When it searches"
+    description: "DeepSeek documents web search, deep thinking search and direct URL reading in consumer Chat. Deep thinking search can open pages in multiple steps."
+  - label: "Where results come from"
+    description: "DeepSeek Chat can show search, page-reading and citation blocks for web results."
+  - label: "Crawlers"
+    undocumented: true
+  - label: "Keeping a page out"
+    undocumented: true
+  - label: "Shopping"
+    undocumented: true
+  - label: "Ads"
+    undocumented: true
+  - label: "Measurement"
+    undocumented: true
+changes:
+  - date: "Nov 2026"
+    change: "DeepSeek published consumer Chat examples alongside its new application APIs."
+    why: "Brand teams can use the documented search and page-reading views to diagnose where a claim came from."
+sources:
+  - title: "DeepSeek — Consumer Chat example and search modes"
+    url: https://api-docs.deepseek.com/guides/build_a_chatbot/
+    checked: 2026-11-17
+  - title: "DeepSeek — The full DeepSeek App experience"
+    url: https://api-docs.deepseek.com/news/news261113/
+    checked: 2026-11-17

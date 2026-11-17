@@ -1,0 +1,46 @@
+name: "Perplexity"
+vendor: "Perplexity"
+region: "global"
+summary: "Perplexity searches the web and links to citations in its answers. Its Instant Buy flow lets US shoppers buy from compatible merchants inside Perplexity."
+actions:
+  - title: "Allow the search crawler in robots.txt and at your firewall"
+    description: "Check that PerplexityBot can reach your public pages. Use Perplexity’s current published IP ranges in your web application firewall if it blocks the crawler."
+  - title: "Check which source supports a brand claim"
+    description: "Open the citation next to the relevant sentence. Record the exact page supplying the claim, including independent publishers or retailers, so the team knows where a correction belongs."
+  - title: "Check whether your US product card offers Instant Buy"
+    description: "Search for a product you sell, open its card and check the merchant, price and checkout option. For Instant Buy, the merchant receives the order and handles fulfilment."
+mechanics:
+  - label: "When it searches"
+    description: "Perplexity gathers web information automatically and can fetch a page in response to a user request."
+  - label: "Where results come from"
+    description: "Answers link to web sources. Perplexity also has publishing partnerships."
+  - label: "Crawlers"
+    crawlers:
+      - userAgent: "PerplexityBot"
+        purpose: "Surfaces and links websites in search"
+        blocked: "Prevents the bot from crawling those pages for search"
+      - userAgent: "Perplexity-User"
+        purpose: "Fetches pages requested by users"
+        blocked: "Generally ignores robots.txt because the fetch is user-directed"
+  - label: "Keeping a page out"
+    description: "Use robots.txt to restrict PerplexityBot. Perplexity-User generally ignores robots.txt during user-requested fetches."
+  - label: "Shopping"
+    description: "In the US, eligible products from compatible merchants can be purchased through Instant Buy. Perplexity sends the order and payment to the merchant for fulfilment."
+  - label: "Ads"
+    undocumented: true
+  - label: "Measurement"
+    undocumented: true
+changes:
+  - date: "Oct 2026"
+    change: "Perplexity updated its US Instant Buy guidance for checkout with compatible merchants."
+    why: "Retailers can check which cards offer checkout and prepare support teams for orders placed in Perplexity."
+sources:
+  - title: "Perplexity Docs — Search crawlers and official IP ranges"
+    url: https://docs.perplexity.ai/docs/resources/perplexity-crawlers
+    checked: 2026-11-17
+  - title: "Perplexity Help — Instant Buy"
+    url: https://www.perplexity.ai/help-center/en/articles/10352906-what-is-instant-buy
+    checked: 2026-11-17
+  - title: "Perplexity — Publishers’ Program"
+    url: https://www.perplexity.ai/en-GB/hub/blog/introducing-the-perplexity-publishers-program
+    checked: 2026-11-17

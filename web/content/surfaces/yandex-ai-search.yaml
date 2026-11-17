@@ -1,0 +1,46 @@
+name: "Yandex Search with Alice AI"
+vendor: "Yandex"
+region: "Russia"
+summary: "Alice AI uses Yandex-indexed pages to answer search questions with links. It can also show merchant offers. Yandex Webmaster has a dedicated report for visibility in Alice AI answers."
+actions:
+  - title: "Track where Alice AI shows your site"
+    description: "Open Alice AI site visibility in Yandex Webmaster. Use share of voice to compare how often your site appears for the supported queries, and review the pages where Alice shows it."
+  - title: "Apply the Alice-specific exclusion if required"
+    description: "Add a robots.txt restriction for YandexAdditional or YandexAdditionalBot on the page you want to exclude from Alice’s answers. Keep the general Yandex Search decision separate."
+  - title: "Check your Yandex Products route to checkout"
+    description: "If you sell in Russia, use Yandex Products to check the onboarding route that applies to your store, website or Yandex Market account. Open an eligible product card and verify the one-click checkout details."
+mechanics:
+  - label: "When it searches"
+    description: "Alice can provide a sourced, generated answer when someone searches or asks a question in its search experience."
+  - label: "Where results come from"
+    description: "Yandex selects relevant content from pages it has indexed, analyses it and links to sources."
+  - label: "Crawlers"
+    crawlers:
+      - userAgent: "YandexAdditional / YandexAdditionalBot"
+        purpose: "Robots.txt controls for content in Search with Alice"
+        blocked: "Restricts display of content from the specified page in Alice answers"
+  - label: "Keeping a page out"
+    description: "Add the documented YandexAdditional or YandexAdditionalBot restriction to robots.txt for the pages you want excluded."
+  - label: "Shopping"
+    description: "Product results can include merchant offers. Eligible sellers can enable one-click purchase cards through Yandex Products and the universal checkout."
+  - label: "Ads"
+    undocumented: true
+  - label: "Measurement"
+    description: "Yandex Webmaster’s Alice AI visibility tool reports share of voice in Alice responses. It does not report impressions or clicks."
+changes:
+  - date: "Apr 2026"
+    change: "Yandex introduced Alice AI visibility reporting in Webmaster."
+    why: "Site owners can compare visibility in generated answers without using referral clicks as a proxy."
+sources:
+  - title: "Yandex Webmaster — Search with Alice and opt-out"
+    url: https://m.yandex.ru/support/webmaster/en/alice
+    checked: 2026-11-17
+  - title: "Yandex Webmaster — Site visibility in Alice AI"
+    url: https://yandex.ru/support/webmaster/ru/service/alice-answers
+    checked: 2026-11-17
+  - title: "Yandex — Visibility reporting launch"
+    url: https://ir.yandex.ru/press-releases?id=07-04-2026-01&year=2026
+    checked: 2026-11-17
+  - title: "Yandex Advertising — Shopping and universal checkout"
+    url: https://b2b.yandex.ru/adv/news/prodazhi-iz-poiska-i-alisy-ai-teper-dostupny-dlya-vsekh-prodavczov
+    checked: 2026-11-17

@@ -1,0 +1,18 @@
+{
+  "mistral-le-chat": "Mistral documents the move from Le Chat to Vibe. Merchant and publisher controls for Vibe are not documented by Mistral.",
+  "you-com": "You.com documents its search API. Consumer search controls for brands are not documented by You.com.",
+  "duckduckgo-duck-ai": "DuckDuckGo explains how Duck.ai selects web sources. Duck.ai-specific publisher and merchant controls are not documented by DuckDuckGo.",
+  "genspark": "Genspark documents its workspace and assistants. Publisher controls for consumer answers are not documented by Genspark.",
+  "quark-ai": "Quark describes its AI search and assistant. Crawler and merchant inclusion controls are not documented by Quark.",
+  "tencent-yuanbao": "Tencent describes Yuanbao’s assistant. Publisher eligibility and citation reporting are not documented by Tencent.",
+  "kimi": "Moonshot AI documents Kimi’s assistant and research tools. Publisher and shopping controls are not documented by Moonshot AI.",
+  "nano-ai-search": "360’s Nano search URL now leads to its workspace. Current publisher controls for consumer Nano AI Search are not documented by 360.",
+  "zhipu-qingyan": "Zhipu documents its assistant. Brand or publisher controls for Qingyan answers are not documented by Zhipu.",
+  "gigachat": "Sber describes GigaChat’s assistant. Publisher eligibility and brand measurement are not documented by Sber.",
+  "baidu-wenxin-assistant": "Baidu’s reporting covers AI citations in regular Search. Equivalent reporting and controls for Wenxin Assistant are not documented by Baidu.",
+  "kakao-kanana": "Kakao announced Kanana Search in KakaoTalk. Local listing and publisher eligibility for its answers are not documented by Kakao.",
+  "felo": "Felo documents real-time search and footnotes. Publisher and merchant controls are not documented by Felo.",
+  "manus": "Manus documents its general-purpose agent. Publisher or merchant participation in its research answers is not documented by Manus.",
+  "poe": "Poe hosts different assistants with different capabilities. A common publisher or shopping programme for their answers is not documented by Poe.",
+  "apple-intelligence-siri": "Apple documents Siri’s ChatGPT handoff. A Siri-specific route for publisher or merchant inclusion is not documented by Apple."
+}

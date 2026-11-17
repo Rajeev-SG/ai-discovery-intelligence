@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Fragment } from "react";
 import registry from "@/lib/generated-registry.json";
+import comingSoonReasons from "@/content/coming-soon.json";
 import { formatCheckedDate, type Crawler, type SurfaceGuide } from "@/lib/surface-guides";
 import styles from "./surface-field-guide.module.css";
 
@@ -19,7 +20,7 @@ function SurfaceSwitcher({
   slug,
   guides,
 }: {
-  slug: string;
+  slug?: string;
   guides: Map<string, SurfaceGuide>;
 }) {
   const listed = new Set(featured.map((surface) => surface.slug));
@@ -27,31 +28,39 @@ function SurfaceSwitcher({
     .filter(([id]) => !listed.has(id))
     .map(([id, guide]) => ({ slug: id, name: guide.name }));
   const comingSoon = registry.surfaces.filter(
-    ({ id }) => !listed.has(id) && !guides.has(id) && !coveredByGoogleGuide.has(id),
+    ({ id }) => !guides.has(id) && !coveredByGoogleGuide.has(id),
   );
+  const reasons: Readonly<Record<string, string>> = comingSoonReasons;
 
   return (
     <nav className={styles.switcher} aria-label="AI surfaces">
-      {[...featured, ...published].map(({ slug: id, name }) =>
-        guides.has(id) ? (
-          <Link key={id} className={styles.pill} href={`/surfaces/${id}`} aria-current={id === slug ? "page" : undefined}>
-            {name}
-          </Link>
-        ) : (
-          <span key={id} className={styles.pill}>
-            {name} <small>Coming soon</small>
-          </span>
-        ),
+      {[...featured, ...published].filter(({ slug: id }) => guides.has(id)).map(({ slug: id, name }) => (
+        <Link key={id} className={styles.pill} href={`/surfaces/${id}`} aria-current={id === slug ? "page" : undefined}>
+          {name}
+        </Link>
+      ))}
+      {comingSoon.length > 0 && (
+        <details className={styles.more}>
+          <summary className={styles.pill}>Coming soon</summary>
+          <ul>
+            {comingSoon.map(({ id, name }) => (
+              <li key={id}>{name}<small>{reasons[id]}</small></li>
+            ))}
+          </ul>
+        </details>
       )}
-      <details className={styles.more}>
-        <summary className={styles.pill}>More…</summary>
-        <ul>
-          {comingSoon.map(({ id, name }) => (
-            <li key={id}>{name} <small>Coming soon</small></li>
-          ))}
-        </ul>
-      </details>
     </nav>
+  );
+}
+
+export function SurfaceDirectory({ guides }: { guides: Map<string, SurfaceGuide> }) {
+  return (
+    <div className={styles.page}>
+      <div className={styles.shell}>
+        <h1 className={styles.intro}>Where brands show up in AI answers, shopping recommendations and ads.</h1>
+        <SurfaceSwitcher guides={guides} />
+      </div>
+    </div>
   );
 }
 

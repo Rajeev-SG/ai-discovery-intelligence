@@ -12,21 +12,38 @@ actions:
   - title: Check the product card and its Shopping destination
     description: >-
       Search for a product you sell, open its card if it appears, and verify that it takes shoppers to the intended NAVER Shopping listing.
+  - title: Test the follow-up from AI Briefing
+    description: >-
+      Start from a regular NAVER Search query. Where AI Briefing offers a follow-up box, continue into AI Tab
+      and check which place or product details it carries into the conversation.
 mechanics:
   - label: When it searches
-    description: People open AI Tab from NAVER’s mobile or desktop search bar and ask a question.
+    description: People open AI Tab from NAVER’s mobile or desktop search bar. A follow-up in AI Briefing can also lead into AI Tab.
   - label: Where results come from
     description: Local answers can show NAVER Map details and live reservation slots.
+  - label: Crawlers
+    undocumented: true
+  - label: Keeping a page out
+    undocumented: true
   - label: Shopping
     description: Product cards in answers can send shoppers into NAVER Shopping.
+  - label: Ads
+    undocumented: true
   - label: Measurement
     description: >-
-      NAVER reported click-through rates above 20% for both product and place cards during the April–June 2026 beta.
+      NAVER reported click-through rates above 20% for both product and place cards during the April–June 2026 beta for NAVER Plus members.
+      These are product-wide beta figures.
 changes:
+  - date: Jul 2026
+    change: NAVER added an AI Briefing route into AI Tab for follow-up questions.
+    why: A buyer can move from a regular search summary to a conversation about the same query.
   - date: Jun 2026
     change: NAVER launched AI Tab for all users and replaced Green Dot in the app search bar.
     why: Place discovery and booking became reachable directly from the main search bar.
 sources:
   - title: NAVER — AI Tab launch
     url: https://www.navercorp.com/media/pressReleasesDetail?seq=10034442
+    checked: 2026-11-17
+  - title: NAVER — AI Tab and AI Briefing follow-ups
+    url: https://www.navercorp.com/media/pressReleasesDetail?seq=10034523
     checked: 2026-11-17

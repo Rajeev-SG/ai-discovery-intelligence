@@ -1,0 +1,37 @@
+name: "Bing Copilot Search"
+vendor: "Microsoft"
+region: "global"
+summary: "Copilot Search is Bing’s dedicated generative search experience. It links to the passages and pages behind its answers and offers related searches."
+actions:
+  - title: "Check the full source list next to the answer"
+    description: "Open Copilot Search from Bing and expand the source list for a brand or product question. Click the linked passage to check the exact URL behind a claim."
+  - title: "Follow the related topics Bing offers"
+    description: "Open the next relevant suggested topic and check whether the product, publisher or retailer cited changes. Capture themes a buyer can discover without starting another search."
+  - title: "Compare cited URLs in Bing Webmaster Tools"
+    description: "Use AI Performance to see which of your URLs are cited across participating Microsoft experiences. Compare it with your manual Bing Copilot Search checks."
+mechanics:
+  - label: "When it searches"
+    description: "People can open Copilot Search from Bing’s navigation or from suggested topics under relevant Bing answers."
+  - label: "Where results come from"
+    description: "Bing provides a source list, linked passages and related web results."
+  - label: "Crawlers"
+    undocumented: true
+  - label: "Keeping a page out"
+    undocumented: true
+  - label: "Shopping"
+    undocumented: true
+  - label: "Ads"
+    undocumented: true
+  - label: "Measurement"
+    description: "Bing Webmaster Tools reports aggregate AI citation activity across Microsoft Copilot, Bing AI summaries and select partners."
+changes:
+  - date: "Apr 2025"
+    change: "Microsoft launched Copilot Search in Bing."
+    why: "A source list and linked passages made it easier to trace the evidence behind a brand or product claim."
+sources:
+  - title: "Bing — Copilot Search launch"
+    url: https://blogs.bing.com/search/2025/4/Introducing-Copilot-Search-in-Bing/
+    checked: 2026-11-17
+  - title: "Bing Webmaster Tools — AI Performance"
+    url: https://blogs.bing.com/webmaster/2026/2/Introducing-AI-Performance-in-Bing-Webmaster-Tools-Public-Preview/
+    checked: 2026-11-17

@@ -2,5 +2,13 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "buildCommand": "next build",
-  "installCommand": "npm ci"
+  "installCommand": "npm ci",
+  "redirects": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "ai-discovery-observation-plane-rust\\.vercel\\.app" }],
+      "destination": "/solutions/ai-discovery",
+      "permanent": false
+    }
+  ]
 }

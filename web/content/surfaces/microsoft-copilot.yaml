@@ -1,0 +1,49 @@
+name: "Microsoft Copilot"
+vendor: "Microsoft"
+region: "global"
+summary: "Consumer Copilot can use web results in its answers, show products and let eligible shoppers check out. Bing Webmaster Tools reports citations across several Microsoft AI experiences, including Copilot."
+actions:
+  - title: "Track cited pages in Bing Webmaster Tools"
+    description: "Open AI Performance and compare total citations and the pages cited over time. The data combines supported Microsoft experiences and select partners."
+  - title: "Check your Merchant Center product data"
+    description: "Review product variants, availability and the landing pages in your Microsoft Merchant Center feed. Microsoft uses feeds for product discovery and uses UCP to support transactions for eligible merchants."
+  - title: "Verify the checkout path for your store"
+    description: "Check Microsoft’s onboarding requirements for your commerce platform. If you use Shopify, review the Copilot storefront controls in Shopify admin."
+mechanics:
+  - label: "When it searches"
+    description: "Microsoft says Copilot can search the web when it needs current information."
+  - label: "Where results come from"
+    description: "Copilot can use material from the web and provide source links. Bing Webmaster’s citation report includes Microsoft Copilot."
+  - label: "Crawlers"
+    undocumented: true
+  - label: "Keeping a page out"
+    undocumented: true
+  - label: "Shopping"
+    description: "Product feeds help Microsoft identify products. Copilot Checkout is available to eligible English-language merchants selling to US buyers in US dollars."
+  - label: "Ads"
+    description: "Offer Highlights can show differentiators supplied in Microsoft Merchant Center in ads on Copilot product detail pages. Microsoft announced this for retail in English-speaking markets."
+  - label: "Measurement"
+    description: "Bing Webmaster Tools’ AI Performance reports citations, cited URLs and a sample of retrieval queries across supported experiences."
+changes:
+  - date: "Feb 2026"
+    change: "Microsoft introduced AI Performance in Bing Webmaster Tools."
+    why: "Site owners gained citation data for their own URLs across participating AI experiences."
+  - date: "Jan 2026"
+    change: "Microsoft announced Copilot Checkout."
+    why: "Eligible retailers can convert a recommendation into a purchase inside the assistant."
+sources:
+  - title: "Microsoft Support — Consumer Copilot transparency note"
+    url: https://support.microsoft.com/en-au/privacy/microsoft-copilot/transparency-note
+    checked: 2026-11-17
+  - title: "Bing Webmaster Tools — AI Performance"
+    url: https://blogs.bing.com/webmaster/2026/2/Introducing-AI-Performance-in-Bing-Webmaster-Tools-Public-Preview/
+    checked: 2026-11-17
+  - title: "Microsoft Advertising — Merchant onboarding and checkout"
+    url: https://about.ads.microsoft.com/en/solutions/technology/agentic-commerce
+    checked: 2026-11-17
+  - title: "Microsoft Advertising — Copilot Checkout launch"
+    url: https://about.ads.microsoft.com/en/blog/post/january-2026/conversations-that-convert-copilot-checkout-and-brand-agents
+    checked: 2026-11-17
+  - title: "Microsoft Advertising — Offer Highlights"
+    url: https://about.ads.microsoft.com/en/blog/post/april-2026/win-across-all-three-eras-of-the-web
+    checked: 2026-11-17

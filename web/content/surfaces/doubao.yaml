@@ -1,0 +1,34 @@
+name: "Doubao"
+vendor: "ByteDance"
+region: "China"
+summary: "Doubao can show shopping and local offers from Douyin’s commerce services. Buyers who connect their Douyin accounts can shop inside the Doubao app."
+actions:
+  - title: "Check your Douyin Shop offer inside Doubao"
+    description: "Use a linked Douyin account to search for an item you sell. When a product appears, check the seller, variant and price against the offer in Douyin Shop."
+  - title: "Test the local deal separately"
+    description: "If you sell through Douyin Local Services, check the offer in Doubao using the city and category it applies to. Confirm that the location and deal match what customers can buy."
+  - title: "Give support the Doubao order path"
+    description: "For shoppers who buy inside the app, use My → Settings → My orders to identify the underlying order. Route product and group-buying queries to the relevant Douyin commerce service."
+mechanics:
+  - label: "When it searches"
+    description: "Doubao supports product questions and browsing or ordering through partner services. The general web-search trigger is not documented by ByteDance."
+  - label: "Where results come from"
+    description: "The documented shopping partners include Douyin E-commerce for products and Douyin Local Services for group-buying offers."
+  - label: "Crawlers"
+    undocumented: true
+  - label: "Keeping a page out"
+    undocumented: true
+  - label: "Shopping"
+    description: "Users can browse, add to cart and order eligible products or services inside Doubao. Orders can be viewed in the app, with commerce provided by the partner platforms."
+  - label: "Ads"
+    undocumented: true
+  - label: "Measurement"
+    undocumented: true
+changes:
+  - date: "Sep 2026"
+    change: "Doubao’s updated privacy notice documents linked Douyin shopping and partner fulfilment paths."
+    why: "Merchants can check the buyer journey in Doubao and identify which Douyin service owns the transaction."
+sources:
+  - title: "Doubao — App privacy notice, sections 1.11.3–1.11.4 and linked Douyin services"
+    url: https://www.doubao.com/legal/privacy
+    checked: 2026-11-17

@@ -12,9 +12,13 @@ actions:
   - title: Keep Merchant Center product data current
     description: >-
       Match product details, prices and availability to your landing pages. AI Mode can show product cards from Google’s Shopping Graph.
-  - title: Brief media teams on where existing campaigns can appear
+  - title: Check campaign eligibility for exploratory queries
     description: >-
-      Eligible Search, Shopping and Performance Max campaigns can serve in these placements. Google includes the results in standard campaign reporting.
+      AI Max, broad match, Shopping and Performance Max can match the query and the AI answer context.
+      Exact and phrase match can serve when the query itself expresses direct commercial intent.
+  - title: Track organic AI visibility in Search Console
+    description: >-
+      Open Search Generative AI performance to see impressions by page, country and device. Use the standard Web report for overall search traffic.
 mechanics:
   - label: When it searches
     description: >-
@@ -38,11 +42,15 @@ mechanics:
   - label: Ads
     description: >-
       Sponsored text and Shopping ads can appear within or next to AI answers where supported.
-      There’s no separate campaign for targeting only these placements.
+      Google Ads does not offer exclusive targeting or a separate opt-out for these placements.
   - label: Measurement
     description: >-
-      Organic clicks are included in Search Console’s Web search totals. Paid impressions, clicks and conversions roll up into regular Google Ads reporting.
+      Search Console has a dedicated organic AI impressions report. Overall organic search traffic remains in the Web report.
+      Paid impressions, clicks and conversions are aggregated in standard Google Ads reporting.
 changes:
+  - date: Aug 2026
+    change: Google completed the worldwide rollout of its Search Generative AI performance reports.
+    why: Teams can track which URLs appear in Search AI features separately from total Search impressions.
   - date: May 2025
     change: Google began rolling out AI Mode in US Search beyond Labs.
     why: Shoppers could enter a dedicated search conversation and follow up on comparisons.
@@ -58,4 +66,7 @@ sources:
     checked: 2026-11-17
   - title: Google — AI Mode rollout in Search
     url: https://blog.google/products-and-platforms/products/search/google-search-ai-mode-update/
+    checked: 2026-11-17
+  - title: Google Search Central — Search Generative AI performance reports
+    url: https://developers.google.com/search/blog/2026/06/gen-ai-performance-reports
     checked: 2026-11-17
