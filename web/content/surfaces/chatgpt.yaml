@@ -1,0 +1,84 @@
+name: ChatGPT
+vendor: OpenAI
+region: global
+summary: >-
+  Answers questions from its own crawl of the web plus third-party search providers, links to the pages it uses,
+  recommends products in the US, and now sells ads beneath its answers. Getting in is mostly a robots.txt decision;
+  getting chosen depends on your content.
+actions:
+  - title: Allow OAI-SearchBot in robots.txt
+    description: >-
+      It is the only way into ChatGPT’s search answers. Blocking GPTBot (training) is a separate choice and doesn’t affect this.
+      Changes take about 24 hours.
+  - title: Selling products in the US? Send a product feed
+    description: >-
+      Apply through ChatGPT merchants. Shopify and Etsy catalogues are already connected.
+      No fees; purchases complete on your own site.
+  - title: Measure it as its own channel
+    description: Links from ChatGPT search carry `utm_source=chatgpt.com`. Add it to your analytics channel grouping.
+  - title: Test ChatGPT Ads if you can buy conversational intent
+    description: >-
+      Ads appear below answers, labelled Sponsored, and OpenAI says they don’t influence the answer itself.
+      Self-serve Ads Manager is in beta.
+mechanics:
+  - label: When it searches
+    undocumented: true
+  - label: Where results come from
+    description: >-
+      OpenAI’s own crawler (OAI-SearchBot) plus third-party search providers, which OpenAI doesn’t name.
+      Some news publishers supply content directly through partnerships.
+  - label: Crawlers
+    crawlers:
+      - userAgent: OAI-SearchBot
+        purpose: Search answers
+        blocked: Out of answers; may still show as a bare link
+      - userAgent: GPTBot
+        purpose: Model training
+        blocked: Opts out of training only
+      - userAgent: ChatGPT-User
+        purpose: Pages a user asks about
+        blocked: robots.txt may not apply
+      - userAgent: OAI-AdsBot
+        purpose: Reviewing ad landing pages
+        blocked: Only visits pages you submit as ads
+  - label: Keeping a page out
+    description: >-
+      A disallowed URL can still appear as a link and title if OpenAI learns of it elsewhere.
+      Use a `noindex` tag — and let the crawler fetch the page so it can see the tag.
+  - label: Shopping
+    description: >-
+      US only for now. Products come from merchant feeds or crawled pages; feeds give more control over how items appear.
+      OpenAI has scaled back its in-chat Instant Checkout — shoppers now buy on the merchant’s site. How products are ranked is not documented.
+  - label: Ads
+    description: >-
+      Launched in the US in February 2026 for logged-in adults on the Free and Go plans; paid plans stay ad-free.
+      Expanded to dozens of countries during 2026 — OpenAI’s own posts give different counts (60+ and 89), so check your market.
+  - label: Measurement
+    description: >-
+      Referral links are tagged `utm_source=chatgpt.com`. Answers that mention you without a click are invisible to analytics.
+changes:
+  - date: Late 2026
+    change: Instant Checkout scaled back; merchant-owned checkout preferred.
+    why: Feed quality now matters more than checkout integration.
+  - date: "2026"
+    change: Ads expanded beyond the US, with a self-serve Ads Manager.
+    why: ChatGPT is now a paid media channel, not only an organic one.
+  - date: Feb 2026
+    change: Ads launched in the US.
+    why: New crawler OAI-AdsBot reviews ad landing pages.
+sources:
+  - title: OpenAI — Overview of OpenAI crawlers
+    url: https://developers.openai.com/api/docs/bots
+    checked: 2026-11-17
+  - title: OpenAI Help — Publishers and developers FAQ
+    url: https://help.openai.com/en/articles/12627856
+    checked: 2026-11-17
+  - title: OpenAI — ChatGPT merchants
+    url: https://chatgpt.com/merchants/
+    checked: 2026-11-17
+  - title: OpenAI Help — Ads in ChatGPT
+    url: https://help.openai.com/en/articles/20001047-ads-in-chatgpt
+    checked: 2026-11-17
+  - title: OpenAI — ChatGPT Ads expands to 26 new countries
+    url: https://openai.com/index/chatgpt-ads-expands-26-new-countries/
+    checked: 2026-11-17

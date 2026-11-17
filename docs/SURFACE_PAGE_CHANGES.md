@@ -1,0 +1,3 @@
+# Future source for surface updates
+
+The existing `GET /events?surface=<surface-id>` endpoint can supply candidates for the field guide’s “Recent changes that matter” section without a backend change. Use the event’s effective or publication date and its title as the starting point, and verify it against the linked sources. For a guide covering multiple products, fetch their existing surface IDs separately and deduplicate overlapping events. An editor can select changes with consequences for brands, write the “why it matters” sentence, and save the approved rows in the surface YAML. Keep the guide independent of the live endpoint.

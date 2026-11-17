@@ -34,7 +34,7 @@ test.beforeAll(() => {
 });
 
 test.beforeEach(async ({ page }) => {
-  await page.goto(BASE ?? "/surfaces");
+  await page.goto(BASE ?? "/archive/surfaces");
 });
 
 test("renders every canonical surface and the named global/regional products", async ({ page }) => {

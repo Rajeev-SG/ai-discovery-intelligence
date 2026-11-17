@@ -1,0 +1,61 @@
+name: Google AI Overviews & AI Mode
+vendor: Google
+region: global
+summary: >-
+  AI Overviews summarise selected queries in Google Search. AI Mode gives people a separate place to ask follow-up questions
+  and compare options. Both can run related searches and show links to supporting pages. Pages eligible for a normal
+  Google Search snippet can also be eligible here.
+actions:
+  - title: Check that key pages are indexed and eligible for snippets
+    description: >-
+      Use Search Console’s URL Inspection tool to check priority pages. Google requires no extra schema or special file for either feature.
+  - title: Keep Merchant Center product data current
+    description: >-
+      Match product details, prices and availability to your landing pages. AI Mode can show product cards from Google’s Shopping Graph.
+  - title: Brief media teams on where existing campaigns can appear
+    description: >-
+      Eligible Search, Shopping and Performance Max campaigns can serve in these placements. Google includes the results in standard campaign reporting.
+mechanics:
+  - label: When it searches
+    description: >-
+      An AI Overview appears when Google judges that a summary would add value to standard results.
+      People can choose AI Mode to ask a question and continue with follow-ups.
+  - label: Where results come from
+    description: >-
+      Both features can break a question into related searches and find supporting pages for different parts of the answer.
+      The links can differ between AI Overviews and AI Mode.
+  - label: Crawlers
+    crawlers:
+      - userAgent: Googlebot
+        purpose: Crawls for Google Search, including its AI features
+        blocked: Googlebot cannot fetch the blocked pages
+  - label: Keeping a page out
+    description: >-
+      Use `nosnippet` to withhold a Search snippet or `noindex` to remove a page from Search.
+      Allow Googlebot to fetch the page so it can read the directive.
+  - label: Shopping
+    description: AI Mode can show product cards based on Google’s Shopping Graph.
+  - label: Ads
+    description: >-
+      Sponsored text and Shopping ads can appear within or next to AI answers where supported.
+      There’s no separate campaign for targeting only these placements.
+  - label: Measurement
+    description: >-
+      Organic clicks are included in Search Console’s Web search totals. Paid impressions, clicks and conversions roll up into regular Google Ads reporting.
+changes:
+  - date: May 2025
+    change: Google began rolling out AI Mode in US Search beyond Labs.
+    why: Shoppers could enter a dedicated search conversation and follow up on comparisons.
+sources:
+  - title: Google Search Central — AI features and your website
+    url: https://developers.google.com/search/docs/appearance/ai-features
+    checked: 2026-11-17
+  - title: Google — AI Mode product and place cards
+    url: https://blog.google/products-and-platforms/products/search/ai-mode-updates-may-2025/
+    checked: 2026-11-17
+  - title: Google Ads Help — Ads in AI-powered experiences in Google Search
+    url: https://support.google.com/google-ads/answer/18826097
+    checked: 2026-11-17
+  - title: Google — AI Mode rollout in Search
+    url: https://blog.google/products-and-platforms/products/search/google-search-ai-mode-update/
+    checked: 2026-11-17

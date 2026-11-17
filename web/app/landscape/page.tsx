@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
  * Primary landscape + mechanics comparison (Phase 2, issue #60). The marketer
  * answers "what AI discovery surfaces exist and how do they differ?" without
  * navigating the analyst registry first. The exhaustive 35-surface registry
- * remains available at /surfaces for deep exploration.
+ * remains available at /archive/surfaces for deep exploration.
  */
 export default async function LandscapePage() {
   const outcome = await fetchLandscape();

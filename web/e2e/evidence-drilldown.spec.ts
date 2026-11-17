@@ -24,7 +24,7 @@ test("evidenced surface: every claim, value, source link, provenance and confide
   test.skip(!HAS_API, "requires EVIDENCE_API_URL or EVIDENCE_FIXTURE=1");
   test.skip((page.viewportSize()?.width ?? 0) < 861, DESKTOP_ONLY);
 
-  await page.goto("/surfaces");
+  await page.goto("/archive/surfaces");
   await page.getByTestId("search-input").fill("ChatGPT");
   await page.getByTestId("row-chatgpt").scrollIntoViewIfNeeded();
   await page.getByTestId("cell-chatgpt-evidence").click();
@@ -71,7 +71,7 @@ test("no-evidence surface: explicit state, no contradictory chrome", async ({ pa
   test.skip(!HAS_API, "requires EVIDENCE_API_URL or EVIDENCE_FIXTURE=1");
   test.skip((page.viewportSize()?.width ?? 0) < 861, DESKTOP_ONLY);
 
-  await page.goto("/surfaces");
+  await page.goto("/archive/surfaces");
   await page.getByTestId("search-input").fill("Grok");
   await page.getByTestId("row-grok").scrollIntoViewIfNeeded();
   await page.getByTestId("cell-grok-evidence").click();

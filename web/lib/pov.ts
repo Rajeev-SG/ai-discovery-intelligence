@@ -124,10 +124,10 @@ export function formatDateTime(iso: string | null): string {
 
 /**
  * Link an evidence/claim id to the observation-plane evidence drill-down, which
- * now lives at `/surfaces` (issue #45 moved the registry off the root).
+ * now lives under `/archive/surfaces`.
  */
 export function evidenceHref(claimId: string): string {
-  return `/surfaces?evidence=${encodeURIComponent(claimId)}`;
+  return `/archive/surfaces?evidence=${encodeURIComponent(claimId)}`;
 }
 
 function asEvidence(raw: unknown): PovEvidence {
