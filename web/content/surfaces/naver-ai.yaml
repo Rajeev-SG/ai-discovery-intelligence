@@ -1,0 +1,32 @@
+name: NAVER AI Tab
+vendor: NAVER
+region: South Korea
+summary: >-
+  AI Tab brings conversational search into NAVER’s mobile and desktop search bars. Answers can show shopping and place cards,
+  NAVER Map details and available reservation times. For restaurants and other bookable venues, a recommendation can lead straight to a booking.
+actions:
+  - title: Check your NAVER Map listing and available booking slots
+    description: >-
+      Run a search for your venue type, neighbourhood and a specific time in AI Tab. If your venue appears, check that the map details
+      and available slots match what customers can book.
+  - title: Check the product card and its Shopping destination
+    description: >-
+      Search for a product you sell, open its card if it appears, and verify that it takes shoppers to the intended NAVER Shopping listing.
+mechanics:
+  - label: When it searches
+    description: People open AI Tab from NAVER’s mobile or desktop search bar and ask a question.
+  - label: Where results come from
+    description: Local answers can show NAVER Map details and live reservation slots.
+  - label: Shopping
+    description: Product cards in answers can send shoppers into NAVER Shopping.
+  - label: Measurement
+    description: >-
+      NAVER reported click-through rates above 20% for both product and place cards during the April–June 2026 beta.
+changes:
+  - date: Jun 2026
+    change: NAVER launched AI Tab for all users and replaced Green Dot in the app search bar.
+    why: Place discovery and booking became reachable directly from the main search bar.
+sources:
+  - title: NAVER — AI Tab launch
+    url: https://www.navercorp.com/media/pressReleasesDetail?seq=10034442
+    checked: 2026-11-17

@@ -49,7 +49,7 @@ function ImplicationCard({ impl, showSurfaces = true }: { impl: Implication; sho
         <p className="impl-scope">
           <strong>Applies to:</strong>{" "}
           {impl.surfaces.map((s) => (
-            <Link key={s} className="impl-surface-link" href={`/surfaces?surface=${encodeURIComponent(s)}`}>
+            <Link key={s} className="impl-surface-link" href={`/archive/surfaces?surface=${encodeURIComponent(s)}`}>
               {s}
             </Link>
           ))}

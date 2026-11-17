@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ChatGPT — how it finds and shows brands</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FFFFFF}
+a{color:#1F5FD1}a:hover{color:#163F8C}
+</style>
+</helmet>
+<div style="font-family: Inter, system-ui, sans-serif; color: #111418; background: #FFFFFF; padding: 32px 24px 64px; box-sizing: border-box;">
+<div style="max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px;">
+
+<!-- Surface switcher -->
+<nav aria-label="AI surfaces" style="display: flex; flex-wrap: wrap; gap: 8px;">
+<a href="#" aria-current="page" style="text-decoration: none; background: #111418; color: #FFFFFF; font-size: 14px; font-weight: 500; padding: 10px 14px; border-radius: 999px;">ChatGPT</a>
+<a href="#" style="text-decoration: none; background: #F1F3F6; color: #2A3038; font-size: 14px; font-weight: 500; padding: 10px 14px; border-radius: 999px;">Google AI Overviews &amp; AI Mode</a>
+<a href="#" style="text-decoration: none; background: #F1F3F6; color: #2A3038; font-size: 14px; font-weight: 500; padding: 10px 14px; border-radius: 999px;">Gemini</a>
+<a href="#" style="text-decoration: none; background: #F1F3F6; color: #2A3038; font-size: 14px; font-weight: 500; padding: 10px 14px; border-radius: 999px;">Perplexity</a>
+<a href="#" style="text-decoration: none; background: #F1F3F6; color: #2A3038; font-size: 14px; font-weight: 500; padding: 10px 14px; border-radius: 999px;">Copilot</a>
+<a href="#" style="text-decoration: none; background: #F1F3F6; color: #2A3038; font-size: 14px; font-weight: 500; padding: 10px 14px; border-radius: 999px;">Meta AI</a>
+<a href="#" style="text-decoration: none; background: #F1F3F6; color: #2A3038; font-size: 14px; font-weight: 500; padding: 10px 14px; border-radius: 999px;">More…</a>
+</nav>
+
+<!-- Header -->
+<header style="display: flex; flex-direction: column; gap: 14px;">
+<span style="font-size: 14px; color: #5B6470; font-weight: 500;">OpenAI · global</span>
+<h1 style="margin: 0; font-size: 40px; line-height: 1.15; font-weight: 700; letter-spacing: -0.02em;">ChatGPT</h1>
+<p style="margin: 0; font-size: 19px; line-height: 1.6; color: #2A3038; max-width: 760px;">Answers questions from its own crawl of the web plus third-party search providers, links to the pages it uses, recommends products in the US, and now sells ads beneath its answers. Getting in is mostly a robots.txt decision; getting chosen depends on your content.</p>
+<span style="font-size: 13px; color: #5B6470;">Sources checked 17 Nov 2026</span>
+</header>
+
+<!-- Actions -->
+<section style="background: #F3F7FF; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 18px;">
+<h2 style="margin: 0; font-size: 22px; font-weight: 650;">What to do</h2>
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 16px;">
+<li style="display: flex; gap: 14px;"><span style="flex: none; width: 28px; height: 28px; border-radius: 999px; background: #1F5FD1; color: #FFFFFF; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center;">1</span><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 16px; font-weight: 600;">Allow OAI-SearchBot in robots.txt</span><span style="font-size: 15px; line-height: 1.55; color: #3A414B;">It is the only way into ChatGPT’s search answers. Blocking GPTBot (training) is a separate choice and doesn’t affect this. Changes take about 24 hours.</span></div></li>
+<li style="display: flex; gap: 14px;"><span style="flex: none; width: 28px; height: 28px; border-radius: 999px; background: #1F5FD1; color: #FFFFFF; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center;">2</span><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 16px; font-weight: 600;">Selling products in the US? Send a product feed</span><span style="font-size: 15px; line-height: 1.55; color: #3A414B;">Apply through ChatGPT merchants. Shopify and Etsy catalogues are already connected. No fees; purchases complete on your own site.</span></div></li>
+<li style="display: flex; gap: 14px;"><span style="flex: none; width: 28px; height: 28px; border-radius: 999px; background: #1F5FD1; color: #FFFFFF; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center;">3</span><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 16px; font-weight: 600;">Measure it as its own channel</span><span style="font-size: 15px; line-height: 1.55; color: #3A414B;">Links from ChatGPT search carry <code style="font-size: 14px; background: #FFFFFF; padding: 1px 5px; border-radius: 4px;">utm_source=chatgpt.com</code>. Add it to your analytics channel grouping.</span></div></li>
+<li style="display: flex; gap: 14px;"><span style="flex: none; width: 28px; height: 28px; border-radius: 999px; background: #1F5FD1; color: #FFFFFF; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center;">4</span><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 16px; font-weight: 600;">Test ChatGPT Ads if you can buy conversational intent</span><span style="font-size: 15px; line-height: 1.55; color: #3A414B;">Ads appear below answers, labelled Sponsored, and OpenAI says they don’t influence the answer itself. Self-serve Ads Manager is in beta.</span></div></li>
+</ol>
+</section>
+
+<!-- How it works -->
+<section style="display: flex; flex-direction: column; gap: 6px;">
+<h2 style="margin: 0 0 10px; font-size: 24px; font-weight: 650;">How it works</h2>
+
+<div style="display: grid; grid-template-columns: minmax(150px, 200px) minmax(0, 1fr); gap: 8px 24px; padding: 16px 0; border-top: 1px solid #E3E6EA;">
+<span style="font-size: 15px; font-weight: 600;">When it searches</span>
+<span style="font-size: 15px; line-height: 1.6; color: #8A3F00;">Not documented by OpenAI.</span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(150px, 200px) minmax(0, 1fr); gap: 8px 24px; padding: 16px 0; border-top: 1px solid #E3E6EA;">
+<span style="font-size: 15px; font-weight: 600;">Where results come from</span>
+<span style="font-size: 15px; line-height: 1.6; color: #2A3038;">OpenAI’s own crawler (OAI-SearchBot) plus third-party search providers, which OpenAI doesn’t name. Some news publishers supply content directly through partnerships.</span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(150px, 200px) minmax(0, 1fr); gap: 8px 24px; padding: 16px 0; border-top: 1px solid #E3E6EA;">
+<span style="font-size: 15px; font-weight: 600;">Crawlers</span>
+<div style="overflow-x: auto;">
+<table style="width: 100%; min-width: 460px; border-collapse: collapse; font-size: 14px; line-height: 1.5;">
+<thead><tr style="text-align: left; color: #5B6470;"><th scope="col" style="padding: 0 12px 8px 0; font-weight: 600; font-size: 13px;">User agent</th><th scope="col" style="padding: 0 12px 8px 0; font-weight: 600; font-size: 13px;">Used for</th><th scope="col" style="padding: 0 0 8px; font-weight: 600; font-size: 13px;">If you block it</th></tr></thead>
+<tbody>
+<tr style="border-top: 1px solid #EEF0F3;"><td style="padding: 8px 12px 8px 0; font-weight: 600;">OAI-SearchBot</td><td style="padding: 8px 12px 8px 0;">Search answers</td><td style="padding: 8px 0;">Out of answers; may still show as a bare link</td></tr>
+<tr style="border-top: 1px solid #EEF0F3;"><td style="padding: 8px 12px 8px 0; font-weight: 600;">GPTBot</td><td style="padding: 8px 12px 8px 0;">Model training</td><td style="padding: 8px 0;">Opts out of training only</td></tr>
+<tr style="border-top: 1px solid #EEF0F3;"><td style="padding: 8px 12px 8px 0; font-weight: 600;">ChatGPT-User</td><td style="padding: 8px 12px 8px 0;">Pages a user asks about</td><td style="padding: 8px 0;">robots.txt may not apply</td></tr>
+<tr style="border-top: 1px solid #EEF0F3;"><td style="padding: 8px 12px 8px 0; font-weight: 600;">OAI-AdsBot</td><td style="padding: 8px 12px 8px 0;">Reviewing ad landing pages</td><td style="padding: 8px 0;">Only visits pages you submit as ads</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(150px, 200px) minmax(0, 1fr); gap: 8px 24px; padding: 16px 0; border-top: 1px solid #E3E6EA;">
+<span style="font-size: 15px; font-weight: 600;">Keeping a page out</span>
+<span style="font-size: 15px; line-height: 1.6; color: #2A3038;">A disallowed URL can still appear as a link and title if OpenAI learns of it elsewhere. Use a <code style="font-size: 14px; background: #F1F3F6; padding: 1px 5px; border-radius: 4px;">noindex</code> tag — and let the crawler fetch the page so it can see the tag.</span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(150px, 200px) minmax(0, 1fr); gap: 8px 24px; padding: 16px 0; border-top: 1px solid #E3E6EA;">
+<span style="font-size: 15px; font-weight: 600;">Shopping</span>
+<span style="font-size: 15px; line-height: 1.6; color: #2A3038;">US only for now. Products come from merchant feeds or crawled pages; feeds give more control over how items appear. OpenAI has scaled back its in-chat Instant Checkout — shoppers now buy on the merchant’s site. How products are ranked is not documented.</span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(150px, 200px) minmax(0, 1fr); gap: 8px 24px; padding: 16px 0; border-top: 1px solid #E3E6EA;">
+<span style="font-size: 15px; font-weight: 600;">Ads</span>
+<span style="font-size: 15px; line-height: 1.6; color: #2A3038;">Launched in the US in February 2026 for logged-in adults on the Free and Go plans; paid plans stay ad-free. Expanded to dozens of countries during 2026 — OpenAI’s own posts give different counts (60+ and 89), so check your market.</span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(150px, 200px) minmax(0, 1fr); gap: 8px 24px; padding: 16px 0; border-top: 1px solid #E3E6EA; border-bottom: 1px solid #E3E6EA;">
+<span style="font-size: 15px; font-weight: 600;">Measurement</span>
+<span style="font-size: 15px; line-height: 1.6; color: #2A3038;">Referral links are tagged <code style="font-size: 14px; background: #F1F3F6; padding: 1px 5px; border-radius: 4px;">utm_source=chatgpt.com</code>. Answers that mention you without a click are invisible to analytics.</span>
+</div>
+</section>
+
+<!-- Changes -->
+<section style="display: flex; flex-direction: column; gap: 14px;">
+<h2 style="margin: 0; font-size: 24px; font-weight: 650;">Recent changes that matter</h2>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px;">
+<li style="display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; font-size: 15px; line-height: 1.55;"><span style="color: #5B6470; font-weight: 500;">Late 2026</span><span>Instant Checkout scaled back; merchant-owned checkout preferred. <span style="color: #5B6470;">Feed quality now matters more than checkout integration.</span></span></li>
+<li style="display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; font-size: 15px; line-height: 1.55;"><span style="color: #5B6470; font-weight: 500;">2026</span><span>Ads expanded beyond the US, with a self-serve Ads Manager. <span style="color: #5B6470;">ChatGPT is now a paid media channel, not only an organic one.</span></span></li>
+<li style="display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; font-size: 15px; line-height: 1.55;"><span style="color: #5B6470; font-weight: 500;">Feb 2026</span><span>Ads launched in the US. <span style="color: #5B6470;">New crawler OAI-AdsBot reviews ad landing pages.</span></span></li>
+</ul>
+</section>
+
+<!-- Sources -->
+<footer style="border-top: 1px solid #E3E6EA; padding-top: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; line-height: 1.6; color: #5B6470;">
+<span style="font-weight: 600; color: #2A3038;">Sources · checked 17 Nov 2026</span>
+<a href="https://developers.openai.com/api/docs/bots" style="color: #5B6470;">OpenAI — Overview of OpenAI crawlers</a>
+<a href="https://help.openai.com/en/articles/12627856" style="color: #5B6470;">OpenAI Help — Publishers and developers FAQ</a>
+<a href="https://chatgpt.com/merchants/" style="color: #5B6470;">OpenAI — ChatGPT merchants</a>
+<a href="https://help.openai.com/en/articles/20001047-ads-in-chatgpt" style="color: #5B6470;">OpenAI Help — Ads in ChatGPT</a>
+<a href="https://openai.com/index/chatgpt-ads-expands-26-new-countries/" style="color: #5B6470;">OpenAI — ChatGPT Ads expands to 26 new countries</a>
+</footer>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":2500}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

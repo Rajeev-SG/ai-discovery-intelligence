@@ -272,10 +272,10 @@ export function formatAdjustment(adjustment: number | null): string {
 
 /**
  * Link back into the evidence surface route (detail drill-down lives in #46).
- * The registry matrix moved to `/surfaces` in issue #45.
+ * The registry matrix lives under `/archive/surfaces`.
  */
 export function surfaceHref(surface: string): string {
-  return `/surfaces?surface=${encodeURIComponent(surface)}`;
+  return `/archive/surfaces?surface=${encodeURIComponent(surface)}`;
 }
 
 function normalizeClaims(body: unknown): ReconClaim[] {

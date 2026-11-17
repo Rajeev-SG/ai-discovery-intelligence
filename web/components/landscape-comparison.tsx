@@ -29,7 +29,7 @@ function Cell({ surfaceId, cell }: { surfaceId: string; cell: ComparisonCell | u
         {cell.confidence ? <span className="muted"> · {cell.confidence} confidence</span> : null}
       </p>
       {cell.claim_id ? (
-        <Link className="cmp-link" href={`/surfaces?surface=${encodeURIComponent(surfaceId)}`}>
+        <Link className="cmp-link" href={`/archive/surfaces?surface=${encodeURIComponent(surfaceId)}`}>
           evidence →
         </Link>
       ) : null}

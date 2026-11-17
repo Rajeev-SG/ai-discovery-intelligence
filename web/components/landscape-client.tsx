@@ -108,7 +108,7 @@ export function LandscapeClient({ projection }: { projection: LandscapeProjectio
           metadata. Reach is a single evidenced figure where one exists; mechanics
           coverage and confidence come from validated claims only. Market share is
           context, not the product.{" "}
-          <Link href="/surfaces">Explore the full 35-surface registry →</Link>
+          <Link href="/archive/surfaces">Explore the full 35-surface registry →</Link>
         </p>
         <LandscapeGrid surfaces={projection.surfaces} selected={selected} onToggle={toggle} />
       </section>

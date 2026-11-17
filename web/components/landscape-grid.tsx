@@ -68,7 +68,7 @@ export function LandscapeGrid({
                           {" "}
                           <Link
                             className="landscape-evidence-link"
-                            href={`/surfaces?surface=${encodeURIComponent(s.id)}`}
+                            href={`/archive/surfaces?surface=${encodeURIComponent(s.id)}`}
                           >
                             evidence
                           </Link>
@@ -95,7 +95,7 @@ export function LandscapeGrid({
 
             <p className="landscape-relevance">{s.relevance}</p>
 
-            <Link className="landscape-open" href={`/surfaces?surface=${encodeURIComponent(s.id)}`}>
+            <Link className="landscape-open" href={`/archive/surfaces?surface=${encodeURIComponent(s.id)}`}>
               Open evidence &amp; mechanics →
             </Link>
           </article>
