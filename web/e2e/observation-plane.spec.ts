@@ -37,6 +37,12 @@ test.beforeEach(async ({ page }) => {
   await page.goto(BASE ?? "/archive/surfaces");
 });
 
+test("saved registry links still open the selected view", async ({ page }) => {
+  await page.goto("/surfaces?q=DeepSeek");
+  await expect(page.getByTestId("result-summary")).toContainText('matching “DeepSeek”');
+  await expect(page.getByTestId("surface-count")).toHaveText("1");
+});
+
 test("renders every canonical surface and the named global/regional products", async ({ page }) => {
   await expect(page.getByTestId("registry-count")).toHaveText("35");
   await expect(page.getByTestId("surface-count")).toHaveText("35");
