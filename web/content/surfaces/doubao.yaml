@@ -1,7 +1,7 @@
 name: "Doubao"
 vendor: "ByteDance"
 region: "China"
-summary: "Doubao can show shopping and local offers from Douyin’s commerce services. Buyers who connect their Douyin accounts can shop inside the Doubao app."
+summary: "Doubao can show shopping and local offers from Douyin’s commerce services. Buyers who connect their Douyin accounts can shop inside the app. QuestMobile reports average monthly use of 144.6 minutes per user as of April 2026."
 actions:
   - title: "Check your Douyin Shop offer inside Doubao"
     description: "Use a linked Douyin account to search for an item you sell. When a product appears, check the seller, variant and price against the offer in Douyin Shop."
@@ -31,4 +31,11 @@ changes:
 sources:
   - title: "Doubao — App privacy notice, sections 1.11.3–1.11.4 and linked Douyin services"
     url: https://www.doubao.com/legal/privacy
-    checked: 2026-11-17
+    checked: 2026-11-18
+  - title: "QuestMobile — AI platform report (published 26 May 2026), Doubao monthly usage duration"
+    url: https://www.questmobile.com.cn/research/report/2059118379722096641
+    checked: 2026-11-18
+attributions:
+  summary:
+    - https://www.questmobile.com.cn/research/report/2059118379722096641
+    - https://www.doubao.com/legal/privacy
