@@ -13,7 +13,12 @@ import { fileURLToPath } from "node:url";
 import { validateGuide } from "./writer-gates.mjs";
 
 const checkout = process.env.ADI_WRITER_CHECKOUT ?? "/opt/adi-writer/checkout";
-const require = createRequire(process.env.ADI_WRITER_YAML ?? path.join(checkout, "web/package.json"));
+// yaml comes from the deployed toolchain on the host, or from web/ in a dev tree.
+const yamlAnchor = process.env.ADI_WRITER_YAML
+  ?? ["/opt/adi-writer/tools/package.json", path.join(checkout, "web/package.json")]
+    .find((candidate) => fs.existsSync(candidate));
+if (!yamlAnchor) throw new Error("no yaml module anchor found; set ADI_WRITER_YAML");
+const require = createRequire(yamlAnchor);
 const { parse } = require("yaml");
 
 const prev = parse(fs.readFileSync(path.join(checkout, "web/content/surfaces/chatgpt.yaml"), "utf8"));
