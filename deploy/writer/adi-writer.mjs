@@ -23,7 +23,9 @@ const guardDir = process.env.ADI_WRITER_GUARD ?? `${root}/guard`;
 const repo = "Rajeev-SG/ai-discovery-intelligence";
 const summaryIssue = 76;
 // Write and review calls both count, so the subscription spend per run is capped.
-const maxCalls = 12;
+// The cap is deliberately conservative because the owner also uses this
+// subscription interactively. ADI_WRITER_MAX_CALLS bounds a manual run.
+const maxCalls = Number(process.env.ADI_WRITER_MAX_CALLS ?? 12);
 const comingSoonPath = "web/content/coming-soon.json";
 const guideDir = "web/content/surfaces";
 const briefPath = "docs/WRITER_BRIEF.md";
