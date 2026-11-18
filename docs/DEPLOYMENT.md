@@ -36,4 +36,11 @@ Prefer Tailscale/private networking for Oracle-to-Hetzner service traffic. Expos
 
 ## Vercel
 
-Vercel is not required for v1. If a later public `rajeevg.com/solutions` surface is desired, keep data refreshes independent of frontend deployments.
+The public surface `<https://rajeevg.com/solutions/ai-discovery>` is a Vercel
+project, `ai-discovery-observation-plane` (team `rajeevgills-projects`). It is
+git-connected to this repository with root directory `web`, so a push to `main`
+that touches `web/**` deploys production automatically and rajeevg.com proxies
+the result. Data refreshes stay independent of frontend deployments: content
+changes land in `web/content/surfaces/*.yaml` and every such merge is a deploy.
+See [`OPERATIONS.md`](OPERATIONS.md#production-web-deploy) for verification,
+rollback and the manual fallback.

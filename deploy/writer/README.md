@@ -81,7 +81,12 @@ merge guard.
   again. The writer merges only if the guard returns 0 for the exact head.
 - A change over 80 YAML lines, or a newly promoted surface, is never
   auto-merged. It waits for the owner on the open PR.
-- A production deploy follows the merge to `main`.
+- A production deploy follows the merge to `main` by itself: the Vercel project
+  is git-connected to this repository with root directory `web`, so the merge
+  commit is the deploy. Nothing on Oracle runs `vercel deploy`; if the merge
+  lands and no Vercel production deployment appears with that commit, the
+  deploy path is broken and the run is not publishing (see
+  [`../../docs/OPERATIONS.md`](../../docs/OPERATIONS.md#production-web-deploy)).
 - The last good content stays live through any failure: a failed run changes
   nothing and alerts.
 

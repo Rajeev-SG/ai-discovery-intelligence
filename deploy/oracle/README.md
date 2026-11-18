@@ -125,7 +125,9 @@ guard's own `record` command; it merges only when that guard then answers 0 for
 the same head, with the head pinned on the merge. Changes over 80
 added/deleted YAML lines and all promotions are held for an owner decision.
 Promotions remove their Coming-soon entry mechanically in the same PR. The
-existing production deployment follows merges to `main`.
+existing production deployment follows merges to `main` automatically: the
+Vercel project is git-connected with root directory `web`, so the merge commit
+is the deploy and no Oracle step publishes anything.
 
 Run summaries go to [Weekly content updates](https://github.com/Rajeev-SG/ai-discovery-intelligence/issues/76).
 The writer exits nonzero on failures so `adi-alert@` records them. To prove
