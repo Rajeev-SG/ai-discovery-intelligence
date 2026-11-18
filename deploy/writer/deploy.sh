@@ -57,6 +57,10 @@ ssh "$HOST" 'set -e
     || { echo "/etc/claude-writer/env must be root:600" >&2; exit 1; }
   sudo test -f /etc/ai-discovery/env || { echo "MISSING /etc/ai-discovery/env" >&2; exit 1; }
   test -x /opt/adi-writer/guard/merge-guard.sh || { echo "MISSING /opt/adi-writer/guard/merge-guard.sh" >&2; exit 1; }
+  test -f /opt/adi-writer/guard/review_pro_gate.py || { echo "MISSING /opt/adi-writer/guard/review_pro_gate.py" >&2; exit 1; }
+  test -f /opt/adi-writer/guard/review_change_classifier.py || { echo "MISSING /opt/adi-writer/guard/review_change_classifier.py" >&2; exit 1; }
+  /usr/bin/gh --version | grep -qE "^gh version 2\.(5[3-9]|[6-9][0-9]|[1-9][0-9]{2})" \
+    || { echo "gh too old: the guard needs --slurp (>= 2.53)" >&2; exit 1; }
   test -x /opt/adi-writer/tools/node_modules/.bin/claude || { echo "MISSING claude CLI" >&2; exit 1; }
   sudo -n systemctl is-active adi-db-tunnel.service >/dev/null || { echo "adi-db-tunnel is not running" >&2; exit 1; }
   echo "writer prerequisites OK"'

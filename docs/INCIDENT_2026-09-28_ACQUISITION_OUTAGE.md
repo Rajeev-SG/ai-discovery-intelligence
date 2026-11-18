@@ -93,6 +93,21 @@ Applied to the box:
 
 4. `adi:current` rebuilt from current `main` and `adi-run.service` rerun.
 
+Restoration proof (Oracle, first green run since the outage):
+
+```
+/var/lib/ai-discovery/status/latest.json
+{"started_at": "2026-11-18T00:04:54Z", "finished_at": "2026-11-18T00:16:19Z",
+ "ok": 1, "run_exit": 0, "replicated": 1, "api_evidence_items": 137,
+ "log": "/var/lib/ai-discovery/runs/run-2026-11-18T000454Z.log"}
+```
+
+`ok: 1` is the pipeline signal, `replicated: 1` is the Hetzner snapshot copy, and
+`api_evidence_items` is read from the live evidence API, so it proves the whole
+path rather than container exit alone. The run took 11m25s and the evidence API
+grew from 135 to 137 items. Before the fix the same unit exited in under a
+second with `run_exit: 125`.
+
 ## The second defect this exposed
 
 Restoring the image exposed a separate break that had been invisible: the

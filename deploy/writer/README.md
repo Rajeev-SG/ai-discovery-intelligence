@@ -115,6 +115,9 @@ Prerequisites the script checks and refuses to proceed without:
 - `/opt/adi-writer/guard/`, the owner's `merge-guard.sh`, `review_pro_gate.py`
   and `review_change_classifier.py` (shared rig tooling, installed outside this
   repository);
+- `gh` 2.53 or newer. The guard reads PR comments with `gh api --slurp`, which
+  older Ubuntu packages do not support; on 2.46 the guard fails closed with
+  `unknown flag: --slurp` and nothing can merge. Oracle was upgraded to 2.105.0;
 - a running `adi-db-tunnel.service`.
 
 ## Prove it without changing a page

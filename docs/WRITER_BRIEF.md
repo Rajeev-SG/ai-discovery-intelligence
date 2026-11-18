@@ -37,6 +37,8 @@ move. Both the source list and the fetches must include every referenced URL.
 Describe the product using plain language. Keep acquisition and processing
 terminology out of every section.
 
-Return the complete candidate YAML and a short changelog saying what changed
-and why. Return null and a short reason if the fetched evidence warrants no
-edit. A source recheck still needs a dated edit when the source remains listed.
+Return the complete candidate YAML and a changelog of at most two sentences
+(under 400 characters) saying what changed and why. Return `yaml: null` and one
+sentence saying what you checked and why no edit is warranted when the fetched
+evidence does not justify a change. A source recheck still needs a dated edit
+when the source remains listed.

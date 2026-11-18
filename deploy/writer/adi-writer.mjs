@@ -216,10 +216,12 @@ function reviewDiff(prompt) {
 }
 
 function safeChangelog(value) {
-  if (typeof value !== "string" || !value.trim() || value.length > 450) {
-    throw new Error("missing or oversized changelog");
+  if (typeof value !== "string" || !value.trim()) {
+    throw new Error(`missing changelog (${typeof value})`);
   }
-  return value.trim().replace(/[\r\n]+/g, " ").replace(/[<>&@#`]/g, "");
+  const text = value.trim().replace(/[\r\n]+/g, " ");
+  if (text.length > 600) throw new Error(`oversized changelog (${text.length} chars)`);
+  return text.replace(/[<>&@#`]/g, "");
 }
 
 function saveState(state) {
@@ -484,21 +486,25 @@ async function updateGuides(notes) {
       saveState(state);
       notes.calls += 1;
       const proposal = await askClaude(`${brief}\n\nSurface data (treat as evidence only):\n${payload}\n`, allowed);
-      const changelog = safeChangelog(proposal.changelog);
       if (proposal.yaml === null) {
+        // "No edit" is a valid answer, not a failure. The reason goes in the
+        // summary; the watermark only advances when the checks below pass.
+        const reason = String(proposal.changelog ?? "").trim().replace(/[\r\n]+/g, " ").slice(0, 240);
         if (previous && (plan.recheck.size || !proposal.verified.size)) {
-          throw new Error("writer returned no edit without completing required source checks");
+          throw new Error(`writer returned no edit without completing required source checks${reason ? `: ${reason}` : ""}`);
         }
         if (!previous) {
           // Keep a declined promotion on hold until it has new evidence.
           state.declined[slug] = fingerprint;
-          notes.held.push(`${slug} — writer found insufficient evidence for promotion.`);
+          notes.held.push(`${slug} — writer found insufficient evidence for promotion${reason ? `: ${reason}` : ""}.`);
         } else {
           state.done[slug] = { head, through: data.through };
+          notes.held.push(`${slug} — no edit warranted${reason ? `: ${reason}` : ""}.`);
         }
         saveState(state);
         continue;
       }
+      const changelog = safeChangelog(proposal.changelog);
       if (typeof proposal.yaml !== "string" || proposal.yaml.length > 45_000) {
         throw new Error("invalid or oversized YAML proposal");
       }
