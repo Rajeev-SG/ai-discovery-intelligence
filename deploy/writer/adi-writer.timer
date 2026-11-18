@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly AI Discovery field-guide update
+
+[Timer]
+OnCalendar=Sun *-*-* 02:00:00 UTC
+Persistent=true
+Unit=adi-writer.service
+
+[Install]
+WantedBy=timers.target

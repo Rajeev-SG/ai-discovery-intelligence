@@ -9,7 +9,7 @@
 # scheduled run that fails — or a timer that never fires — is visible from
 # latest.json plus `systemctl list-timers`. OnFailure=adi-alert@%n appends
 # to /var/lib/ai-discovery/status/failures.log.
-set -uo pipefail
+set -euo pipefail
 
 STATE_DIR=/var/lib/ai-discovery
 STATUS_DIR=$STATE_DIR/status
@@ -31,8 +31,43 @@ mkdir -p "$STATUS_DIR" "$LOG_DIR" "$STATE_DIR/snapshots" "$STATE_DIR/dagster-hom
 started=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 log="$LOG_DIR/run-${started//:/}.log"
 
+# Under `set -e`, any unexpected non-zero exit must still leave a status file
+# behind. Without this, a single failing command could abort the script before
+# latest.json is rewritten, which is the same silent-staleness mode this unit
+# was fixed for.
+wrote_status=0
+aborted() {
+  rc=$?
+  [ "$wrote_status" -eq 0 ] || return 0
+  tmp="$STATUS_DIR/.latest.json.tmp"
+  printf '{"started_at": "%s", "finished_at": "%s", "ok": 0, "run_exit": %s, "replicated": 0, "api_evidence_items": -1, "error": "aborted_before_status", "log": "%s"}\n' \
+    "$started" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$rc" "$log" >"$tmp"
+  mv "$tmp" "$STATUS_DIR/latest.json"
+  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) RUN_ABORTED rc=$rc action=inspect_log" \
+    >>"$STATUS_DIR/failures.log"
+}
+trap aborted EXIT
+
+# Preflight: adi:current is built on this host by deploy/oracle/deploy.sh and is
+# never pulled. Before this check, a pruned image made every scheduled run exit
+# in under a second with the reason only in a run log, and OnFailure was in the
+# wrong systemd section, so 51 daily runs failed unnoticed (Sep 28 – Nov 17
+# 2026). Fail loudly, record it twice, and never try to pull.
+if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
+  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) IMAGE_MISSING image=$IMAGE action=rebuild" \
+    >>"$STATUS_DIR/failures.log"
+  tmp="$STATUS_DIR/.latest.json.tmp"
+  printf '{"started_at": "%s", "finished_at": "%s", "ok": 0, "run_exit": 125, "replicated": 0, "api_evidence_items": -1, "error": "image_missing", "log": "%s"}\n' \
+    "$started" "$started" "$log" >"$tmp"
+  mv "$tmp" "$STATUS_DIR/latest.json"
+  wrote_status=1
+  echo "FATAL: Docker image '$IMAGE' is missing locally; refusing to pull." >&2
+  echo "Rebuild it with deploy/oracle/deploy.sh and rerun adi-run.service." >&2
+  exit 1
+fi
+
 run_rc=0
-docker run --rm --name adi-run \
+docker run --pull=never --rm --name adi-run \
   --network host \
   --env-file "$ENV_FILE" \
   --memory 6g --cpus 2 \
@@ -70,5 +105,9 @@ printf '{"started_at": "%s", "finished_at": "%s", "ok": %s, "run_exit": %s, "rep
   "$started" "$finished" "$ok" "$run_rc" "$replicated" "$api_items" "$log" \
   >"$status"
 mv "$status" "$STATUS_DIR/latest.json"
+wrote_status=1
 
-[ "$ok" -eq 1 ] || exit 1
+if [ "$ok" -ne 1 ]; then
+  echo "Acquisition failed (Docker exit $run_rc, API evidence items $api_items). See $log." >&2
+  exit 1
+fi

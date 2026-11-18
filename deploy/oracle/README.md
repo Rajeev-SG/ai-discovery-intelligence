@@ -79,3 +79,56 @@ A fresh `latest.json` with `ok: true`, `replicated: 1` and a recent
 Oracle-only" signal. `api_evidence_items` is read from the live evidence API,
 so it proves the end-to-end path (capture → extraction → ledger → API), not
 just container health.
+
+`adi:current` is built here and never pulled. If it is missing, `adi-run.sh`
+now fails loudly in the first second, records `IMAGE_MISSING` and the reason in
+`latest.json`, and the unit's `OnFailure=` starts `adi-alert@`. That check exists
+because a pruned image plus a misplaced `OnFailure=` meant 51 daily runs failed
+unnoticed; see
+[`docs/INCIDENT_2026-09-28_ACQUISITION_OUTAGE.md`](../../docs/INCIDENT_2026-09-28_ACQUISITION_OUTAGE.md).
+
+## Weekly field-guide writer
+
+`adi-writer.timer` runs at 02:00 UTC Sundays. It accepts acquisition evidence
+only after a successful run in the last 48 hours. It compares a read-only
+Postgres snapshot against the last successful write per guide, or the last
+content commit on first use. It also checks for changed source captures and
+guide sources due for a 30-day recheck. Coming-soon candidates need current
+official evidence from at least two URLs across three relevant topics, including
+a documented crawler, commercial or measurement control. The writer tries
+the surfaces least recently attempted first and caps each run at 12 Sonnet
+invocations, counting write and review calls.
+
+Deploy it with `bash deploy/writer/deploy.sh oracle`, then
+`sudo systemctl enable --now adi-writer.timer`. That script installs the runner
+into the root-owned `/opt/adi-writer`, pins
+`@anthropic-ai/claude-code@2.1.327` and `yaml@2.8.1` in `/opt/adi-writer/tools`,
+clones the repository into `/opt/adi-writer/checkout`, installs both units, and
+refuses to finish unless `/etc/claude-writer/env` (root, 0600),
+`/etc/ai-discovery/env`, `/opt/adi-writer/guard/merge-guard.sh`, the pinned CLI
+and a running `adi-db-tunnel.service` are all present. The ledger reader uses
+the local `postgres:17-alpine` image over that tunnel. Progress is written to
+`/var/lib/adi-writer`; GitHub actions use the existing Oracle `ubuntu` CLI
+login. The isolated, unprivileged Claude process receives its subscription
+credential only from the root-only `/etc/claude-writer/env` through systemd.
+Its sole tool is WebFetch for the supplied source hosts. The coordinator applies
+the proposed YAML only after checking the fetch transcript, schema, source URLs,
+attribution and editorial budgets.
+
+Run on demand with `sudo systemctl start adi-writer.service`. Pause with
+`sudo systemctl disable --now adi-writer.timer`; `systemctl stop
+adi-writer.service` also cuts a run in flight.
+
+Every candidate goes through a PR. The existing web CI runs the build, Vitest
+and Playwright. For a normal-sized update the writer runs an independent review
+pass over the exact head diff and records the verdict through the repository
+guard's own `record` command; it merges only when that guard then answers 0 for
+the same head, with the head pinned on the merge. Changes over 80
+added/deleted YAML lines and all promotions are held for an owner decision.
+Promotions remove their Coming-soon entry mechanically in the same PR. The
+existing production deployment follows merges to `main`.
+
+Run summaries go to [Weekly content updates](https://github.com/Rajeev-SG/ai-discovery-intelligence/issues/76).
+The writer exits nonzero on failures so `adi-alert@` records them. To prove
+the content gate on Oracle without changing a page or using Claude, run
+`sudo /usr/local/bin/node /opt/adi-writer/runner/adi-writer.mjs --prove-gate`.

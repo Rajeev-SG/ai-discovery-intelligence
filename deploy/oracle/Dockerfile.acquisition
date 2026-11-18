@@ -26,6 +26,13 @@ RUN uv sync --frozen --no-install-project --no-dev --all-extras \
 COPY src ./src
 COPY config ./config
 COPY db ./db
+# The mechanics_claims asset loads scripts/build_mechanics_claims.py from the
+# repository root at run time (pipeline.py resolves parents[2]/scripts), and that
+# builder re-verifies quotes against the committed captures under
+# proof/claim_ledger/captures. Both must exist in the image or the asset fails
+# after the expensive capture and extraction steps have already run.
+COPY scripts ./scripts
+COPY proof/claim_ledger/captures ./proof/claim_ledger/captures
 RUN uv sync --frozen --no-dev --all-extras
 
 CMD ["dagster", "job", "execute", "-m", "ai_discovery.pipeline", "-j", "acquisition_job"]

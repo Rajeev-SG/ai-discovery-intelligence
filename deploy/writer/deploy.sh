@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# Deploy the weekly field-guide writer to the Oracle VPS (issue #75).
+#
+# Layout on the host:
+#   /opt/adi-writer/runner    this directory's files (root-owned, 0755)
+#   /opt/adi-writer/tools     pinned Claude Code CLI + yaml (npm)
+#   /opt/adi-writer/checkout  a real clone of this repository (root-owned)
+#   /opt/adi-writer/guard     the owner's merge guard, installed outside this repo
+#   /var/lib/adi-writer       write progress and pending PR state (systemd StateDirectory)
+#
+# The subscription credential is never handled here. It lives in
+# /etc/claude-writer/env (root, 0600) and reaches the Claude child only through
+# systemd's EnvironmentFile=.
+set -euo pipefail
+
+HOST=${1:-oracle}
+ROOT=/opt/adi-writer
+CLONE_URL=https://github.com/Rajeev-SG/ai-discovery-intelligence.git
+SRC=$(cd "$(dirname "$0")" && pwd)
+REPO_ROOT=$(cd "$SRC/../.." && pwd)
+test -f "$REPO_ROOT/pyproject.toml" || { echo "refusing to deploy: $REPO_ROOT is not the repo root" >&2; exit 1; }
+
+ssh "$HOST" "sudo install -d -m 0755 $ROOT $ROOT/runner $ROOT/tools $ROOT/guard"
+
+rsync -a --delete "$SRC/" "$HOST:/tmp/adi-writer-runner/"
+ssh "$HOST" "sudo rsync -a --delete /tmp/adi-writer-runner/ $ROOT/runner/ && \
+  sudo chown -R root:root $ROOT/runner && sudo rm -rf /tmp/adi-writer-runner"
+
+# The writing and review briefs are versioned with the pages. Keep a deploy-time
+# copy in the runner directory so a host can run before they reach main.
+rsync -a "$REPO_ROOT/docs/WRITER_BRIEF.md" "$REPO_ROOT/docs/WRITER_REVIEW.md" "$HOST:/tmp/"
+ssh "$HOST" "sudo install -m 0644 /tmp/WRITER_BRIEF.md /tmp/WRITER_REVIEW.md $ROOT/runner/ && \
+  sudo rm -f /tmp/WRITER_BRIEF.md /tmp/WRITER_REVIEW.md"
+
+# Pinned toolchain. The writer never upgrades itself mid-run.
+ssh "$HOST" "cd $ROOT/tools && sudo npm install --silent --no-audit --no-fund \
+  --save-exact @anthropic-ai/claude-code@2.1.327 yaml@2.8.1 && \
+  sudo chown -R root:root $ROOT/tools"
+
+# The writer edits and pushes from its own checkout, never the live deploy tree.
+ssh "$HOST" "set -e
+  if [ ! -d $ROOT/checkout/.git ]; then
+    sudo git clone --quiet $CLONE_URL $ROOT/checkout
+  fi
+  sudo git -C $ROOT/checkout fetch --quiet origin main
+  sudo git -C $ROOT/checkout checkout --quiet --detach origin/main
+  sudo chown -R root:root $ROOT/checkout"
+
+scp -q "$SRC/adi-writer.service" "$SRC/adi-writer.timer" "$HOST:/tmp/"
+ssh "$HOST" "sudo install -m 0644 /tmp/adi-writer.service /tmp/adi-writer.timer /etc/systemd/system/ && \
+  sudo rm -f /tmp/adi-writer.service /tmp/adi-writer.timer && sudo systemctl daemon-reload"
+
+# Fail loudly at deploy time rather than at 02:00 on Sunday.
+ssh "$HOST" 'set -e
+  sudo test -f /etc/claude-writer/env || { echo "MISSING /etc/claude-writer/env (root, 0600)" >&2; exit 1; }
+  sudo stat -c "%U:%a" /etc/claude-writer/env | grep -qx "root:600" \
+    || { echo "/etc/claude-writer/env must be root:600" >&2; exit 1; }
+  sudo test -f /etc/ai-discovery/env || { echo "MISSING /etc/ai-discovery/env" >&2; exit 1; }
+  test -x /opt/adi-writer/guard/merge-guard.sh || { echo "MISSING /opt/adi-writer/guard/merge-guard.sh" >&2; exit 1; }
+  test -f /opt/adi-writer/guard/review_pro_gate.py || { echo "MISSING /opt/adi-writer/guard/review_pro_gate.py" >&2; exit 1; }
+  test -f /opt/adi-writer/guard/review_change_classifier.py || { echo "MISSING /opt/adi-writer/guard/review_change_classifier.py" >&2; exit 1; }
+  /usr/bin/gh --version | grep -qE "^gh version 2\.(5[3-9]|[6-9][0-9]|[1-9][0-9]{2})" \
+    || { echo "gh too old: the guard needs --slurp (>= 2.53)" >&2; exit 1; }
+  test -x /opt/adi-writer/tools/node_modules/.bin/claude || { echo "MISSING claude CLI" >&2; exit 1; }
+  sudo -n systemctl is-active adi-db-tunnel.service >/dev/null || { echo "adi-db-tunnel is not running" >&2; exit 1; }
+  echo "writer prerequisites OK"'
+
+echo "deployed. Enable the weekly run with:"
+echo "  ssh $HOST 'sudo systemctl enable --now adi-writer.timer'"
+echo "Run one now (manual proof) with:"
+echo "  ssh $HOST 'sudo systemctl start adi-writer.service'"
