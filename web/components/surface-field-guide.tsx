@@ -3,6 +3,7 @@ import { Fragment } from "react";
 import registry from "@/lib/generated-registry.json";
 import comingSoonReasons from "@/content/coming-soon.json";
 import { formatCheckedDate, type Crawler, type SurfaceGuide } from "@/lib/surface-guides";
+import { SurfacePicker } from "./surface-picker";
 import styles from "./surface-field-guide.module.css";
 
 const featured = [
@@ -31,24 +32,32 @@ function SurfaceSwitcher({
     ({ id }) => !guides.has(id) && !coveredByGoogleGuide.has(id),
   );
   const reasons: Readonly<Record<string, string>> = comingSoonReasons;
+  const choices = [...featured, ...published].filter(({ slug: id }) => guides.has(id));
 
   return (
     <nav className={styles.switcher} aria-label="AI surfaces">
-      {[...featured, ...published].filter(({ slug: id }) => guides.has(id)).map(({ slug: id, name }) => (
-        <Link key={id} className={styles.pill} href={`/surfaces/${id}`} aria-current={id === slug ? "page" : undefined}>
-          {name}
-        </Link>
-      ))}
-      {comingSoon.length > 0 && (
-        <details className={styles.more}>
-          <summary className={styles.pill}>Coming soon</summary>
-          <ul>
-            {comingSoon.map(({ id, name }) => (
-              <li key={id}>{name}<small>{reasons[id]}</small></li>
-            ))}
-          </ul>
-        </details>
-      )}
+      <SurfacePicker
+        slug={slug}
+        published={choices}
+        comingSoon={comingSoon.map(({ id, name }) => ({ slug: id, name }))}
+      />
+      <div className={styles.pillList}>
+        {choices.map(({ slug: id, name }) => (
+          <Link key={id} className={styles.pill} href={`/surfaces/${id}`} aria-current={id === slug ? "page" : undefined}>
+            {name}
+          </Link>
+        ))}
+        {comingSoon.length > 0 && (
+          <details className={styles.more}>
+            <summary className={styles.pill}>Coming soon</summary>
+            <ul>
+              {comingSoon.map(({ id, name }) => (
+                <li key={id}>{name}<small>{reasons[id]}</small></li>
+              ))}
+            </ul>
+          </details>
+        )}
+      </div>
     </nav>
   );
 }

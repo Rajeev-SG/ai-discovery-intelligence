@@ -14,7 +14,8 @@ function observeErrors(page: Page) {
 
 test("home and every published guide render with no backend dependency", async ({ page }, testInfo) => {
   const width = testInfo.project.name === "mobile-chromium" ? 390 : 1280;
-  await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
+  const phone = width === 390;
+  await page.setViewportSize({ width, height: phone ? 844 : 900 });
   const errors = observeErrors(page);
 
   expect((await page.goto("/"))?.status()).toBe(200);
@@ -29,16 +30,29 @@ test("home and every published guide render with no backend dependency", async (
     "href",
     "https://rajeevg.com",
   );
-  await expect(nav.getByRole("link")).toHaveCount(guides.size);
+  const picker = nav.getByLabel("AI surface", { exact: true });
+  if (phone) {
+    // Under 640px the pill wall is replaced by one native select.
+    await expect(picker).toBeVisible();
+    await expect(nav.getByRole("link")).toHaveCount(0);
+    await expect(picker.locator("optgroup[label='Field guides'] option")).toHaveCount(guides.size);
+  } else {
+    await expect(picker).toBeHidden();
+    await expect(nav.getByRole("link")).toHaveCount(guides.size);
+  }
   await expect(page.locator('a[href^="/pov"], a[href^="/reconciliation"], a[href^="/implications"], a[href^="/landscape"]')).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
   await page.screenshot({ path: testInfo.outputPath(`home-${width}.png`), fullPage: true, scale: "css" });
 
   for (const [slug, guide] of guides) {
     const route = `/surfaces/${slug}`;
-    await expect(nav.locator(`a[href="${route}"]`)).toHaveCount(1);
     expect((await page.goto(route))?.status()).toBe(200);
-    await expect(nav.locator(`a[href="${route}"]`)).toHaveAttribute("aria-current", "page");
+    if (phone) {
+      await expect(nav.getByLabel("AI surface", { exact: true })).toHaveValue(slug);
+    } else {
+      await expect(nav.locator(`a[href="${route}"]`)).toHaveCount(1);
+      await expect(nav.locator(`a[href="${route}"]`)).toHaveAttribute("aria-current", "page");
+    }
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(guide.name);
     await expect(page).toHaveTitle(`${guide.name} — AI Discovery Intelligence`);
     await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", guide.summary);
@@ -68,9 +82,27 @@ test("home and every published guide render with no backend dependency", async (
   expect(errors).toEqual([]);
 });
 
-test("visitors can open guides and see why some surfaces are coming soon", async ({ page }) => {
+test("visitors can open guides and see why some surfaces are coming soon", async ({ page }, testInfo) => {
+  const phone = testInfo.project.name === "mobile-chromium";
   await page.goto("/");
   const nav = page.getByRole("navigation", { name: "AI surfaces" });
+
+  if (phone) {
+    // The compact control carries coming-soon surfaces as a disabled optgroup.
+    const picker = nav.getByLabel("AI surface", { exact: true });
+    const soon = picker.locator("optgroup[label='Coming soon'] option");
+    await expect(soon.first()).toHaveCount(1);
+    await expect(soon.first()).toBeDisabled();
+    await picker.selectOption("perplexity");
+    await expect(page).toHaveURL(/\/surfaces\/perplexity$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Perplexity");
+    await picker.selectOption("naver-ai");
+    await expect(page).toHaveURL(/\/surfaces\/naver-ai$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("NAVER AI Tab");
+    expect((await page.goto("/surfaces/not-in-the-directory"))?.status()).toBe(404);
+    return;
+  }
+
   await nav.getByText("Coming soon", { exact: true }).click();
   await expect(nav.getByRole("listitem").first()).toBeVisible();
   await expect(nav.getByRole("listitem").first().locator("small")).not.toBeEmpty();
@@ -84,6 +116,30 @@ test("visitors can open guides and see why some surfaces are coming soon", async
   await expect(page).toHaveURL(/\/surfaces\/naver-ai$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("NAVER AI Tab");
   expect((await page.goto("/surfaces/not-in-the-directory"))?.status()).toBe(404);
+});
+
+test("a phone gets one compact control and the guide heading stays above the fold", async ({ page }, testInfo) => {
+  const phone = testInfo.project.name === "mobile-chromium";
+  await page.setViewportSize({ width: phone ? 390 : 1440, height: 844 });
+  await page.goto("/surfaces/chatgpt");
+
+  const nav = page.getByRole("navigation", { name: "AI surfaces" });
+  const picker = nav.getByLabel("AI surface", { exact: true });
+  const heading = page.getByRole("heading", { level: 1 });
+
+  if (phone) {
+    await expect(picker).toBeVisible();
+    await expect(nav.getByRole("link")).toHaveCount(0);
+    // The regression this guards: pills used to consume the whole first screen.
+    const switcher = await nav.boundingBox();
+    const title = await heading.boundingBox();
+    expect(switcher!.height).toBeLessThan(120);
+    expect(title!.y).toBeLessThan(844 / 2);
+  } else {
+    await expect(picker).toBeHidden();
+    expect(await nav.getByRole("link").count()).toBeGreaterThan(3);
+    await expect(heading).toBeVisible();
+  }
 });
 
 test("the rajeevg.com header frames the page at desktop and mobile widths", async ({ page }, testInfo) => {
