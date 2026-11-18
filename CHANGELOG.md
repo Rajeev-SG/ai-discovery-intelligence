@@ -2,6 +2,18 @@
 
 This file records repository/product changes. The generated intelligence changelog will live separately in the canonical data store and `pov/CHANGELOG.md` once implemented.
 
+## 2026-11-18 (site header)
+
+- **rajeevg.com site header on every page.** The app is proxied under
+  `rajeevg.com/solutions/ai-discovery`, so it now carries the main site's header
+  instead of starting cold: the "Rajeev Gill" wordmark linking to
+  `https://rajeevg.com` and Home, Solutions (active), Interfaces, Writing and
+  About linking to the site's paths, at the same 4rem height, type sizes and
+  spacing as `src/components/site-chrome.tsx`. Colours follow the page beneath
+  (light surface guides, dark analysis pages). The mobile menu is a native
+  disclosure, so it needs no JavaScript. E2E proof at 1440 and 390:
+  `web/e2e/landing.spec.ts`.
+
 ## 2026-09-20 (issue #61)
 
 - **Marketer-first information architecture.** The homepage now answers the four
