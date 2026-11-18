@@ -59,6 +59,17 @@ PLANE_URL="https://gh-1-observation-plane.ai-discovery-observation-plane.localho
 
 Screenshots are written to `proof/`.
 
+## Deploy
+
+Production is not pushed from a laptop. The Vercel project
+(`ai-discovery-observation-plane`) is git-connected to this repository with root
+directory `web`, so a merge to `main` that changes `web/**` builds and promotes
+production by itself, and `https://rajeevg.com/solutions/ai-discovery` serves it
+through the site's proxy. Preview deployments build on every branch push, without
+`BASE_PATH` or the live evidence API. Manual `vercel deploy` is only the
+break-glass path — see
+[`../docs/OPERATIONS.md`](../docs/OPERATIONS.md#production-web-deploy).
+
 ## Product behaviours
 
 - Search across surface, vendor, family, region and retrieval status.

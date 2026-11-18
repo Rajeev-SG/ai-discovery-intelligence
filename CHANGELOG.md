@@ -2,6 +2,23 @@
 
 This file records repository/product changes. The generated intelligence changelog will live separately in the canonical data store and `pov/CHANGELOG.md` once implemented.
 
+## 2026-11-18 (production deploy path)
+
+- **Merged content now actually goes live.** The Vercel project
+  `ai-discovery-observation-plane` had no git connection, so production only
+  moved on a manual `vercel deploy`; the weekly writer merged content PRs and
+  logged "production deploy follows main", which was false. The project is now
+  connected to this repository with production branch `main`, root directory
+  `web` and framework Next.js, so the merge commit is the deploy. Proof: merging
+  [#84](https://github.com/Rajeev-SG/ai-discovery-intelligence/pull/84) produced
+  production deployment `dpl_HJBw2bJup8fHZeDFHXn4LSfv5sMj` (source `git`, commit
+  `09e2ea2`) with no manual step, and
+  `https://rajeevg.com/solutions/ai-discovery/surfaces/chatgpt` returned 200
+  serving that build. The writer log line, `docs/OPERATIONS.md`,
+  `docs/DEPLOYMENT.md`, `web/README.md` and the Oracle/writer READMEs now state
+  the real path, including the 2026-12-18 expiry of the project-scoped CLI token
+  kept only as a fallback.
+
 ## 2026-11-18 (mobile surface switcher)
 
 - **The surface switcher stops eating the first screen on a phone.** At 390px

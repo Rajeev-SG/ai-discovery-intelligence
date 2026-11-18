@@ -353,7 +353,7 @@ function reconcile(slug, pending, state, notes, reviewBrief) {
     gh(["pr", "merge", pr.url, "--repo", repo, "--squash", "--match-head-commit", pending.head]);
     const merged = ghPR(pr.number);
     if (merged.state !== "MERGED") throw new Error("GitHub did not confirm merge");
-    notes.changed.push(`${slug} — merged ${pr.url}; production deploy follows main.`);
+    notes.changed.push(`${slug} — merged ${pr.url}; the push to main deploys production (Vercel git build, root directory web).`);
     // Later proposals in this run must be cut from the new main, not the head we
     // started with, or the next PR could be based on a superseded tree.
     git("fetch", "origin", "main");
