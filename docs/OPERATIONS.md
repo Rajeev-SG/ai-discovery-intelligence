@@ -35,7 +35,7 @@ failed for 51 days in 2026 (see
 
 | Timer | When | What | Pause |
 | --- | --- | --- | --- |
-| `adi-run.timer` | daily 06:10 UTC | capture → extract → claim ledger → snapshot replication | `systemctl disable --now adi-run.timer` |
+| `adi-run.timer` | weekly, Sat 06:10 UTC (on demand: `sudo intel-refresh adi`) | capture → extract → claim ledger → snapshot replication | `systemctl disable --now adi-run.timer` |
 | `adi-writer.timer` | Sundays 02:00 UTC | field-guide updates from new evidence | `systemctl disable --now adi-writer.timer` |
 
 The writer refuses to run unless acquisition has succeeded in the last 48 hours,

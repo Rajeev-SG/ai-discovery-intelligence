@@ -202,7 +202,7 @@ discovery_job = define_asset_job("discovery_job", selection=["source_registry", 
 audit_job = define_asset_job("coverage_audit_job", selection=["source_registry", "source_health", "coverage_gaps"])
 
 daily_high_value = ScheduleDefinition(
-    name="daily_high_value_sources", job=acquisition_job, cron_schedule="0 6 * * *"
+    name="weekly_high_value_sources", job=acquisition_job, cron_schedule="10 6 * * 6"
 )
 weekly_discovery = ScheduleDefinition(
     name="weekly_discovery_lane", job=discovery_job, cron_schedule="0 7 * * 1"
