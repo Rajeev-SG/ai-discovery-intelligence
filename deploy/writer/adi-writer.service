@@ -1,0 +1,15 @@
+[Unit]
+Description=AI Discovery weekly field-guide writer
+Wants=network-online.target
+Requires=docker.service adi-db-tunnel.service
+After=network-online.target docker.service adi-db-tunnel.service adi-run.service
+OnFailure=adi-alert@%n.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/adi-writer/checkout
+EnvironmentFile=/etc/ai-discovery/env
+StateDirectory=adi-writer
+StateDirectoryMode=0700
+TimeoutStartSec=2h
+ExecStart=/usr/local/bin/node /opt/adi-writer/runner/adi-writer.mjs

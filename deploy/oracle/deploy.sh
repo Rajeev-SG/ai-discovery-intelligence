@@ -13,12 +13,17 @@ set -euo pipefail
 HOST=${1:-oracle}
 APP_DIR=/opt/ai-discovery/app
 
-SRC=$(cd "$(dirname "$0")/.." && pwd)   # repo root (deploy/..)
+SRC=$(cd "$(dirname "$0")/../.." && pwd)   # repo root (deploy/oracle/../..)
+test -f "$SRC/pyproject.toml" || { echo "refusing to deploy: $SRC is not the repo root" >&2; exit 1; }
 
+# Sync the repository root the script lives in, not the caller's working
+# directory, so `bash ~/path/deploy.sh` from anywhere builds the same tree.
+# proof/ is kept because the acquisition image re-verifies quotes against
+# proof/claim_ledger/captures at run time.
 rsync -a --delete \
-  --exclude .git --exclude .venv --exclude web --exclude proof \
+  --exclude .git --exclude .venv --exclude web \
   --exclude node_modules --exclude .pytest_cache \
-  ./ "$HOST:$APP_DIR/"
+  "$SRC/" "$HOST:$APP_DIR/"
 
 ssh "$HOST" "cd $APP_DIR && docker build -f deploy/oracle/Dockerfile.acquisition -t adi:current ."
 

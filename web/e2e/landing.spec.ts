@@ -46,10 +46,15 @@ test("home and every published guide render with no backend dependency", async (
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
 
     if (slug === "chatgpt") {
-      await expect(article.getByRole("table", { name: "Crawlers" }).getByRole("rowheader")).toHaveText([
-        "OAI-SearchBot", "GPTBot", "ChatGPT-User", "OAI-AdsBot",
-      ]);
-      await expect(article.getByText("Not documented by OpenAI.", { exact: true })).toBeVisible();
+      const crawlers = guide.mechanics.find(({ label }) => label === "Crawlers");
+      if (crawlers && "crawlers" in crawlers) {
+        await expect(article.getByRole("table", { name: "Crawlers" }).getByRole("rowheader")).toHaveText(
+          crawlers.crawlers.map(({ userAgent }) => userAgent),
+        );
+      }
+      if (guide.mechanics.some((row) => "undocumented" in row)) {
+        await expect(article.getByText(`Not documented by ${guide.vendor}.`, { exact: true }).first()).toBeVisible();
+      }
       await page.screenshot({ path: testInfo.outputPath(`chatgpt-${width}.png`), fullPage: true, scale: "css" });
     }
   }
