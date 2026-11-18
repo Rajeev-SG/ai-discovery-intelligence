@@ -23,6 +23,9 @@ test -f "$SRC/pyproject.toml" || { echo "refusing to deploy: $SRC is not the rep
 rsync -a --delete \
   --exclude .git --exclude .venv --exclude web \
   --exclude node_modules --exclude .pytest_cache \
+  --exclude "/proof/*" --include "/proof/claim_ledger/" \
+  --include "/proof/claim_ledger/captures/" --include "/proof/claim_ledger/captures/***" \
+  --exclude "/proof/**" \
   "$SRC/" "$HOST:$APP_DIR/"
 
 ssh "$HOST" "cd $APP_DIR && docker build -f deploy/oracle/Dockerfile.acquisition -t adi:current ."

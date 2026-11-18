@@ -30,7 +30,7 @@ Evidence, in the run logs `adi-run.sh` keeps under `/var/lib/ai-discovery/runs/`
 - 51 consecutive 209-byte logs after it, one per day, to
   `run-2026-11-17T061754Z.log`.
 
-## Why the image disappeared
+## Why the image most likely disappeared
 
 Docker's root is `/workspace/docker` on this host. `workspace-disk-guard.service`
 (`/usr/local/bin/workspace-disk-guard.sh`, installed **2026-09-27 15:12 UTC**,
@@ -49,7 +49,9 @@ repository CI step prunes images), and its install time sits inside the gap
 between the last success and the first failure. Journald keeps two boots and
 `/var/log/sysstat` keeps eight days, so the actual prune event is no longer on
 disk; the identification is by elimination plus the timestamp, and the mechanism
-is reproducible on demand.
+is reproducible on demand. Treat it as the most likely cause rather than a
+logged fact; if it recurs, capture `docker events` alongside the guard's output
+so the next occurrence is proven rather than inferred.
 
 ## Why nobody noticed for 51 days
 

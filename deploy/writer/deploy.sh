@@ -15,10 +15,10 @@ set -euo pipefail
 
 HOST=${1:-oracle}
 ROOT=/opt/adi-writer
-REPO=https://github.com/Rajeev-SG/ai-discovery-intelligence.git
+CLONE_URL=https://github.com/Rajeev-SG/ai-discovery-intelligence.git
 SRC=$(cd "$(dirname "$0")" && pwd)
-REPO=$(cd "$SRC/../.." && pwd)
-test -f "$REPO/pyproject.toml" || { echo "refusing to deploy: $REPO is not the repo root" >&2; exit 1; }
+REPO_ROOT=$(cd "$SRC/../.." && pwd)
+test -f "$REPO_ROOT/pyproject.toml" || { echo "refusing to deploy: $REPO_ROOT is not the repo root" >&2; exit 1; }
 
 ssh "$HOST" "sudo install -d -m 0755 $ROOT $ROOT/runner $ROOT/tools $ROOT/guard"
 
@@ -28,7 +28,7 @@ ssh "$HOST" "sudo rsync -a --delete /tmp/adi-writer-runner/ $ROOT/runner/ && \
 
 # The writing and review briefs are versioned with the pages. Keep a deploy-time
 # copy in the runner directory so a host can run before they reach main.
-rsync -a "$REPO/docs/WRITER_BRIEF.md" "$REPO/docs/WRITER_REVIEW.md" "$HOST:/tmp/"
+rsync -a "$REPO_ROOT/docs/WRITER_BRIEF.md" "$REPO_ROOT/docs/WRITER_REVIEW.md" "$HOST:/tmp/"
 ssh "$HOST" "sudo install -m 0644 /tmp/WRITER_BRIEF.md /tmp/WRITER_REVIEW.md $ROOT/runner/ && \
   sudo rm -f /tmp/WRITER_BRIEF.md /tmp/WRITER_REVIEW.md"
 
@@ -40,7 +40,7 @@ ssh "$HOST" "cd $ROOT/tools && sudo npm install --silent --no-audit --no-fund \
 # The writer edits and pushes from its own checkout, never the live deploy tree.
 ssh "$HOST" "set -e
   if [ ! -d $ROOT/checkout/.git ]; then
-    sudo git clone --quiet $REPO $ROOT/checkout
+    sudo git clone --quiet $CLONE_URL $ROOT/checkout
   fi
   sudo git -C $ROOT/checkout fetch --quiet origin main
   sudo git -C $ROOT/checkout checkout --quiet --detach origin/main

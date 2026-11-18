@@ -6,6 +6,13 @@ import { formatCheckedDate, loadSurfaceGuides } from "../lib/surface-guides";
 describe("editorial surface guides", () => {
   const guides = loadSurfaceGuides();
 
+  // These tests pin *structure*, not wording. Publishing is now partly
+  // machine-assisted (deploy/writer), so any assertion on exact action titles,
+  // change dates or source counts would fail on a legitimate content update and
+  // teach everyone to loosen it under pressure. What must not drift is the
+  // shape a reader depends on: the seven mechanics labels in order, at least
+  // three concrete actions, at least one dated change, and real source links.
+  // Exact prose is gated elsewhere, against evidence, before it can merge.
   it("loads the ChatGPT guide in the target's editorial order", () => {
     const guide = guides.get("chatgpt")!;
     expect(guide.vendor).toBe("OpenAI");
@@ -13,6 +20,8 @@ describe("editorial surface guides", () => {
       "When it searches", "Where results come from", "Crawlers",
       "Keeping a page out", "Shopping", "Ads", "Measurement",
     ]);
+    const crawlers = guide.mechanics[2];
+    expect("crawlers" in crawlers && crawlers.crawlers.length).toBeGreaterThan(0);
   });
 
   it("uses real source links and an unambiguous check date on published guides", () => {
