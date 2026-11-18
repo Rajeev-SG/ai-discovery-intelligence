@@ -17,12 +17,20 @@ HOST=${1:-oracle}
 ROOT=/opt/adi-writer
 REPO=https://github.com/Rajeev-SG/ai-discovery-intelligence.git
 SRC=$(cd "$(dirname "$0")" && pwd)
+REPO=$(cd "$SRC/../.." && pwd)
+test -f "$REPO/pyproject.toml" || { echo "refusing to deploy: $REPO is not the repo root" >&2; exit 1; }
 
 ssh "$HOST" "sudo install -d -m 0755 $ROOT $ROOT/runner $ROOT/tools $ROOT/guard"
 
 rsync -a --delete "$SRC/" "$HOST:/tmp/adi-writer-runner/"
 ssh "$HOST" "sudo rsync -a --delete /tmp/adi-writer-runner/ $ROOT/runner/ && \
   sudo chown -R root:root $ROOT/runner && sudo rm -rf /tmp/adi-writer-runner"
+
+# The writing and review briefs are versioned with the pages. Keep a deploy-time
+# copy in the runner directory so a host can run before they reach main.
+rsync -a "$REPO/docs/WRITER_BRIEF.md" "$REPO/docs/WRITER_REVIEW.md" "$HOST:/tmp/"
+ssh "$HOST" "sudo install -m 0644 /tmp/WRITER_BRIEF.md /tmp/WRITER_REVIEW.md $ROOT/runner/ && \
+  sudo rm -f /tmp/WRITER_BRIEF.md /tmp/WRITER_REVIEW.md"
 
 # Pinned toolchain. The writer never upgrades itself mid-run.
 ssh "$HOST" "cd $ROOT/tools && sudo npm install --silent --no-audit --no-fund \
@@ -44,9 +52,10 @@ ssh "$HOST" "sudo install -m 0644 /tmp/adi-writer.service /tmp/adi-writer.timer 
 
 # Fail loudly at deploy time rather than at 02:00 on Sunday.
 ssh "$HOST" 'set -e
-  test -f /etc/claude-writer/env || { echo "MISSING /etc/claude-writer/env (root, 0600)" >&2; exit 1; }
-  sudo test -f /etc/claude-writer/env
-  test -f /etc/ai-discovery/env || { echo "MISSING /etc/ai-discovery/env" >&2; exit 1; }
+  sudo test -f /etc/claude-writer/env || { echo "MISSING /etc/claude-writer/env (root, 0600)" >&2; exit 1; }
+  sudo stat -c "%U:%a" /etc/claude-writer/env | grep -qx "root:600" \
+    || { echo "/etc/claude-writer/env must be root:600" >&2; exit 1; }
+  sudo test -f /etc/ai-discovery/env || { echo "MISSING /etc/ai-discovery/env" >&2; exit 1; }
   test -x /opt/adi-writer/guard/merge-guard.sh || { echo "MISSING /opt/adi-writer/guard/merge-guard.sh" >&2; exit 1; }
   test -x /opt/adi-writer/tools/node_modules/.bin/claude || { echo "MISSING claude CLI" >&2; exit 1; }
   sudo -n systemctl is-active adi-db-tunnel.service >/dev/null || { echo "adi-db-tunnel is not running" >&2; exit 1; }

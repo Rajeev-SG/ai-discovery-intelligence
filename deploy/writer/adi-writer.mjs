@@ -30,6 +30,16 @@ const briefPath = "docs/WRITER_BRIEF.md";
 const reviewPath = "docs/WRITER_REVIEW.md";
 const home = { PATH: "/usr/local/bin:/usr/bin:/bin", HOME: "/root", GIT_TERMINAL_PROMPT: "0" };
 const read = (file) => fs.readFileSync(file, "utf8");
+
+// The briefs live in the checkout so they are versioned with the pages, but a
+// fresh host may run before they reach main. deploy.sh also drops a copy in the
+// runner directory; fall back to it rather than failing the run.
+function readBrief(name) {
+  for (const file of [path.join(checkout, name), path.join(root, "runner", path.basename(name))]) {
+    if (fs.existsSync(file)) return read(file);
+  }
+  throw new Error(`missing ${name}`);
+}
 const require = createRequire(process.env.ADI_WRITER_YAML ?? `${root}/tools/package.json`);
 const { parseDocument } = require("yaml");
 const credential = "!/usr/sbin/runuser -u ubuntu -- /usr/bin/gh auth git-credential";
@@ -328,7 +338,11 @@ function reconcile(slug, pending, state, notes, reviewBrief) {
     const merged = ghPR(pr.number);
     if (merged.state !== "MERGED") throw new Error("GitHub did not confirm merge");
     notes.changed.push(`${slug} — merged ${pr.url}; production deploy follows main.`);
-    return; // Reconcile the merged commit from origin/main on the next run.
+    // Later proposals in this run must be cut from the new main, not the head we
+    // started with, or the next PR could be based on a superseded tree.
+    git("fetch", "origin", "main");
+    git("checkout", "--detach", "origin/main");
+    return;
   }
   if (pr.state === "MERGED") {
     if (!pr.mergeCommit?.oid) throw new Error("merged PR missing commit");
@@ -402,8 +416,8 @@ async function updateGuides(notes) {
   const guides = fs.readdirSync(path.join(checkout, guideDir)).filter((file) => file.endsWith(".yaml"))
     .map((file) => file.slice(0, -5));
   const registry = JSON.parse(read(path.join(checkout, "web/lib/generated-registry.json")));
-  const brief = read(path.join(checkout, briefPath));
-  const reviewBrief = read(path.join(checkout, reviewPath));
+  const brief = readBrief(briefPath);
+  const reviewBrief = readBrief(reviewPath);
   const data = readLedger();
   if (!Number.isFinite(Date.parse(data.through))) throw new Error("ledger snapshot missing timestamp");
   notes.ledger = `Read ${data.claims.length} claims, ${data.events.length} change events and ${data.captures.length} captures.`;
@@ -531,6 +545,28 @@ function proveGate() {
 async function main() {
   if (process.argv[2] === "--prove-gate") {
     proveGate();
+    return;
+  }
+  // Reviewed on demand with the same independent pass the weekly run uses:
+  //   node adi-writer.mjs --review-pr <number>
+  // Records evidence for the current head and prints the guard's answer.
+  if (process.argv[2] === "--review-pr") {
+    const number = Number(process.argv[3]);
+    if (!Number.isInteger(number) || number <= 0) throw new Error("--review-pr needs a PR number");
+    const pr = ghPR(number);
+    if (pr.state !== "OPEN") throw new Error(`PR ${number} is ${pr.state}`);
+    const reviewBrief = readBrief(reviewPath);
+    const diff = gh(["pr", "diff", String(number), "--repo", repo]).stdout;
+    if (!diff.trim()) throw new Error("empty diff");
+    const review = reviewDiff(
+      `${reviewBrief}\n\nThis is pull request ${pr.url} in ${repo}, at head ${pr.headRefOid}.\n\nDiff:\n${diff}`,
+    );
+    const recorded = recordReview(number, review.verdict, review.findings);
+    console.log(`review: ${review.verdict}\n${review.findings}`);
+    console.log(`record: ${recorded.stdout.trim()}`);
+    const guard = mergeGuard(number);
+    console.log(`guard: ${guard.code} ${guard.payload.status} ${guard.payload.message}`);
+    if (guard.code !== 0) process.exitCode = 1;
     return;
   }
   const notes = { calls: 0, changed: [], held: [], failures: [] };
