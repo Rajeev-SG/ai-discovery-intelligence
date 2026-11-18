@@ -6,7 +6,11 @@ brand can show up, what levers it has and what to measure. State the market,
 product mode and eligibility conditions where they matter. Keep the existing
 page structure and work only on the surface named in the request.
 
-- **Summary** gives the current picture in at most 350 characters.
+- **Summary** gives the current picture in at most 350 characters. A number
+  earns its place only if a buyer can act on it: say what is measured ("share of
+  chats", "share of referred visits"), for which period, and from which named
+  third party. Prefer a dated or stable page to a dashboard whose figures move
+  every month; if the only support is a live dashboard, leave the figure out.
 - **What to do** gives three to five concrete actions. Name the setting, feed,
   tag, buying route or measurement step and explain who should use it. Titles
   are at most 105 characters and descriptions 260. Omit generic SEO advice.
