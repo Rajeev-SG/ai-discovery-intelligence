@@ -25,6 +25,18 @@ export function sourceUrl(value) {
   return url;
 }
 
+const botBlockingHosts = new Set([
+  "help.openai.com", "openai.com", "perplexity.ai", "www.perplexity.ai", "x.ai",
+]);
+
+export function sourceReachability(hostname, status) {
+  if (/^2\d\d$/.test(status)) return "reachable";
+  if (botBlockingHosts.has(hostname) && ["401", "403", "429"].includes(status)) {
+    return "reachable, blocked";
+  }
+  return null;
+}
+
 function length(array, min, max, section) {
   requireGate(Array.isArray(array) && array.length >= min && array.length <= max,
     `schema or length budget at ${section}`);

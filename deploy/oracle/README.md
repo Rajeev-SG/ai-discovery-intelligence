@@ -80,12 +80,11 @@ Oracle-only" signal. `api_evidence_items` is read from the live evidence API,
 so it proves the end-to-end path (capture → extraction → ledger → API), not
 just container health.
 
-`adi:current` is built here and never pulled. If it is missing, `adi-run.sh`
-now fails loudly in the first second, records `IMAGE_MISSING` and the reason in
-`latest.json`, and the unit's `OnFailure=` starts `adi-alert@`. That check exists
-because a pruned image plus a misplaced `OnFailure=` meant 51 daily runs failed
-unnoticed; see
-[`docs/INCIDENT_2026-09-28_ACQUISITION_OUTAGE.md`](../../docs/INCIDENT_2026-09-28_ACQUISITION_OUTAGE.md).
+`adi:current` carries the `keep=true` label so the Oracle disk guard skips
+it. If the image is missing, `adi-run.sh` rebuilds it from the deployed tree
+at `/opt/ai-discovery/app` before acquisition. A failed build leaves its
+output in the run log, records the exit status in `latest.json`, and triggers
+the unit's `OnFailure=` alert.
 
 ## Weekly field-guide writer
 

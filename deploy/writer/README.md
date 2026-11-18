@@ -63,8 +63,9 @@ The proposal never reaches git unless all of these hold:
   `provenance`, `pipeline`, `ingestion`, `embeddings`, `retrieval taxonomy`);
 - "Not documented by `<vendor>`" is the only way the page may express an
   unknown;
-- every source URL is public HTTPS and returns 2xx (SSRF-checked: resolve
-  first, then connect only to that address);
+- every source URL is public HTTPS and returns 2xx or, on a listed official
+  bot-blocking host, 401/403/429. Each hop is DNS-checked and pinned to a
+  public address. The link check is separate from Claude fetch attribution;
 - every new or changed statement appears in the structured `attributions`
   field, and every URL it names was re-fetched in that same call and is dated
   today.

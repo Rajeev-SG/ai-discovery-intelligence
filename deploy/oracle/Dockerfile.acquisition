@@ -35,4 +35,6 @@ COPY scripts ./scripts
 COPY proof/claim_ledger/captures ./proof/claim_ledger/captures
 RUN uv sync --frozen --no-dev --all-extras
 
+LABEL keep=true
+
 CMD ["dagster", "job", "execute", "-m", "ai_discovery.pipeline", "-j", "acquisition_job"]
