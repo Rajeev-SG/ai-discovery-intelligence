@@ -1,7 +1,7 @@
 name: "Microsoft Copilot"
 vendor: "Microsoft"
 region: "global"
-summary: "Consumer Copilot can use web results in its answers, show products and let eligible shoppers check out. Bing Webmaster Tools reports citations across several Microsoft AI experiences, including Copilot."
+summary: "Consumer Copilot can use web results in its answers, show products and let eligible shoppers check out. Bing Webmaster Tools reports citations across several Microsoft AI experiences, including Copilot. Statcounter reports a 2.18% worldwide AI chatbot share for Copilot in October 2026."
 actions:
   - title: "Track cited pages in Bing Webmaster Tools"
     description: "Open AI Performance and compare total citations and the pages cited over time. The data combines supported Microsoft experiences and select partners."
@@ -47,3 +47,9 @@ sources:
   - title: "Microsoft Advertising — Offer Highlights"
     url: https://about.ads.microsoft.com/en/blog/post/april-2026/win-across-all-three-eras-of-the-web
     checked: 2026-11-17
+  - title: "Statcounter — AI chatbot market share"
+    url: https://gs.statcounter.com/ai-chatbot-market-share
+    checked: 2026-11-18
+attributions:
+  summary:
+    - https://gs.statcounter.com/ai-chatbot-market-share
