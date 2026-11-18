@@ -22,7 +22,13 @@ test("home and every published guide render with no backend dependency", async (
     "Where brands show up in AI answers, shopping recommendations and ads.",
   );
   const nav = page.getByRole("navigation", { name: "AI surfaces" });
-  await expect(page.getByRole("navigation")).toHaveCount(1);
+  // The site header is a second landmark; on a phone its links sit behind
+  // the disclosure control, so it is asserted by name rather than by count.
+  await expect(nav).toHaveCount(1);
+  await expect(page.getByTestId("site-header").getByRole("link", { name: "Rajeev Gill" })).toHaveAttribute(
+    "href",
+    "https://rajeevg.com",
+  );
   await expect(nav.getByRole("link")).toHaveCount(guides.size);
   await expect(page.locator('a[href^="/pov"], a[href^="/reconciliation"], a[href^="/implications"], a[href^="/landscape"]')).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
@@ -78,4 +84,55 @@ test("visitors can open guides and see why some surfaces are coming soon", async
   await expect(page).toHaveURL(/\/surfaces\/naver-ai$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("NAVER AI Tab");
   expect((await page.goto("/surfaces/not-in-the-directory"))?.status()).toBe(404);
+});
+
+test("the rajeevg.com header frames the page at desktop and mobile widths", async ({ page }, testInfo) => {
+  const width = testInfo.project.name === "mobile-chromium" ? 390 : 1440;
+  await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
+  await page.goto("/surfaces/chatgpt");
+
+  const header = page.getByTestId("site-header");
+  await expect(header).toBeVisible();
+  await expect(header.getByRole("link", { name: "Rajeev Gill" })).toHaveAttribute(
+    "href",
+    "https://rajeevg.com",
+  );
+
+  const expected = [
+    ["Home", "https://rajeevg.com/"],
+    ["Solutions", "https://rajeevg.com/solutions"],
+    ["Interfaces", "https://rajeevg.com/interfaces"],
+    ["Writing", "https://rajeevg.com/blog"],
+    ["About", "https://rajeevg.com/about"],
+  ] as const;
+
+  if (width === 390) {
+    // The nav collapses behind the disclosure control on a phone.
+    await expect(header.getByRole("navigation", { name: "Primary navigation" })).toBeHidden();
+    await header.locator("summary").click();
+    const mobile = header.getByRole("navigation", { name: "Mobile navigation" });
+    for (const [name, href] of expected) {
+      await expect(mobile.getByRole("link", { name })).toHaveAttribute("href", href);
+    }
+    await expect(mobile.getByRole("link", { name: "Solutions" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+  } else {
+    const nav = header.getByRole("navigation", { name: "Primary navigation" });
+    for (const [name, href] of expected) {
+      await expect(nav.getByRole("link", { name, exact: true })).toHaveAttribute("href", href);
+    }
+    await expect(nav.getByRole("link", { name: "Solutions" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+  }
+
+  // The header must not push the page sideways at either width.
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
+  await page.screenshot({
+    path: testInfo.outputPath(`header-${width}.png`),
+    clip: { x: 0, y: 0, width, height: 160 },
+  });
 });
