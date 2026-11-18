@@ -195,7 +195,12 @@ async function askClaude(input, allowed) {
   });
   if (status !== 0 || final?.subtype !== "success" || final.is_error || !final.structured_output) {
     const subtype = /^[a-z_]{1,50}$/.test(final?.subtype ?? "") ? final.subtype : "no structured result";
-    throw new Error(`Claude did not complete (${subtype})`);
+    // Say why: a missing structured_output is usually a refusal or a truncated
+    // answer, and the first 160 characters of the text distinguish them.
+    const why = final?.is_error ? "error result"
+      : final?.structured_output ? ""
+        : `no structured output; said: ${String(final?.result ?? "").slice(0, 160)}`;
+    throw new Error(`Claude did not complete (${subtype}${why ? `; ${why}` : ""})`);
   }
   return { ...final.structured_output, verified };
 }
