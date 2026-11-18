@@ -37,7 +37,9 @@ const read = (file) => fs.readFileSync(file, "utf8");
 // fresh host may run before they reach main. deploy.sh also drops a copy in the
 // runner directory; fall back to it rather than failing the run.
 function readBrief(name) {
-  for (const file of [path.join(checkout, name), path.join(root, "runner", path.basename(name))]) {
+  // The deployed copy wins: it ships with the code that reads it, while the
+  // checkout may lag behind main until a content PR merges.
+  for (const file of [path.join(root, "runner", path.basename(name)), path.join(checkout, name)]) {
     if (fs.existsSync(file)) return read(file);
   }
   throw new Error(`missing ${name}`);

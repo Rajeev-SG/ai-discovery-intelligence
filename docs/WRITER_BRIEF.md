@@ -20,6 +20,9 @@ page structure and work only on the surface named in the request.
   expression of uncertainty is “Not documented by <vendor>”.
 - **Recent changes that matter** gives one to five dated changes and what each
   changes for a media buyer. Limit each change and reason to 180 characters.
+  Every new or changed fact belongs here as a dated entry: if you add a figure
+  to the summary, say in this section what changed and what a buyer should do
+  differently because of it.
 - **Sources** lists at most 12 pages. Prefer official product documentation,
   help pages and release notes. Attribute vendor statements to the vendor.
   Separate consumer features from API features. If sources disagree, report
@@ -38,6 +41,12 @@ Use zero-based dotted field paths, for example `summary`,
 `actions.0.description`, `mechanics.2.crawlers.0.blocked` or `changes.0.why`.
 Preserve attributions for unchanged statements and keep them aligned if rows
 move. Both the source list and the fetches must include every referenced URL.
+Change only what the evidence requires. Do not fix wording, tighten phrasing or
+drop qualifiers in sentences the evidence did not touch; an unexplained edit is
+reviewed as unsupported and blocks the change. Name every metric exactly (time
+spent per user, share of chats, share of referred visits) and never write a bare
+percentage or an ambiguous phrase such as "average use".
+
 Describe the product using plain language. Keep acquisition and processing
 terminology out of every section.
 

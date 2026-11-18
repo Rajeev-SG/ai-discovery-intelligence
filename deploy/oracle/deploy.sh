@@ -18,14 +18,13 @@ test -f "$SRC/pyproject.toml" || { echo "refusing to deploy: $SRC is not the rep
 
 # Sync the repository root the script lives in, not the caller's working
 # directory, so `bash ~/path/deploy.sh` from anywhere builds the same tree.
-# proof/ is kept because the acquisition image re-verifies quotes against
-# proof/claim_ledger/captures at run time.
+# proof/ is synced whole (~6 MB). The acquisition image re-verifies quotes
+# against proof/claim_ledger/captures at run time, and an rsync include/exclude
+# filter for just that subtree is easy to get wrong: rules are first-match-wins,
+# so a leading exclude silently drops the captures and the image build fails.
 rsync -a --delete \
   --exclude .git --exclude .venv --exclude web \
   --exclude node_modules --exclude .pytest_cache \
-  --exclude "/proof/*" --include "/proof/claim_ledger/" \
-  --include "/proof/claim_ledger/captures/" --include "/proof/claim_ledger/captures/***" \
-  --exclude "/proof/**" \
   "$SRC/" "$HOST:$APP_DIR/"
 
 ssh "$HOST" "cd $APP_DIR && docker build -f deploy/oracle/Dockerfile.acquisition -t adi:current ."
