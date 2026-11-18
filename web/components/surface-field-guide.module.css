@@ -41,6 +41,49 @@
   align-items: stretch;
 }
 
+/* Desktop: the pill row. Hidden under 640px, where it is a wall of chips that
+   pushes the guide below the fold. */
+.pillList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: stretch;
+  flex: 1 1 auto;
+}
+
+/* Phone: one labelled native select, shown only under 640px. */
+.picker { display: none; }
+
+.pickerLabel {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pickerSelect {
+  width: 100%;
+  min-height: 44px;
+  appearance: none;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background-color: #f7f8fa;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%235b6470' stroke-width='2'%3E%3Cpath d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding: 10px 38px 10px 14px;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .pillList { display: none; }
+  .picker { display: grid; gap: 6px; }
+}
+
 .pill {
   display: inline-flex;
   flex-direction: column;

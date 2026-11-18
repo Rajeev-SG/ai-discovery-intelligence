@@ -2,6 +2,16 @@
 
 This file records repository/product changes. The generated intelligence changelog will live separately in the canonical data store and `pov/CHANGELOG.md` once implemented.
 
+## 2026-11-18 (mobile surface switcher)
+
+- **The surface switcher stops eating the first screen on a phone.** At 390px
+  the pill row was 21 chips stacked into 424px and pushed the guide heading to
+  y=579. Below 640px it is now one native `<select>` labelled "AI surface" that
+  navigates on change, with coming-soon surfaces as a disabled optgroup; desktop
+  keeps the pill links and their `aria-current`. Switcher height drops 424px →
+  67px and the heading moves to y=223. Proof: `web/e2e/landing.spec.ts` (width-
+  aware switcher tests plus an above-the-fold guard) at 390 and 1440.
+
 ## 2026-11-18 (site header)
 
 - **rajeevg.com site header on every page.** The app is proxied under
