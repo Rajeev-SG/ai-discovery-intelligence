@@ -10,7 +10,8 @@ import fs from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { validateGuide } from "./writer-gates.mjs";
+import assert from "node:assert/strict";
+import { sourceReachability, validateGuide } from "./writer-gates.mjs";
 
 const checkout = process.env.ADI_WRITER_CHECKOUT ?? "/opt/adi-writer/checkout";
 // yaml comes from the deployed toolchain on the host, or from web/ in a dev tree.
@@ -34,6 +35,24 @@ const rechecked = (guide) => ({
 });
 
 const cases = [
+  ["official bot-blocking hosts are reachable on 401, 403 or 429", () => {
+    for (const host of ["help.openai.com", "openai.com", "perplexity.ai", "www.perplexity.ai", "x.ai"]) {
+      for (const status of ["401", "403", "429"]) {
+        assert.equal(sourceReachability(host, status), "reachable, blocked");
+      }
+    }
+  }, true],
+  ["broken links and blocks on unlisted hosts fail", () => {
+    for (const status of ["000", "404", "410", "500", "503"]) {
+      assert.equal(sourceReachability("x.ai", status), null);
+    }
+    for (const host of ["x.ai.example.com", "other.x.ai", "example.com"]) {
+      for (const status of ["401", "403", "429"]) {
+        assert.equal(sourceReachability(host, status), null);
+      }
+    }
+    assert.equal(sourceReachability("example.com", "200"), "reachable");
+  }, true],
   ["unchanged guide is accepted",
     () => validateGuide(clone(), prev, new Set(), urls, new Set(), today), true],
   ["attributed change on a freshly fetched source is accepted", () => {

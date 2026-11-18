@@ -14,7 +14,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { isDeepStrictEqual } from "node:util";
 import { planGuide } from "./writer-changes.mjs";
-import { sourceUrl, validateGuide } from "./writer-gates.mjs";
+import { sourceReachability, sourceUrl, validateGuide } from "./writer-gates.mjs";
 
 const root = "/opt/adi-writer";
 const checkout = process.env.ADI_WRITER_CHECKOUT ?? `${root}/checkout`;
@@ -129,7 +129,8 @@ async function checkLink(value) {
       "--write-out", "%{http_code}\n%{redirect_url}", "--", url.href,
     ]);
     const [status, redirect] = stdout.split("\n");
-    if (/^2\d\d$/.test(status)) return;
+    const reachability = sourceReachability(url.hostname, status);
+    if (reachability) return reachability;
     if (!/^3\d\d$/.test(status) || !redirect) throw new Error(`source returned HTTP ${status}`);
     value = redirect;
   }

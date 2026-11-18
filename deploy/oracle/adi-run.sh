@@ -16,6 +16,7 @@ STATUS_DIR=$STATE_DIR/status
 LOG_DIR=$STATE_DIR/runs
 ENV_FILE=/etc/ai-discovery/env
 IMAGE=adi:current
+APP_DIR=/opt/ai-discovery/app
 API_HEALTH_URL=${ADI_API_HEALTH_URL:-http://iyercyduhzplx2m7ldqqz0cp.89.167.5.185.sslip.io/health}
 # The non-root adi-worker account on Hetzner, over the tailnet on port 2222. The
 # default :22 is served by Tailscale SSH (interactive browser auth), unusable by
@@ -48,32 +49,22 @@ aborted() {
 }
 trap aborted EXIT
 
-# Preflight: adi:current is built on this host by deploy/oracle/deploy.sh and is
-# never pulled. Before this check, a pruned image made every scheduled run exit
-# in under a second with the reason only in a run log, and OnFailure was in the
-# wrong systemd section, so 51 daily runs failed unnoticed (Sep 28 – Nov 17
-# 2026). Fail loudly, record it twice, and never try to pull.
+run_rc=0
 if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
-  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) IMAGE_MISSING image=$IMAGE action=rebuild" \
-    >>"$STATUS_DIR/failures.log"
-  tmp="$STATUS_DIR/.latest.json.tmp"
-  printf '{"started_at": "%s", "finished_at": "%s", "ok": 0, "run_exit": 125, "replicated": 0, "api_evidence_items": -1, "error": "image_missing", "log": "%s"}\n' \
-    "$started" "$started" "$log" >"$tmp"
-  mv "$tmp" "$STATUS_DIR/latest.json"
-  wrote_status=1
-  echo "FATAL: Docker image '$IMAGE' is missing locally; refusing to pull." >&2
-  echo "Rebuild it with deploy/oracle/deploy.sh and rerun adi-run.service." >&2
-  exit 1
+  echo "Docker image $IMAGE is missing locally; rebuilding from $APP_DIR." >>"$log"
+  docker build -f "$APP_DIR/deploy/oracle/Dockerfile.acquisition" -t "$IMAGE" "$APP_DIR" \
+    >>"$log" 2>&1 || run_rc=$?
 fi
 
-run_rc=0
-docker run --pull=never --rm --name adi-run \
-  --network host \
-  --env-file "$ENV_FILE" \
-  --memory 6g --cpus 2 \
-  -v "$STATE_DIR":/data \
-  "$IMAGE" \
-    >>"$log" 2>&1 || run_rc=$?
+if [ "$run_rc" -eq 0 ]; then
+  docker run --pull=never --rm --name adi-run \
+    --network host \
+    --env-file "$ENV_FILE" \
+    --memory 6g --cpus 2 \
+    -v "$STATE_DIR":/data \
+    "$IMAGE" \
+      >>"$log" 2>&1 || run_rc=$?
+fi
 
 # Durable-state replication: the private snapshot store is the only state the
 # worker owns; the ledger/claims live in the Hetzner Postgres. A failed
